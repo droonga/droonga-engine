@@ -6,7 +6,7 @@ module Fluent
   class SocketIOOutput < Output
     Plugin.register_output('socket_io', self)
 
-    config_param :dest, :string, :default => "http://localhost:3000"
+    config_param :dest, :string, :default => "http://localhost"
 
     def configure(conf)
       super
