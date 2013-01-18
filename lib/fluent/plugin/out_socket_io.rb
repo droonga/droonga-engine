@@ -1,3 +1,5 @@
+# -*- mode: ruby; coding: utf-8 -*-
+
 require 'SocketIO'
 
 module Fluent
