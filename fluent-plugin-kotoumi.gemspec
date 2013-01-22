@@ -12,5 +12,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_dependency "fluentd"
+  gem.add_dependency "groonga"
   gem.add_dependency "socketio-client"
 end
