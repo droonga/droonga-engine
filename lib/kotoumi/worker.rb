@@ -17,9 +17,8 @@
 
 require 'groonga'
 
-module Fluent
   module Kotoumi
-    class Session
+    class Worker
       def initialize(database, queuename)
         Groonga::Database.open(database)
         @ctx = Groonga::Context.default
@@ -42,4 +41,3 @@ module Fluent
       end
     end
   end
-end

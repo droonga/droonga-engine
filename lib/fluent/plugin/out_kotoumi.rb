@@ -21,8 +21,7 @@ module Fluent
   class KotoumiOutput < Output
     Plugin.register_output('kotoumi', self)
 
-    require 'fluent/plugin/kotoumi'
-    include Kotoumi
+    require 'kotoumi/worker'
 
     config_param :database, :string, :default => "kotoumi.db"
     config_param :queuename, :string, :default => "KotoumiQueue"
@@ -30,7 +29,7 @@ module Fluent
     def start
       super
       # prefork @workers
-      @session = Session.new(@database, @queuename)
+      @session = Kotoumi::Worker.new(@database, @queuename)
       @outputs = {}
     end
 
