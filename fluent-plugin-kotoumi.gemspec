@@ -30,4 +30,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency "fluentd"
   gem.add_dependency "rroonga"
   gem.add_dependency "socketio-client"
+  gem.add_development_dependency "test-unit"
 end
