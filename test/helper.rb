@@ -31,11 +31,11 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'fluent/test'
 unless ENV.has_key?('VERBOSE')
   null_logger = Object.new
-  null_logger.instance_eval {|obj|
+  null_logger.instance_eval do |obj|
     def method_missing(method, *args)
       # pass
     end
-  }
+  end
   $log = null_logger
 end
 
