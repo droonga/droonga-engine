@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- mode: ruby; coding: utf-8 -*-
 #
 # Copyright (C) 2013 Kotoumi project
 #

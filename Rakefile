@@ -1,3 +1,5 @@
+# -*- ruby -*-
+#
 # Copyright (C) 2013 Kotoumi project
 #
 # This library is free software; you can redistribute it and/or
