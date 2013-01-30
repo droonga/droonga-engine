@@ -24,12 +24,12 @@ module Fluent
     Plugin.register_output("kotoumi", self)
 
     config_param :database, :string, :default => "kotoumi.db"
-    config_param :queuename, :string, :default => "KotoumiQueue"
+    config_param :queue_name, :string, :default => "KotoumiQueue"
 
     def start
       super
       # prefork @workers
-      @worker = Kotoumi::Worker.new(@database, @queuename)
+      @worker = Kotoumi::Worker.new(@database, @queue_name)
       @outputs = {}
     end
 
