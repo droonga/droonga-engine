@@ -15,7 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require 'SocketIO'
+require "socket"
+require "msgpack"
 require 'kotoumi/worker'
 
 module Fluent
@@ -35,7 +36,7 @@ module Fluent
     def shutdown
       super
       @outputs.each do |dest, socket|
-        socket.disconnect
+        socket.close
       end
     end
 
@@ -64,16 +65,14 @@ module Fluent
     end
 
     def post(dest, tag, result)
-      post_socket_io(dest, tag, result)
-    end
-
-    def post_socket_io(dest, tag, result)
       unless @outputs[dest]
-        uri = 'http://' + dest
-        socket = SocketIO.connect(uri, sync: true)
+        host, port = dest.split(/:/, 2)
+        port = Integer(port)
+        socket = TCPSocket.new(host, port)
         @outputs[dest] = socket
       end
-      @outputs[dest].emit(tag, result)
+      data = {"tag" => tag, "data" => result}.to_msgpack
+      @outputs[dest].write(data)
     end
   end
 end
