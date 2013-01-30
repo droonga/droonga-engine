@@ -25,7 +25,7 @@ module Kotoumi
       @queuename = queuename
     end
 
-    def process_message(tag, time, record)
+    def process_message(record)
       return {
         "main-search-result" => {
           startTime: "2001-08-02T10:45:23.5+09:00",

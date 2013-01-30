@@ -54,7 +54,7 @@ module Fluent
     end
 
     def exec(tag, time, record)
-      result = @worker.process_message(tag, time, record)
+      result = @worker.process_message(record)
       if record["replyTo"]
         post(record["replyTo"], tag, {
                inReplyTo: record["id"],
