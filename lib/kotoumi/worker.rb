@@ -22,7 +22,7 @@ module Kotoumi
     def initialize(database, queue_name)
       Groonga::Database.open(database)
       @ctx = Groonga::Context.default
-      @queuename = queue_name
+      @queue_name = queue_name
     end
 
     def process_message(record)
