@@ -35,6 +35,7 @@ module Fluent
 
     def shutdown
       super
+      @worker.shutdown
       @outputs.each do |dest, socket|
         socket.close
       end

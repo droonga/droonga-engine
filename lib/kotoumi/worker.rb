@@ -20,9 +20,16 @@ require 'groonga'
 module Kotoumi
   class Worker
     def initialize(database, queue_name)
-      Groonga::Database.open(database)
+      @database = Groonga::Database.open(database)
       @ctx = Groonga::Context.default
       @queue_name = queue_name
+    end
+
+    def shutdown
+      @database.close
+      @ctx.close
+      @database = @ctx = nil
+      Groonga::Context.default = nil
     end
 
     def process_message(record)
