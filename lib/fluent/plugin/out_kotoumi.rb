@@ -28,7 +28,7 @@ module Fluent
     def start
       super
       # prefork @workers
-      @session = Kotoumi::Worker.new(@database, @queuename)
+      @worker = Kotoumi::Worker.new(@database, @queuename)
       @outputs = {}
     end
 
@@ -53,7 +53,7 @@ module Fluent
     end
 
     def exec(tag, time, record)
-      result = @session.process_message(tag, time, record)
+      result = @worker.process_message(tag, time, record)
       if record["replyTo"]
         post(record["replyTo"], tag, {
                inReplyTo: record["id"],
