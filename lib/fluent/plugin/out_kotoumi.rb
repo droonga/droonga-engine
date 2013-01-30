@@ -17,11 +17,11 @@
 
 require "socket"
 require "msgpack"
-require 'kotoumi/worker'
+require "kotoumi/worker"
 
 module Fluent
   class KotoumiOutput < Output
-    Plugin.register_output('kotoumi', self)
+    Plugin.register_output("kotoumi", self)
 
     config_param :database, :string, :default => "kotoumi.db"
     config_param :queuename, :string, :default => "KotoumiQueue"
@@ -58,7 +58,7 @@ module Fluent
       if record["replyTo"]
         post(record["replyTo"], tag, {
                inReplyTo: record["id"],
-               type: (record["type"] || "") + '.result',
+               type: (record["type"] || "") + ".result",
                body: result
              })
       end
