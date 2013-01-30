@@ -29,7 +29,9 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.add_dependency "fluentd"
   gem.add_dependency "rroonga"
-  gem.add_dependency "socketio-client"
+  gem.add_dependency "msgpack"
+  gem.add_development_dependency "rake"
+  gem.add_development_dependency "bundler"
   gem.add_development_dependency "test-unit"
   gem.add_development_dependency "test-unit-notify"
 end
