@@ -16,12 +16,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require 'SocketIO'
+require 'kotoumi/worker'
 
 module Fluent
   class KotoumiOutput < Output
     Plugin.register_output('kotoumi', self)
-
-    require 'kotoumi/worker'
 
     config_param :database, :string, :default => "kotoumi.db"
     config_param :queuename, :string, :default => "KotoumiQueue"
