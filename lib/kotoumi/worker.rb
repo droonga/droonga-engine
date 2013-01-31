@@ -52,12 +52,19 @@ module Kotoumi
     def search_query(query)
       start_time = Time.now
       source = @context[query["source"]]
-      attributes = source.columns.collect do |column|
+      columns = source.columns
+      attributes = columns.collect do |column|
         {
           "name" => column.local_name,
           "type" => column.range.name,
           "vector" => column.vector?,
         }
+      end
+      column_names = columns.collect(&:local_name)
+      records = source.collect do |record|
+        column_names.collect do |name|
+          record[name]
+        end
       end
       elapsed_time = Time.now.to_f - start_time.to_f
 
@@ -65,7 +72,8 @@ module Kotoumi
         "count" => source.size,
         "startTime" => start_time.iso8601,
         "elapsedTime" => elapsed_time,
-        "attributes" => attributes
+        "attributes" => attributes,
+        "records" => records,
       }
     end
   end

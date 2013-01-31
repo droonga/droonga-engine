@@ -63,6 +63,44 @@ class WorkerTest < Test::Unit::TestCase
             {"name" => "content", "type" => "Text",      "vector" => false},
             {"name" => "title",   "type" => "ShortText", "vector" => false},
           ],
+          "records" => [
+            [
+              "Groonga is a fast and accurate full text search engine based on inverted index. One of the characteristics of groonga is that a newly registered document instantly appears in search results. Also, groonga allows updates without read locks. These characteristics result in superior performance on real-time applications.",
+              "Groonga overview",
+            ],
+            [
+              "In widely used DBMSs, updates are immediately processed, for example, a newly registered record appears in the result of the next query. In contrast, some full text search engines do not support instant updates, because it is difficult to dynamically update inverted indexes, the underlying data structure.",
+              "Full text search and Instant update",
+            ],
+            [
+              "People can collect more than enough data in the Internet era. However, it is difficult to extract informative knowledge from a large database, and such a task requires a many-sided analysis through trial and error. For example, search refinement by date, time and location may reveal hidden patterns. Aggregate queries are useful to perform this kind of tasks.",
+              "Column store and aggregate query",
+            ],
+            [
+              "An inverted index is a traditional data structure used for large-scale full text search. A search engine based on inverted index extracts index terms from a document when it is added. Then in retrieval, a query is divided into index terms to find documents containing those index terms. In this way, index terms play an important role in full text search and thus the way of extracting index terms is a key to a better search engine.",
+              "Inverted index and tokenizer",
+            ],
+            [
+              "Multi-core processors are mainstream today and the number of cores per processor is increasing. In order to exploit multiple cores, executing multiple queries in parallel or dividing a query into sub-queries for parallel processing is becoming more important.",
+              "Sharable storage and read lock-free",
+            ],
+            [
+              "Location services are getting more convenient because of mobile devices with GPS. For example, if you are going to have lunch or dinner at a nearby restaurant, a local search service for restaurants may be very useful, and for such services, fast geo-location search is becoming more important.",
+              "Geo-location (latitude and longitude) search",
+            ],
+            [
+              "The basic functions of groonga are provided in a C library and any application can use groonga as a full text search engine or a column-oriented database. Also, libraries for languages other than C/C++, such as Ruby, are provided in related projects. See related projects for details.",
+              "Groonga library",
+            ],
+            [
+              "Groonga provides a built-in server command which supports HTTP, the memcached binary protocol and the groonga query transfer protocol (gqtp). Also, a groonga server supports query caching, which significantly reduces response time for repeated read queries. Using this command, groonga is available even on a server that does not allow you to install new libraries.",
+              "Groonga server",
+            ],
+            [
+              "Groonga works not only as an independent column-oriented DBMS but also as storage engines of well-known DBMSs. For example, mroonga is a MySQL pluggable storage engine using groonga. By using mroonga, you can use groonga for column-oriented storage and full text search. A combination of a built-in storage engine, MyISAM or InnoDB, and a groonga-based full text search engine is also available. All the combinations have good and bad points and the best one depends on the application. See related projects for details.",
+              "Groonga storage engine",
+            ],
+          ],
         },
       }
       actual = @worker.process_message(request)
