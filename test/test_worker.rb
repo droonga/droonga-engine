@@ -59,7 +59,11 @@ class WorkerTest < Test::Unit::TestCase
           "startTime" => start_time,
           "elapsedTime" => elapsed_time,
           "count" => 9,
-        }
+          "attributes" => [
+            {"name" => "content", "type" => "Text",      "vector" => false},
+            {"name" => "title",   "type" => "ShortText", "vector" => false},
+          ],
+        },
       }
       actual = @worker.process_message(request)
       assert_equal(expected, normalize_result_set(actual))
