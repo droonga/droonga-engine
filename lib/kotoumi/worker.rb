@@ -15,6 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "time"
+
 require 'groonga'
 
 module Kotoumi
@@ -48,9 +50,13 @@ module Kotoumi
     end
 
     def search_query(query)
+      start_time = Time.now
       source = @context[query["source"]]
+      elapsed_time = Time.now.to_f - start_time.to_f
       {
         "count" => source.size,
+        "startTime" => start_time.iso8601,
+        "elapsedTime" => elapsed_time,
       }
     end
   end

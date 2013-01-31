@@ -56,11 +56,35 @@ class WorkerTest < Test::Unit::TestCase
       }
       expected = {
         "sections" => {
+          "startTime" => start_time,
+          "elapsedTime" => elapsed_time,
           "count" => 9,
         }
       }
-      assert_equal(expected,
-                   @worker.process_message(request))
+      actual = @worker.process_message(request)
+      assert_equal(expected, normalize_result_set(actual))
+    end
+
+    private
+    def start_time
+      "2013-01-31T14:34:47+09:00"
+    end
+
+    def elapsed_time
+      0.01
+    end
+
+    def normalize_result_set(result_set)
+      normalized_result_set = copy_deeply(result_set)
+      normalized_result_set.each do |name, result|
+        result["startTime"] = start_time if result["startTime"]
+        result["elapsedTime"] = elapsed_time if result["elapsedTime"]
+      end
+      normalized_result_set
+    end
+
+    def copy_deeply(object)
+      Marshal.load(Marshal.dump(object))
     end
   end
 end
