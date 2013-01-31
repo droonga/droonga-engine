@@ -25,8 +25,8 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-require 'test-unit'
-require 'test/unit/notify'
+require "test-unit"
+require "test/unit/notify"
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
