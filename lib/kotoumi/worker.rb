@@ -20,30 +20,37 @@ require 'groonga'
 module Kotoumi
   class Worker
     def initialize(database, queue_name)
-      @database = Groonga::Database.open(database)
-      @ctx = Groonga::Context.default
+      @context = Groonga::Context.new
+      @database = @context.open_database(database)
       @queue_name = queue_name
     end
 
     def shutdown
       @database.close
-      @ctx.close
-      @database = @ctx = nil
-      Groonga::Context.default = nil
+      @context.close
+      @database = @context = nil
     end
 
-    def process_message(record)
-      return {
-        "main-search-result" => {
-          startTime: "2001-08-02T10:45:23.5+09:00",
-          elapsedTime: 123.456,
-          count: 123,
-          attributes: [
-            { name: "name", type: "ShortText", vector: false },
-            { name: "age", type: "UInt32", vector: false }
-          ],
-          records: [ ["a", 10], ["b", 20] ]
-        }
+    def process_message(envelope)
+      case envelope["type"]
+      when "search"
+        search(envelope["body"])
+      end
+    end
+
+    private
+    def search(request)
+      result = {}
+      request["queries"].each do |name, query|
+        result[name] = search_query(query)
+      end
+      result
+    end
+
+    def search_query(query)
+      source = @context[query["source"]]
+      {
+        "count" => source.size,
       }
     end
   end

@@ -44,28 +44,23 @@ class WorkerTest < Test::Unit::TestCase
   private
   class SearchTest < self
     def test_minimum
+      request = {
+        "type" => "search",
+        "body" => {
+          "queries" => {
+            "sections" => {
+              "source" => "Sections",
+            },
+          }
+        },
+      }
       expected = {
-        "main-search-result" => {
-          :attributes => [
-            {
-              :name   => "name",
-              :type   => "ShortText",
-              :vector => false
-            },
-            {
-              :name   => "age",
-              :type   => "UInt32",
-              :vector => false
-            },
-          ],
-          :count => 123,
-          :elapsedTime => 123.456,
-          :records => [["a", 10], ["b", 20]],
-          :startTime => "2001-08-02T10:45:23.5+09:00",
+        "sections" => {
+          "count" => 9,
         }
       }
       assert_equal(expected,
-                   @worker.process_message({}))
+                   @worker.process_message(request))
     end
   end
 end
