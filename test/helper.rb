@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Kotoumi project
+# Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,7 @@ module Sandbox
       FileUtils.mkdir_p(@base_temporary_directory.to_s)
     end
 
-    @temporary_directory = @base_temporary_directory + "fluent-plugin-kotoumi"
+    @temporary_directory = @base_temporary_directory + "fluent-plugin-droonga"
     FileUtils.rm_rf(@temporary_directory.to_s)
     FileUtils.mkdir_p(@temporary_directory.to_s)
   end

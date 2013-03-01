@@ -1,11 +1,11 @@
-# Fluent::Plugin::Kotoumi
+# Fluent::Plugin::Droonga
 
 TODO: Write a gem description
 
-## What's "kotoumi"?
+## What's "droonga"?
 
-Kotoumi is a distributed fulltext search engine.
-This package provides kotoumi plugin for Fluent event collector.
+Droonga is a distributed fulltext search engine, named from "distributed-groonga".
+This package provides droonga plugin for Fluent event collector.
 
 ## Usage
 
@@ -13,6 +13,6 @@ TODO: Write usage.
 
 ## Copyright
 
-* Copyright (c) 2013 Kotoumi project
+* Copyright (c) 2013 droonga project
 * License
   * GNU Lesser General Public License version 2.1

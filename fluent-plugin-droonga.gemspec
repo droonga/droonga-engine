@@ -1,6 +1,6 @@
 # -*- mode: ruby; coding: utf-8 -*-
 #
-# Copyright (C) 2013 Kotoumi project
+# Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Gem::Specification.new do |gem|
-  gem.name          = "fluent-plugin-kotoumi"
+  gem.name          = "fluent-plugin-droonga"
   gem.version       = "0.0.1"
-  gem.authors       = ["Kotoumi project"]
-  gem.email         = ["kotoumi@groonga.org"]
-  gem.description   = "kotoumi(distributed groonga) plugin for Fluent event collector"
+  gem.authors       = ["droonga project"]
+  gem.email         = ["droonga@groonga.org"]
+  gem.description   = "droonga(distributed groonga) plugin for Fluent event collector"
   gem.summary       = gem.description
-  gem.homepage      = "https://github.com/groonga/fluent-plugin-kotoumi"
+  gem.homepage      = "https://github.com/groonga/fluent-plugin-droonga"
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})

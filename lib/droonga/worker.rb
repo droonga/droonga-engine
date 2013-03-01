@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Kotoumi project
+# Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ require "time"
 
 require 'groonga'
 
-module Kotoumi
+module Droonga
   class Worker
     def initialize(database, queue_name)
       @context = Groonga::Context.new

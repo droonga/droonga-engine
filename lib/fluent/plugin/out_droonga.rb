@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Kotoumi project
+# Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,19 +17,19 @@
 
 require "socket"
 require "msgpack"
-require "kotoumi/worker"
+require "droonga/worker"
 
 module Fluent
-  class KotoumiOutput < Output
-    Plugin.register_output("kotoumi", self)
+  class DroongaOutput < Output
+    Plugin.register_output("droonga", self)
 
-    config_param :database, :string, :default => "kotoumi.db"
-    config_param :queue_name, :string, :default => "KotoumiQueue"
+    config_param :database, :string, :default => "droonga.db"
+    config_param :queue_name, :string, :default => "DroongaQueue"
 
     def start
       super
       # prefork @workers
-      @worker = Kotoumi::Worker.new(@database, @queue_name)
+      @worker = Droonga::Worker.new(@database, @queue_name)
       @outputs = {}
     end
 

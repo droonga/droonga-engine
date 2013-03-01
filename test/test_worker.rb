@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Kotoumi project
+# Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
 
 require "helper"
 
-require "kotoumi/worker"
+require "droonga/worker"
 
 class WorkerTest < Test::Unit::TestCase
   def setup
@@ -33,7 +33,7 @@ class WorkerTest < Test::Unit::TestCase
   end
 
   def setup_worker
-    @worker = Kotoumi::Worker.new(@database_path.to_s, "KotoumiQueue")
+    @worker = Droonga::Worker.new(@database_path.to_s, "DroongaQueue")
   end
 
   def teardown_worker
