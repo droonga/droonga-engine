@@ -13,34 +13,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "pathname"
-
-require 'rubygems'
-require 'bundler'
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
-
-require "test-unit"
-require "test/unit/notify"
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'fluent/test'
-unless ENV.has_key?('VERBOSE')
-  null_logger = Object.new
-  null_logger.instance_eval do |obj|
-    def method_missing(method, *args)
-      # pass
-    end
-  end
-  $log = null_logger
-end
-
 module Sandbox
   class << self
     def included(base)
