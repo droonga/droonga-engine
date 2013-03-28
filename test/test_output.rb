@@ -32,8 +32,25 @@ module OutputStub
     end
   end
 
+  class Logger
+    attr_reader :tag, :options
+    attr_reader :posted_tag, :posted_message
+    def initialize(tag, options)
+      @tag = tag
+      @options = options
+    end
+
+    def post(tag, message)
+      @posted_tag = tag
+      @posted_message = message
+    end
+
+    def close
+    end
+  end
+
   class Output < Fluent::DroongaOutput
-    attr_reader :worker
+    attr_reader :worker, :outputs
     def initialize(response)
       @response = response
       super()
@@ -41,6 +58,10 @@ module OutputStub
 
     def create_worker
       Worker.new(@response)
+    end
+
+    def create_logger(tag, options)
+      Logger.new(tag, options)
     end
   end
 end
@@ -60,6 +81,36 @@ class OutputTest < Test::Unit::TestCase
       driver.emit(request, time)
     end
     assert_equal(request, @output.worker.processed_record)
+  end
+
+  def test_replyTo
+    response = {}
+    driver = create_driver("droonga.message", response)
+    request = {
+      "id"      => "29",
+      "replyTo" => "127.0.0.1:2929/droonga.meessage",
+      "type"    => "search",
+    }
+    time = Time.parse("2012-10-26T08:45:42Z").to_i
+    driver.run do
+      driver.emit(request, time)
+    end
+
+    response_output = @output.outputs["127.0.0.1:2929"]
+    response_logger = response_output[:logger]
+    assert_equal([
+                   "message",
+                   {
+                     :body => {:result => {}},
+                     :inReplyTo => "29",
+                     :statusCode => 200,
+                     :type => "search.result",
+                   },
+                 ],
+                 [
+                   response_logger.posted_tag,
+                   response_logger.posted_message,
+                 ])
   end
 
   private
