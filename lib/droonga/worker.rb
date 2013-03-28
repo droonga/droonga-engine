@@ -16,10 +16,31 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "time"
-
+require 'tsort'
 require 'groonga'
 
 module Droonga
+  class QuerySorter
+    include TSort
+    def initialize()
+      @queries = {}
+    end
+
+    def add(name, sources=[])
+      @queries[name] = sources
+    end
+
+    def tsort_each_node(&block)
+      @queries.each_key(&block)
+    end
+
+    def tsort_each_child(node, &block)
+      if @queries[node]
+        @queries[node].each(&block)
+      end
+    end
+  end
+
   class Worker
     def initialize(database, queue_name)
       @context = Groonga::Context.new
@@ -42,44 +63,58 @@ module Droonga
 
     private
     def search(request)
-      result = {}
-      request["queries"].each do |name, query|
-        result[name] = search_query(query)
+      queries = request["queries"]
+      results = {}
+      outputs = {}
+      query_sorter = QuerySorter.new
+      queries.each do |name, query|
+        query_sorter.add(name, [query["source"]])
       end
-      result
-    end
-
-    def search_query(query)
-      start_time = Time.now
-      source = @context[query["source"]]
-      offset = query["offset"] || 0
-      limit = query["limit"] || 10
-      columns = source.columns
-      attributes = columns.collect do |column|
-        {
-          "name" => column.local_name,
-          "type" => column.range.name,
-          "vector" => column.vector?,
-        }
-      end
-      column_names = columns.collect(&:local_name)
-      records = source.open_cursor(:offset => offset,
-                                   :limit => limit) do |cursor|
-        cursor.collect do |record|
-          column_names.collect do |name|
-            record[name]
-          end
+      query_sorter.tsort.each do |name|
+        if queries[name]
+          search_query(name, queries, results, outputs)
+        elsif @context[name]
+          results[name] = @context[name]
+        else
+          raise "undefined source(#{name}) was assigned"
         end
       end
-      elapsed_time = Time.now.to_f - start_time.to_f
+      outputs
+    end
 
-      {
-        "count" => source.size,
-        "startTime" => start_time.iso8601,
-        "elapsedTime" => elapsed_time,
-        "attributes" => attributes,
-        "records" => records,
-      }
+    def search_query(name, queries, results, outputs)
+      start_time = Time.now
+      query = queries[name]
+      source = results[query["source"]]
+      if query["output"]
+        offset = query["offset"] || 0
+        limit = query["limit"] || 10
+        columns = source.columns
+        attributes = columns.collect do |column|
+          {
+            "name" => column.local_name,
+            "type" => column.range.name,
+            "vector" => column.vector?,
+          }
+        end
+        column_names = columns.collect(&:local_name)
+        records = source.open_cursor(:offset => offset,
+                                     :limit => limit) do |cursor|
+          cursor.collect do |record|
+            column_names.collect do |name|
+              record[name]
+            end
+          end
+        end
+        elapsed_time = Time.now.to_f - start_time.to_f
+        outputs[name] = {
+          "count" => source.size,
+          "startTime" => start_time.iso8601,
+          "elapsedTime" => elapsed_time,
+          "attributes" => attributes,
+          "records" => records,
+        }
+      end
     end
   end
 end
