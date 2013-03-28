@@ -74,8 +74,7 @@ module Fluent
         connection_id = $1
         if not has_connection_id or output[:connection_id] != connection_id
           output[:connection_id] = connection_id
-          logger = Fluent::Logger::FluentLogger.new(tag, :host => host,
-                                                         :port=> port.to_i)
+          logger = create_logger(tag, :host => host, :port => port.to_i)
           # output[:logger] should be closed if it exists beforehand?
           output[:logger] = logger
         end
@@ -110,6 +109,10 @@ module Fluent
     private
     def create_worker
       Droonga::Worker.new(@database, @queue_name)
+    end
+
+    def create_logger(tag, options)
+      Fluent::Logger::FluentLogger.new(tag, options)
     end
   end
 end
