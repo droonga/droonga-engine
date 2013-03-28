@@ -17,11 +17,14 @@ require "fluent/plugin/out_droonga"
 
 module OutputStub
   class Worker
+    attr_reader :processed_record
     def initialize(response)
       @response = response
+      @processed_record = nil
     end
 
     def process_message(record)
+      @processed_record = record
       @response
     end
 
@@ -30,6 +33,7 @@ module OutputStub
   end
 
   class Output < Fluent::DroongaOutput
+    attr_reader :worker
     def initialize(response)
       @response = response
       super()
@@ -47,19 +51,21 @@ class OutputTest < Test::Unit::TestCase
     Fluent::Test.setup
   end
 
-  def test_emit
+  def test_exec
     response = {}
     driver = create_driver("droonga.message", response)
+    request = {"hello" => "world"}
     time = Time.parse("2012-10-26T08:45:42Z").to_i
     driver.run do
-      driver.emit({"replyTo" => "127.0.0.1:2929/droonga.message"}, time)
+      driver.emit(request, time)
     end
+    assert_equal(request, @output.worker.processed_record)
   end
 
   private
   def create_driver(tag, response)
-    output = OutputStub::Output.new(response)
-    driver = Fluent::Test::OutputTestDriver.new(output, tag)
+    @output = OutputStub::Output.new(response)
+    driver = Fluent::Test::OutputTestDriver.new(@output, tag)
     driver.configure(configuration)
     driver
   end
