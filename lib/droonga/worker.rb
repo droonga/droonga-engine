@@ -52,6 +52,8 @@ module Droonga
     def search_query(query)
       start_time = Time.now
       source = @context[query["source"]]
+      offset = query["offset"] || 0
+      limit = query["limit"] || 10
       columns = source.columns
       attributes = columns.collect do |column|
         {
@@ -61,9 +63,12 @@ module Droonga
         }
       end
       column_names = columns.collect(&:local_name)
-      records = source.collect do |record|
-        column_names.collect do |name|
-          record[name]
+      records = source.open_cursor(:offset => offset,
+                                   :limit => limit) do |cursor|
+        cursor.collect do |record|
+          column_names.collect do |name|
+            record[name]
+          end
         end
       end
       elapsed_time = Time.now.to_f - start_time.to_f
