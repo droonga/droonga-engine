@@ -28,7 +28,7 @@ module Fluent
     def start
       super
       # prefork @workers
-      @worker = Droonga::Worker.new(@database, @queue_name)
+      @worker = create_worker
       @outputs = {}
     end
 
@@ -105,6 +105,11 @@ module Fluent
         }
         output.post("message", response)
       end
+    end
+
+    private
+    def create_worker
+      Droonga::Worker.new(@database, @queue_name)
     end
   end
 end
