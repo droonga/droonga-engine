@@ -15,43 +15,39 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require 'groonga'
 require "droonga/handler_plugin"
 
 module Droonga
-  class Worker
-    def initialize(database, queue_name)
-      @context = Groonga::Context.new
-      @database = @context.open_database(database)
-      @queue_name = queue_name
-      @handlers = []
+  class Handler
+    @@commands = {}
+    class << self
+      def command(name_or_map)
+        if name_or_map.is_a?(Hash)
+          command_map = name_or_map
+          command_map.each do |command_name, method_name|
+            @@commands[command_name.to_s] = method_name
+          end
+        else
+          name = name_or_map
+          method_name = name
+          @@commands[name.to_s] = method_name
+        end
+      end
     end
 
-    def add_handler(name)
-      plugin = HandlerPlugin.new(name)
-      @handlers << plugin.instantiate(@context)
+    def initialize(context)
+      @context = context
     end
 
     def shutdown
-      @handlers.each do |handler|
-        handler.shutdown
-      end
-      @database.close
-      @context.close
-      @database = @context = nil
     end
 
-    def process_message(envelope)
-      command = envelope["type"]
-      handler = find_handler(command)
-      handler.handle(command, envelope["body"])
+    def handlable?(command)
+      not @@commands[command.to_s].nil?
     end
 
-    private
-    def find_handler(command)
-      @handlers.find do |handler|
-        handler.handlable?(command)
-      end
+    def handle(command, request)
+      __send__(@@commands[command], request)
     end
   end
 end

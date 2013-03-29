@@ -17,6 +17,7 @@
 
 require "fluent-logger"
 require "droonga/worker"
+require "droonga/plugin"
 
 module Fluent
   class DroongaOutput < Output
@@ -24,6 +25,14 @@ module Fluent
 
     config_param :database, :string, :default => "droonga.db"
     config_param :queue_name, :string, :default => "DroongaQueue"
+    config_param :handlers, :default => [] do |value|
+      value.split(/\s*,\s*/)
+    end
+
+    def configure(conf)
+      super
+      load_handlers
+    end
 
     def start
       super
@@ -107,8 +116,19 @@ module Fluent
     end
 
     private
+    def load_handlers
+      @handlers.each do |handler_name|
+        plugin = Droonga::Plugin.new("handler", handler_name)
+        plugin.load
+      end
+    end
+
     def create_worker
-      Droonga::Worker.new(@database, @queue_name)
+      worker = Droonga::Worker.new(@database, @queue_name)
+      @handlers.each do |handler_name|
+        worker.add_handler(handler_name)
+      end
+      worker
     end
 
     def create_logger(tag, options)

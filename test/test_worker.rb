@@ -20,6 +20,7 @@ require "droonga/worker"
 class WorkerTest < Test::Unit::TestCase
   def setup
     setup_database
+    setup_handlers
     setup_worker
   end
 
@@ -32,8 +33,16 @@ class WorkerTest < Test::Unit::TestCase
     restore(fixture_data("document.grn"))
   end
 
+  def setup_handlers
+    ["search"].each do |handler_name|
+      plugin = Droonga::Plugin.new("handler", handler_name)
+      plugin.load
+    end
+  end
+
   def setup_worker
     @worker = Droonga::Worker.new(@database_path.to_s, "DroongaQueue")
+    @worker.add_handler("search")
   end
 
   def teardown_worker
