@@ -32,7 +32,7 @@ module Sandbox
 
   def setup_temporary_directory
     @base_temporary_directory = Pathname(File.dirname(__FILE__)) + "tmp"
-    memory_file_system = "/dev/shm"
+    memory_file_system = "/run/shm"
     if File.exist?(memory_file_system)
       FileUtils.mkdir_p(@base_temporary_directory.parent.to_s)
       FileUtils.rm_f(@base_temporary_directory.to_s)
