@@ -49,7 +49,23 @@ module Droonga
       start_time = Time.now
       query = queries[name]
       source = results[query["source"]]
+      if query["query"]
+        options = query["options"] || {}
+        if query["matchTo"]
+          matchTo = Groonga::Expression.new(context: @context)
+          matchTo.define_variable(:domain => source)
+          matchTo.parse(query["matchTo"], :syntax => :script)
+          options[:default_column] = matchTo
+        end
+        query_expression = Groonga::Expression.new(context: @context)
+        query_expression.define_variable(:domain => source)
+        query_expression.parse(query["query"], options)
+        results[name] = source.select(query_expression)
+      else
+        results[name] = source
+      end
       if query["output"]
+        result = results[name]
         offset = query["offset"] || 0
         limit = query["limit"] || 10
         columns = source.columns
@@ -61,7 +77,7 @@ module Droonga
           }
         end
         column_names = columns.collect(&:local_name)
-        records = source.open_cursor(:offset => offset,
+        records = result.open_cursor(:offset => offset,
                                      :limit => limit) do |cursor|
           cursor.collect do |record|
             column_names.collect do |name|
@@ -71,7 +87,7 @@ module Droonga
         end
         elapsed_time = Time.now.to_f - start_time.to_f
         outputs[name] = {
-          "count" => source.size,
+          "count" => result.size,
           "startTime" => start_time.iso8601,
           "elapsedTime" => elapsed_time,
           "attributes" => attributes,
