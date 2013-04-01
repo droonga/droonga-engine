@@ -68,31 +68,38 @@ module Droonga
         result = results[name]
         offset = query["offset"] || 0
         limit = query["limit"] || 10
-        columns = source.columns
-        attributes = columns.collect do |column|
-          {
-            "name" => column.local_name,
-            "type" => column.range.name,
-            "vector" => column.vector?,
-          }
+        outputs[name] = output = {}
+        if query["output"]["count"]
+          output["count"] = result.size
         end
-        column_names = columns.collect(&:local_name)
-        records = result.open_cursor(:offset => offset,
-                                     :limit => limit) do |cursor|
-          cursor.collect do |record|
-            column_names.collect do |name|
-              record[name]
+        if query["output"]["result"]
+          attributes = query["output"]["result"]["attributes"]
+          if attributes
+            attrs = attributes.map do |attr|
+              if attr.is_a?(String)
+                { label: attr, source: attr}
+              else
+                { label: attr["label"] || attr["source"],
+                  source: attr["source"] }
+              end
+            end
+            output["result"] = result.open_cursor(:offset => offset,
+                                                  :limit => limit) do |cursor|
+              cursor.collect do |record|
+                values = {}
+                attrs.collect do |attr|
+                  $log.info attr[:source]
+                  values[attr[:label]] = record[attr[:source]]
+                end
+                values
+              end
             end
           end
         end
-        elapsed_time = Time.now.to_f - start_time.to_f
-        outputs[name] = {
-          "count" => result.size,
-          "startTime" => start_time.iso8601,
-          "elapsedTime" => elapsed_time,
-          "attributes" => attributes,
-          "records" => records,
-        }
+        if query["output"]["elapsedTime"]
+          output["startTime"] = start_time.iso8601
+          output["elapsedTime"] = Time.now.to_f - start_time.to_f
+        end
       end
     end
 
