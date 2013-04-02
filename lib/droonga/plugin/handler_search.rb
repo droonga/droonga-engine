@@ -125,8 +125,8 @@ module Droonga
       end
       results[name] = result
       if query["output"]
-        offset = query["offset"] || 0
-        limit = query["limit"] || 10
+        offset = query["output"]["offset"] || 0
+        limit = query["output"]["limit"] || 10
         outputs[name] = output = {}
         if query["output"]["count"]
           output["count"] = result.size
