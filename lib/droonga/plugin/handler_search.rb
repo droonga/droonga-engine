@@ -113,17 +113,18 @@ module Droonga
     def search_query(name, queries, results, outputs)
       start_time = Time.now
       query = queries[name]
-      source = results[query["source"]]
+      result = source = results[query["source"]]
       if query["condition"]
         expression = Groonga::Expression.new(context: @context)
         expression.define_variable(:domain => source)
         parseCondition(source, expression, query["condition"])
-        results[name] = source.select(expression)
-      else
-        results[name] = source
+        result = source.select(expression)
       end
+      if query["groupBy"]
+        result = result.group(query["groupBy"])
+      end
+      results[name] = result
       if query["output"]
-        result = results[name]
         offset = query["offset"] || 0
         limit = query["limit"] || 10
         outputs[name] = output = {}
