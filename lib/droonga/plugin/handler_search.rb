@@ -110,6 +110,16 @@ module Droonga
       end
     end
 
+    def parseOrderKeys(keys)
+      keys.map do |key|
+        if key =~ /^-/
+          [$', :descending]
+        else
+          [key, :ascending]
+        end
+      end
+    end
+
     def search_query(name, queries, results, outputs)
       start_time = Time.now
       query = queries[name]
@@ -123,13 +133,28 @@ module Droonga
       if query["groupBy"]
         result = result.group(query["groupBy"])
       end
+      count = result.size
+      if query["sortBy"]
+        if query["sortBy"].is_a? Array
+          keys = parseOrderKeys(query["sortBy"])
+          offset = 0
+          limit = -1
+        elsif query["sortBy"].is_a? Hash
+          keys = parseOrderKeys(query["sortBy"]["keys"])
+          offset = query["sortBy"]["offset"]
+          limit = query["sortBy"]["limit"]
+        else
+          raise '"sortBy" parameter must be a Hash or an Array'
+        end
+        result = result.sort(keys, :offset => offset, :limit => limit)
+      end
       results[name] = result
       if query["output"]
         offset = query["output"]["offset"] || 0
         limit = query["output"]["limit"] || 10
         outputs[name] = output = {}
         if query["output"]["count"]
-          output["count"] = result.size
+          output["count"] = count
         end
         if query["output"]["result"]
           attributes = query["output"]["result"]["attributes"]
