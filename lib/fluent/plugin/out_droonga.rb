@@ -33,6 +33,7 @@ module Fluent
     def configure(conf)
       super
       ensure_database
+      ensure_queue
       load_handlers
     end
 
@@ -84,6 +85,17 @@ module Fluent
       FileUtils.mkdir_p(File.dirname(@database))
       context = Groonga::Context.new
       context.create_database(@database) do
+      end
+      context.close
+    end
+
+    def ensure_queue
+      context = Groonga::Context.new
+      context.open_database(@database) do
+        Groonga::Schema.define(:context => context) do |schema|
+          schema.create_table(@queue_name, :type => :array) do
+          end
+        end
       end
       context.close
     end
