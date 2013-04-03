@@ -23,7 +23,7 @@ module Fluent
     Plugin.register_output("droonga", self)
 
     config_param :n_workers, :integer, :default => 1
-    config_param :database, :string, :default => "droonga.db"
+    config_param :database, :string, :default => "droonga/db"
     config_param :queue_name, :string, :default => "DroongaQueue"
     config_param :handlers, :default => [] do |value|
       value.split(/\s*,\s*/)
