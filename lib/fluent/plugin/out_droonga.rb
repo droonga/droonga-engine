@@ -83,7 +83,7 @@ module Fluent
       return if File.exist?(@database)
       FileUtils.mkdir_p(File.dirname(@database))
       context = Groonga::Context.new
-      Groonga::Database.create(:context => context, :path => @database) do
+      context.create_database(@database) do
       end
       context.close
     end
