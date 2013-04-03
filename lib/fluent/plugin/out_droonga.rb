@@ -15,7 +15,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "fluent-logger"
 require "droonga/worker"
 require "droonga/plugin"
 
@@ -23,6 +22,7 @@ module Fluent
   class DroongaOutput < Output
     Plugin.register_output("droonga", self)
 
+    config_param :n_workers, :integer, :default => 1
     config_param :database, :string, :default => "droonga.db"
     config_param :queue_name, :string, :default => "DroongaQueue"
     config_param :handlers, :default => [] do |value|
@@ -36,16 +36,27 @@ module Fluent
 
     def start
       super
-      # prefork @workers
+      @workers = []
+      @n_workers.times do
+        pid = Process.fork
+        if pid
+          @workers << pid
+          next
+        end
+        # child process
+        begin
+          create_worker.start
+          exit! 0
+        end
+      end
       @worker = create_worker
-      @outputs = {}
     end
 
     def shutdown
       super
       @worker.shutdown
-      @outputs.each do |dest, output|
-        output[:logger].close if output[:logger]
+      @workers.each do |pid|
+        Process.kill(:TERM, pid)
       end
     end
 
@@ -58,60 +69,10 @@ module Fluent
     end
 
     def dispatch(tag, time, record)
-      # Post to peers or execute it as needed
-      exec(tag, time, record)
-    end
-
-    def get_output(event)
-      receiver = event["replyTo"]
-      return nil unless receiver
-      unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
-        raise "format: hostname:port/tag(?params)"
-      end
-      host = $1
-      port = $2
-      tag  = $3
-      params = $4
-
-      host_port = "#{host}:#{port}"
-      @outputs[host_port] ||= {}
-      output = @outputs[host_port]
-
-      has_connection_id = (not params.nil? \
-                           and params =~ /[\?&;]connection_id=([^&;]+)/)
-      if output[:logger].nil? or has_connection_id
-        connection_id = $1
-        if not has_connection_id or output[:connection_id] != connection_id
-          output[:connection_id] = connection_id
-          logger = create_logger(tag, :host => host, :port => port.to_i)
-          # output[:logger] should be closed if it exists beforehand?
-          output[:logger] = logger
-        end
-      end
-
-      has_client_session_id = (not params.nil? \
-                               and params =~ /[\?&;]client_session_id=([^&;]+)/)
-      if has_client_session_id
-        client_session_id = $1
-        # some generic way to handle client_session_id is expected
-      end
-
-      output[:logger]
-    end
-
-    def exec(tag, time, record)
-      result = @worker.process_message(record)
-      output = get_output(record)
-      if output
-        response = {
-          inReplyTo: record["id"],
-          statusCode: 200,
-          type: (record["type"] || "") + ".result",
-          body: {
-            result: result
-          }
-        }
-        output.post("message", response)
+      if @workers.empty?
+        @worker.process_message(record)
+      else
+        @worker.post_message(record)
       end
     end
 
@@ -129,10 +90,6 @@ module Fluent
         worker.add_handler(handler_name)
       end
       worker
-    end
-
-    def create_logger(tag, options)
-      Fluent::Logger::FluentLogger.new(tag, options)
     end
   end
 end

@@ -17,6 +17,8 @@
 
 require 'groonga'
 require "droonga/handler_plugin"
+require "fluent-logger"
+require "json"
 
 module Droonga
   class Worker
@@ -25,6 +27,9 @@ module Droonga
       @database = @context.open_database(database)
       @queue_name = queue_name
       @handlers = []
+      @outputs = {}
+      @finish = false
+      @status = :IDLE
     end
 
     def add_handler(name)
@@ -36,15 +41,63 @@ module Droonga
       @handlers.each do |handler|
         handler.shutdown
       end
+      @outputs.each do |dest, output|
+        output[:logger].close if output[:logger]
+      end
       @database.close
       @context.close
       @database = @context = nil
     end
 
+    def start
+      # TODO: doesn't work
+      Signal.trap(:TERM) do
+        @finish = true
+        exit! 0 if @status == :IDLE
+      end
+      queue = @context[@queue_name]
+      while !@finish
+        value = nil
+        queue.pull do |record|
+          @status = :BUSY
+          value = record["value"] if record
+        end
+        if value
+#         value.force_encoding("UTF-8")
+#         envelope = MessagePack.unpack(value)
+          envelope = JSON.parse(value)
+          process_message(envelope) if value
+        end
+        @status = :IDLE
+      end
+    end
+
+    def post_message(envelope)
+#     value = envelope.to_msgpack
+#     value.force_encoding("UTF-8")
+      value = envelope.to_json
+      queue = @context[@queue_name]
+      queue.push do |record|
+        record["value"] = value
+      end
+    end
+
     def process_message(envelope)
       command = envelope["type"]
       handler = find_handler(command)
-      handler.handle(command, envelope["body"])
+      result = handler.handle(command, envelope["body"])
+      output = get_output(envelope)
+      if output
+        response = {
+          inReplyTo: envelope["id"],
+          statusCode: 200,
+          type: (envelope["type"] || "") + ".result",
+          body: {
+            result: result
+          }
+        }
+        output.post("message", response)
+      end
     end
 
     private
@@ -52,6 +105,47 @@ module Droonga
       @handlers.find do |handler|
         handler.handlable?(command)
       end
+    end
+
+    def get_output(event)
+      receiver = event["replyTo"]
+      return nil unless receiver
+      unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
+        raise "format: hostname:port/tag(?params)"
+      end
+      host = $1
+      port = $2
+      tag  = $3
+      params = $4
+
+      host_port = "#{host}:#{port}"
+      @outputs[host_port] ||= {}
+      output = @outputs[host_port]
+
+      has_connection_id = (not params.nil? \
+                           and params =~ /[\?&;]connection_id=([^&;]+)/)
+      if output[:logger].nil? or has_connection_id
+        connection_id = $1
+        if not has_connection_id or output[:connection_id] != connection_id
+          output[:connection_id] = connection_id
+          logger = create_logger(tag, :host => host, :port => port.to_i)
+          # output[:logger] should be closed if it exists beforehand?
+          output[:logger] = logger
+        end
+      end
+
+      has_client_session_id = (not params.nil? \
+                               and params =~ /[\?&;]client_session_id=([^&;]+)/)
+      if has_client_session_id
+        client_session_id = $1
+        # some generic way to handle client_session_id is expected
+      end
+
+      output[:logger]
+    end
+
+    def create_logger(tag, options)
+      Fluent::Logger::FluentLogger.new(tag, options)
     end
   end
 end
