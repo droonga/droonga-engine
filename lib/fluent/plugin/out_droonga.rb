@@ -15,6 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "fileutils"
 require "droonga/worker"
 require "droonga/plugin"
 
@@ -31,6 +32,7 @@ module Fluent
 
     def configure(conf)
       super
+      ensure_database
       load_handlers
     end
 
@@ -77,6 +79,15 @@ module Fluent
     end
 
     private
+    def ensure_database
+      return if File.exist?(@database)
+      FileUtils.mkdir_p(File.dirname(@database))
+      context = Groonga::Context.new
+      Groonga::Database.create(:context => context, :path => @database) do
+      end
+      context.close
+    end
+
     def load_handlers
       @handlers.each do |handler_name|
         plugin = Droonga::Plugin.new("handler", handler_name)
