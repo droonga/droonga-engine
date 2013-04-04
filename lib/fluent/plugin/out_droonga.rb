@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "fileutils"
+require "droonga/job_queue"
 require "droonga/worker"
 require "droonga/plugin"
 
@@ -32,8 +32,7 @@ module Fluent
 
     def configure(conf)
       super
-      ensure_database
-      ensure_queue
+      Droonga::JobQueue.ensure_schema(@database, @queue_name)
       load_handlers
     end
 
@@ -80,35 +79,6 @@ module Fluent
     end
 
     private
-    def ensure_database
-      return if File.exist?(@database)
-      FileUtils.mkdir_p(File.dirname(@database))
-      create_context do |context|
-        context.create_database(@database) do
-        end
-      end
-    end
-
-    def ensure_queue
-      create_context do |context|
-        context.open_database(@database) do
-          Groonga::Schema.define(:context => context) do |schema|
-            schema.create_table(@queue_name, :type => :array) do
-            end
-          end
-        end
-      end
-    end
-
-    def create_context
-      context = Groonga::Context.new
-      begin
-        yield(context)
-      ensure
-        context.close
-      end
-    end
-
     def load_handlers
       @handlers.each do |handler_name|
         plugin = Droonga::Plugin.new("handler", handler_name)
