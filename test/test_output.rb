@@ -50,7 +50,7 @@ module OutputStub
   end
 
   class Output < Fluent::DroongaOutput
-    attr_reader :worker, :outputs
+    attr_reader :worker
     def initialize(response)
       @response = response
       super()
@@ -83,36 +83,6 @@ class OutputTest < Test::Unit::TestCase
     assert_equal(request, @output.worker.processed_record)
   end
 
-  def test_replyTo
-    response = {}
-    driver = create_driver("droonga.message", response)
-    request = {
-      "id"      => "29",
-      "replyTo" => "127.0.0.1:2929/droonga.meessage",
-      "type"    => "search",
-    }
-    time = Time.parse("2012-10-26T08:45:42Z").to_i
-    driver.run do
-      driver.emit(request, time)
-    end
-
-    response_output = @output.outputs["127.0.0.1:2929"]
-    response_logger = response_output[:logger]
-    assert_equal([
-                   "message",
-                   {
-                     :body => {:result => {}},
-                     :inReplyTo => "29",
-                     :statusCode => 200,
-                     :type => "search.result",
-                   },
-                 ],
-                 [
-                   response_logger.posted_tag,
-                   response_logger.posted_message,
-                 ])
-  end
-
   private
   def create_driver(tag, response)
     @output = OutputStub::Output.new(response)
@@ -123,6 +93,7 @@ class OutputTest < Test::Unit::TestCase
 
   def configuration
     <<-EOC
+n_workers 0
 EOC
   end
 end
