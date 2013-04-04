@@ -58,7 +58,7 @@ module Fluent
       super
       @worker.shutdown
       @workers.each do |pid|
-        Process.kill(:TERM, pid)
+        Process.kill(:KILL, pid)
       end
     end
 
