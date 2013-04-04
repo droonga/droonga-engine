@@ -156,26 +156,23 @@ module Droonga
         if query["output"]["count"]
           output["count"] = count
         end
-        if query["output"]["result"]
-          attributes = query["output"]["result"]["attributes"]
-          if attributes
-            attrs = attributes.map do |attr|
-              if attr.is_a?(String)
-                { label: attr, source: attr}
-              else
-                { label: attr["label"] || attr["source"],
-                  source: attr["source"] }
-              end
+        if query["output"]["attributes"].is_a? Array
+          attributes = query["output"]["attributes"].map do |attribute|
+            if attribute.is_a?(String)
+              { label: attribute, source: attribute}
+            else
+              { label: attribute["label"] || attribute["source"],
+                source: attribute["source"] }
             end
-            output["result"] = result.open_cursor(:offset => offset,
-                                                  :limit => limit) do |cursor|
-              cursor.collect do |record|
-                values = {}
-                attrs.collect do |attr|
-                  values[attr[:label]] = record[attr[:source]]
-                end
-                values
+          end
+          output["records"] = result.open_cursor(:offset => offset,
+                                                 :limit => limit) do |cursor|
+            cursor.collect do |record|
+              values = {}
+              attrs.collect do |attr|
+                values[attr[:label]] = record[attr[:source]]
               end
+              values
             end
           end
         end

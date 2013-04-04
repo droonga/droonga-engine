@@ -90,9 +90,7 @@ module Droonga
           inReplyTo: envelope["id"],
           statusCode: 200,
           type: (envelope["type"] || "") + ".result",
-          body: {
-            result: result
-          }
+          body: result
         }
         output.post("message", response)
       end
