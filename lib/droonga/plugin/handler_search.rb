@@ -169,8 +169,8 @@ module Droonga
                                                  :limit => limit) do |cursor|
             cursor.collect do |record|
               values = {}
-              attrs.collect do |attr|
-                values[attr[:label]] = record[attr[:source]]
+              attributes.collect do |attribute|
+                values[attribute[:label]] = record[attribute[:source]]
               end
               values
             end
