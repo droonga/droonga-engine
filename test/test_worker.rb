@@ -22,10 +22,12 @@ class WorkerTest < Test::Unit::TestCase
     setup_database
     setup_handlers
     setup_worker
+    setup_output_receiver
   end
 
   def teardown
     teardown_worker
+    teardown_output_receiver
   end
 
   private
@@ -50,11 +52,24 @@ class WorkerTest < Test::Unit::TestCase
     @worker = nil
   end
 
+  def setup_output_receiver
+    @output_receiver_host = "127.0.0.1"
+    @output_receiver_port = 2929
+    @output_receiver = TCPServer.new(@output_receiver_host,
+                                     @output_receiver_port)
+  end
+
+  def teardown_output_receiver
+    @output_receiver.close
+    @output_receiver = nil
+  end
+
   private
   class SearchTest < self
     def test_minimum
       request = {
         "type" => "search",
+        "replyTo" => reply_to,
         "body" => {
           "queries" => {
             "sections" => {
@@ -112,7 +127,8 @@ class WorkerTest < Test::Unit::TestCase
           ],
         },
       }
-      actual = @worker.process_message(request)
+      @worker.process_message(request)
+      actual = receive_response
       assert_equal(expected, normalize_result_set(actual))
     end
 
@@ -125,13 +141,28 @@ class WorkerTest < Test::Unit::TestCase
       0.01
     end
 
+    def reply_to
+      "#{@output_receiver_host}:#{@output_receiver_port}/droonga.message"
+    end
+
     def normalize_result_set(result_set)
       normalized_result_set = copy_deeply(result_set)
-      normalized_result_set.each do |name, result|
+      normalized_result_set["body"].each do |name, result|
         result["startTime"] = start_time if result["startTime"]
         result["elapsedTime"] = elapsed_time if result["elapsedTime"]
       end
       normalized_result_set
+    end
+
+    ENOUGH_RESPONSE_DATA_SIZE = 4096 * 4
+    def receive_response
+      readables, = IO.select([@output_receiver], [], [], 0)
+      assert_not_empty(readables, "not replied")
+
+      response_socket = @output_receiver.accept
+      response_data = response_socket.read_nonblock(ENOUGH_RESPONSE_DATA_SIZE)
+      tag, time, response = MessagePack.unpack(response_data)
+      response
     end
 
     def copy_deeply(object)
