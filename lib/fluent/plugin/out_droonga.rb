@@ -83,21 +83,30 @@ module Fluent
     def ensure_database
       return if File.exist?(@database)
       FileUtils.mkdir_p(File.dirname(@database))
-      context = Groonga::Context.new
+      create_context do |context|
       context.create_database(@database) do
       end
-      context.close
+      end
     end
 
     def ensure_queue
-      context = Groonga::Context.new
+      create_context do |context|
       context.open_database(@database) do
         Groonga::Schema.define(:context => context) do |schema|
           schema.create_table(@queue_name, :type => :array) do
           end
         end
       end
-      context.close
+      end
+    end
+
+    def create_context
+      context = Groonga::Context.new
+      begin
+        yield(context)
+      ensure
+        context.close
+      end
     end
 
     def load_handlers
