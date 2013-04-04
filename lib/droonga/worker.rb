@@ -57,28 +57,28 @@ module Droonga
       end
       queue = @context[@queue_name]
       while !@finish
-        value = nil
+        request = nil
         queue.pull do |record|
           @status = :BUSY
-          value = record["value"] if record
+          request = record.request if record
         end
-        if value
-#         value.force_encoding("UTF-8")
-#         envelope = MessagePack.unpack(value)
-          envelope = JSON.parse(value)
-          process_message(envelope) if value
+        if request
+#         request.force_encoding("UTF-8")
+#         envelope = MessagePack.unpack(request)
+          envelope = JSON.parse(request)
+          process_message(envelope) if request
         end
         @status = :IDLE
       end
     end
 
     def post_message(envelope)
-#     value = envelope.to_msgpack
-#     value.force_encoding("UTF-8")
-      value = envelope.to_json
+#     request = envelope.to_msgpack
+#     request.force_encoding("UTF-8")
+      request = envelope.to_json
       queue = @context[@queue_name]
       queue.push do |record|
-        record["value"] = value
+        record.request = request
       end
     end
 

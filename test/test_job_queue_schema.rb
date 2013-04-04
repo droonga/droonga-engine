@@ -39,7 +39,7 @@ class JobQueueSchemaTest < Test::Unit::TestCase
     context.close
     assert_equal(<<-SCHEMA, dumped_commands)
 table_create #{@queue_name} TABLE_NO_KEY
-column_create #{@queue_name} value COLUMN_SCALAR Text
+column_create #{@queue_name} request COLUMN_SCALAR Text
 SCHEMA
   end
 end
