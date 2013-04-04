@@ -18,13 +18,14 @@
 require "groonga"
 require "droonga/handler_plugin"
 require "fluent-logger"
-require "json"
+require "msgpack"
 
 module Droonga
   class Worker
     def initialize(database, queue_name)
       @context = Groonga::Context.new
       @database = @context.open_database(database)
+      @context.encoding = :none
       @queue_name = queue_name
       @handlers = []
       @outputs = {}
@@ -63,9 +64,7 @@ module Droonga
           request = record.request if record
         end
         if request
-#         request.force_encoding("UTF-8")
-#         envelope = MessagePack.unpack(request)
-          envelope = JSON.parse(request)
+          envelope = MessagePack.unpack(request)
           process_message(envelope) if request
         end
         @status = :IDLE
@@ -73,9 +72,7 @@ module Droonga
     end
 
     def post_message(envelope)
-#     request = envelope.to_msgpack
-#     request.force_encoding("UTF-8")
-      request = envelope.to_json
+      request = envelope.to_msgpack
       queue = @context[@queue_name]
       queue.push do |record|
         record.request = request
