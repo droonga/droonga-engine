@@ -45,7 +45,8 @@ module Droonga
       create_context do |context|
         context.open_database(@database_path) do
           Groonga::Schema.define(:context => context) do |schema|
-            schema.create_table(@queue_name, :type => :array) do
+            schema.create_table(@queue_name, :type => :array) do |table|
+              table.text("value")
             end
           end
         end
