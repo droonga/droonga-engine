@@ -59,24 +59,24 @@ module Droonga
       end
       queue = @context[@queue_name]
       while !@finish
-        request = nil
+        message = nil
         queue.pull do |record|
           @status = :BUSY
-          request = record.request if record
+          message = record.message if record
         end
-        if request
-          envelope = MessagePack.unpack(request)
-          process_message(envelope) if request
+        if message
+          envelope = MessagePack.unpack(message)
+          process_message(envelope) if message
         end
         @status = :IDLE
       end
     end
 
     def post_message(envelope)
-      request = envelope.to_msgpack
+      message = envelope.to_msgpack
       queue = @context[@queue_name]
       queue.push do |record|
-        record.request = request
+        record.message = message
       end
     end
 
