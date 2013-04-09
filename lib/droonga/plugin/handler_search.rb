@@ -207,36 +207,36 @@ module Droonga
         query = @query
         result = @result
         output = {}
-          offset = query["output"]["offset"] || 0
-          limit = query["output"]["limit"] || 10
-          if query["output"]["count"]
-            count = result.size
-            output["count"] = count
-          end
-          if query["output"]["attributes"].is_a? Array
-            attributes = query["output"]["attributes"].map do |attribute|
-              if attribute.is_a?(String)
-                { label: attribute, source: attribute}
-              else
-                { label: attribute["label"] || attribute["source"],
-                  source: attribute["source"] }
-              end
-            end
-            output["records"] = result.open_cursor(:offset => offset,
-                                                   :limit => limit) do |cursor|
-              cursor.collect do |record|
-                values = {}
-                attributes.collect do |attribute|
-                  values[attribute[:label]] = record[attribute[:source]]
-                end
-                values
-              end
+        offset = query["output"]["offset"] || 0
+        limit = query["output"]["limit"] || 10
+        if query["output"]["count"]
+          count = result.size
+          output["count"] = count
+        end
+        if query["output"]["attributes"].is_a? Array
+          attributes = query["output"]["attributes"].map do |attribute|
+            if attribute.is_a?(String)
+              { label: attribute, source: attribute}
+            else
+              { label: attribute["label"] || attribute["source"],
+                source: attribute["source"] }
             end
           end
-          if query["output"]["elapsedTime"]
-            output["startTime"] = start_time.iso8601
-            output["elapsedTime"] = Time.now.to_f - start_time.to_f
+          output["records"] = result.open_cursor(:offset => offset,
+                                                 :limit => limit) do |cursor|
+            cursor.collect do |record|
+              values = {}
+              attributes.collect do |attribute|
+                values[attribute[:label]] = record[attribute[:source]]
+              end
+              values
+            end
           end
+        end
+        if query["output"]["elapsedTime"]
+          output["startTime"] = start_time.iso8601
+          output["elapsedTime"] = Time.now.to_f - start_time.to_f
+        end
         output
       end
     end
