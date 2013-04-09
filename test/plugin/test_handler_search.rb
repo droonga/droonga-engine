@@ -92,4 +92,24 @@ class SearchHandlerTest < Test::Unit::TestCase
                     })
     end
   end
+
+  class OutputTest < self
+    def test_count
+      assert_search({
+                      "sections-result" => {
+                        "count" => 9,
+                      },
+                    },
+                    {
+                      "queries" => {
+                        "sections-result" => {
+                          "source" => "Sections",
+                          "output" => {
+                            "count" => true,
+                          },
+                        },
+                      },
+                    })
+    end
+  end
 end
