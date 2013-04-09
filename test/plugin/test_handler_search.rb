@@ -50,4 +50,10 @@ class SearchHandlerTest < Test::Unit::TestCase
       assert_equal({}, @handler.search({}))
     end
   end
+
+  class QueriesTest < self
+    def test_empty
+      assert_equal({}, @handler.search({"queries" => []}))
+    end
+  end
 end
