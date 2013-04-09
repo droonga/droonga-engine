@@ -27,12 +27,14 @@ module Droonga
     command :search
     def search(request)
       queries = request["queries"]
-      results = {}
       outputs = {}
+      return outputs if queries.nil?
+
       query_sorter = QuerySorter.new
       queries.each do |name, query|
         query_sorter.add(name, [query["source"]])
       end
+      results = {}
       query_sorter.tsort.each do |name|
         if queries[name]
           search_query(name, queries, results, outputs)
