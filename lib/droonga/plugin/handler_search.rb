@@ -101,27 +101,7 @@ module Droonga
         params = @query["output"]
         formatted_result = {}
         format_count(params, formatted_result)
-        offset = params["offset"] || 0
-        limit = params["limit"] || 10
-        if params["attributes"].is_a? Array
-          attributes = params["attributes"].map do |attribute|
-            if attribute.is_a?(String)
-              { label: attribute, source: attribute}
-            else
-              { label: attribute["label"] || attribute["source"],
-                source: attribute["source"] }
-            end
-          end
-          @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
-            formatted_result["records"] = cursor.collect do |record|
-              values = {}
-              attributes.collect do |attribute|
-                values[attribute[:label]] = record[attribute[:source]]
-              end
-              values
-            end
-          end
-        end
+        format_records(params, formatted_result)
         if params["elapsedTime"]
           formatted_result["startTime"] = @start_time.iso8601
           formatted_result["elapsedTime"] = Time.now.to_f - @start_time.to_f
@@ -237,6 +217,30 @@ module Droonga
       def format_count(params, formatted_result)
         return unless params["count"]
         formatted_result["count"] = @result.size
+      end
+
+      def format_records(params, formatted_result)
+        offset = params["offset"] || 0
+        limit = params["limit"] || 10
+        if params["attributes"].is_a? Array
+          attributes = params["attributes"].map do |attribute|
+            if attribute.is_a?(String)
+              { label: attribute, source: attribute}
+            else
+              { label: attribute["label"] || attribute["source"],
+                source: attribute["source"] }
+            end
+          end
+          @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+            formatted_result["records"] = cursor.collect do |record|
+              values = {}
+              attributes.collect do |attribute|
+                values[attribute[:label]] = record[attribute[:source]]
+              end
+              values
+            end
+          end
+        end
       end
     end
   end
