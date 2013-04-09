@@ -64,7 +64,6 @@ class WorkerTest < Test::Unit::TestCase
     @output_receiver = nil
   end
 
-  private
   class SearchTest < self
     def test_minimum
       request = {
