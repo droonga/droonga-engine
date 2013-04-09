@@ -86,6 +86,7 @@ module Droonga
         @context = context
         @query = query
         @result = nil
+        @start_time = nil
       end
 
       def search(results)
