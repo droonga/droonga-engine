@@ -223,7 +223,22 @@ module Droonga
         attributes = params["attributes"]
         return if attributes.nil?
 
-        target_attributes = attributes.map do |attribute|
+        target_attributes = normalize_target_attributes(attributes)
+        offset = params["offset"] || 0
+        limit = params["limit"] || 10
+        @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+          formatted_result["records"] = cursor.collect do |record|
+            values = {}
+            target_attributes.collect do |attribute|
+              values[attribute[:label]] = record[attribute[:source]]
+            end
+            values
+          end
+        end
+      end
+
+      def normalize_target_attributes(attributes)
+        attributes.map do |attribute|
           if attribute.is_a?(String)
             {
               label: attribute,
@@ -234,18 +249,6 @@ module Droonga
               label: attribute["label"] || attribute["source"],
               source: attribute["source"],
             }
-          end
-        end
-
-        offset = params["offset"] || 0
-        limit = params["limit"] || 10
-        @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
-          formatted_result["records"] = cursor.collect do |record|
-            values = {}
-            target_attributes.collect do |attribute|
-              values[attribute[:label]] = record[attribute[:source]]
-            end
-            values
           end
         end
       end
