@@ -46,7 +46,23 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   def search(request)
-    @handler.search(request)
+    normalize_result_set(@handler.search(request))
+  end
+
+  def normalize_result_set(result_set)
+    result_set.each do |name, result|
+      result["startTime"] = start_time if result["startTime"]
+      result["elapsedTime"] = elapsed_time if result["elapsedTime"]
+    end
+    result_set
+  end
+
+  def start_time
+    "2013-01-31T14:34:47+09:00"
+  end
+
+  def elapsed_time
+    0.01
   end
 
   def assert_search(expected, request)
@@ -106,6 +122,25 @@ class SearchHandlerTest < Test::Unit::TestCase
                           "source" => "Sections",
                           "output" => {
                             "count" => true,
+                          },
+                        },
+                      },
+                    })
+    end
+
+    def test_elapsed_time
+      assert_search({
+                      "sections-result" => {
+                        "startTime" => start_time,
+                        "elapsedTime" => elapsed_time,
+                      },
+                    },
+                    {
+                      "queries" => {
+                        "sections-result" => {
+                          "source" => "Sections",
+                          "output" => {
+                            "elapsedTime" => true,
                           },
                         },
                       },

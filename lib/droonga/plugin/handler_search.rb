@@ -168,7 +168,7 @@ module Droonga
       end
 
       def search_query(query, results)
-        start_time = Time.now
+        @start_time = Time.now
         result = source = results[query["source"]]
         if query["condition"]
           expression = Groonga::Expression.new(context: @context)
@@ -234,8 +234,8 @@ module Droonga
           end
         end
         if params["elapsedTime"]
-          output["startTime"] = start_time.iso8601
-          output["elapsedTime"] = Time.now.to_f - start_time.to_f
+          output["startTime"] = @start_time.iso8601
+          output["elapsedTime"] = Time.now.to_f - @start_time.to_f
         end
         output
       end
