@@ -24,6 +24,17 @@ module Droonga
   class SearchHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("search", self)
 
+    class Error < StandardError
+    end
+
+    class UndefinedSourceError < Error
+      attr_reader :name
+      def initialize(name)
+        @name = name
+        super("undefined source was used: <#{name}>")
+      end
+    end
+
     command :search
     def search(request)
       queries = request["queries"]
@@ -41,7 +52,7 @@ module Droonga
         elsif @context[name]
           results[name] = @context[name]
         else
-          raise "undefined source(#{name}) was assigned"
+          raise UndefinedSourceError.new(name)
         end
       end
       outputs
