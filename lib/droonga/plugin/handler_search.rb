@@ -93,59 +93,59 @@ module Droonga
         search_query(@name, @query, results)
       end
 
-       def parseCondition(source, expression, condition)
-         if condition.is_a? String
-           expression.parse(condition, :syntax => :script)
-         elsif condition.is_a? Hash
-           options = {}
-           if condition["matchTo"]
-             matchTo = Groonga::Expression.new(context: @context)
-             matchTo.define_variable(:domain => source)
-             matchTo.parse(condition["matchTo"], :syntax => :script)
-             options[:default_column] = matchTo
-           end
-           if condition["query"]
-             options[:syntax] = :query
-             if condition["default_operator"]
-               case condition["default_operator"]
-               when "||"
-                 options[:default_operator] = Groonga::Operator::OR
-               when "&&"
-                 options[:default_operator] = Groonga::Operator::AND
-               when "-"
-                 options[:default_operator] = Groonga::Operator::BUT
-               else
-                 raise "undefined operator assigned #{condition["default_operator"]}"
-               end
-             end
-             if condition["allow_pragma"]
-               options[:allow_pragma] = true
-             end
-             if condition["allow_column"]
-               options[:allow_column] = true
-             end
-             expression.parse(condition["query"], options)
-           elsif condition["script"]
-             # "script" is ignored when "query" is also assigned.
-             options[:syntax] = :script
-             if condition["allow_update"]
-               options[:allow_update] = true
-             end
-             expression.parse(condition["script"], options)
-           else
-             raise "neither 'query' nor 'script' assigned in #{condition.inspect}"
-           end
-         elsif condition.is_a? Array
-           case condition[0]
-           when "||"
-             operator = Groonga::Operator::OR
-           when "&&"
-             operator = Groonga::Operator::AND
-           when "-"
-             operator = Groonga::Operator::BUT
-           else
-             raise "undefined operator assigned #{condition[0]}"
-                    end
+      def parseCondition(source, expression, condition)
+        if condition.is_a? String
+          expression.parse(condition, :syntax => :script)
+        elsif condition.is_a? Hash
+          options = {}
+          if condition["matchTo"]
+            matchTo = Groonga::Expression.new(context: @context)
+            matchTo.define_variable(:domain => source)
+            matchTo.parse(condition["matchTo"], :syntax => :script)
+            options[:default_column] = matchTo
+          end
+          if condition["query"]
+            options[:syntax] = :query
+            if condition["default_operator"]
+              case condition["default_operator"]
+              when "||"
+                options[:default_operator] = Groonga::Operator::OR
+              when "&&"
+                options[:default_operator] = Groonga::Operator::AND
+              when "-"
+                options[:default_operator] = Groonga::Operator::BUT
+              else
+                raise "undefined operator assigned #{condition["default_operator"]}"
+              end
+            end
+            if condition["allow_pragma"]
+              options[:allow_pragma] = true
+            end
+            if condition["allow_column"]
+              options[:allow_column] = true
+            end
+            expression.parse(condition["query"], options)
+          elsif condition["script"]
+            # "script" is ignored when "query" is also assigned.
+            options[:syntax] = :script
+            if condition["allow_update"]
+              options[:allow_update] = true
+            end
+            expression.parse(condition["script"], options)
+          else
+            raise "neither 'query' nor 'script' assigned in #{condition.inspect}"
+          end
+        elsif condition.is_a? Array
+          case condition[0]
+          when "||"
+            operator = Groonga::Operator::OR
+          when "&&"
+            operator = Groonga::Operator::AND
+          when "-"
+            operator = Groonga::Operator::BUT
+          else
+            raise "undefined operator assigned #{condition[0]}"
+          end
           if condition[1]
             parseCondition(source, expression, condition[1])
           end
