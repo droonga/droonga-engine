@@ -90,143 +90,143 @@ module Droonga
         search_query(@name, queries, results, outputs)
       end
 
-    def parseCondition(source, expression, condition)
-      if condition.is_a? String
-        expression.parse(condition, :syntax => :script)
-      elsif condition.is_a? Hash
-        options = {}
-        if condition["matchTo"]
-          matchTo = Groonga::Expression.new(context: @context)
-          matchTo.define_variable(:domain => source)
-          matchTo.parse(condition["matchTo"], :syntax => :script)
-          options[:default_column] = matchTo
-        end
-        if condition["query"]
-          options[:syntax] = :query
-          if condition["default_operator"]
-            case condition["default_operator"]
-            when "||"
-              options[:default_operator] = Groonga::Operator::OR
-            when "&&"
-              options[:default_operator] = Groonga::Operator::AND
-            when "-"
-              options[:default_operator] = Groonga::Operator::BUT
-            else
-              raise "undefined operator assigned #{condition["default_operator"]}"
-            end
+       def parseCondition(source, expression, condition)
+         if condition.is_a? String
+           expression.parse(condition, :syntax => :script)
+         elsif condition.is_a? Hash
+           options = {}
+           if condition["matchTo"]
+             matchTo = Groonga::Expression.new(context: @context)
+             matchTo.define_variable(:domain => source)
+             matchTo.parse(condition["matchTo"], :syntax => :script)
+             options[:default_column] = matchTo
+           end
+           if condition["query"]
+             options[:syntax] = :query
+             if condition["default_operator"]
+               case condition["default_operator"]
+               when "||"
+                 options[:default_operator] = Groonga::Operator::OR
+               when "&&"
+                 options[:default_operator] = Groonga::Operator::AND
+               when "-"
+                 options[:default_operator] = Groonga::Operator::BUT
+               else
+                 raise "undefined operator assigned #{condition["default_operator"]}"
+               end
+             end
+             if condition["allow_pragma"]
+               options[:allow_pragma] = true
+             end
+             if condition["allow_column"]
+               options[:allow_column] = true
+             end
+             expression.parse(condition["query"], options)
+           elsif condition["script"]
+             # "script" is ignored when "query" is also assigned.
+             options[:syntax] = :script
+             if condition["allow_update"]
+               options[:allow_update] = true
+             end
+             expression.parse(condition["script"], options)
+           else
+             raise "neither 'query' nor 'script' assigned in #{condition.inspect}"
+           end
+         elsif condition.is_a? Array
+           case condition[0]
+           when "||"
+             operator = Groonga::Operator::OR
+           when "&&"
+             operator = Groonga::Operator::AND
+           when "-"
+             operator = Groonga::Operator::BUT
+           else
+             raise "undefined operator assigned #{condition[0]}"
+                    end
+          if condition[1]
+            parseCondition(source, expression, condition[1])
           end
-          if condition["allow_pragma"]
-            options[:allow_pragma] = true
+          condition[2..-1].each do |element|
+            parseCondition(source, expression, element)
+            expression.append_operation(operator, 2)
           end
-          if condition["allow_column"]
-            options[:allow_column] = true
-          end
-          expression.parse(condition["query"], options)
-        elsif condition["script"]
-          # "script" is ignored when "query" is also assigned.
-          options[:syntax] = :script
-          if condition["allow_update"]
-            options[:allow_update] = true
-          end
-          expression.parse(condition["script"], options)
         else
-          raise "neither 'query' nor 'script' assigned in #{condition.inspect}"
+          raise "unacceptable object #{condition.inspect} assigned"
         end
-      elsif condition.is_a? Array
-        case condition[0]
-        when "||"
-          operator = Groonga::Operator::OR
-        when "&&"
-          operator = Groonga::Operator::AND
-        when "-"
-          operator = Groonga::Operator::BUT
-        else
-          raise "undefined operator assigned #{condition[0]}"
-        end
-        if condition[1]
-          parseCondition(source, expression, condition[1])
-        end
-        condition[2..-1].each do |element|
-          parseCondition(source, expression, element)
-          expression.append_operation(operator, 2)
-        end
-      else
-        raise "unacceptable object #{condition.inspect} assigned"
       end
-    end
 
-    def parseOrderKeys(keys)
-      keys.map do |key|
-        if key =~ /^-/
-          [$', :descending]
-        else
-          [key, :ascending]
-        end
-      end
-    end
-
-    def search_query(name, queries, results, outputs)
-      start_time = Time.now
-      query = queries[name]
-      result = source = results[query["source"]]
-      if query["condition"]
-        expression = Groonga::Expression.new(context: @context)
-        expression.define_variable(:domain => source)
-        parseCondition(source, expression, query["condition"])
-        result = source.select(expression)
-      end
-      if query["groupBy"]
-        result = result.group(query["groupBy"])
-      end
-      count = result.size
-      if query["sortBy"]
-        if query["sortBy"].is_a? Array
-          keys = parseOrderKeys(query["sortBy"])
-          offset = 0
-          limit = -1
-        elsif query["sortBy"].is_a? Hash
-          keys = parseOrderKeys(query["sortBy"]["keys"])
-          offset = query["sortBy"]["offset"]
-          limit = query["sortBy"]["limit"]
-        else
-          raise '"sortBy" parameter must be a Hash or an Array'
-        end
-        result = result.sort(keys, :offset => offset, :limit => limit)
-      end
-      results[name] = result
-      if query["output"]
-        offset = query["output"]["offset"] || 0
-        limit = query["output"]["limit"] || 10
-        outputs[name] = output = {}
-        if query["output"]["count"]
-          output["count"] = count
-        end
-        if query["output"]["attributes"].is_a? Array
-          attributes = query["output"]["attributes"].map do |attribute|
-            if attribute.is_a?(String)
-              { label: attribute, source: attribute}
-            else
-              { label: attribute["label"] || attribute["source"],
-                source: attribute["source"] }
-            end
+      def parseOrderKeys(keys)
+        keys.map do |key|
+          if key =~ /^-/
+            [$', :descending]
+          else
+            [key, :ascending]
           end
-          output["records"] = result.open_cursor(:offset => offset,
-                                                 :limit => limit) do |cursor|
-            cursor.collect do |record|
-              values = {}
-              attributes.collect do |attribute|
-                values[attribute[:label]] = record[attribute[:source]]
+        end
+      end
+
+      def search_query(name, queries, results, outputs)
+        start_time = Time.now
+        query = queries[name]
+        result = source = results[query["source"]]
+        if query["condition"]
+          expression = Groonga::Expression.new(context: @context)
+          expression.define_variable(:domain => source)
+          parseCondition(source, expression, query["condition"])
+          result = source.select(expression)
+        end
+        if query["groupBy"]
+          result = result.group(query["groupBy"])
+        end
+        count = result.size
+        if query["sortBy"]
+          if query["sortBy"].is_a? Array
+            keys = parseOrderKeys(query["sortBy"])
+            offset = 0
+            limit = -1
+          elsif query["sortBy"].is_a? Hash
+            keys = parseOrderKeys(query["sortBy"]["keys"])
+            offset = query["sortBy"]["offset"]
+            limit = query["sortBy"]["limit"]
+          else
+            raise '"sortBy" parameter must be a Hash or an Array'
+          end
+          result = result.sort(keys, :offset => offset, :limit => limit)
+        end
+        results[name] = result
+        if query["output"]
+          offset = query["output"]["offset"] || 0
+          limit = query["output"]["limit"] || 10
+          outputs[name] = output = {}
+          if query["output"]["count"]
+            output["count"] = count
+          end
+          if query["output"]["attributes"].is_a? Array
+            attributes = query["output"]["attributes"].map do |attribute|
+              if attribute.is_a?(String)
+                { label: attribute, source: attribute}
+              else
+                { label: attribute["label"] || attribute["source"],
+                  source: attribute["source"] }
               end
-              values
+            end
+            output["records"] = result.open_cursor(:offset => offset,
+                                                   :limit => limit) do |cursor|
+              cursor.collect do |record|
+                values = {}
+                attributes.collect do |attribute|
+                  values[attribute[:label]] = record[attribute[:source]]
+                end
+                values
+              end
             end
           end
-        end
-        if query["output"]["elapsedTime"]
-          output["startTime"] = start_time.iso8601
-          output["elapsedTime"] = Time.now.to_f - start_time.to_f
+          if query["output"]["elapsedTime"]
+            output["startTime"] = start_time.iso8601
+            output["elapsedTime"] = Time.now.to_f - start_time.to_f
+          end
         end
       end
-    end
     end
   end
 end
