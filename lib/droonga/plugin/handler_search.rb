@@ -198,7 +198,7 @@ module Droonga
       end
 
       def need_output?
-        @query.has_key?("output")
+        @result and @query.has_key?("output")
       end
 
       def output
