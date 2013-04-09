@@ -225,10 +225,15 @@ module Droonga
 
         target_attributes = attributes.map do |attribute|
           if attribute.is_a?(String)
-            { label: attribute, source: attribute}
+            {
+              label: attribute,
+              source: attribute,
+            }
           else
-            { label: attribute["label"] || attribute["source"],
-              source: attribute["source"] }
+            {
+              label: attribute["label"] || attribute["source"],
+              source: attribute["source"],
+            }
           end
         end
 
