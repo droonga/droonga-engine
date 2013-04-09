@@ -89,7 +89,7 @@ module Droonga
       end
 
       def search(results)
-        search_query(@query, results)
+        search_query(results)
       end
 
       def need_output?
@@ -100,12 +100,11 @@ module Droonga
         return nil unless need_output?
 
         params = @query["output"]
-        result = @result
         output = {}
         offset = params["offset"] || 0
         limit = params["limit"] || 10
         if params["count"]
-          count = result.size
+          count = @result.size
           output["count"] = count
         end
         if params["attributes"].is_a? Array
@@ -117,8 +116,8 @@ module Droonga
                 source: attribute["source"] }
             end
           end
-          output["records"] = result.open_cursor(:offset => offset,
-                                                 :limit => limit) do |cursor|
+          output["records"] = @result.open_cursor(:offset => offset,
+                                                  :limit => limit) do |cursor|
             cursor.collect do |record|
               values = {}
               attributes.collect do |attribute|
@@ -211,27 +210,27 @@ module Droonga
         end
       end
 
-      def search_query(query, results)
+      def search_query(results)
         @start_time = Time.now
-        result = source = results[query["source"]]
-        if query["condition"]
+        result = source = results[@query["source"]]
+        if @query["condition"]
           expression = Groonga::Expression.new(context: @context)
           expression.define_variable(:domain => source)
-          parseCondition(source, expression, query["condition"])
+          parseCondition(source, expression, @query["condition"])
           result = source.select(expression)
         end
-        if query["groupBy"]
-          result = result.group(query["groupBy"])
+        if @query["groupBy"]
+          result = result.group(@query["groupBy"])
         end
-        if query["sortBy"]
-          if query["sortBy"].is_a? Array
-            keys = parseOrderKeys(query["sortBy"])
+        if @query["sortBy"]
+          if @query["sortBy"].is_a? Array
+            keys = parseOrderKeys(@query["sortBy"])
             offset = 0
             limit = -1
-          elsif query["sortBy"].is_a? Hash
-            keys = parseOrderKeys(query["sortBy"]["keys"])
-            offset = query["sortBy"]["offset"]
-            limit = query["sortBy"]["limit"]
+          elsif @query["sortBy"].is_a? Hash
+            keys = parseOrderKeys(@query["sortBy"]["keys"])
+            offset = @query["sortBy"]["offset"]
+            limit = @query["sortBy"]["limit"]
           else
             raise '"sortBy" parameter must be a Hash or an Array'
           end
