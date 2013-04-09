@@ -49,7 +49,7 @@ module Droonga
       query_sorter.tsort.each do |name|
         if queries[name]
           searcher = QuerySearcher.new(@context, name)
-          searcher.search(queries, results, outputs)
+          searcher.search(queries[name], results, outputs)
         elsif @context[name]
           results[name] = @context[name]
         else
@@ -86,8 +86,8 @@ module Droonga
         @name = name
       end
 
-      def search(queries, results, outputs)
-        search_query(@name, queries, results, outputs)
+      def search(query, results, outputs)
+        search_query(@name, query, results, outputs)
       end
 
        def parseCondition(source, expression, condition)
@@ -165,9 +165,8 @@ module Droonga
         end
       end
 
-      def search_query(name, queries, results, outputs)
+      def search_query(name, query, results, outputs)
         start_time = Time.now
-        query = queries[name]
         result = source = results[query["source"]]
         if query["condition"]
           expression = Groonga::Expression.new(context: @context)
