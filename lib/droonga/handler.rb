@@ -19,19 +19,31 @@ require "droonga/handler_plugin"
 
 module Droonga
   class Handler
-    @@commands = {}
     class << self
+      def inherited(sub_class)
+        super
+        sub_class.instance_variable_set(:@commands, {})
+      end
+
       def command(name_or_map)
         if name_or_map.is_a?(Hash)
           command_map = name_or_map
           command_map.each do |command_name, method_name|
-            @@commands[command_name.to_s] = method_name
+            @commands[command_name.to_s] = method_name
           end
         else
           name = name_or_map
           method_name = name
-          @@commands[name.to_s] = method_name
+          @commands[name.to_s] = method_name
         end
+      end
+
+      def method_name(command)
+        @commands[command.to_s]
+      end
+
+      def handlable?(command)
+        not method_name(command).nil?
       end
     end
 
@@ -43,11 +55,11 @@ module Droonga
     end
 
     def handlable?(command)
-      not @@commands[command.to_s].nil?
+      self.class.handlable?(command)
     end
 
     def handle(command, request)
-      __send__(@@commands[command], request)
+      __send__(self.class.method_name(command), request)
     end
   end
 end
