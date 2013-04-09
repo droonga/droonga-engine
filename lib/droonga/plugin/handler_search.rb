@@ -92,6 +92,50 @@ module Droonga
         search_query(@query, results)
       end
 
+      def need_output?
+        @result and @query.has_key?("output")
+      end
+
+      def output
+        return nil unless need_output?
+
+        params = @query["output"]
+        result = @result
+        output = {}
+        offset = params["offset"] || 0
+        limit = params["limit"] || 10
+        if params["count"]
+          count = result.size
+          output["count"] = count
+        end
+        if params["attributes"].is_a? Array
+          attributes = params["attributes"].map do |attribute|
+            if attribute.is_a?(String)
+              { label: attribute, source: attribute}
+            else
+              { label: attribute["label"] || attribute["source"],
+                source: attribute["source"] }
+            end
+          end
+          output["records"] = result.open_cursor(:offset => offset,
+                                                 :limit => limit) do |cursor|
+            cursor.collect do |record|
+              values = {}
+              attributes.collect do |attribute|
+                values[attribute[:label]] = record[attribute[:source]]
+              end
+              values
+            end
+          end
+        end
+        if params["elapsedTime"]
+          output["startTime"] = @start_time.iso8601
+          output["elapsedTime"] = Time.now.to_f - @start_time.to_f
+        end
+        output
+      end
+
+      private
       def parseCondition(source, expression, condition)
         if condition.is_a? String
           expression.parse(condition, :syntax => :script)
@@ -195,49 +239,6 @@ module Droonga
         end
         @result = result
         result
-      end
-
-      def need_output?
-        @result and @query.has_key?("output")
-      end
-
-      def output
-        return nil unless need_output?
-
-        params = @query["output"]
-        result = @result
-        output = {}
-        offset = params["offset"] || 0
-        limit = params["limit"] || 10
-        if params["count"]
-          count = result.size
-          output["count"] = count
-        end
-        if params["attributes"].is_a? Array
-          attributes = params["attributes"].map do |attribute|
-            if attribute.is_a?(String)
-              { label: attribute, source: attribute}
-            else
-              { label: attribute["label"] || attribute["source"],
-                source: attribute["source"] }
-            end
-          end
-          output["records"] = result.open_cursor(:offset => offset,
-                                                 :limit => limit) do |cursor|
-            cursor.collect do |record|
-              values = {}
-              attributes.collect do |attribute|
-                values[attribute[:label]] = record[attribute[:source]]
-              end
-              values
-            end
-          end
-        end
-        if params["elapsedTime"]
-          output["startTime"] = @start_time.iso8601
-          output["elapsedTime"] = Time.now.to_f - @start_time.to_f
-        end
-        output
       end
     end
   end
