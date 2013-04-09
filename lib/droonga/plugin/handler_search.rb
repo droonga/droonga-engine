@@ -48,7 +48,8 @@ module Droonga
       results = {}
       query_sorter.tsort.each do |name|
         if queries[name]
-          search_query(name, queries, results, outputs)
+          searcher = QuerySearcher.new(@context, name)
+          searcher.search(queries, results, outputs)
         elsif @context[name]
           results[name] = @context[name]
         else
@@ -57,6 +58,37 @@ module Droonga
       end
       outputs
     end
+
+    class QuerySorter
+      include TSort
+      def initialize()
+        @queries = {}
+      end
+
+      def add(name, sources=[])
+        @queries[name] = sources
+      end
+
+      def tsort_each_node(&block)
+        @queries.each_key(&block)
+      end
+
+      def tsort_each_child(node, &block)
+        if @queries[node]
+          @queries[node].each(&block)
+        end
+      end
+    end
+
+    class QuerySearcher
+      def initialize(context, name)
+        @context = context
+        @name = name
+      end
+
+      def search(queries, results, outputs)
+        search_query(@name, queries, results, outputs)
+      end
 
     def parseCondition(source, expression, condition)
       if condition.is_a? String
@@ -195,26 +227,6 @@ module Droonga
         end
       end
     end
-
-    class QuerySorter
-      include TSort
-      def initialize()
-        @queries = {}
-      end
-
-      def add(name, sources=[])
-        @queries[name] = sources
-      end
-
-      def tsort_each_node(&block)
-        @queries.each_key(&block)
-      end
-
-      def tsort_each_child(node, &block)
-        if @queries[node]
-          @queries[node].each(&block)
-        end
-      end
     end
   end
 end
