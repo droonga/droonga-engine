@@ -213,15 +213,15 @@ module Droonga
 
       def search_query(results)
         @start_time = Time.now
-        result = source = results[@query["source"]]
+        @result = source = results[@query["source"]]
         if @query["condition"]
           expression = Groonga::Expression.new(context: @context)
           expression.define_variable(:domain => source)
           parseCondition(source, expression, @query["condition"])
-          result = source.select(expression)
+          @result = source.select(expression)
         end
         if @query["groupBy"]
-          result = result.group(@query["groupBy"])
+          @result = @result.group(@query["groupBy"])
         end
         if @query["sortBy"]
           if @query["sortBy"].is_a? Array
@@ -235,10 +235,9 @@ module Droonga
           else
             raise '"sortBy" parameter must be a Hash or an Array'
           end
-          result = result.sort(keys, :offset => offset, :limit => limit)
+          @result = @result.sort(keys, :offset => offset, :limit => limit)
         end
-        @result = result
-        result
+        @result
       end
     end
   end
