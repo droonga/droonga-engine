@@ -102,12 +102,9 @@ module Droonga
 
         params = @query["output"]
         output = {}
+        output_count(params, output)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
-        if params["count"]
-          count = @result.size
-          output["count"] = count
-        end
         if params["attributes"].is_a? Array
           attributes = params["attributes"].map do |attribute|
             if attribute.is_a?(String)
@@ -238,6 +235,11 @@ module Droonga
           @result = @result.sort(keys, :offset => offset, :limit => limit)
         end
         @result
+      end
+
+      def output_count(params, output)
+        return unless params["count"]
+        output["count"] = @result.size
       end
     end
   end
