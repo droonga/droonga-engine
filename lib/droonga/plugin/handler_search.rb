@@ -98,8 +98,6 @@ module Droonga
       end
 
       def format
-        return nil unless need_output?
-
         params = @query["output"]
         formatted_result = {}
         format_count(params, formatted_result)
