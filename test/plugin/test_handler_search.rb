@@ -45,15 +45,23 @@ class SearchHandlerTest < Test::Unit::TestCase
     @handler = nil
   end
 
+  def search(request)
+    @handler.search(request)
+  end
+
+  def assert_search(expected, request)
+    assert_equal(expected, search(request))
+  end
+
   class NoParameterTest < self
     def test_empty
-      assert_equal({}, @handler.search({}))
+      assert_search({}, {})
     end
   end
 
   class QueriesTest < self
     def test_empty
-      assert_equal({}, @handler.search({"queries" => []}))
+      assert_search({}, {"queries" => {}})
     end
   end
 end
