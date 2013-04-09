@@ -48,9 +48,9 @@ module Droonga
       results = {}
       query_sorter.tsort.each do |name|
         if queries[name]
-          searcher = QuerySearcher.new(@context, name, queries[name])
+          searcher = QuerySearcher.new(@context, queries[name])
           results[name] = searcher.search(results)
-          searcher.output(outputs)
+          outputs[name] = searcher.output if searcher.need_output?
         elsif @context[name]
           results[name] = @context[name]
         else
@@ -82,9 +82,8 @@ module Droonga
     end
 
     class QuerySearcher
-      def initialize(context, name, query)
+      def initialize(context, query)
         @context = context
-        @name = name
         @query = query
         @result = nil
       end
@@ -198,13 +197,18 @@ module Droonga
         result
       end
 
-      def output(outputs)
+      def need_output?
+        @query.has_key?("output")
+      end
+
+      def output
+        return nil unless need_output?
+
         query = @query
         result = @result
-        if query["output"]
+        output = {}
           offset = query["output"]["offset"] || 0
           limit = query["output"]["limit"] || 10
-          outputs[@name] = output = {}
           if query["output"]["count"]
             count = result.size
             output["count"] = count
@@ -233,7 +237,7 @@ module Droonga
             output["startTime"] = start_time.iso8601
             output["elapsedTime"] = Time.now.to_f - start_time.to_f
           end
-        end
+        output
       end
     end
   end
