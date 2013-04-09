@@ -220,26 +220,27 @@ module Droonga
       end
 
       def format_records(params, formatted_result)
+        attributes = params["attributes"]
+        return if attributes.nil?
+
+        target_attributes = attributes.map do |attribute|
+          if attribute.is_a?(String)
+            { label: attribute, source: attribute}
+          else
+            { label: attribute["label"] || attribute["source"],
+              source: attribute["source"] }
+          end
+        end
+
         offset = params["offset"] || 0
         limit = params["limit"] || 10
-        attributes = params["attributes"]
-        if attributes.is_a?(Array)
-          target_attributes = attributes.map do |attribute|
-            if attribute.is_a?(String)
-              { label: attribute, source: attribute}
-            else
-              { label: attribute["label"] || attribute["source"],
-                source: attribute["source"] }
+        @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+          formatted_result["records"] = cursor.collect do |record|
+            values = {}
+            target_attributes.collect do |attribute|
+              values[attribute[:label]] = record[attribute[:source]]
             end
-          end
-          @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
-            formatted_result["records"] = cursor.collect do |record|
-              values = {}
-              target_attributes.collect do |attribute|
-                values[attribute[:label]] = record[attribute[:source]]
-              end
-              values
-            end
+            values
           end
         end
       end
