@@ -50,7 +50,7 @@ module Droonga
         if queries[name]
           searcher = QuerySearcher.new(@context, queries[name])
           results[name] = searcher.search(results)
-          outputs[name] = searcher.output if searcher.need_output?
+          outputs[name] = searcher.format if searcher.need_output?
         elsif @context[name]
           results[name] = @context[name]
         else
@@ -97,12 +97,12 @@ module Droonga
         @result and @query.has_key?("output")
       end
 
-      def output
+      def format
         return nil unless need_output?
 
         params = @query["output"]
-        output = {}
-        output_count(params, output)
+        formatted_result = {}
+        format_count(params, formatted_result)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
         if params["attributes"].is_a? Array
@@ -114,9 +114,8 @@ module Droonga
                 source: attribute["source"] }
             end
           end
-          output["records"] = @result.open_cursor(:offset => offset,
-                                                  :limit => limit) do |cursor|
-            cursor.collect do |record|
+          @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+            formatted_result["records"] = cursor.collect do |record|
               values = {}
               attributes.collect do |attribute|
                 values[attribute[:label]] = record[attribute[:source]]
@@ -126,10 +125,10 @@ module Droonga
           end
         end
         if params["elapsedTime"]
-          output["startTime"] = @start_time.iso8601
-          output["elapsedTime"] = Time.now.to_f - @start_time.to_f
+          formatted_result["startTime"] = @start_time.iso8601
+          formatted_result["elapsedTime"] = Time.now.to_f - @start_time.to_f
         end
-        output
+        formatted_result
       end
 
       private
@@ -237,9 +236,9 @@ module Droonga
         @result
       end
 
-      def output_count(params, output)
+      def format_count(params, formatted_result)
         return unless params["count"]
-        output["count"] = @result.size
+        formatted_result["count"] = @result.size
       end
     end
   end
