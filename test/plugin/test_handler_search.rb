@@ -148,7 +148,6 @@ class SearchHandlerTest < Test::Unit::TestCase
     end
 
     class AttributesTest < self
-      class ArrayTest < self
         def test_source_only
           expected = {
             "sections-result" => {
@@ -220,7 +219,6 @@ class SearchHandlerTest < Test::Unit::TestCase
           }
           assert_search(expected, request)
         end
-      end
     end
   end
 end
