@@ -48,8 +48,9 @@ module Droonga
       results = {}
       query_sorter.tsort.each do |name|
         if queries[name]
-          searcher = QuerySearcher.new(@context, name)
-          searcher.search(queries[name], results, outputs)
+          searcher = QuerySearcher.new(@context, name, queries[name])
+          searcher.search(results)
+          searcher.output(outputs)
         elsif @context[name]
           results[name] = @context[name]
         else
@@ -81,13 +82,15 @@ module Droonga
     end
 
     class QuerySearcher
-      def initialize(context, name)
+      def initialize(context, name, query)
         @context = context
         @name = name
+        @query = query
+        @result = nil
       end
 
-      def search(query, results, outputs)
-        search_query(@name, query, results, outputs)
+      def search(results)
+        search_query(@name, @query, results)
       end
 
        def parseCondition(source, expression, condition)
@@ -165,7 +168,7 @@ module Droonga
         end
       end
 
-      def search_query(name, query, results, outputs)
+      def search_query(name, query, results)
         start_time = Time.now
         result = source = results[query["source"]]
         if query["condition"]
@@ -177,7 +180,6 @@ module Droonga
         if query["groupBy"]
           result = result.group(query["groupBy"])
         end
-        count = result.size
         if query["sortBy"]
           if query["sortBy"].is_a? Array
             keys = parseOrderKeys(query["sortBy"])
@@ -192,12 +194,18 @@ module Droonga
           end
           result = result.sort(keys, :offset => offset, :limit => limit)
         end
-        results[name] = result
+        @result = results[name] = result
+      end
+
+      def output(outputs)
+        query = @query
+        result = @result
         if query["output"]
           offset = query["output"]["offset"] || 0
           limit = query["output"]["limit"] || 10
-          outputs[name] = output = {}
+          outputs[@name] = output = {}
           if query["output"]["count"]
+            count = result.size
             output["count"] = count
           end
           if query["output"]["attributes"].is_a? Array
