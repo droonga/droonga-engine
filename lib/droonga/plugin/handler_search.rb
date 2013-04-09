@@ -204,17 +204,17 @@ module Droonga
       def output
         return nil unless need_output?
 
-        query = @query
+        params = @query["output"]
         result = @result
         output = {}
-        offset = query["output"]["offset"] || 0
-        limit = query["output"]["limit"] || 10
-        if query["output"]["count"]
+        offset = params["offset"] || 0
+        limit = params["limit"] || 10
+        if params["count"]
           count = result.size
           output["count"] = count
         end
-        if query["output"]["attributes"].is_a? Array
-          attributes = query["output"]["attributes"].map do |attribute|
+        if params["attributes"].is_a? Array
+          attributes = params["attributes"].map do |attribute|
             if attribute.is_a?(String)
               { label: attribute, source: attribute}
             else
@@ -233,7 +233,7 @@ module Droonga
             end
           end
         end
-        if query["output"]["elapsedTime"]
+        if params["elapsedTime"]
           output["startTime"] = start_time.iso8601
           output["elapsedTime"] = Time.now.to_f - start_time.to_f
         end
