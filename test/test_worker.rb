@@ -87,10 +87,8 @@ class WorkerTest < Test::Unit::TestCase
         "type" => "search.result",
         "statusCode" => 200,
         "body" => {
-          "result" => {
-            "sections" => {
-              "count" => 9,
-            },
+          "sections" => {
+            "count" => 9,
           },
         },
       }
