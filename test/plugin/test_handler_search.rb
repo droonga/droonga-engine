@@ -77,5 +77,19 @@ class SearchHandlerTest < Test::Unit::TestCase
                })
       end
     end
+
+    def test_existent
+      assert_search({
+                      "sections-result" => {},
+                    },
+                    {
+                      "queries" => {
+                        "sections-result" => {
+                          "source" => "Sections",
+                          "output" => {},
+                        },
+                      },
+                    })
+    end
   end
 end
