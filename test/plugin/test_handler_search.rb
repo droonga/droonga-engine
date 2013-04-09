@@ -148,77 +148,77 @@ class SearchHandlerTest < Test::Unit::TestCase
     end
 
     class AttributesTest < self
-        def test_source_only
-          expected = {
+      def test_source_only
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "_key" => "1.1",
+                "title" => "Groonga overview",
+              },
+              {
+                "_key" => "1.2",
+                "title" => "Full text search and Instant update",
+              },
+              {
+                "_key" => "1.3",
+                "title" => "Column store and aggregate query",
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
             "sections-result" => {
-              "records" => [
-                {
-                  "_key" => "1.1",
-                  "title" => "Groonga overview",
-                },
-                {
-                  "_key" => "1.2",
-                  "title" => "Full text search and Instant update",
-                },
-                {
-                  "_key" => "1.3",
-                  "title" => "Column store and aggregate query",
-                },
-              ],
-            },
-          }
-          request = {
-            "queries" => {
-              "sections-result" => {
-                "source" => "Sections",
-                "output" => {
-                  "limit" => 3,
-                  "attributes" => ["_key", "title"],
-                },
+              "source" => "Sections",
+              "output" => {
+                "limit" => 3,
+                "attributes" => ["_key", "title"],
               },
             },
-          }
-          assert_search(expected, request)
-        end
+          },
+        }
+        assert_search(expected, request)
+      end
 
-        def test_label
-          expected = {
+      def test_label
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "key" => "1.1",
+                "title" => "Groonga overview",
+              },
+              {
+                "key" => "1.2",
+                "title" => "Full text search and Instant update",
+              },
+              {
+                "key" => "1.3",
+                "title" => "Column store and aggregate query",
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
             "sections-result" => {
-              "records" => [
-                {
-                  "key" => "1.1",
-                  "title" => "Groonga overview",
-                },
-                {
-                  "key" => "1.2",
-                  "title" => "Full text search and Instant update",
-                },
-                {
-                  "key" => "1.3",
-                  "title" => "Column store and aggregate query",
-                },
-              ],
-            },
-          }
-          request = {
-            "queries" => {
-              "sections-result" => {
-                "source" => "Sections",
-                "output" => {
-                  "limit" => 3,
-                  "attributes" => [
-                    {
-                      "label" => "key",
-                      "source" => "_key",
-                    },
-                    "title",
-                  ],
-                },
+              "source" => "Sections",
+              "output" => {
+                "limit" => 3,
+                "attributes" => [
+                  {
+                    "label" => "key",
+                    "source" => "_key",
+                  },
+                  "title",
+                ],
               },
             },
-          }
-          assert_search(expected, request)
-        end
+          },
+        }
+        assert_search(expected, request)
+      end
     end
   end
 end
