@@ -70,21 +70,33 @@ module Droonga
       @handlers << plugin.instantiate(self)
     end
 
+    def add_route(route)
+      envelope[:via].push(route)
+    end
+
     def post(body, destination=nil)
+      route = envelope[:via].pop
+      destination = route unless destination
       output = get_output(destination)
-      if output
-        response = {
+      return unless output
+      if destination
+        message = envelope
+        message[:body] = body
+      else
+        message = {
           inReplyTo: envelope["id"],
           statusCode: 200,
           type: (envelope["type"] || "") + ".result",
           body: body
         }
-        output.post("message", response)
       end
+      output.post("message", message)
+      add_route(route) if route
     end
 
-    def process_message(envelope)
-      @envelope = envelope
+    def process_message(record)
+      @envelope = record
+      envelope[:via] ||= []
       command = envelope["type"]
       handler = find_handler(command)
       return unless handler
@@ -165,7 +177,7 @@ module Droonga
     end
 
     def get_output(destination)
-      receiver = @envelope["replyTo"]
+      receiver = envelope["replyTo"]
       return nil unless receiver
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"

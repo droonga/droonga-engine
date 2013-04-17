@@ -56,6 +56,10 @@ module Droonga
       @worker.post(body, destination)
     end
 
+    def add_route(route)
+      @worker.add_route(route)
+    end
+
     def shutdown
     end
 
