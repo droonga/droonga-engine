@@ -16,10 +16,14 @@
 require "droonga/plugin/handler_search"
 
 class Worker
-  attr_reader :context
+  attr_reader :context, :body
 
   def initialize()
     @context = Groonga::Context.default
+  end
+
+  def post(body, destination=nil)
+    @body = body
   end
 end
 
@@ -46,7 +50,8 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   def setup_handler
-    @handler = Droonga::SearchHandler.new(Worker.new)
+    @worker = Worker.new
+    @handler = Droonga::SearchHandler.new(@worker)
   end
 
   def teardown_handler
@@ -54,7 +59,8 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   def search(request)
-    normalize_result_set(@handler.search(request))
+    @handler.search(request)
+    normalize_result_set(@worker.body)
   end
 
   def normalize_result_set(result_set)

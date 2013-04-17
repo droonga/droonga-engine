@@ -52,6 +52,10 @@ module Droonga
       @context = @worker.context
     end
 
+    def post(body, destination=nil)
+      @worker.post(body, destination)
+    end
+
     def shutdown
     end
 

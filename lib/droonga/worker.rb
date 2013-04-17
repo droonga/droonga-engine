@@ -70,22 +70,25 @@ module Droonga
       @handlers << plugin.instantiate(self)
     end
 
-    def process_message(envelope)
-      @envelope = envelope
-      command = envelope["type"]
-      handler = find_handler(command)
-      return unless handler
-      result = handler.handle(command, envelope["body"])
-      output = get_output
+    def post(body, destination=nil)
+      output = get_output(destination)
       if output
         response = {
           inReplyTo: envelope["id"],
           statusCode: 200,
           type: (envelope["type"] || "") + ".result",
-          body: result
+          body: body
         }
         output.post("message", response)
       end
+    end
+
+    def process_message(envelope)
+      @envelope = envelope
+      command = envelope["type"]
+      handler = find_handler(command)
+      return unless handler
+      handler.handle(command, envelope["body"])
     end
 
     private
@@ -161,7 +164,7 @@ module Droonga
       end
     end
 
-    def get_output
+    def get_output(destination)
       receiver = @envelope["replyTo"]
       return nil unless receiver
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/

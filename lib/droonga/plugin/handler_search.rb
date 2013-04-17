@@ -39,25 +39,25 @@ module Droonga
     def search(request)
       queries = request["queries"]
       outputs = {}
-      return outputs if queries.nil?
-
-      query_sorter = QuerySorter.new
-      queries.each do |name, query|
-        query_sorter.add(name, [query["source"]])
-      end
-      results = {}
-      query_sorter.tsort.each do |name|
-        if queries[name]
-          searcher = QuerySearcher.new(@context, queries[name])
-          results[name] = searcher.search(results)
-          outputs[name] = searcher.format if searcher.need_output?
-        elsif @context[name]
-          results[name] = @context[name]
-        else
-          raise UndefinedSourceError.new(name)
+      if queries
+        query_sorter = QuerySorter.new
+        queries.each do |name, query|
+          query_sorter.add(name, [query["source"]])
+        end
+        results = {}
+        query_sorter.tsort.each do |name|
+          if queries[name]
+            searcher = QuerySearcher.new(@context, queries[name])
+            results[name] = searcher.search(results)
+            outputs[name] = searcher.format if searcher.need_output?
+          elsif @context[name]
+            results[name] = @context[name]
+          else
+            raise UndefinedSourceError.new(name)
+          end
         end
       end
-      outputs
+      post(outputs)
     end
 
     class QuerySorter
