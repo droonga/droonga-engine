@@ -43,7 +43,8 @@ class WorkerTest < Test::Unit::TestCase
   end
 
   def setup_worker
-    @worker = Droonga::Worker.new(@database_path.to_s, "DroongaQueue")
+    @worker = Droonga::Worker.new(:database => @database_path.to_s,
+                                  :queue_name => "DroongaQueue")
     @worker.add_handler("search")
   end
 

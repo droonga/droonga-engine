@@ -15,9 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/job_queue"
 require "droonga/worker"
-require "droonga/plugin"
 
 module Fluent
   class DroongaOutput < Output
@@ -30,68 +28,24 @@ module Fluent
       value.split(/\s*,\s*/)
     end
 
-    def configure(conf)
-      super
-      Droonga::JobQueue.ensure_schema(@database, @queue_name)
-      load_handlers
-    end
-
     def start
       super
-      @workers = []
-      @n_workers.times do
-        pid = Process.fork
-        if pid
-          @workers << pid
-          next
-        end
-        # child process
-        begin
-          create_worker.start
-          exit! 0
-        end
-      end
-      @worker = create_worker
+      @worker = Droonga::Worker.new(:database => @database,
+                                    :queue_name => @queue_name,
+                                    :pool_size => @n_workers,
+                                    :handlers => @handlers)
     end
 
     def shutdown
       super
       @worker.shutdown
-      @workers.each do |pid|
-        Process.kill(:KILL, pid)
-      end
     end
 
     def emit(tag, es, chain)
       es.each do |time, record|
-        # Merge it if needed
-        dispatch(tag, time, record)
+        @worker.dispatch(tag, time, record)
       end
       chain.next
-    end
-
-    def dispatch(tag, time, record)
-      if @workers.empty?
-        @worker.process_message(record)
-      else
-        @worker.post_message(record)
-      end
-    end
-
-    private
-    def load_handlers
-      @handlers.each do |handler_name|
-        plugin = Droonga::Plugin.new("handler", handler_name)
-        plugin.load
-      end
-    end
-
-    def create_worker
-      worker = Droonga::Worker.new(@database, @queue_name)
-      @handlers.each do |handler_name|
-        worker.add_handler(handler_name)
-      end
-      worker
     end
   end
 end

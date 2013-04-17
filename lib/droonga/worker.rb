@@ -19,27 +19,31 @@ require "msgpack"
 require "fluent-logger"
 require "groonga"
 
+require "droonga/job_queue"
 require "droonga/handler_plugin"
+require "droonga/plugin"
 
 module Droonga
   class Worker
-    def initialize(database, queue_name)
-      @context = Groonga::Context.new
-      @database = @context.open_database(database)
-      @context.encoding = :none
-      @queue_name = queue_name
+    def initialize(options={})
+      @pool = []
       @handlers = []
       @outputs = {}
-      @finish = false
-      @status = :IDLE
-    end
-
-    def add_handler(name)
-      plugin = HandlerPlugin.new(name)
-      @handlers << plugin.instantiate(@context)
+      @database_name = options[:database] || "droonga/db"
+      @queue_name = options[:queue_name] || "DroongaQueue"
+      Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
+      @handler_names = options[:handlers] || ["search"]
+      load_handlers
+      pool_size = options[:pool_size] || 1
+      @pool = spawn(pool_size)
+      prepare
     end
 
     def shutdown
+      @pool.each do |pid|
+        # TODO: do it gracefully
+        Process.kill(:KILL, pid)
+      end
       @handlers.each do |handler|
         handler.shutdown
       end
@@ -51,7 +55,48 @@ module Droonga
       @database = @context = nil
     end
 
+    def dispatch(tag, time, record)
+      if @pool.empty?
+        process_message(record)
+      else
+        post_message(record)
+      end
+    end
+
+    def add_handler(name)
+      plugin = HandlerPlugin.new(name)
+      @handlers << plugin.instantiate(@context)
+    end
+
+    def process_message(envelope)
+      command = envelope["type"]
+      handler = find_handler(command)
+      return unless handler
+      result = handler.handle(command, envelope["body"])
+      output = get_output(envelope)
+      if output
+        response = {
+          inReplyTo: envelope["id"],
+          statusCode: 200,
+          type: (envelope["type"] || "") + ".result",
+          body: result
+        }
+        output.post("message", response)
+      end
+    end
+
+    private
+    def post_message(envelope)
+      message = envelope.to_msgpack
+      queue = @context[@queue_name]
+      queue.push do |record|
+        record.message = message
+      end
+    end
+
     def start
+      @finish = false
+      @status = :IDLE
       # TODO: doesn't work
       Signal.trap(:TERM) do
         @finish = true
@@ -72,31 +117,41 @@ module Droonga
       end
     end
 
-    def post_message(envelope)
-      message = envelope.to_msgpack
-      queue = @context[@queue_name]
-      queue.push do |record|
-        record.message = message
+    def spawn(pool_size)
+      pool = []
+      pool_size.times do
+        pid = Process.fork
+        if pid
+          pool << pid
+          next
+        end
+        # child process
+        begin
+          prepare
+          start
+          shutdown
+          exit! 0
+        end
+      end
+      pool
+    end
+
+    def load_handlers
+      @handler_names.each do |handler_name|
+        plugin = Droonga::Plugin.new("handler", handler_name)
+        plugin.load
       end
     end
 
-    def process_message(envelope)
-      command = envelope["type"]
-      handler = find_handler(command)
-      result = handler.handle(command, envelope["body"])
-      output = get_output(envelope)
-      if output
-        response = {
-          inReplyTo: envelope["id"],
-          statusCode: 200,
-          type: (envelope["type"] || "") + ".result",
-          body: result
-        }
-        output.post("message", response)
+    def prepare
+      @context = Groonga::Context.new
+      @database = @context.open_database(@database_name)
+      @context.encoding = :none
+      @handler_names.each do |handler_name|
+        add_handler(handler_name)
       end
     end
 
-    private
     def find_handler(command)
       @handlers.find do |handler|
         handler.handlable?(command)

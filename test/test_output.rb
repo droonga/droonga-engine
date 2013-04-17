@@ -23,7 +23,7 @@ module OutputStub
       @processed_record = nil
     end
 
-    def process_message(record)
+    def dispatch(tag, time, record)
       @processed_record = record
       @response
     end
@@ -56,8 +56,8 @@ module OutputStub
       super()
     end
 
-    def create_worker
-      Worker.new(@response)
+    def start
+      @worker = Worker.new(@response)
     end
 
     def create_logger(tag, options)
