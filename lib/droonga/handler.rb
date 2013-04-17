@@ -47,8 +47,9 @@ module Droonga
       end
     end
 
-    def initialize(context)
-      @context = context
+    def initialize(worker)
+      @worker = worker
+      @context = @worker.context
     end
 
     def shutdown

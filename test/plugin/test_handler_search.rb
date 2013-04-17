@@ -15,6 +15,14 @@
 
 require "droonga/plugin/handler_search"
 
+class Worker
+  attr_reader :context
+
+  def initialize()
+    @context = Groonga::Context.default
+  end
+end
+
 class SearchHandlerTest < Test::Unit::TestCase
   def setup
     setup_database
@@ -38,7 +46,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   def setup_handler
-    @handler = Droonga::SearchHandler.new(Groonga::Context.default)
+    @handler = Droonga::SearchHandler.new(Worker.new)
   end
 
   def teardown_handler

@@ -25,6 +25,8 @@ require "droonga/plugin"
 
 module Droonga
   class Worker
+    attr_reader :context, :envelope
+
     def initialize(options={})
       @pool = []
       @handlers = []
@@ -65,15 +67,16 @@ module Droonga
 
     def add_handler(name)
       plugin = HandlerPlugin.new(name)
-      @handlers << plugin.instantiate(@context)
+      @handlers << plugin.instantiate(self)
     end
 
     def process_message(envelope)
+      @envelope = envelope
       command = envelope["type"]
       handler = find_handler(command)
       return unless handler
       result = handler.handle(command, envelope["body"])
-      output = get_output(envelope)
+      output = get_output
       if output
         response = {
           inReplyTo: envelope["id"],
@@ -158,8 +161,8 @@ module Droonga
       end
     end
 
-    def get_output(event)
-      receiver = event["replyTo"]
+    def get_output
+      receiver = @envelope["replyTo"]
       return nil unless receiver
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"

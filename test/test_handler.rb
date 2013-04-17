@@ -31,8 +31,14 @@ class HandlerTest < Test::Unit::TestCase
       end
     end
 
+    class Worker
+      def context
+        nil
+      end
+    end
+
     def setup
-      context = Object.new
+      context = Worker.new
       @search_handler = SearchHandler.new(context)
     end
 
