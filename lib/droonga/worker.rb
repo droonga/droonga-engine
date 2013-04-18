@@ -75,8 +75,11 @@ module Droonga
     end
 
     def post(body, destination=nil)
-      route = envelope[:via].pop
-      destination = route unless destination
+      route = nil
+      unless destination
+        route = envelope[:via].pop
+        destination = route
+      end
       output = get_output(destination)
       return unless output
       if destination
