@@ -118,7 +118,9 @@ module Droonga
           if condition["matchTo"]
             matchTo = Groonga::Expression.new(context: @context)
             matchTo.define_variable(:domain => source)
-            matchTo.parse(condition["matchTo"], :syntax => :script)
+            match_columns = condition["matchTo"]
+            match_columns = match_columns.join(",") if match_columns.is_a?(Array)
+            matchTo.parse(match_columns, :syntax => :script)
             options[:default_column] = matchTo
           end
           if condition["query"]
