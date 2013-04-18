@@ -59,7 +59,7 @@ module Droonga
 
     def dispatch(tag, time, record)
       if @pool.empty?
-        process_message(record)
+        process_message(tag, time, record)
       else
         post_message(tag, time, record)
       end
@@ -97,7 +97,7 @@ module Droonga
       add_route(route) if route
     end
 
-    def process_message(record)
+    def process_message(tag, time, record)
       @envelope = record
       envelope[:via] ||= []
       command = envelope["type"]
@@ -132,7 +132,7 @@ module Droonga
         end
         if packed_message
           tag, time, record = MessagePack.unpack(packed_message)
-          process_message(record)
+          process_message(tag, time, record)
         end
         @status = :IDLE
       end
