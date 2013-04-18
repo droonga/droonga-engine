@@ -61,7 +61,7 @@ module Droonga
       if @pool.empty?
         process_message(record)
       else
-        post_message(record)
+        post_message(tag, time, record)
       end
     end
 
@@ -107,11 +107,11 @@ module Droonga
     end
 
     private
-    def post_message(envelope)
-      message = envelope.to_msgpack
+    def post_message(*message)
+      packed_message = message.to_msgpack
       queue = @context[@queue_name]
       queue.push do |record|
-        record.message = message
+        record.message = packed_message
       end
     end
 
@@ -125,14 +125,14 @@ module Droonga
       end
       queue = @context[@queue_name]
       while !@finish
-        message = nil
+        packed_message = nil
         queue.pull do |record|
           @status = :BUSY
-          message = record.message if record
+          packed_message = record.message if record
         end
-        if message
-          envelope = MessagePack.unpack(message)
-          process_message(envelope) if message
+        if packed_message
+          tag, time, record = MessagePack.unpack(packed_message)
+          process_message(record)
         end
         @status = :IDLE
       end
