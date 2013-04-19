@@ -98,9 +98,22 @@ module Droonga
     end
 
     private
-    def process_message(tag, time, record)
-      @envelope = record
+    def parse_message(tag, time, record)
+      @message = [tag, time, record]
+      prefix, type = tag.split(/\./)
+      if type.nil? || type.empty? || type == 'message'
+        @envelope = record
+      else
+        @envelope = {
+          "type" => type,
+          "body" => record
+        }
+      end
       envelope[:via] ||= []
+    end
+
+    def process_message(tag, time, record)
+      parse_message(tag, time, record)
       command = envelope["type"]
       handler = find_handler(command)
       return unless handler
