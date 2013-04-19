@@ -90,12 +90,13 @@ module Droonga
           synchronous = destination["synchronous"]
         end
         handler = find_handler(command)
-        return unless handler
-        # synchronous = handler.prefer_synchronous? if synchronous.nil?
-        if route || @pool.empty? || synchronous
-          handler.handle(command, body)
-        else
-          push_message
+        if handler
+          # synchronous = handler.prefer_synchronous? if synchronous.nil?
+          if route || @pool.empty? || synchronous
+            handler.handle(command, body)
+          else
+            push_message
+          end
         end
       end
       add_route(route) if route
