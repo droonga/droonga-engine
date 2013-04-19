@@ -95,6 +95,55 @@ class SearchHandlerTest < Test::Unit::TestCase
     end
   end
 
+  class HashQueryTest < self
+    def test_string_matchTo
+      request = base_request
+      request["queries"]["sections-result"]["condition"] = {
+        "query" => "Groonga",
+        "matchTo" => "title"
+      }
+      assert_search({
+                      "sections-result" => {
+                        "records" => [
+                          { "title" => "Groonga overview" },
+                        ],
+                      },
+                    },
+                    request)
+    end
+
+    def test_array_matchTo
+      request = base_request
+      request["queries"]["sections-result"]["condition"] = {
+        "query" => "Groonga",
+        "matchTo" => ["title"]
+      }
+      assert_search({
+                      "sections-result" => {
+                        "records" => [
+                          { "title" => "Groonga overview" },
+                        ],
+                      },
+                    },
+                    request)
+    end
+
+    def base_request
+      {
+        "queries" => {
+          "sections-result" => {
+            "source" => "Sections",
+            "output" => {
+              "format" => "complex",
+              "limit" => 1,
+              "attributes" => ["title"],
+            },
+          },
+        },
+      }
+    end
+  end
+
   class SourceTest < self
     def test_non_existent
       assert_raise(Droonga::SearchHandler::UndefinedSourceError) do
@@ -186,6 +235,7 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "format" => "complex",
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
               },
@@ -219,6 +269,7 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "format" => "complex",
                 "limit" => 3,
                 "attributes" => [
                   {
@@ -232,6 +283,91 @@ class SearchHandlerTest < Test::Unit::TestCase
           },
         }
         assert_search(expected, request)
+      end
+    end
+
+    class FormatTest < self
+      def test_complex
+        expected = 
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "format" => "complex",
+                "limit" => 3,
+                "attributes" => ["_key", "title"],
+              },
+            },
+          },
+        }
+        assert_search(complex_result, request)
+      end
+
+      def test_simple
+        expected = 
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "format" => "simple",
+                "limit" => 3,
+                "attributes" => ["_key", "title"],
+              },
+            },
+          },
+        }
+        assert_search(simple_result, request)
+      end
+
+      def test_default
+        expected = 
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "limit" => 3,
+                "attributes" => ["_key", "title"],
+              },
+            },
+          },
+        }
+        assert_search(simple_result, request)
+      end
+
+      def complex_result
+        {
+          "sections-result" => {
+            "records" => [
+              {
+                "_key" => "1.1",
+                "title" => "Groonga overview",
+              },
+              {
+                "_key" => "1.2",
+                "title" => "Full text search and Instant update",
+              },
+              {
+                "_key" => "1.3",
+                "title" => "Column store and aggregate query",
+              },
+            ],
+          },
+        }
+      end
+
+      def simple_result
+        {
+          "sections-result" => {
+            "records" => [
+              ["1.1", "Groonga overview"],
+              ["1.2", "Full text search and Instant update"],
+              ["1.3", "Column store and aggregate query"],
+            ],
+          },
+        }
       end
     end
   end

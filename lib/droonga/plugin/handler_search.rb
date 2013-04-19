@@ -229,13 +229,29 @@ module Droonga
         offset = params["offset"] || 0
         limit = params["limit"] || 10
         @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
-          formatted_result["records"] = cursor.collect do |record|
-            values = {}
-            target_attributes.collect do |attribute|
-              values[attribute[:label]] = record[attribute[:source]]
+          if params["format"] == "complex"
+            formatted_result["records"] = cursor.collect do |record|
+              complex_record(target_attributes, record)
             end
-            values
+          else
+            formatted_result["records"] = cursor.collect do |record|
+              simple_record(target_attributes, record)
+            end
           end
+        end
+      end
+
+      def complex_record(attributes, record)
+        values = {}
+        attributes.collect do |attribute|
+          values[attribute[:label]] = record[attribute[:source]]
+        end
+        values
+      end
+
+      def simple_record(attributes, record)
+        attributes.collect do |attribute|
+          record[attribute[:source]]
         end
       end
 
