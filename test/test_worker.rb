@@ -44,7 +44,8 @@ class WorkerTest < Test::Unit::TestCase
 
   def setup_worker
     @worker = Droonga::Worker.new(:database => @database_path.to_s,
-                                  :queue_name => "DroongaQueue")
+                                  :queue_name => "DroongaQueue",
+                                  :pool_size => 0)
     @worker.add_handler("search")
   end
 
@@ -92,7 +93,7 @@ class WorkerTest < Test::Unit::TestCase
           },
         },
       }
-      @worker.process_message(nil, 0, request)
+      @worker.dispatch("", 0, request)
       actual = receive_response
       assert_equal(expected, normalize_result_set(actual))
     end
