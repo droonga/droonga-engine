@@ -77,18 +77,24 @@ module Droonga
         route = envelope["via"].pop
         destination = route
       end
-      if destination.nil? || destination.is_a?(Hash) && destination["to"]
-        output(body, destination)
+      command = nil
+      reciever = nil
+      synchronous = nil
+      is_reply = false
+      case destination
+      when String
+        command = destination
+      when Hash
+        command = destination["type"]
+        receiver = destination["to"]
+        synchronous = destination["synchronous"]
       else
-        synchronous = nil
-        command = nil
-        case destination
-        when String
-          command = destination
-        when Hash
-          command = destination["type"]
-          synchronous = destination["synchronous"]
-        end
+        receiver = envelope["replyTo"]
+        is_reply = true
+      end
+      if receiver
+        output(body, receiver, is_reply)
+      else
         handler = find_handler(command)
         if handler
           # synchronous = handler.prefer_synchronous? if synchronous.nil?
@@ -103,19 +109,19 @@ module Droonga
     end
 
     private
-    def output(body, destination)
-      output = get_output(destination)
+    def output(body, receiver, is_reply=false)
+      output = get_output(receiver)
       return unless output
-      if destination
-        message = envelope
-        message[:body] = body
-      else
+      if is_reply
         message = {
           inReplyTo: envelope["id"],
           statusCode: 200,
           type: (envelope["type"] || "") + ".result",
           body: body
         }
+      else
+        message = envelope
+        message[:body] = body
       end
       output.post("message", message)
     end
@@ -214,8 +220,7 @@ module Droonga
       end
     end
 
-    def get_output(destination)
-      receiver = envelope["replyTo"]
+    def get_output(receiver)
       return nil unless receiver
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"
