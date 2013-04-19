@@ -97,6 +97,7 @@ module Droonga
       add_route(route) if route
     end
 
+    private
     def process_message(tag, time, record)
       @envelope = record
       envelope[:via] ||= []
@@ -106,7 +107,6 @@ module Droonga
       handler.handle(command, envelope["body"])
     end
 
-    private
     def post_message(*message)
       packed_message = message.to_msgpack
       queue = @context[@queue_name]
