@@ -6,6 +6,8 @@ table_create Bigram TABLE_PAT_KEY ShortText \
 table_create Sections TABLE_HASH_KEY ShortText
 column_create Sections title COLUMN_SCALAR ShortText
 column_create Sections content COLUMN_SCALAR Text
+column_create Bigram Sections_title COLUMN_INDEX|WITH_POSITION Sections title
+column_create Bigram Sections_content COLUMN_INDEX|WITH_POSITION Sections content
 
 load --table Sections
 [
