@@ -59,6 +59,7 @@ module Droonga
 
     def dispatch(tag, time, record)
       if @pool.empty?
+        parse_message(tag, time, record)
         process_message(tag, time, record)
       else
         post_message(tag, time, record)
@@ -113,7 +114,6 @@ module Droonga
     end
 
     def process_message(tag, time, record)
-      parse_message(tag, time, record)
       command = envelope["type"]
       handler = find_handler(command)
       return unless handler
@@ -145,6 +145,7 @@ module Droonga
         end
         if packed_message
           tag, time, record = MessagePack.unpack(packed_message)
+          parse_message(tag, time, record)
           process_message(tag, time, record)
         end
         @status = :IDLE
