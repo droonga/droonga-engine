@@ -71,13 +71,13 @@ module Droonga
     end
 
     def add_route(route)
-      envelope[:via].push(route)
+      envelope["via"].push(route)
     end
 
     def post(body, destination=nil)
       route = nil
       unless destination
-        route = envelope[:via].pop
+        route = envelope["via"].pop
         destination = route
       end
       output = get_output(destination)
@@ -109,7 +109,7 @@ module Droonga
           "body" => record
         }
       end
-      envelope[:via] ||= []
+      envelope["via"] ||= []
     end
 
     def process_message(tag, time, record)
