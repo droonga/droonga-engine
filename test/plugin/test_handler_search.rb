@@ -186,6 +186,7 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "format" => "complex",
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
               },
@@ -219,6 +220,7 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "format" => "complex",
                 "limit" => 3,
                 "attributes" => [
                   {
