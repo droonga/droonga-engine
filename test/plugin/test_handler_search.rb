@@ -95,6 +95,55 @@ class SearchHandlerTest < Test::Unit::TestCase
     end
   end
 
+  class HashQueryTest < self
+    def test_string_matchTo
+      request = base_request
+      request["queries"]["sections-result"]["condition"] = {
+        "query" => "Groonga",
+        "matchTo" => "title"
+      }
+      assert_search({
+                      "sections-result" => {
+                        "records" => [
+                          { "title" => "Groonga overview" },
+                        ],
+                      },
+                    },
+                    request)
+    end
+
+    def test_array_matchTo
+      request = base_request
+      request["queries"]["sections-result"]["condition"] = {
+        "query" => "Groonga",
+        "matchTo" => ["title"]
+      }
+      assert_search({
+                      "sections-result" => {
+                        "records" => [
+                          { "title" => "Groonga overview" },
+                        ],
+                      },
+                    },
+                    request)
+    end
+
+    def base_request
+      {
+        "queries" => {
+          "sections-result" => {
+            "source" => "Sections",
+            "output" => {
+              "format" => "complex",
+              "limit" => 1,
+              "attributes" => ["title"],
+            },
+          },
+        },
+      }
+    end
+  end
+
   class SourceTest < self
     def test_non_existent
       assert_raise(Droonga::SearchHandler::UndefinedSourceError) do
