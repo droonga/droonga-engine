@@ -57,13 +57,9 @@ module Droonga
       @database = @context = nil
     end
 
-    def dispatch(tag, time, record)
-      if @pool.empty?
-        parse_message(tag, time, record)
-        process_message(tag, time, record)
-      else
-        post_message(tag, time, record)
-      end
+    def dispatch(*message)
+      parse_message(message)
+      post(envelope["body"], envelope["type"])
     end
 
     def add_handler(name)
@@ -81,6 +77,32 @@ module Droonga
         route = envelope["via"].pop
         destination = route
       end
+      if destination.nil? || destination.is_a?(Hash) && destination["to"]
+        output(body, destination)
+      else
+        synchronous = nil
+        command = nil
+        case destination
+        when String
+          command = destination
+        when Hash
+          command = destination["type"]
+          synchronous = destination["synchronous"]
+        end
+        handler = find_handler(command)
+        return unless handler
+        # synchronous = handler.prefer_synchronous? if synchronous.nil?
+        if route || @pool.empty? || synchronous
+          handler.handle(command, body)
+        else
+          push_message
+        end
+      end
+      add_route(route) if route
+    end
+
+    private
+    def output(body, destination)
       output = get_output(destination)
       return unless output
       if destination
@@ -95,12 +117,11 @@ module Droonga
         }
       end
       output.post("message", message)
-      add_route(route) if route
     end
 
-    private
-    def parse_message(tag, time, record)
-      @message = [tag, time, record]
+    def parse_message(message)
+      @message = message
+      tag, time, record = message
       prefix, type = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
         @envelope = record
@@ -113,19 +134,23 @@ module Droonga
       envelope["via"] ||= []
     end
 
-    def process_message(tag, time, record)
-      command = envelope["type"]
-      handler = find_handler(command)
-      return unless handler
-      handler.handle(command, envelope["body"])
-    end
-
-    def post_message(*message)
-      packed_message = message.to_msgpack
+    def push_message
+      packed_message = @message.to_msgpack
       queue = @context[@queue_name]
       queue.push do |record|
         record.message = packed_message
       end
+    end
+
+    def pull_message
+      packed_message = nil
+      @status = :IDLE
+      @queue.pull do |record|
+        @status = :BUSY
+        packed_message = record.message if record
+      end
+      return nil unless packed_message
+      MessagePack.unpack(packed_message)
     end
 
     def start
@@ -136,19 +161,14 @@ module Droonga
         @finish = true
         exit! 0 if @status == :IDLE
       end
-      queue = @context[@queue_name]
+      @queue = @context[@queue_name]
       while !@finish
-        packed_message = nil
-        queue.pull do |record|
-          @status = :BUSY
-          packed_message = record.message if record
-        end
-        if packed_message
-          tag, time, record = MessagePack.unpack(packed_message)
-          parse_message(tag, time, record)
-          process_message(tag, time, record)
-        end
-        @status = :IDLE
+        message = pull_message
+        next unless message
+        parse_message(message)
+        command = envelope["type"]
+        handler = find_handler(command)
+        handler.handle(command, envelope["body"]) if handler
       end
     end
 
