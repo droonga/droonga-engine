@@ -315,7 +315,7 @@ class SearchHandlerTest < Test::Unit::TestCase
             "records" => [
               ["1.1", "Groonga overview"],
               ["1.2", "Full text search and Instant update"],
-              ["1.3", "Column store and aggregate query"]
+              ["1.3", "Column store and aggregate query"],
             ],
           },
         }
