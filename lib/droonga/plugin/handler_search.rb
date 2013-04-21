@@ -199,6 +199,7 @@ module Droonga
         if @query["groupBy"]
           @result = @result.group(@query["groupBy"])
         end
+        @count = @result.size
         if @query["sortBy"]
           if @query["sortBy"].is_a? Array
             keys = parseOrderKeys(@query["sortBy"])
@@ -218,7 +219,7 @@ module Droonga
 
       def format_count(params, formatted_result)
         return unless params["count"]
-        formatted_result["count"] = @result.size
+        formatted_result["count"] = @count
       end
 
       def format_records(params, formatted_result)
