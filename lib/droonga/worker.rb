@@ -129,12 +129,13 @@ module Droonga
     def parse_message(message)
       @message = message
       tag, time, record = message
-      prefix, type = tag.split(/\./)
+      prefix, type, *arguments = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
         @envelope = record
       else
         @envelope = {
           "type" => type,
+          "arguments" => arguments,
           "body" => record
         }
       end
