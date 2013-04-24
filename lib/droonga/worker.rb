@@ -59,7 +59,10 @@ module Droonga
 
     def dispatch(*message)
       parse_message(message)
-      post(envelope["body"], envelope["type"], *envelope["arguments"])
+      post_or_push(message,
+                   envelope["body"],
+                   envelope["type"],
+                   envelope["arguments"])
     end
 
     def add_handler(name)
@@ -72,6 +75,11 @@ module Droonga
     end
 
     def post(body, destination=nil, *arguments)
+      post_or_push(nil, body, destination, arguments)
+    end
+
+    private
+    def post_or_push(message, body, destination, arguments)
       route = nil
       unless destination
         route = envelope["via"].pop
@@ -101,14 +109,19 @@ module Droonga
           if route || @pool.empty? || synchronous
             handler.handle(command, body, *arguments)
           else
-            push_message
+            unless message
+              envelope["body"] = body
+              envelope["type"] = command
+              envelope["arguments"] = arguments
+              message = ['', Time.now.to_f, envelope]
+            end
+            push_message(message)
           end
         end
       end
       add_route(route) if route
     end
 
-    private
     def output(body, receiver, is_reply=false)
       output = get_output(receiver)
       return unless output
@@ -127,7 +140,6 @@ module Droonga
     end
 
     def parse_message(message)
-      @message = message
       tag, time, record = message
       prefix, type, *arguments = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
@@ -142,8 +154,8 @@ module Droonga
       envelope["via"] ||= []
     end
 
-    def push_message
-      packed_message = @message.to_msgpack
+    def push_message(message)
+      packed_message = message.to_msgpack
       queue = @context[@queue_name]
       queue.push do |record|
         record.message = packed_message
