@@ -36,8 +36,8 @@ module Droonga
       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
       @handler_names = options[:handlers] || ["search"]
       load_handlers
-      pool_size = options[:pool_size] || 1
-      @pool = spawn(pool_size)
+      @pool_size = options[:pool_size] || 1
+      @pool = spawn
       prepare
     end
 
@@ -106,7 +106,7 @@ module Droonga
         handler = find_handler(command)
         if handler
           # synchronous = handler.prefer_synchronous? if synchronous.nil?
-          if route || @pool.empty? || synchronous
+          if route || @pool_size.zero? || synchronous
             handler.handle(command, body, *arguments)
           else
             unless message
@@ -192,9 +192,9 @@ module Droonga
       end
     end
 
-    def spawn(pool_size)
+    def spawn
       pool = []
-      pool_size.times do
+      @pool_size.times do
         pid = Process.fork
         if pid
           pool << pid
