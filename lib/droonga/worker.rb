@@ -188,7 +188,8 @@ module Droonga
         parse_message(message)
         command = envelope["type"]
         handler = find_handler(command)
-        handler.handle(command, envelope["body"]) if handler
+        arguments = envelope["arguments"]
+        handler.handle(command, envelope["body"], *arguments) if handler
       end
     end
 
