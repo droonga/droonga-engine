@@ -59,7 +59,7 @@ module Droonga
 
     def dispatch(*message)
       parse_message(message)
-      post(envelope["body"], envelope["type"])
+      post(envelope["body"], envelope["type"], *envelope["arguments"])
     end
 
     def add_handler(name)
@@ -71,7 +71,7 @@ module Droonga
       envelope["via"].push(route)
     end
 
-    def post(body, destination=nil)
+    def post(body, destination=nil, *arguments)
       route = nil
       unless destination
         route = envelope["via"].pop
@@ -99,7 +99,7 @@ module Droonga
         if handler
           # synchronous = handler.prefer_synchronous? if synchronous.nil?
           if route || @pool.empty? || synchronous
-            handler.handle(command, body)
+            handler.handle(command, body, *arguments)
           else
             push_message
           end

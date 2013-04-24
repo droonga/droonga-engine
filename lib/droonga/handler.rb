@@ -67,8 +67,8 @@ module Droonga
       self.class.handlable?(command)
     end
 
-    def handle(command, request)
-      __send__(self.class.method_name(command), request)
+    def handle(command, request, *arguments)
+      __send__(self.class.method_name(command), request, *arguments)
     end
   end
 end
