@@ -86,7 +86,7 @@ module Droonga
         destination = route
       end
       command = nil
-      reciever = nil
+      receiver = nil
       synchronous = nil
       is_reply = false
       case destination
