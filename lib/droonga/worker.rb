@@ -98,10 +98,9 @@ module Droonga
         synchronous = destination["synchronous"]
       else
         receiver = envelope["replyTo"]
-        is_reply = true
       end
       if receiver
-        output(body, receiver, is_reply)
+        output(receiver, body, command, arguments)
       else
         handler = find_handler(command)
         if handler
@@ -122,19 +121,21 @@ module Droonga
       add_route(route) if route
     end
 
-    def output(body, receiver, is_reply=false)
+    def output(receiver, body, command, arguments)
       output = get_output(receiver)
       return unless output
-      if is_reply
+      if command
+        message = envelope
+        message[:body] = body
+        message[:type] = command
+        message[:arguments] = arguments
+      else
         message = {
           inReplyTo: envelope["id"],
           statusCode: 200,
           type: (envelope["type"] || "") + ".result",
           body: body
         }
-      else
-        message = envelope
-        message[:body] = body
       end
       output.post("message", message)
     end
