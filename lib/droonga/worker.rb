@@ -85,7 +85,6 @@ module Droonga
       command = nil
       receiver = nil
       arguments = nil
-      is_reply = false
       synchronous = nil
       case destination
       when String
