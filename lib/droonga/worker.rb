@@ -61,8 +61,8 @@ module Droonga
       parse_message(message)
       post_or_push(message,
                    envelope["body"],
-                   envelope["type"],
-                   envelope["arguments"])
+                   "type" => envelope["type"],
+                   "arguments" => envelope["arguments"])
     end
 
     def add_handler(name)
@@ -74,12 +74,12 @@ module Droonga
       envelope["via"].push(route)
     end
 
-    def post(body, destination=nil, *arguments)
-      post_or_push(nil, body, destination, arguments)
+    def post(body, destination=nil)
+      post_or_push(nil, body, destination)
     end
 
     private
-    def post_or_push(message, body, destination, arguments)
+    def post_or_push(message, body, destination)
       route = nil
       unless destination
         route = envelope["via"].pop
@@ -87,14 +87,16 @@ module Droonga
       end
       command = nil
       receiver = nil
-      synchronous = nil
+      arguments = nil
       is_reply = false
+      synchronous = nil
       case destination
       when String
         command = destination
       when Hash
         command = destination["type"]
         receiver = destination["to"]
+        arguments = destination["arguments"]
         synchronous = destination["synchronous"]
       else
         receiver = envelope["replyTo"]
