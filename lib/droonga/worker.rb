@@ -58,11 +58,8 @@ module Droonga
     end
 
     def dispatch(*message)
-      parse_message(message)
-      post_or_push(message,
-                   envelope["body"],
-                   "type" => envelope["type"],
-                   "arguments" => envelope["arguments"])
+      body, type, arguments = parse_message(message)
+      post_or_push(message, body, "type" => type, "arguments" => arguments)
     end
 
     def add_handler(name)
@@ -155,6 +152,7 @@ module Droonga
         }
       end
       envelope["via"] ||= []
+      [envelope["body"], envelope["type"], envelope["arguments"]]
     end
 
     def push_message(message)
@@ -189,10 +187,9 @@ module Droonga
         message = pull_message
         next unless message
         parse_message(message)
-        command = envelope["type"]
+        body, command, arguments = parse_message(message)
         handler = find_handler(command)
-        arguments = envelope["arguments"]
-        handler.handle(command, envelope["body"], *arguments) if handler
+        handler.handle(command, body, *arguments) if handler
       end
     end
 
