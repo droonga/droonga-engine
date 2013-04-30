@@ -102,7 +102,9 @@ module Droonga
       else
         handler = find_handler(command)
         if handler
-          # synchronous = handler.prefer_synchronous? if synchronous.nil?
+          if synchronous.nil?
+            synchronous = handler.prefer_synchronous?(command)
+          end
           if route || @pool_size.zero? || synchronous
             handler.handle(command, body, *arguments)
           else
