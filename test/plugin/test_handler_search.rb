@@ -134,6 +134,9 @@ class SearchHandlerTest < Test::Unit::TestCase
           "sections-result" => {
             "source" => "Sections",
             "output" => {
+              "elements" => [
+                "records",
+              ],
               "format" => "complex",
               "limit" => 1,
               "attributes" => ["title"],
@@ -184,7 +187,9 @@ class SearchHandlerTest < Test::Unit::TestCase
                         "sections-result" => {
                           "source" => "Sections",
                           "output" => {
-                            "count" => true,
+                            "elements" => [
+                              "count",
+                            ],
                           },
                         },
                       },
@@ -203,7 +208,10 @@ class SearchHandlerTest < Test::Unit::TestCase
                         "sections-result" => {
                           "source" => "Sections",
                           "output" => {
-                            "elapsedTime" => true,
+                            "elements" => [
+                              "startTime",
+                              "elapsedTime",
+                            ],
                           },
                         },
                       },
@@ -235,6 +243,9 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "elements" => [
+                  "records",
+                ],
                 "format" => "complex",
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
@@ -269,6 +280,9 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "elements" => [
+                  "records",
+                ],
                 "format" => "complex",
                 "limit" => 3,
                 "attributes" => [
@@ -294,6 +308,9 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "elements" => [
+                  "records",
+                ],
                 "format" => "complex",
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
@@ -311,6 +328,9 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "elements" => [
+                  "records",
+                ],
                 "format" => "simple",
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
@@ -328,6 +348,9 @@ class SearchHandlerTest < Test::Unit::TestCase
             "sections-result" => {
               "source" => "Sections",
               "output" => {
+                "elements" => [
+                  "records",
+                ],
                 "limit" => 3,
                 "attributes" => ["_key", "title"],
               },

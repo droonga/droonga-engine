@@ -77,7 +77,9 @@ class WorkerTest < Test::Unit::TestCase
             "sections" => {
               "source" => "Sections",
               "output" => {
-                "count" => true,
+                "elements" => [
+                  "count",
+                ],
               },
             },
           },

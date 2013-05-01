@@ -98,12 +98,13 @@ module Droonga
       end
 
       def format
-        params = @query["output"]
         formatted_result = {}
-        format_count(params, formatted_result)
-        format_records(params, formatted_result)
-        if params["elapsedTime"]
+        format_count(formatted_result)
+        format_records(formatted_result)
+        if need_element_output?("startTime")
           formatted_result["startTime"] = @start_time.iso8601
+        end
+        if need_element_output?("elapsedTime")
           formatted_result["elapsedTime"] = Time.now.to_f - @start_time.to_f
         end
         formatted_result
@@ -217,15 +218,26 @@ module Droonga
         @result
       end
 
-      def format_count(params, formatted_result)
-        return unless params["count"]
-        formatted_result["count"] = @count
+      def need_element_output?(element)
+        params = @query["output"]
+
+        elements = params["elements"]
+        return false if elements.nil?
+
+        elements.include?(element)
       end
 
-      def format_records(params, formatted_result)
-        attributes = params["attributes"]
-        return if attributes.nil?
+      def format_count(formatted_result)
+        return unless need_element_output?("count")
+        formatted_result["count"] = @result.size
+      end
 
+      def format_records(formatted_result)
+        return unless need_element_output?("records")
+
+        params = @query["output"]
+
+        attributes = params["attributes"]
         target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
