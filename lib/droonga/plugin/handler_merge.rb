@@ -91,7 +91,7 @@ module Droonga
           path = policy["path"]
           case policy["procedure"]
           when "sum"
-            last = path[-1].intern
+            last = path[-1]
             _a, _b = fetch_element(path[0..-2], a, b)
             _a[last] += _b[last]
           when "sort"
@@ -103,8 +103,8 @@ module Droonga
 
       def fetch_element(path, a, b)
         path.each do |index|
-          a = a[index]||a[index.intern]
-          b = b[index]||b[index.intern]
+          a = a[index]||a[index]
+          b = b[index]||b[index]
         end
         [a, b]
       end
