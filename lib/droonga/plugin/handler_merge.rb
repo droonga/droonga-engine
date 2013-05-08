@@ -35,10 +35,10 @@ module Droonga
     command "merge.result" => :adapt_reply
 
     def adapt_request(request, *arguments)
-      add_route("merge.result")
       dataset = @config["datasets"][request["dataset"]]
       return unless dataset
       @mergers[envelope["id"]] = merger = Merger.new(dataset)
+      add_route(merger.merger_path)
       merger.routes.each do |route|
         post(request, route)
       end
@@ -57,9 +57,11 @@ module Droonga
     class Merger
       attr_reader :routes
       attr_reader :result
+      attr_reader :merger_path
       def initialize(dataset)
         @dataset = dataset
         @merge_policy = dataset["merge_policy"]
+        @merger_path = dataset["merger_path"] || "merge.result"
         @routes = []
         dataset["shards"].collect do |key, shard|
           n_replications = shard["instances"].size
