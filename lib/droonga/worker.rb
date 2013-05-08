@@ -122,7 +122,15 @@ module Droonga
     end
 
     def output(receiver, body, command, arguments)
-      output = get_output(receiver)
+      return nil unless receiver
+      unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
+        raise "format: hostname:port/tag(?params)"
+      end
+      host = $1
+      port = $2
+      tag  = $3
+      params = $4
+      output = get_output(host, port, params)
       return unless output
       if command
         message = envelope
@@ -137,7 +145,7 @@ module Droonga
           body: body
         }
       end
-      output.post("message", message)
+      output.post(tag + ".message", message)
     end
 
     def parse_message(message)
@@ -235,16 +243,7 @@ module Droonga
       end
     end
 
-    def get_output(receiver)
-      return nil unless receiver
-      unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
-        raise "format: hostname:port/tag(?params)"
-      end
-      host = $1
-      port = $2
-      tag  = $3
-      params = $4
-
+    def get_output(host, port, params)
       host_port = "#{host}:#{port}"
       @outputs[host_port] ||= {}
       output = @outputs[host_port]
@@ -255,7 +254,7 @@ module Droonga
         connection_id = $1
         if not has_connection_id or output[:connection_id] != connection_id
           output[:connection_id] = connection_id
-          logger = create_logger(tag, :host => host, :port => port.to_i)
+          logger = create_logger(:host => host, :port => port.to_i)
           # output[:logger] should be closed if it exists beforehand?
           output[:logger] = logger
         end
@@ -271,8 +270,8 @@ module Droonga
       output[:logger]
     end
 
-    def create_logger(tag, options)
-      Fluent::Logger::FluentLogger.new(tag, options)
+    def create_logger(options)
+      Fluent::Logger::FluentLogger.new(nil, options)
     end
   end
 end
