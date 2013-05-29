@@ -257,14 +257,14 @@ module Droonga
       def complex_record(attributes, record)
         values = {}
         attributes.collect do |attribute|
-          values[attribute[:label]] = attributes[:static_value] || record[attribute[:source]]
+          values[attribute[:label]] = attribute[:static_value] || record[attribute[:source]]
         end
         values
       end
 
       def simple_record(attributes, record)
         attributes.collect do |attribute|
-          attributes[:static_value] || record[attribute[:source]]
+          attribute[:static_value] || record[attribute[:source]]
         end
       end
 
@@ -277,6 +277,7 @@ module Droonga
             {
               label: attribute,
               source: attribute,
+              static_value: nil,
             }
           else
             source = attribute["source"]
