@@ -268,6 +268,9 @@ module Droonga
         end
       end
 
+      STATIC_NUMBER_VALUE_PATTERN = /\A[-+]?[\d\.]+\z/.freeze
+      STATIC_STRING_VALUE_PATTERN = /\A("[^"]*"|'[^']*')\z/.freeze
+
       def normalize_target_attributes(attributes)
         attributes.map do |attribute|
           if attribute.is_a?(String)
@@ -276,9 +279,17 @@ module Droonga
               source: attribute,
             }
           else
+            source = attribute["source"]
+            static_value = nil
+            if STATIC_NUMBER_VALUE_PATTERN =~ source
+              static_value = source.to_i
+            elsif STATIC_NUMBER_VALUE_PATTERN =~ source
+              static_value = source[1..-2]
+            end
             {
               label: attribute["label"] || attribute["source"],
-              source: attribute["source"],
+              source: source,
+              static_value: static_value,
             }
           end
         end
