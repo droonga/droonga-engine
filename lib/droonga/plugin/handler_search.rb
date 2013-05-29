@@ -264,7 +264,7 @@ module Droonga
 
       def simple_record(attributes, record)
         attributes.collect do |attribute|
-          record[attributes[:static_value] || attribute[:source]]
+          attributes[:static_value] || record[attribute[:source]]
         end
       end
 
