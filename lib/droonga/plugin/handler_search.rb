@@ -282,10 +282,11 @@ module Droonga
           else
             source = attribute["source"]
             static_value = nil
-            if STATIC_NUMBER_VALUE_PATTERN =~ source
-              static_value = source.to_i
-            elsif STATIC_NUMBER_VALUE_PATTERN =~ source
-              static_value = source[1..-2]
+            case source
+            when STATIC_NUMBER_VALUE_PATTERN
+             static_value = source.to_i
+            when STATIC_STRING_VALUE_PATTERN
+             static_value = source[1..-2]
             end
             {
               label: attribute["label"] || attribute["source"],
