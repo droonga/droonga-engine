@@ -284,7 +284,7 @@ module Droonga
             source = attribute["source"]
             static_value = nil
             case source
-            when STATIC_INTEVER_VALUE_PATTERN
+            when STATIC_INTEGER_VALUE_PATTERN
              static_value = source.to_i
             when STATIC_FLOAT_VALUE_PATTERN
              static_value = source.to_f
