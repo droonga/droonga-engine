@@ -257,14 +257,14 @@ module Droonga
       def complex_record(attributes, record)
         values = {}
         attributes.collect do |attribute|
-          values[attribute[:label]] = record[attribute[:source]]
+          values[attribute[:label]] = attributes[:static_value] || record[attribute[:source]]
         end
         values
       end
 
       def simple_record(attributes, record)
         attributes.collect do |attribute|
-          record[attribute[:source]]
+          record[attributes[:static_value] || attribute[:source]]
         end
       end
 
