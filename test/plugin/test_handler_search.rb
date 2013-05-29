@@ -298,6 +298,60 @@ class SearchHandlerTest < Test::Unit::TestCase
         }
         assert_search(expected, request)
       end
+
+      def test_static_value
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "single_quote_string" => "string value",
+                "double_quote_string" => "string value",
+                "integer" => 29,
+                "complex_negative_number" => -29.29,
+              },
+              {
+                "single_quote_string" => "string value",
+                "double_quote_string" => "string value",
+                "integer" => 29,
+                "complex_negative_number" => -29.29,
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 2,
+                "attributes" => [
+                  {
+                    "label" => "single_quote_string",
+                    "source" => "'string value'",
+                  },
+                  {
+                    "label" => "double_quote_string",
+                    "source" => '"string value"',
+                  },
+                  {
+                    "label" => "integer",
+                    "source" => "29",
+                  },
+                  {
+                    "label" => "complex_negative_number",
+                    "source" => "-29.29",
+                  },
+                ],
+              },
+            },
+          },
+        }
+        assert_search(expected, request)
+      end
     end
 
     class FormatTest < self
