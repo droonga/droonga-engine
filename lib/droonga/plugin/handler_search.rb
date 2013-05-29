@@ -268,8 +268,8 @@ module Droonga
         end
       end
 
-      STATIC_INTEGER_VALUE_PATTERN = /\A[-+]?[\d]+\z/.freeze
-      STATIC_FLOAT_VALUE_PATTERN = /\A[-+]?[\d]*\.[\d]+\z/.freeze
+      STATIC_INTEGER_VALUE_PATTERN = /\A[-+]?\d+\z/.freeze
+      STATIC_FLOAT_VALUE_PATTERN = /\A[-+]?\d*\.\d+\z/.freeze
       STATIC_STRING_VALUE_PATTERN = /\A("[^"]*"|'[^']*')\z/.freeze
 
       def normalize_target_attributes(attributes)
