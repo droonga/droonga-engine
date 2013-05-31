@@ -73,6 +73,14 @@ module Droonga
 
     def handle(command, request, *arguments)
       __send__(self.class.method_name(command), request, *arguments)
+    rescue => exception
+      if $log
+        $log.error "error while handling #{command}",
+          request: request,
+          arguments: arguments,
+          exception: exception
+        $log.error_backtrace
+      end
     end
 
     def prefer_synchronous?(command)
