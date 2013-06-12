@@ -229,7 +229,7 @@ module Droonga
 
       def format_count(formatted_result)
         return unless need_element_output?("count")
-        formatted_result["count"] = @result.size
+        formatted_result["count"] = @count
       end
 
       def format_records(formatted_result)
