@@ -42,10 +42,7 @@ module Droonga
     end
 
     def shutdown
-      @pool.each do |pid|
-        # TODO: do it gracefully
-        Process.kill(:KILL, pid)
-      end
+      shutdown_workers
       @handlers.each do |handler|
         handler.shutdown
       end
@@ -76,6 +73,24 @@ module Droonga
     end
 
     private
+    def shutdown_workers
+      @pool.each do |pid|
+        Process.kill(:TERM, pid)
+      end
+      queue = @context[@queue_name]
+      3.times do |i|
+        break if @pool.empty?
+        queue.unblock
+        @pool.reject! do |pid|
+          not Process.waitpid(pid, Process::WNOHANG).nil?
+        end
+        sleep(i ** 2 * 0.1)
+      end
+      @pool.each do |pid|
+        Process.kill(:KILL, pid)
+      end
+    end
+
     def post_or_push(message, body, destination)
       route = nil
       unless destination
