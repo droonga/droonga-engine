@@ -262,15 +262,19 @@ module Droonga
       def complex_record(attributes, record)
         values = {}
         attributes.collect do |attribute|
-          values[attribute[:label]] = attribute[:static_value] || record[attribute[:source]]
+          values[attribute[:label]] = record_value(record, attribute)
         end
         values
       end
 
       def simple_record(attributes, record)
         attributes.collect do |attribute|
-          attribute[:static_value] || record[attribute[:source]]
+          record_value(record, attribute)
         end
+      end
+
+      def record_value(record, attribute)
+        attribute[:static_value] || record[attribute[:source]]
       end
 
       STATIC_INTEGER_VALUE_PATTERN = /\A[-+]?\d+\z/.freeze
