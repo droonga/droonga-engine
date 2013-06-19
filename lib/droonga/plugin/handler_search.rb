@@ -183,7 +183,7 @@ module Droonga
       end
 
       def parseOrderKeys(keys)
-        keys.map do |key|
+        keys.collect do |key|
           if key =~ /^-/
             [$', :descending]
           else
@@ -277,7 +277,7 @@ module Droonga
       STATIC_STRING_VALUE_PATTERN = /\A("[^"]*"|'[^']*')\z/.freeze
 
       def normalize_target_attributes(attributes)
-        attributes.map do |attribute|
+        attributes.collect do |attribute|
           if attribute.is_a?(String)
             {
               label: attribute,
