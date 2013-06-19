@@ -356,7 +356,6 @@ class SearchHandlerTest < Test::Unit::TestCase
 
     class FormatTest < self
       def test_complex
-        expected = 
         request = {
           "queries" => {
             "sections-result" => {
@@ -376,7 +375,6 @@ class SearchHandlerTest < Test::Unit::TestCase
       end
 
       def test_simple
-        expected = 
         request = {
           "queries" => {
             "sections-result" => {
@@ -396,7 +394,6 @@ class SearchHandlerTest < Test::Unit::TestCase
       end
 
       def test_default
-        expected = 
         request = {
           "queries" => {
             "sections-result" => {
