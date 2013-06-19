@@ -183,7 +183,7 @@ module Droonga
         end
       end
 
-      def parseOrderKeys(keys)
+      def parse_order_keys(keys)
         keys.collect do |key|
           if key =~ /^-/
             [$POSTMATCH, :descending]
@@ -208,11 +208,11 @@ module Droonga
         @count = @result.size
         if @query["sortBy"]
           if @query["sortBy"].is_a? Array
-            keys = parseOrderKeys(@query["sortBy"])
+            keys = parse_order_keys(@query["sortBy"])
             offset = 0
             limit = -1
           elsif @query["sortBy"].is_a? Hash
-            keys = parseOrderKeys(@query["sortBy"]["keys"])
+            keys = parse_order_keys(@query["sortBy"]["keys"])
             offset = @query["sortBy"]["offset"]
             limit = @query["sortBy"]["limit"]
           else
