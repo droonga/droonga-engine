@@ -352,6 +352,41 @@ class SearchHandlerTest < Test::Unit::TestCase
         }
         assert_search(expected, request)
       end
+
+      def test_expression
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "formatted title" => "<Groonga overview>",
+                "title" => "Groonga overview",
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 1,
+                "attributes" => [
+                  "title",
+                  {
+                    "label" => "formatted title",
+                    "source" => "'<' + title + '>'",
+                  },
+                ],
+              },
+            },
+          },
+        }
+        assert_search(expected, request)
+      end
     end
 
     class FormatTest < self

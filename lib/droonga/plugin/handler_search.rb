@@ -274,38 +274,43 @@ module Droonga
       end
 
       def record_value(record, attribute)
-        attribute[:static_value] || record[attribute[:source]]
+        expression = attribute[:expression]
+        if expression
+          variable = attribute[:variable]
+          variable.value = record
+          expression.execute
+        else
+          record[attribute[:source]]
+        end
       end
 
-      STATIC_INTEGER_VALUE_PATTERN = /\A[-+]?\d+\z/.freeze
-      STATIC_FLOAT_VALUE_PATTERN = /\A[-+]?\d*\.\d+\z/.freeze
-      STATIC_STRING_VALUE_PATTERN = /\A("[^"]*"|'[^']*')\z/.freeze
+      def accessor_name?(source)
+        /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
+      end
 
       def normalize_target_attributes(attributes)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
-            {
-              label: attribute,
-              source: attribute,
-              static_value: nil,
-            }
-          else
-            source = attribute["source"]
-            static_value = nil
-            case source
-            when STATIC_INTEGER_VALUE_PATTERN
-             static_value = source.to_i
-            when STATIC_FLOAT_VALUE_PATTERN
-             static_value = source.to_f
-            when STATIC_STRING_VALUE_PATTERN
-             static_value = source[1..-2]
-            end
-            {
-              label: attribute["label"] || attribute["source"],
-              source: source,
-              static_value: static_value,
+            attribute = {
+              "source" => attribute,
             }
           end
+          source = attribute["source"]
+          if accessor_name?(source)
+            expression = nil
+            variable = nil
+          else
+            expression = Groonga::Expression.new(context: @context)
+            variable = expression.define_variable(domain: @result)
+            expression.parse(source, syntax: :script)
+            source = nil
+          end
+          {
+            label: attribute["label"] || attribute["source"],
+            source: source,
+            expression: expression,
+            variable: variable,
+          }
         end
       end
     end
