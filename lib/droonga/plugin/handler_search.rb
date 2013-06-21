@@ -91,6 +91,7 @@ module Droonga
         @context = context
         @query = query
         @result = nil
+        @condition = nil
         @start_time = nil
       end
 
@@ -201,6 +202,7 @@ module Droonga
           expression.define_variable(:domain => source)
           parseCondition(source, expression, @query["condition"])
           @result = source.select(expression)
+          @condition = expression
         end
         if @query["groupBy"]
           if @query["groupBy"].is_a? String
@@ -311,6 +313,9 @@ module Droonga
             expression = Groonga::Expression.new(context: @context)
             variable = expression.define_variable(domain: @result)
             expression.parse(source, syntax: :script)
+            condition = expression.define_variable(name: "$condition",
+                                                   reference: true)
+            condition.value = @condition
             source = nil
           end
           {

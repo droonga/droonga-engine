@@ -387,6 +387,47 @@ class SearchHandlerTest < Test::Unit::TestCase
         }
         assert_search(expected, request)
       end
+
+      def test_snippet_html
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "title" => "Groonga overview",
+                "snippet" => [
+                  "<span class=\"keyword\">Groonga</span> overview",
+                ],
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "condition" => {
+                "query" => "Groonga",
+                "matchTo" => ["title"],
+              },
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 1,
+                "attributes" => [
+                  "title",
+                  {
+                    "label" => "snippet",
+                    "source" => "snippet_html(title)",
+                  },
+                ],
+              },
+            },
+          },
+        }
+        assert_search(expected, request)
+      end
     end
 
     class FormatTest < self
