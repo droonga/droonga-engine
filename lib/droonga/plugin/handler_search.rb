@@ -203,7 +203,15 @@ module Droonga
           @result = source.select(expression)
         end
         if @query["groupBy"]
-          @result = @result.group(@query["groupBy"])
+          if @query["groupBy"].is_a? String
+            @result = @result.group(@query["groupBy"])
+          elseif @query["groupBy"].is_a? Hash
+            key = @query["groupBy"]["key"]
+            max_n_sub_records = @query["groupBy"]["maxNumSubRecords"]
+            @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
+          else
+            raise '"groupBy" parameter must be a Hash or a String'
+          end
         end
         @count = @result.size
         if @query["sortBy"]
