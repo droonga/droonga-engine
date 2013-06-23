@@ -48,8 +48,8 @@ module Droonga
           path = @context.database.path
           destination = @config["forward"][path]
           return destination unless destination.nil? || destination.empty?
-          sleep 5
         end
+        sleep 5
       end
     end
 
