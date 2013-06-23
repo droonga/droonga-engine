@@ -207,7 +207,7 @@ module Droonga
         if @query["groupBy"]
           if @query["groupBy"].is_a? String
             @result = @result.group(@query["groupBy"])
-          elseif @query["groupBy"].is_a? Hash
+          elsif @query["groupBy"].is_a? Hash
             key = @query["groupBy"]["key"]
             max_n_sub_records = @query["groupBy"]["maxNumSubRecords"]
             @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
@@ -284,21 +284,43 @@ module Droonga
       end
 
       def record_value(record, attribute)
-        expression = attribute[:expression]
-        if expression
-          variable = attribute[:variable]
-          variable.value = record
-          expression.execute
+        if attribute[:source] == "_subrecs"
+          if @query["output"]["format"] == "complex"
+            record.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              complex_record(target_attributes, sub_record)
+            end
+          else
+            record.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              simple_record(target_attributes, sub_record)
+            end
+          end
         else
-          record[attribute[:source]]
+          expression = attribute[:expression]
+          if expression
+            variable = attribute[:variable]
+            variable.value = record
+            expression.execute
+          else
+            record[attribute[:source]]
+          end
         end
+      end
+
+      def resolve_attributes(attribute, record)
+        unless attribute[:target_attributes]
+          attribute[:target_attributes] = 
+            normalize_target_attributes(attribute[:attributes], record.table)
+        end
+        return attribute[:target_attributes]
       end
 
       def accessor_name?(source)
         /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
       end
 
-      def normalize_target_attributes(attributes)
+      def normalize_target_attributes(attributes, domain = @result)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
             attribute = {
@@ -311,7 +333,7 @@ module Droonga
             variable = nil
           else
             expression = Groonga::Expression.new(context: @context)
-            variable = expression.define_variable(domain: @result)
+            variable = expression.define_variable(domain: domain)
             expression.parse(source, syntax: :script)
             condition = expression.define_variable(name: "$condition",
                                                    reference: true)
@@ -323,6 +345,7 @@ module Droonga
             source: source,
             expression: expression,
             variable: variable,
+            attributes: attribute["attributes"]
           }
         end
       end
