@@ -210,7 +210,6 @@ module Droonga
       while !@finish
         message = pull_message
         next unless message
-        parse_message(message)
         body, command, arguments = parse_message(message)
         handler = find_handler(command)
         handler.handle(command, body, *arguments) if handler
