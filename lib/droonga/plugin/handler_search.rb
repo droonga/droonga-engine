@@ -209,7 +209,7 @@ module Droonga
             @result = @result.group(@query["groupBy"])
           elsif @query["groupBy"].is_a? Hash
             key = @query["groupBy"]["key"]
-            max_n_sub_records = @query["groupBy"]["maxNumSubRecords"]
+            max_n_sub_records = @query["groupBy"]["maxNSubRecords"]
             @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
           else
             raise '"groupBy" parameter must be a Hash or a String'
