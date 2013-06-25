@@ -64,6 +64,12 @@ module Droonga
         @config = JSON.parse(file.read)
       end
       @config_mtime = mtime
+    rescue => exception
+      if $log
+        $log.error "error while refreshing config", exception: exception
+        $log.error_backtrace
+      end
+      @config = nil
     end
   end
 end
