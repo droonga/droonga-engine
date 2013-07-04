@@ -192,7 +192,10 @@ module Droonga
       @status = :IDLE
       @queue.pull do |record|
         @status = :BUSY
-        packed_message = record.message if record
+        if record
+          packed_message = record.message
+          record.delete
+        end
       end
       return nil unless packed_message
       MessagePack.unpack(packed_message)
