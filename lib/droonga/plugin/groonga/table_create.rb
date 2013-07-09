@@ -26,10 +26,36 @@ module Droonga
 
       def execute(request)
         name = request["name"]
+        options = parse_request(request)
         Groonga::Schema.define(:context => @context) do |schema|
-          schema.create_table(name)
+          schema.create_table(name, options)
         end
         [true]
+      end
+
+      private
+      def parse_request(request)
+        options = {:type => :hash}
+        if request["flags"]
+          request["flags"].split(/\|/).each do |flag|
+            case flag
+            when "TABLE_NO_KEY"
+              options[:type] = :array
+            when "TABLE_HASH_KEY"
+              options[:type] = :hash
+            when "TABLE_PAT_KEY"
+              options[:type] = :patricia_trie
+            when "TABLE_DAT_KEY"
+              options[:type] = :double_array_trie
+            when "KEY_WITH_SIS"
+              options[:key_with_sis] = true
+            end
+          end
+          if options[:key_with_sis]
+            options[:key_with_sis] = false unless options[:type] == :patricia_trie
+          end
+        end
+        options
       end
     end
   end

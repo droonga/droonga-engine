@@ -22,7 +22,75 @@ class TableCreateTest < GroongaHandlerTest
   def test_name
     @handler.table_create({"name" => "Books"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_NO_KEY
+table_create Books TABLE_HASH_KEY --key_type ShortText
     SCHEMA
+  end
+
+  class FlagsTest < self
+    def test_table_no_key
+      request = {
+        "name"  => "Books",
+        "flags" => "TABLE_NO_KEY",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_NO_KEY
+      SCHEMA
+    end
+
+    def test_table_hash_key
+      request = {
+        "name"  => "Books",
+        "flags" => "TABLE_HASH_KEY",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+      SCHEMA
+    end
+
+    def test_table_pat_key
+      request = {
+        "name"  => "Books",
+        "flags" => "TABLE_PAT_KEY",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_PAT_KEY --key_type ShortText
+      SCHEMA
+    end
+
+    def test_table_dat_key
+      request = {
+        "name"  => "Books",
+        "flags" => "TABLE_DAT_KEY",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_DAT_KEY --key_type ShortText
+      SCHEMA
+    end
+
+    def test_key_with_sis_with_pat_key
+      request = {
+        "name"  => "Books",
+        "flags" => "KEY_WITH_SIS|TABLE_PAT_KEY",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
+      SCHEMA
+    end
+
+    def test_key_with_sis_without_pat_key
+      request = {
+        "name"  => "Books",
+        "flags" => "TABLE_NO_KEY|KEY_WITH_SIS",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_NO_KEY
+      SCHEMA
+    end
   end
 end
