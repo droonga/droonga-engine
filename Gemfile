@@ -20,4 +20,6 @@ gemspec
 local_rroonga_path = File.join(File.dirname(__FILE__), "..", "rroonga")
 if File.exist?(local_rroonga_path)
   gem "rroonga", :path => local_rroonga_path
+elsif ENV["TRAVIS"] == "true"
+  gem "rroonga", :git => "git://github.com/ranguba/rroonga.git"
 end
