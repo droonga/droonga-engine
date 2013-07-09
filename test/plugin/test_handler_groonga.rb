@@ -65,18 +65,4 @@ class GroongaHandlerTest < Test::Unit::TestCase
     database_dumper = Groonga::DatabaseDumper.new(:database => @database)
     database_dumper.dump
   end
-
-  class TableCreateTest < self
-    def test_success
-      @handler.table_create({"name" => "Books"})
-      assert_equal([true], @worker.body)
-    end
-
-    def test_name
-      @handler.table_create({"name" => "Books"})
-      assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_NO_KEY
-      SCHEMA
-    end
-  end
 end
