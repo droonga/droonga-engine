@@ -17,19 +17,20 @@
 
 require "groonga"
 
-require "droonga/handler"
-
 module Droonga
-  class GroongaHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("groonga", self)
+  class GroongaHandler
+    class TableCreate
+      def initialize(context)
+        @context = context
+      end
 
-    command :table_create
-    def table_create(request)
-      command = TableCreate.new(@context)
-      outputs = command.execute(request)
-      post(outputs)
+      def execute(request)
+        name = request["name"]
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.create_table(name)
+        end
+        [true]
+      end
     end
   end
 end
-
-require "droonga/plugin/groonga/table_create"
