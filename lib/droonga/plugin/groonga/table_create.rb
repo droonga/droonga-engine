@@ -25,7 +25,7 @@ module Droonga
         @context = context
       end
 
-      def header(return_code, error_message = "")
+      def header(return_code, error_message="")
         elapsed_time = Time.now.to_f - @start_time
         header = [return_code, @start_time, elapsed_time]
         header.push(error_message) unless error_message.empty?
