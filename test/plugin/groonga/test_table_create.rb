@@ -19,6 +19,11 @@ class TableCreateTest < GroongaHandlerTest
     assert_equal([true], @worker.body)
   end
 
+  def test_failure
+    @handler.table_create({})
+    assert_equal([false], @worker.body)
+  end
+
   def test_name
     @handler.table_create({"name" => "Books"})
     assert_equal(<<-SCHEMA, dump)

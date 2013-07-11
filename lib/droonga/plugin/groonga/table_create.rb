@@ -26,6 +26,8 @@ module Droonga
 
       def execute(request)
         name = request["name"]
+        return [false] unless name
+
         options = parse_request(request)
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
