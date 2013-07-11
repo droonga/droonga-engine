@@ -18,8 +18,11 @@ source "https://rubygems.org"
 gemspec
 
 local_rroonga_path = File.join(File.dirname(__FILE__), "..", "rroonga")
+local_groonga_command_path = File.join(File.dirname(__FILE__), "..", "groonga-command")
 if File.exist?(local_rroonga_path)
   gem "rroonga", :path => local_rroonga_path
+  gem "groonga-command", :path => local_groonga_command_path
 elsif ENV["TRAVIS"] == "true"
   gem "rroonga", :git => "git://github.com/ranguba/rroonga.git"
+  gem "groonga-command", :git => "git://github.com/groonga/groonga-command.git"
 end

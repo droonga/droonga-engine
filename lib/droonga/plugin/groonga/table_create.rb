@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "groonga"
+require "groonga/command/table-create"
 
 module Droonga
   class GroongaHandler
@@ -25,10 +26,13 @@ module Droonga
       end
 
       def execute(request)
-        name = request["name"]
+        command_class = Groonga::Command.find("table_create")
+        command = command_class.new("table_create", request)
+
+        name = command["name"]
         return [false] unless name
 
-        options = parse_request(request)
+        options = parse_request(command)
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
         end
@@ -48,24 +52,17 @@ module Droonga
 
       def parse_flags(options, request)
         options[:type] = :hash
-        if request["flags"]
-          request["flags"].split(/\|/).each do |flag|
-            case flag
-            when "TABLE_NO_KEY"
-              options[:type] = :array
-            when "TABLE_HASH_KEY"
-              options[:type] = :hash
-            when "TABLE_PAT_KEY"
-              options[:type] = :patricia_trie
-            when "TABLE_DAT_KEY"
-              options[:type] = :double_array_trie
-            when "KEY_WITH_SIS"
-              options[:key_with_sis] = true
-            end
-          end
-          if options[:key_with_sis]
-            options[:key_with_sis] = false unless options[:type] == :patricia_trie
-          end
+        if request.table_no_key?
+          options[:type] = :array
+        elsif request.table_hash_key?
+          options[:type] = :hash
+        elsif request.table_pat_key?
+          options[:type] = :patricia_trie
+        elsif request.table_dat_key?
+          options[:type] = :double_array_trie
+        end
+        if request.key_with_sis? and request.table_pat_key?
+          options[:key_with_sis] = true
         end
         options
       end
