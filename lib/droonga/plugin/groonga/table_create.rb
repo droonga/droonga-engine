@@ -36,12 +36,12 @@ module Droonga
         @start_time = Time.now.to_f
 
         command_class = Groonga::Command.find("table_create")
-        command = command_class.new("table_create", request)
+        @command = command_class.new("table_create", request)
 
-        name = command["name"]
+        name = @command["name"]
         return [header(Status::INVALID_ARGUMENT, "Should not create anonymous table"), false] unless name
 
-        options = parse_command(command)
+        options = parse_command
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
         end
@@ -49,50 +49,50 @@ module Droonga
       end
 
       private
-      def parse_command(command)
+      def parse_command
         options = {}
-        parse_flags(options, command)
-        parse_key_type(options, command)
-        parse_value_type(options, command)
-        parse_default_tokenizer(options, command)
-        parse_normalizer(options, command)
+        parse_flags(options)
+        parse_key_type(options)
+        parse_value_type(options)
+        parse_default_tokenizer(options)
+        parse_normalizer(options)
         options
       end
 
-      def parse_flags(options, command)
+      def parse_flags(options)
         options[:type] = :hash
-        if command.table_no_key?
+        if @command.table_no_key?
           options[:type] = :array
-        elsif command.table_hash_key?
+        elsif @command.table_hash_key?
           options[:type] = :hash
-        elsif command.table_pat_key?
+        elsif @command.table_pat_key?
           options[:type] = :patricia_trie
-        elsif command.table_dat_key?
+        elsif @command.table_dat_key?
           options[:type] = :double_array_trie
         end
-        if command.key_with_sis? and command.table_pat_key?
+        if @command.key_with_sis? and @command.table_pat_key?
           options[:key_with_sis] = true
         end
         options
       end
 
-      def parse_key_type(options, command)
-        options[:key_type] = command["key_type"] if command["key_type"]
+      def parse_key_type(options)
+        options[:key_type] = @command["key_type"] if @command["key_type"]
         options
       end
 
-      def parse_value_type(options, command)
-        options[:value_type] = command["value_type"] if command["value_type"]
+      def parse_value_type(options)
+        options[:value_type] = @command["value_type"] if @command["value_type"]
         options
       end
 
-      def parse_default_tokenizer(options, command)
-        options[:default_tokenizer] = command["default_tokenizer"] if command["default_tokenizer"]
+      def parse_default_tokenizer(options)
+        options[:default_tokenizer] = @command["default_tokenizer"] if @command["default_tokenizer"]
         options
       end
 
-      def parse_normalizer(options, command)
-        options[:normalizer] = command["normalizer"] if command["normalizer"]
+      def parse_normalizer(options)
+        options[:normalizer] = @command["normalizer"] if @command["normalizer"]
         options
       end
     end
