@@ -119,4 +119,17 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
       SCHEMA
     end
   end
+
+  class DefaultTokenizerTest < self
+    def test_default_tokenizer
+      request = {
+        "name"  => "Books",
+        "default_tokenizer" => "TokenBigram",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer TokenBigram
+      SCHEMA
+    end
+  end
 end

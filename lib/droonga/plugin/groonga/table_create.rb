@@ -39,6 +39,7 @@ module Droonga
         parse_flags(options, request)
         parse_key_type(options, request)
         parse_value_type(options, request)
+        parse_default_tokenizer(options, request)
         options
       end
 
@@ -73,6 +74,11 @@ module Droonga
 
       def parse_value_type(options, request)
         options[:value_type] = request["value_type"] if request["value_type"]
+        options
+      end
+
+      def parse_default_tokenizer(options, request)
+        options[:default_tokenizer] = request["default_tokenizer"] if request["default_tokenizer"]
         options
       end
     end
