@@ -35,6 +35,11 @@ module Droonga
 
       private
       def parse_request(request)
+        options = parse_flags(request)
+        options
+      end
+
+      def parse_flags(request)
         options = {:type => :hash}
         if request["flags"]
           request["flags"].split(/\|/).each do |flag|
