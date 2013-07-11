@@ -36,14 +36,14 @@ module Droonga
       private
       def parse_request(request)
         options = {}
-        options.merge!(parse_flags(request))
-        options.merge!(parse_key_type(request))
-        options.merge!(parse_value_type(request))
+        parse_flags(options, request)
+        parse_key_type(options, request)
+        parse_value_type(options, request)
         options
       end
 
-      def parse_flags(request)
-        options = {:type => :hash}
+      def parse_flags(options, request)
+        options[:type] = :hash
         if request["flags"]
           request["flags"].split(/\|/).each do |flag|
             case flag
@@ -66,14 +66,12 @@ module Droonga
         options
       end
 
-      def parse_key_type(request)
-        options = {}
+      def parse_key_type(options, request)
         options[:key_type] = request["key_type"] if request["key_type"]
         options
       end
 
-      def parse_value_type(request)
-        options = {}
+      def parse_value_type(options, request)
         options[:value_type] = request["value_type"] if request["value_type"]
         options
       end
