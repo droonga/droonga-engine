@@ -38,6 +38,7 @@ module Droonga
         options = {}
         options.merge!(parse_flags(request))
         options.merge!(parse_key_type(request))
+        options.merge!(parse_value_type(request))
         options
       end
 
@@ -68,6 +69,12 @@ module Droonga
       def parse_key_type(request)
         options = {}
         options[:key_type] = request["key_type"] if request["key_type"]
+        options
+      end
+
+      def parse_value_type(request)
+        options = {}
+        options[:value_type] = request["value_type"] if request["value_type"]
         options
       end
     end

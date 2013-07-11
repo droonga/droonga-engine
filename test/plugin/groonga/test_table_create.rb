@@ -106,4 +106,17 @@ table_create Books TABLE_HASH_KEY --key_type Int32
       SCHEMA
     end
   end
+
+  class ValueTypeTest < self
+    def test_value_type
+      request = {
+        "name"  => "Books",
+        "value_type" => "Int32",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
+      SCHEMA
+    end
+  end
 end
