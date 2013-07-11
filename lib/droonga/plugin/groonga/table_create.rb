@@ -32,7 +32,7 @@ module Droonga
         name = command["name"]
         return [false] unless name
 
-        options = parse_request(command)
+        options = parse_command(command)
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
         end
@@ -40,50 +40,50 @@ module Droonga
       end
 
       private
-      def parse_request(request)
+      def parse_command(command)
         options = {}
-        parse_flags(options, request)
-        parse_key_type(options, request)
-        parse_value_type(options, request)
-        parse_default_tokenizer(options, request)
-        parse_normalizer(options, request)
+        parse_flags(options, command)
+        parse_key_type(options, command)
+        parse_value_type(options, command)
+        parse_default_tokenizer(options, command)
+        parse_normalizer(options, command)
         options
       end
 
-      def parse_flags(options, request)
+      def parse_flags(options, command)
         options[:type] = :hash
-        if request.table_no_key?
+        if command.table_no_key?
           options[:type] = :array
-        elsif request.table_hash_key?
+        elsif command.table_hash_key?
           options[:type] = :hash
-        elsif request.table_pat_key?
+        elsif command.table_pat_key?
           options[:type] = :patricia_trie
-        elsif request.table_dat_key?
+        elsif command.table_dat_key?
           options[:type] = :double_array_trie
         end
-        if request.key_with_sis? and request.table_pat_key?
+        if command.key_with_sis? and command.table_pat_key?
           options[:key_with_sis] = true
         end
         options
       end
 
-      def parse_key_type(options, request)
-        options[:key_type] = request["key_type"] if request["key_type"]
+      def parse_key_type(options, command)
+        options[:key_type] = command["key_type"] if command["key_type"]
         options
       end
 
-      def parse_value_type(options, request)
-        options[:value_type] = request["value_type"] if request["value_type"]
+      def parse_value_type(options, command)
+        options[:value_type] = command["value_type"] if command["value_type"]
         options
       end
 
-      def parse_default_tokenizer(options, request)
-        options[:default_tokenizer] = request["default_tokenizer"] if request["default_tokenizer"]
+      def parse_default_tokenizer(options, command)
+        options[:default_tokenizer] = command["default_tokenizer"] if command["default_tokenizer"]
         options
       end
 
-      def parse_normalizer(options, request)
-        options[:normalizer] = request["normalizer"] if request["normalizer"]
+      def parse_normalizer(options, command)
+        options[:normalizer] = command["normalizer"] if command["normalizer"]
         options
       end
     end
