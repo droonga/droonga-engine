@@ -132,4 +132,17 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
       SCHEMA
     end
   end
+
+  class NormalizerTest < self
+    def test_default_tokenizer
+      request = {
+        "name"  => "Books",
+        "normalizer" => "NormalizerAuto",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY|KEY_NORMALIZE --key_type ShortText
+      SCHEMA
+    end
+  end
 end

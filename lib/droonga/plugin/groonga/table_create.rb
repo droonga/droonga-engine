@@ -40,6 +40,7 @@ module Droonga
         parse_key_type(options, request)
         parse_value_type(options, request)
         parse_default_tokenizer(options, request)
+        parse_normalizer(options, request)
         options
       end
 
@@ -79,6 +80,11 @@ module Droonga
 
       def parse_default_tokenizer(options, request)
         options[:default_tokenizer] = request["default_tokenizer"] if request["default_tokenizer"]
+        options
+      end
+
+      def parse_normalizer(options, request)
+        options[:normalizer] = request["normalizer"] if request["normalizer"]
         options
       end
     end
