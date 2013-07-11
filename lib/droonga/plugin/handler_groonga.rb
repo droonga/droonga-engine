@@ -29,6 +29,11 @@ module Droonga
       outputs = command.execute(request)
       post(outputs)
     end
+
+    module Status
+      SUCCESS          = 0
+      INVALID_ARGUMENT = 65514
+    end
   end
 end
 

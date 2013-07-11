@@ -25,18 +25,27 @@ module Droonga
         @context = context
       end
 
+      def header(return_code, error_message = "")
+        elapsed_time = Time.now.to_f - @start_time
+        header = [return_code, @start_time, elapsed_time]
+        header.push(error_message) unless error_message.empty?
+        header
+      end
+
       def execute(request)
+        @start_time = Time.now.to_f
+
         command_class = Groonga::Command.find("table_create")
         command = command_class.new("table_create", request)
 
         name = command["name"]
-        return [false] unless name
+        return [header(Status::INVALID_ARGUMENT, "Should not create anonymous table"), false] unless name
 
         options = parse_command(command)
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
         end
-        [true]
+        [header(Status::SUCCESS), true]
       end
 
       private

@@ -65,4 +65,12 @@ class GroongaHandlerTest < Test::Unit::TestCase
     database_dumper = Groonga::DatabaseDumper.new(:database => @database)
     database_dumper.dump
   end
+
+  NORMALIZED_START_TIME = Time.parse("2013-07-11T16:04:28+0900").to_i
+  NORMALIZED_ELAPSED_TIME = 1
+  def normalize_header(header)
+    start_time = NORMALIZED_START_TIME
+    elapsed_time = NORMALIZED_ELAPSED_TIME
+    [header[0], start_time, elapsed_time]
+  end
 end
