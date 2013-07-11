@@ -35,7 +35,9 @@ module Droonga
 
       private
       def parse_request(request)
-        options = parse_flags(request)
+        options = {}
+        options.merge!(parse_flags(request))
+        options.merge!(parse_key_type(request))
         options
       end
 
@@ -60,6 +62,12 @@ module Droonga
             options[:key_with_sis] = false unless options[:type] == :patricia_trie
           end
         end
+        options
+      end
+
+      def parse_key_type(request)
+        options = {}
+        options[:key_type] = request["key_type"] if request["key_type"]
         options
       end
     end

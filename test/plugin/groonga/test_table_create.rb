@@ -93,4 +93,17 @@ table_create Books TABLE_NO_KEY
       SCHEMA
     end
   end
+
+  class KeyTypeTest < self
+    def test_key_type
+      request = {
+        "name"  => "Books",
+        "key_type" => "Int32",
+      }
+      @handler.table_create(request)
+      assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type Int32
+      SCHEMA
+    end
+  end
 end
