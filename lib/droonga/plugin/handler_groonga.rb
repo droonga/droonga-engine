@@ -32,7 +32,7 @@ module Droonga
 
     module Status
       SUCCESS          = 0
-      INVALID_ARGUMENT = 65514
+      INVALID_ARGUMENT = -22
     end
   end
 end
