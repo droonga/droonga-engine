@@ -38,70 +38,51 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
   end
 
   class FlagsTest < self
-    def test_table_no_key
-      request = {
-        "name"  => "Books",
-        "flags" => "TABLE_NO_KEY",
-      }
-      @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
+    data({
+           "TABLE_NO_KEY" => {
+             :flags => "TABLE_NO_KEY",
+             :schema => <<-SCHEMA,
 table_create Books TABLE_NO_KEY
-      SCHEMA
-    end
-
-    def test_table_hash_key
-      request = {
-        "name"  => "Books",
-        "flags" => "TABLE_HASH_KEY",
-      }
-      @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
+             SCHEMA
+           },
+           "TABLE_HASH_KEY" => {
+             :flags => "TABLE_HASH_KEY",
+             :schema => <<-SCHEMA,
 table_create Books TABLE_HASH_KEY --key_type ShortText
-      SCHEMA
-    end
-
-    def test_table_pat_key
-      request = {
-        "name"  => "Books",
-        "flags" => "TABLE_PAT_KEY",
-      }
-      @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
+             SCHEMA
+           },
+           "TABLE_PAT_KEY" => {
+             :flags => "TABLE_PAT_KEY",
+             :schema => <<-SCHEMA,
 table_create Books TABLE_PAT_KEY --key_type ShortText
-      SCHEMA
-    end
-
-    def test_table_dat_key
-      request = {
-        "name"  => "Books",
-        "flags" => "TABLE_DAT_KEY",
-      }
-      @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
+             SCHEMA
+           },
+           "TABLE_DAT_KEY" => {
+             :flags => "TABLE_DAT_KEY",
+             :schema => <<-SCHEMA,
 table_create Books TABLE_DAT_KEY --key_type ShortText
-      SCHEMA
-    end
-
-    def test_key_with_sis_with_pat_key
-      request = {
-        "name"  => "Books",
-        "flags" => "KEY_WITH_SIS|TABLE_PAT_KEY",
-      }
-      @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
+             SCHEMA
+           },
+           "TABLE_PAT_KEY with KEY_WITH_SIS" => {
+             :flags => "KEY_WITH_SIS|TABLE_PAT_KEY",
+             :schema => <<-SCHEMA,
 table_create Books TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
-      SCHEMA
-    end
-
-    def test_key_with_sis_without_pat_key
+             SCHEMA
+           },
+           "KEY_WITH_SIS without TABLE_PAT_KEY" => {
+             :flags => "TABLE_NO_KEY|KEY_WITH_SIS",
+             :schema => <<-SCHEMA,
+table_create Books TABLE_NO_KEY
+             SCHEMA
+           },
+         })
+    def test_flags(data)
       request = {
-        "name"  => "Books",
-        "flags" => "TABLE_NO_KEY|KEY_WITH_SIS",
+        "name" => "Books",
+        "flags" => data[:flags],
       }
       @handler.table_create(request)
-      assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_NO_KEY
-      SCHEMA
+      assert_equal(data[:schema], dump)
     end
   end
 
