@@ -29,6 +29,15 @@ module Droonga
         command_class = Groonga::Command.find("column_create")
         @command = command_class.new("column_create", request)
 
+        if @command.column_index?
+          # TODO: define_index
+        else
+          define_column
+        end
+      end
+
+      private
+      def define_column
         table_name = @command["table"]
         column_name = @command["name"]
         column_type = @command["type"]
@@ -42,7 +51,6 @@ module Droonga
         [true]
       end
 
-      private
       def create_column_options
         options = {}
         create_column_options_flags(options)
