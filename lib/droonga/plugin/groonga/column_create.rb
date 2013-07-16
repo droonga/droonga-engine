@@ -45,11 +45,11 @@ module Droonga
       private
       def create_column_options
         options = {}
-        parse_flags(options)
+        create_column_options_flags(options)
         options
       end
 
-      def parse_flags(options)
+      def create_column_options_flags(options)
         options[:type] = :scalar
         if @command.column_scalar?
           options[:type] = :scalar
