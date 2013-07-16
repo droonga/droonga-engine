@@ -33,7 +33,7 @@ module Droonga
         column_name = @command["name"]
         column_type = @command["type"]
 
-        options = parse_command
+        options = create_column_options
         Groonga::Schema.define(:context => @context) do |schema|
           schema.change_table(table_name) do |table|
             table.column(column_name, column_type, options)
@@ -43,7 +43,7 @@ module Droonga
       end
 
       private
-      def parse_command
+      def create_column_options
         options = {}
         parse_flags(options)
         options
