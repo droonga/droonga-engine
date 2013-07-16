@@ -84,11 +84,19 @@ module Droonga
       def create_index_options
         options = {}
         create_index_options_name(options)
+        create_index_options_flags(options)
         options
       end
 
       def create_index_options_name(options)
         options[:name] = @command["name"]
+      end
+
+      def create_index_options_flags(options)
+        options[:with_section] = true if @command.with_section?
+        options[:with_weight] = true if @command.with_weight?
+        options[:with_position] = true if @command.with_position?
+        options
       end
     end
   end

@@ -72,6 +72,30 @@ column_create Books title COLUMN_VECTOR ShortText
 column_create Books entry_title COLUMN_INDEX Books title
              SCHEMA
            },
+           "WITH_SECTION" => {
+             :flags => "COLUMN_INDEX|WITH_SECTION",
+             :schema => <<-SCHEMA,
+column_create Books entry_title COLUMN_INDEX|WITH_SECTION Books title
+             SCHEMA
+           },
+           "WITH_WEIGHT" => {
+             :flags => "COLUMN_INDEX|WITH_WEIGHT",
+             :schema => <<-SCHEMA,
+column_create Books entry_title COLUMN_INDEX|WITH_WEIGHT Books title
+             SCHEMA
+           },
+           "WITH_POSITION" => {
+             :flags => "COLUMN_INDEX|WITH_POSITION",
+             :schema => <<-SCHEMA,
+column_create Books entry_title COLUMN_INDEX|WITH_POSITION Books title
+             SCHEMA
+           },
+           "COLUMN_INDEX with all" => {
+             :flags => "COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
+             :schema => <<-SCHEMA,
+column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION Books title
+             SCHEMA
+           },
          })
     def test_index_flags(data)
       request = {
