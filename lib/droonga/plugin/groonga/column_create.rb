@@ -30,7 +30,7 @@ module Droonga
         @command = command_class.new("column_create", request)
 
         if @command.column_index?
-          # TODO: define_index
+          define_index
         else
           define_column
         end
@@ -65,6 +65,20 @@ module Droonga
           options[:type] = :vector
         end
         options
+      end
+
+      def define_index
+        table_name = @command["table"]
+        target_table = @command["type"]
+        target_column = @command["source"]
+
+        options = {}
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.change_table(table_name) do |table|
+            table.index("#{target_table}.#{target_column}", options)
+          end
+        end
+        [true]
       end
     end
   end
