@@ -83,11 +83,11 @@ module Droonga
 
       def create_index_options
         options = {}
-        create_column_index_name(options)
+        create_index_options_name(options)
         options
       end
 
-      def create_column_index_name(options)
+      def create_index_options_name(options)
         options[:name] = @command["name"]
       end
     end
