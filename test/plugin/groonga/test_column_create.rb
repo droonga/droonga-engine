@@ -37,4 +37,32 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books main_text COLUMN_SCALAR LongText
     SCHEMA
   end
+
+  class FlagsTest < self
+    data({
+           "COLUMN_SCALAR" => {
+             :flags => "COLUMN_SCALAR",
+             :schema => <<-SCHEMA,
+column_create Books title COLUMN_SCALAR ShortText
+             SCHEMA
+           },
+           "COLUMN_VECTOR" => {
+             :flags => "COLUMN_VECTOR",
+             :schema => <<-SCHEMA,
+column_create Books title COLUMN_VECTOR ShortText
+             SCHEMA
+           },
+         })
+    def test_flags(data)
+      request = {
+        "table" => "Books",
+        "name"  => "title",
+        "type"  => "ShortText",
+        "flags" => data[:flags],
+      }
+      @handler.table_create({"name" => "Books"})
+      @handler.column_create(request)
+      assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
+    end
+  end
 end

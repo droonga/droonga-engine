@@ -32,12 +32,31 @@ module Droonga
         table_name = @command["table"]
         column_name = @command["name"]
         column_type = @command["type"]
+
+        options = parse_command
         Groonga::Schema.define(:context => @context) do |schema|
           schema.change_table(table_name) do |table|
-            table.column(column_name, column_type)
+            table.column(column_name, column_type, options)
           end
         end
         [true]
+      end
+
+      private
+      def parse_command
+        options = {}
+        parse_flags(options)
+        options
+      end
+
+      def parse_flags(options)
+        options[:type] = :scalar
+        if @command.column_scalar?
+          options[:type] = :scalar
+        elsif @command.column_vector?
+          options[:type] = :vector
+        end
+        options
       end
     end
   end
