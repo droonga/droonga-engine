@@ -28,4 +28,13 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
     SCHEMA
   end
+
+  def test_type
+    @handler.table_create({"name" => "Books"})
+    @handler.column_create({"table" => "Books", "name" => "main_text", "type" => "LongText"})
+    assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+column_create Books main_text COLUMN_SCALAR LongText
+    SCHEMA
+  end
 end
