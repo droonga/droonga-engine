@@ -66,7 +66,7 @@ column_create Books title COLUMN_VECTOR ShortText
     end
 
     data({
-           "WITH_SECTION" => {
+           "COLUMN_INDEX" => {
              :flags => "COLUMN_INDEX",
              :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX Books title
