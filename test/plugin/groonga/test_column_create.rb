@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,34 +13,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "groonga"
-
-require "droonga/handler"
-
-module Droonga
-  class GroongaHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("groonga", self)
-
-    command :table_create
-    def table_create(request)
-      command = TableCreate.new(@context)
-      outputs = command.execute(request)
-      post(outputs)
-    end
-
-    command :column_create
-    def column_create(request)
-      command = ColumnCreate.new(@context)
-      outputs = command.execute(request)
-      post(outputs)
-    end
-
-    module Status
-      SUCCESS          = 0
-      INVALID_ARGUMENT = -22
-    end
+class ColumnCreateTest < GroongaHandlerTest
+  def test_success
+    @handler.table_create({"name" => "Books"})
+    @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+    assert_equal([true], @worker.body)
   end
 end
-
-require "droonga/plugin/groonga/table_create"
-require "droonga/plugin/groonga/column_create"

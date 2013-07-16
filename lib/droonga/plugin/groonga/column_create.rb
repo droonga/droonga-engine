@@ -16,33 +16,29 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "groonga"
-
-require "droonga/handler"
+require "groonga/command/column-create"
 
 module Droonga
-  class GroongaHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("groonga", self)
+  class GroongaHandler
+    class ColumnCreate
+      def initialize(context)
+        @context = context
+      end
 
-    command :table_create
-    def table_create(request)
-      command = TableCreate.new(@context)
-      outputs = command.execute(request)
-      post(outputs)
-    end
+      def execute(request)
+        command_class = Groonga::Command.find("column_create")
+        @command = command_class.new("column_create", request)
 
-    command :column_create
-    def column_create(request)
-      command = ColumnCreate.new(@context)
-      outputs = command.execute(request)
-      post(outputs)
-    end
-
-    module Status
-      SUCCESS          = 0
-      INVALID_ARGUMENT = -22
+        table_name = @command["table"]
+        column_name = @command["name"]
+        column_type = @command["type"]
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.change_table(table_name) do |table|
+            table.column(column_name, column_type)
+          end
+        end
+        [true]
+      end
     end
   end
 end
-
-require "droonga/plugin/groonga/table_create"
-require "droonga/plugin/groonga/column_create"
