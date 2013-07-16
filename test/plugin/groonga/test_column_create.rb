@@ -19,4 +19,13 @@ class ColumnCreateTest < GroongaHandlerTest
     @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
     assert_equal([true], @worker.body)
   end
+
+  def test_name
+    @handler.table_create({"name" => "Books"})
+    @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+    assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+column_create Books title COLUMN_SCALAR ShortText
+    SCHEMA
+  end
 end
