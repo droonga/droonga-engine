@@ -15,18 +15,6 @@
 
 require "droonga/plugin/handler_search"
 
-class Worker
-  attr_reader :context, :body
-
-  def initialize()
-    @context = Groonga::Context.default
-  end
-
-  def post(body, destination=nil)
-    @body = body
-  end
-end
-
 class SearchHandlerTest < Test::Unit::TestCase
   def setup
     setup_database
@@ -50,7 +38,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   def setup_handler
-    @worker = Worker.new
+    @worker = StubWorker.new
     @handler = Droonga::SearchHandler.new(@worker)
   end
 

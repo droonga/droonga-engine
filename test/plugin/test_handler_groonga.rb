@@ -15,18 +15,6 @@
 
 require "droonga/plugin/handler_groonga"
 
-class Worker
-  attr_reader :context, :body
-
-  def initialize()
-    @context = Groonga::Context.default
-  end
-
-  def post(body, destination=nil)
-    @body = body
-  end
-end
-
 class GroongaHandlerTest < Test::Unit::TestCase
   def setup
     setup_database
@@ -52,7 +40,7 @@ class GroongaHandlerTest < Test::Unit::TestCase
   end
 
   def setup_handler
-    @worker = Worker.new
+    @worker = StubWorker.new
     @handler = Droonga::GroongaHandler.new(@worker)
   end
 
