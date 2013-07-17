@@ -13,10 +13,16 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require_relative "helper/sandbox"
-require_relative "helper/fixture"
+module Fixture
+  def fixture_directory
+    File.join(File.dirname(__FILE__), "..", "fixtures")
+  end
 
-class Test::Unit::TestCase
-  include Sandbox
-  include Fixture
+  def fixture_path(*path_components)
+    File.join(fixture_directory, *path_components)
+  end
+
+  def fixture_data(*path_components)
+    File.read(fixture_path(*path_components))
+  end
 end
