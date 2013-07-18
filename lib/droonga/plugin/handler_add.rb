@@ -37,7 +37,7 @@ module Droonga
       else
         table.add(request["key"], request["values"])
       end
-      outputs = [true]
+      [true]
     end
   end
 end
