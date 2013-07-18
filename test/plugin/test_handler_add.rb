@@ -60,7 +60,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   public
-  def test_add
+  def test_add_with_empty_values
     request = {
       "table"  => "Users",
       "key"    => "mori",
