@@ -25,10 +25,14 @@ module Droonga
 
     command :add
     def add(request)
+      outputs = process_add(request)
+      post(outputs)
+    end
+
+    def process_add(request)
       table = @context[request["table"]]
       table.add(request["key"], request["values"])
       outputs = [true]
-      post(outputs)
     end
   end
 end
