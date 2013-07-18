@@ -31,7 +31,11 @@ module Droonga
 
     def process_add(request)
       table = @context[request["table"]]
-      table.add(request["key"], request["values"])
+      if table.class == Groonga::Array
+        table.add(request["values"])
+      else
+        table.add(request["key"], request["values"])
+      end
       outputs = [true]
     end
   end
