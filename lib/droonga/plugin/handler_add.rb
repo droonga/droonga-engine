@@ -31,6 +31,7 @@ module Droonga
 
     def process_add(request)
       table = @context[request["table"]]
+      return [false] unless table
       if table.class == Groonga::Array
         table.add(request["values"])
       else

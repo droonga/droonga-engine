@@ -106,4 +106,13 @@ class AddHandlerTest < Test::Unit::TestCase
     table = @worker.context["Books"]
     assert_equal(["CSS"], table.collect(&:title))
   end
+
+  def test_failure
+    request = {
+      "table"  => "XXX",
+      "values" => {},
+    }
+    @handler.add(request)
+    assert_equal([false], @worker.body)
+  end
 end
