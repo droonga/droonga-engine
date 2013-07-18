@@ -39,6 +39,7 @@ class AddHandlerTest < Test::Unit::TestCase
       schema.create_table("Users",
                           :type => :hash,
                           :key_type => :short_text) do |table|
+        table.short_text("country")
       end
     end
   end
@@ -68,5 +69,16 @@ class AddHandlerTest < Test::Unit::TestCase
     @handler.add(request)
     table = @worker.context["Users"]
     assert_equal(["mori"], table.collect(&:key))
+  end
+
+  def test_add_with_values
+    request = {
+      "table"  => "Users",
+      "key"    => "asami",
+      "values" => { "country" => "japan" },
+    }
+    @handler.add(request)
+    table = @worker.context["Users"]
+    assert_equal(["japan"], table.collect(&:country))
   end
 end
