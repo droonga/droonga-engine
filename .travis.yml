@@ -1,6 +1,6 @@
 notifications:
   recipients:
-    - kou@clear-code.com
+    - groonga-commit@lists.sourceforge.jp
 rvm:
   - 1.9.3
 before_install:
