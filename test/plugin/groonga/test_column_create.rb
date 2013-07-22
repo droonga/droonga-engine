@@ -39,6 +39,7 @@ column_create Books main_text COLUMN_SCALAR LongText
   end
 
   class FlagsTest < self
+    class DataStoreTest < self
     data({
            "COLUMN_SCALAR" => {
              :flags => "COLUMN_SCALAR",
@@ -63,6 +64,7 @@ column_create Books title COLUMN_VECTOR ShortText
       @handler.table_create({"name" => "Books"})
       @handler.column_create(request)
       assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
+    end
     end
 
     class IndexTest < self
