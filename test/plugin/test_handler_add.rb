@@ -87,6 +87,7 @@ class AddHandlerTest < Test::Unit::TestCase
     assert_equal(["japan"], table.collect(&:country))
   end
 
+  class TestNoKey < self
   def test_add_no_key_empty_values
     request = {
       "table"  => "Books",
@@ -105,6 +106,7 @@ class AddHandlerTest < Test::Unit::TestCase
     @handler.add(request)
     table = @worker.context["Books"]
     assert_equal(["CSS"], table.collect(&:title))
+  end
   end
 
   def test_failure
