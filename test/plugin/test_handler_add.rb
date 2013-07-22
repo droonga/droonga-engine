@@ -64,7 +64,7 @@ class AddHandlerTest < Test::Unit::TestCase
       end
     end
 
-    def test_add_with_empty_values
+    def test_empty_values
       request = {
         "table"  => "Users",
         "key"    => "mori",
@@ -75,7 +75,7 @@ class AddHandlerTest < Test::Unit::TestCase
       assert_equal(["mori"], table.collect(&:key))
     end
 
-    def test_add_with_values
+    def test_values
       request = {
         "table"  => "Users",
         "key"    => "asami",
