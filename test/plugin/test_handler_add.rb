@@ -119,7 +119,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   class TestFailure < self
-    def test_failure
+    def test_nonexistent_table
       request = {
         "table"  => "XXX",
         "values" => {},
