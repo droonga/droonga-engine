@@ -65,13 +65,27 @@ column_create Books title COLUMN_VECTOR ShortText
       assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
     end
 
-    data({
-           "COLUMN_INDEX" => {
-             :flags => "COLUMN_INDEX",
-             :schema => <<-SCHEMA,
+    def test_index_column_type
+      data = {
+        :flags  => "COLUMN_INDEX",
+        :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX Books title
-             SCHEMA
-           },
+        SCHEMA
+      }
+      request = {
+        "table"  => "Books",
+        "name"   => "entry_title",
+        "type"   => "Books",
+        "source" => "title",
+        "flags"  => data[:flags],
+      }
+      @handler.table_create({"name" => "Books"})
+      @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+      @handler.column_create(request)
+      assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
+    end
+
+    data({
            "WITH_SECTION" => {
              :flags => "COLUMN_INDEX|WITH_SECTION",
              :schema => <<-SCHEMA,
