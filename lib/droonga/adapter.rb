@@ -15,29 +15,22 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/command_mapper"
+
 module Droonga
   class Adapter
     class << self
       def inherited(sub_class)
         super
-        sub_class.instance_variable_set(:@commands, {})
+        sub_class.instance_variable_set(:@command_mapper, CommandMapper.new)
       end
 
       def command(name_or_map)
-        if name_or_map.is_a?(Hash)
-          command_map = name_or_map
-          command_map.each do |command_name, method_name|
-            @commands[command_name.to_s] = method_name
-          end
-        else
-          name = name_or_map
-          method_name = name
-          @commands[name.to_s] = method_name
-        end
+        @command_mapper.register(name_or_map)
       end
 
       def method_name(command)
-        @commands[command.to_s]
+        @command_mapper[command]
       end
     end
 
