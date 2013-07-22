@@ -37,5 +37,9 @@ module Droonga
     def [](command)
       @commands[command.to_s]
     end
+
+    def commands
+      @commands.keys
+    end
   end
 end

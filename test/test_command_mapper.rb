@@ -30,5 +30,15 @@ class CommandMapperTest < Test::Unit::TestCase
       @command_mapper.register(:command_name => :method_name)
       assert_equal(:method_name, @command_mapper[:command_name])
     end
+
+    def test_multiple_pairs
+      map = {
+        :command_name_1 => :command_name_1,
+        :command_name_2 => :command_name_2,
+      }
+      @command_mapper.register(map)
+      assert_equal(["command_name_1", "command_name_2"],
+                   @command_mapper.commands)
+    end
   end
 end
