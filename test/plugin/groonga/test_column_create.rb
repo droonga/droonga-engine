@@ -77,9 +77,6 @@ column_create Books title COLUMN_VECTOR ShortText
       def test_index_column_type
         data = {
           :flags  => "COLUMN_INDEX",
-          :schema => <<-SCHEMA,
-column_create Books entry_title COLUMN_INDEX Books title
-          SCHEMA
         }
         request = {
           "table"  => "Books",
@@ -89,11 +86,11 @@ column_create Books entry_title COLUMN_INDEX Books title
           "flags"  => data[:flags],
         }
         @handler.column_create(request)
-        assert_equal(<<-EXPECTED.chomp, dump)
+        assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
 
-#{data[:schema]}
+column_create Books entry_title #{data[:flags]} Books title
         EXPECTED
       end
 
