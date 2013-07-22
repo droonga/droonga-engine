@@ -63,7 +63,10 @@ column_create Books title COLUMN_VECTOR ShortText
         }
         @handler.table_create({"name" => "Books"})
         @handler.column_create(request)
-        assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
+        assert_equal(<<-EXPECTED.chomp, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+#{data[:schema]}
+        EXPECTED
       end
     end
 
