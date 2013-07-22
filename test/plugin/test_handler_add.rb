@@ -121,7 +121,7 @@ class AddHandlerTest < Test::Unit::TestCase
   class TestFailure < self
     def test_nonexistent_table
       request = {
-        "table"  => "XXX",
+        "table"  => "Nonexistent",
         "values" => {},
       }
       @handler.add(request)
