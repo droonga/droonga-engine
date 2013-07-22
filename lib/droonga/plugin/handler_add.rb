@@ -29,6 +29,7 @@ module Droonga
       post(outputs)
     end
 
+    private
     def process(request)
       table = @context[request["table"]]
       return [false] unless table

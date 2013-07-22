@@ -43,6 +43,7 @@ module Droonga
       post(outputs)
     end
 
+    private
     def process_queries(queries)
       return {} unless queries
       query_sorter = QuerySorter.new
