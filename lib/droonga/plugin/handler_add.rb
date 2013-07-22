@@ -33,10 +33,10 @@ module Droonga
     def process(request)
       table = @context[request["table"]]
       return [false] unless table
-      if table.class == Groonga::Array
-        table.add(request["values"])
-      else
+      if table.support_key?
         table.add(request["key"], request["values"])
+      else
+        table.add(request["values"])
       end
       [true]
     end
