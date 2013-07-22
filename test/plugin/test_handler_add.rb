@@ -41,11 +41,6 @@ class AddHandlerTest < Test::Unit::TestCase
                           :key_type => :short_text) do |table|
         table.short_text("country")
       end
-
-      schema.create_table("Books",
-                          :type => :array) do |table|
-        table.short_text("title")
-      end
     end
   end
 
@@ -88,6 +83,16 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   class TestNoKey < self
+  def setup
+    super
+    Groonga::Schema.define do |schema|
+      schema.create_table("Books",
+                          :type => :array) do |table|
+        table.short_text("title")
+      end
+    end
+  end
+
   def test_add_no_key_empty_values
     request = {
       "table"  => "Books",
