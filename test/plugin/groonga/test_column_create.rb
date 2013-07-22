@@ -68,6 +68,12 @@ column_create Books title COLUMN_VECTOR ShortText
     end
 
     class IndexTest < self
+      def setup
+        super
+        @handler.table_create({"name" => "Books"})
+        @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+      end
+
       def test_index_column_type
         data = {
           :flags  => "COLUMN_INDEX",
@@ -82,8 +88,6 @@ column_create Books entry_title COLUMN_INDEX Books title
           "source" => "title",
           "flags"  => data[:flags],
         }
-        @handler.table_create({"name" => "Books"})
-        @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
         @handler.column_create(request)
         assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
       end
@@ -122,8 +126,6 @@ column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSIT
           "source" => "title",
           "flags"  => data[:flags],
         }
-        @handler.table_create({"name" => "Books"})
-        @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
         @handler.column_create(request)
         assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
       end
