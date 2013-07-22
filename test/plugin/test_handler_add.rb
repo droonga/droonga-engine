@@ -97,7 +97,7 @@ class AddHandlerTest < Test::Unit::TestCase
       end
     end
 
-    def test_add_no_key_empty_values
+    def test_empty_values
       request = {
         "table"  => "Books",
         "values" => {},
@@ -107,7 +107,7 @@ class AddHandlerTest < Test::Unit::TestCase
       assert_equal([nil], table.collect(&:title))
     end
 
-    def test_add_no_key_with_values
+    def test_with_values
       request = {
         "table"  => "Books",
         "values" => { "title" => "CSS" },
