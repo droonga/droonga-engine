@@ -30,6 +30,7 @@ end
 
 require "test-unit"
 require "test/unit/notify"
+require "test/unit/rr"
 
 require "fluent/test"
 unless ENV.has_key?("VERBOSE")
