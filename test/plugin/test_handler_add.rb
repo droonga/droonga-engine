@@ -118,6 +118,7 @@ class AddHandlerTest < Test::Unit::TestCase
     end
   end
 
+  class TestFailure < self
   def test_failure
     request = {
       "table"  => "XXX",
@@ -125,5 +126,6 @@ class AddHandlerTest < Test::Unit::TestCase
     }
     @handler.add(request)
     assert_equal([false], @worker.body)
+  end
   end
 end
