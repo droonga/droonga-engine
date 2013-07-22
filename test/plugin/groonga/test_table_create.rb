@@ -126,7 +126,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
   end
 
   class NormalizerTest < self
-    def test_default_tokenizer
+    def test_normalizer
       request = {
         "name"  => "Books",
         "normalizer" => "NormalizerAuto",
