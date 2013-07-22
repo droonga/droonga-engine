@@ -35,13 +35,6 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   def setup_schema
-    Groonga::Schema.define do |schema|
-      schema.create_table("Users",
-                          :type => :hash,
-                          :key_type => :short_text) do |table|
-        table.short_text("country")
-      end
-    end
   end
 
   def teardown_database
@@ -61,6 +54,17 @@ class AddHandlerTest < Test::Unit::TestCase
 
   public
   class TestHasKey < self
+  def setup
+    super
+    Groonga::Schema.define do |schema|
+      schema.create_table("Users",
+                          :type => :hash,
+                          :key_type => :short_text) do |table|
+        table.short_text("country")
+      end
+    end
+  end
+
   def test_add_with_empty_values
     request = {
       "table"  => "Users",
