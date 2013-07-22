@@ -40,93 +40,93 @@ column_create Books main_text COLUMN_SCALAR LongText
 
   class FlagsTest < self
     class DataStoreTest < self
-    data({
-           "COLUMN_SCALAR" => {
-             :flags => "COLUMN_SCALAR",
-             :schema => <<-SCHEMA,
+      data({
+             "COLUMN_SCALAR" => {
+               :flags => "COLUMN_SCALAR",
+               :schema => <<-SCHEMA,
 column_create Books title COLUMN_SCALAR ShortText
-             SCHEMA
-           },
-           "COLUMN_VECTOR" => {
-             :flags => "COLUMN_VECTOR",
-             :schema => <<-SCHEMA,
+               SCHEMA
+             },
+             "COLUMN_VECTOR" => {
+               :flags => "COLUMN_VECTOR",
+               :schema => <<-SCHEMA,
 column_create Books title COLUMN_VECTOR ShortText
-             SCHEMA
-           },
-         })
-    def test_data_store_column_type(data)
-      request = {
-        "table" => "Books",
-        "name"  => "title",
-        "type"  => "ShortText",
-        "flags" => data[:flags],
-      }
-      @handler.table_create({"name" => "Books"})
-      @handler.column_create(request)
-      assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
-    end
+               SCHEMA
+             },
+           })
+      def test_data_store_column_type(data)
+        request = {
+          "table" => "Books",
+          "name"  => "title",
+          "type"  => "ShortText",
+          "flags" => data[:flags],
+        }
+        @handler.table_create({"name" => "Books"})
+        @handler.column_create(request)
+        assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\n#{data[:schema]}", dump)
+      end
     end
 
     class IndexTest < self
-    def test_index_column_type
-      data = {
-        :flags  => "COLUMN_INDEX",
-        :schema => <<-SCHEMA,
+      def test_index_column_type
+        data = {
+          :flags  => "COLUMN_INDEX",
+          :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX Books title
-        SCHEMA
-      }
-      request = {
-        "table"  => "Books",
-        "name"   => "entry_title",
-        "type"   => "Books",
-        "source" => "title",
-        "flags"  => data[:flags],
-      }
-      @handler.table_create({"name" => "Books"})
-      @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
-      @handler.column_create(request)
-      assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
-    end
+          SCHEMA
+        }
+        request = {
+          "table"  => "Books",
+          "name"   => "entry_title",
+          "type"   => "Books",
+          "source" => "title",
+          "flags"  => data[:flags],
+        }
+        @handler.table_create({"name" => "Books"})
+        @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+        @handler.column_create(request)
+        assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
+      end
 
-    data({
-           "WITH_SECTION" => {
-             :flags => "COLUMN_INDEX|WITH_SECTION",
-             :schema => <<-SCHEMA,
+      data({
+             "WITH_SECTION" => {
+               :flags => "COLUMN_INDEX|WITH_SECTION",
+               :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX|WITH_SECTION Books title
-             SCHEMA
-           },
-           "WITH_WEIGHT" => {
-             :flags => "COLUMN_INDEX|WITH_WEIGHT",
-             :schema => <<-SCHEMA,
+               SCHEMA
+             },
+             "WITH_WEIGHT" => {
+               :flags => "COLUMN_INDEX|WITH_WEIGHT",
+               :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX|WITH_WEIGHT Books title
-             SCHEMA
-           },
-           "WITH_POSITION" => {
-             :flags => "COLUMN_INDEX|WITH_POSITION",
-             :schema => <<-SCHEMA,
+               SCHEMA
+             },
+             "WITH_POSITION" => {
+               :flags => "COLUMN_INDEX|WITH_POSITION",
+               :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX|WITH_POSITION Books title
-             SCHEMA
-           },
-           "COLUMN_INDEX with all" => {
-             :flags => "COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
-             :schema => <<-SCHEMA,
+               SCHEMA
+             },
+             "COLUMN_INDEX with all" => {
+               :flags => "COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
+               :schema => <<-SCHEMA,
 column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION Books title
-             SCHEMA
-           },
-         })
-    def test_index_flags(data)
-      request = {
-        "table"  => "Books",
-        "name"   => "entry_title",
-        "type"   => "Books",
-        "source" => "title",
-        "flags"  => data[:flags],
-      }
-      @handler.table_create({"name" => "Books"})
-      @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
-      @handler.column_create(request)
-      assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
-    end
+               SCHEMA
+             },
+           })
+      def test_index_flags(data)
+        request = {
+          "table"  => "Books",
+          "name"   => "entry_title",
+          "type"   => "Books",
+          "source" => "title",
+          "flags"  => data[:flags],
+        }
+        @handler.table_create({"name" => "Books"})
+        @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+        @handler.column_create(request)
+        assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
+      end
     end
   end
 end
