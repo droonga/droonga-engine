@@ -40,7 +40,8 @@ class AdapterTest < Test::Unit::TestCase
 
     def test_post
       request = nil
-      mock(@proxy).post(:search)
+      response = nil
+      mock(@proxy).post(:search).yields(response)
       @groonga_adapter.adapt(:select, request)
     end
   end

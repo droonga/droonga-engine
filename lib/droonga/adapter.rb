@@ -42,8 +42,8 @@ module Droonga
       __send__(self.class.method_name(command), request)
     end
 
-    def post(request)
-      @proxy.post(request)
+    def post(request, &block)
+      @proxy.post(request, &block)
     end
   end
 end
