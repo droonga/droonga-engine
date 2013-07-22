@@ -94,32 +94,33 @@ column_create Books entry_title COLUMN_INDEX Books title
 
       data({
              "WITH_SECTION" => {
-               :flags => "COLUMN_INDEX|WITH_SECTION",
+               :flags => "WITH_SECTION",
              },
              "WITH_WEIGHT" => {
-               :flags => "COLUMN_INDEX|WITH_WEIGHT",
+               :flags => "WITH_WEIGHT",
              },
              "WITH_POSITION" => {
-               :flags => "COLUMN_INDEX|WITH_POSITION",
+               :flags => "WITH_POSITION",
              },
              "COLUMN_INDEX with all" => {
-               :flags => "COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
+               :flags => "WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
              },
            })
       def test_index_flags(data)
+        flags = "COLUMN_INDEX|#{data[:flags]}"
         request = {
           "table"  => "Books",
           "name"   => "entry_title",
           "type"   => "Books",
           "source" => "title",
-          "flags"  => data[:flags],
+          "flags"  => flags,
         }
         @handler.column_create(request)
         assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
 
-column_create Books entry_title #{data[:flags]} Books title
+column_create Books entry_title #{flags} Books title
         EXPECTED
       end
     end
