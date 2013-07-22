@@ -63,7 +63,7 @@ table_create Books TABLE_PAT_KEY --key_type ShortText
 table_create Books TABLE_DAT_KEY --key_type ShortText
              SCHEMA
            },
-           "TABLE_PAT_KEY with KEY_WITH_SIS" => {
+           "KEY_WITH_SIS with TABLE_PAT_KEY" => {
              :flags => "KEY_WITH_SIS|TABLE_PAT_KEY",
              :schema => <<-SCHEMA,
 table_create Books TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
