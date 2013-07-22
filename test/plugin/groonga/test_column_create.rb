@@ -53,7 +53,7 @@ column_create Books title COLUMN_VECTOR ShortText
              SCHEMA
            },
          })
-    def test_column_types(data)
+    def test_data_store_column_type(data)
       request = {
         "table" => "Books",
         "name"  => "title",
