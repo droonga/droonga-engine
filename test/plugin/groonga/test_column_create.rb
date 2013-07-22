@@ -127,7 +127,12 @@ column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSIT
           "flags"  => data[:flags],
         }
         @handler.column_create(request)
-        assert_equal("table_create Books TABLE_HASH_KEY --key_type ShortText\ncolumn_create Books title COLUMN_SCALAR ShortText\n\n#{data[:schema]}", dump)
+        assert_equal(<<-EXPECTED.chomp, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+column_create Books title COLUMN_SCALAR ShortText
+
+#{data[:schema]}
+        EXPECTED
       end
     end
   end
