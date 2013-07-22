@@ -54,70 +54,70 @@ class AddHandlerTest < Test::Unit::TestCase
 
   public
   class TestHasKey < self
-  def setup
-    super
-    Groonga::Schema.define do |schema|
-      schema.create_table("Users",
-                          :type => :hash,
-                          :key_type => :short_text) do |table|
-        table.short_text("country")
+    def setup
+      super
+      Groonga::Schema.define do |schema|
+        schema.create_table("Users",
+          :type => :hash,
+          :key_type => :short_text) do |table|
+          table.short_text("country")
+        end
       end
     end
-  end
 
-  def test_add_with_empty_values
-    request = {
-      "table"  => "Users",
-      "key"    => "mori",
-      "values" => {},
-    }
-    @handler.add(request)
-    table = @worker.context["Users"]
-    assert_equal(["mori"], table.collect(&:key))
-  end
+    def test_add_with_empty_values
+      request = {
+        "table"  => "Users",
+        "key"    => "mori",
+        "values" => {},
+      }
+      @handler.add(request)
+      table = @worker.context["Users"]
+      assert_equal(["mori"], table.collect(&:key))
+    end
 
-  def test_add_with_values
-    request = {
-      "table"  => "Users",
-      "key"    => "asami",
-      "values" => { "country" => "japan" },
-    }
-    @handler.add(request)
-    table = @worker.context["Users"]
-    assert_equal(["japan"], table.collect(&:country))
-  end
+    def test_add_with_values
+      request = {
+        "table"  => "Users",
+        "key"    => "asami",
+        "values" => { "country" => "japan" },
+      }
+      @handler.add(request)
+      table = @worker.context["Users"]
+      assert_equal(["japan"], table.collect(&:country))
+    end
   end
 
   class TestNoKey < self
-  def setup
-    super
-    Groonga::Schema.define do |schema|
-      schema.create_table("Books",
-                          :type => :array) do |table|
-        table.short_text("title")
+    def setup
+      super
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books",
+          :type => :array) do |table|
+          table.short_text("title")
+        end
       end
     end
-  end
 
-  def test_add_no_key_empty_values
-    request = {
-      "table"  => "Books",
-      "values" => {},
-    }
-    @handler.add(request)
-    table = @worker.context["Books"]
-    assert_equal([nil], table.collect(&:title))
-  end
+    def test_add_no_key_empty_values
+      request = {
+        "table"  => "Books",
+        "values" => {},
+      }
+      @handler.add(request)
+      table = @worker.context["Books"]
+      assert_equal([nil], table.collect(&:title))
+    end
 
-  def test_add_no_key_with_values
-    request = {
-      "table"  => "Books",
-      "values" => { "title" => "CSS" },
-    }
-    @handler.add(request)
-    table = @worker.context["Books"]
-    assert_equal(["CSS"], table.collect(&:title))
-  end
+    def test_add_no_key_with_values
+      request = {
+        "table"  => "Books",
+        "values" => { "title" => "CSS" },
+      }
+      @handler.add(request)
+      table = @worker.context["Books"]
+      assert_equal(["CSS"], table.collect(&:title))
+    end
   end
 
   def test_failure
