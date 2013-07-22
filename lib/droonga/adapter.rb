@@ -41,8 +41,16 @@ module Droonga
       end
     end
 
+    def initialize(proxy)
+      @proxy = proxy
+    end
+
     def adapt(command, request)
       __send__(self.class.method_name(command), request)
+    end
+
+    def post(request)
+      @proxy.post(request)
     end
   end
 end

@@ -20,17 +20,28 @@ class AdapterTest < Test::Unit::TestCase
     class GroongaAdapter < Droonga::Adapter
       command :select
       def select(request)
+        post(:search) do |response|
+          # do nothing
+        end
         :selected
       end
     end
 
     def setup
-      @groonga_adapter = GroongaAdapter.new
+      @proxy = Object.new
+      @groonga_adapter = GroongaAdapter.new(@proxy)
     end
 
     def test_called
       request = nil
+      stub(@proxy).post
       assert_equal(:selected, @groonga_adapter.adapt(:select, request))
+    end
+
+    def test_post
+      request = nil
+      mock(@proxy).post(:search)
+      @groonga_adapter.adapt(:select, request)
     end
   end
 end
