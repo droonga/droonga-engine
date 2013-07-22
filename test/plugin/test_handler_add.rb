@@ -60,6 +60,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   public
+  class TestHasKey < self
   def test_add_with_empty_values
     request = {
       "table"  => "Users",
@@ -80,6 +81,7 @@ class AddHandlerTest < Test::Unit::TestCase
     @handler.add(request)
     table = @worker.context["Users"]
     assert_equal(["japan"], table.collect(&:country))
+  end
   end
 
   class TestNoKey < self
