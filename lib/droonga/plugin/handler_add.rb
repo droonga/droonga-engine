@@ -25,11 +25,11 @@ module Droonga
 
     command :add
     def add(request)
-      outputs = process_add(request)
+      outputs = process(request)
       post(outputs)
     end
 
-    def process_add(request)
+    def process(request)
       table = @context[request["table"]]
       return [false] unless table
       if table.class == Groonga::Array
