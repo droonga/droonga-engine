@@ -43,15 +43,9 @@ column_create Books main_text COLUMN_SCALAR LongText
       data({
              "COLUMN_SCALAR" => {
                :flags => "COLUMN_SCALAR",
-               :schema => <<-SCHEMA,
-column_create Books title COLUMN_SCALAR ShortText
-               SCHEMA
              },
              "COLUMN_VECTOR" => {
                :flags => "COLUMN_VECTOR",
-               :schema => <<-SCHEMA,
-column_create Books title COLUMN_VECTOR ShortText
-               SCHEMA
              },
            })
       def test_data_store_column_type(data)
@@ -63,9 +57,9 @@ column_create Books title COLUMN_VECTOR ShortText
         }
         @handler.table_create({"name" => "Books"})
         @handler.column_create(request)
-        assert_equal(<<-EXPECTED.chomp, dump)
+        assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
-#{data[:schema]}
+column_create Books title #{data[:flags]} ShortText
         EXPECTED
       end
     end
