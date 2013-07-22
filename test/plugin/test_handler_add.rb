@@ -54,8 +54,7 @@ class AddHandlerTest < Test::Unit::TestCase
 
   public
   class TestHasKey < self
-    def setup
-      super
+    def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Users",
           :type => :hash,
@@ -89,8 +88,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   class TestNoKey < self
-    def setup
-      super
+    def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Books",
           :type => :array) do |table|
