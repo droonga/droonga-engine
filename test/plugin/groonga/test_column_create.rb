@@ -95,27 +95,15 @@ column_create Books entry_title COLUMN_INDEX Books title
       data({
              "WITH_SECTION" => {
                :flags => "COLUMN_INDEX|WITH_SECTION",
-               :schema => <<-SCHEMA,
-column_create Books entry_title COLUMN_INDEX|WITH_SECTION Books title
-               SCHEMA
              },
              "WITH_WEIGHT" => {
                :flags => "COLUMN_INDEX|WITH_WEIGHT",
-               :schema => <<-SCHEMA,
-column_create Books entry_title COLUMN_INDEX|WITH_WEIGHT Books title
-               SCHEMA
              },
              "WITH_POSITION" => {
                :flags => "COLUMN_INDEX|WITH_POSITION",
-               :schema => <<-SCHEMA,
-column_create Books entry_title COLUMN_INDEX|WITH_POSITION Books title
-               SCHEMA
              },
              "COLUMN_INDEX with all" => {
                :flags => "COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION",
-               :schema => <<-SCHEMA,
-column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSITION Books title
-               SCHEMA
              },
            })
       def test_index_flags(data)
@@ -127,11 +115,11 @@ column_create Books entry_title COLUMN_INDEX|WITH_SECTION|WITH_WEIGHT|WITH_POSIT
           "flags"  => data[:flags],
         }
         @handler.column_create(request)
-        assert_equal(<<-EXPECTED.chomp, dump)
+        assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
 
-#{data[:schema]}
+column_create Books entry_title #{data[:flags]} Books title
         EXPECTED
       end
     end
