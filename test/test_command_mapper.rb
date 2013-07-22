@@ -25,5 +25,10 @@ class CommandMapperTest < Test::Unit::TestCase
       @command_mapper.register(:select)
       assert_equal(:select, @command_mapper[:select])
     end
+
+    def test_different_method_name
+      @command_mapper.register(:command_name => :method_name)
+      assert_equal(:method_name, @command_mapper[:command_name])
+    end
   end
 end
