@@ -50,7 +50,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(select_request)
-      @groonga_adapter.select_convert_request(select_request)
+      @groonga_adapter.convert_request(select_request)
     end
   end
 
@@ -83,7 +83,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(search_response)
-      @groonga_adapter.select_convert_response(search_response)
+      @groonga_adapter.convert_response(search_response)
     end
   end
 end

@@ -23,9 +23,9 @@ module Droonga
 
     def select(select_request)
       command = Select.new
-      search_request = command.select_convert_request(select_request)
+      search_request = command.convert_request(select_request)
       post(search_request) do |search_response|
-        command.select_convert_response(search_response)
+        command.convert_response(search_response)
       end
       :selected
     end

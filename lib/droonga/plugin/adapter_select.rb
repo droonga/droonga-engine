@@ -16,7 +16,7 @@
 module Droonga
   class GroongaAdapter
     class Select
-      def select_convert_request(select_request)
+      def convert_request(select_request)
         table = select_request["table"]
         output_columns = select_request["output_columns"]
         attributes = output_columns.split(/, */)
@@ -40,7 +40,7 @@ module Droonga
         }
       end
 
-      def select_convert_response(search_response)
+      def convert_response(search_response)
         select_responses = search_response.collect do |key, value|
           status_code = 0
 
