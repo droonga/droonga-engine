@@ -35,7 +35,7 @@ module Droonga
     end
 
     def load
-      require "droonga/plugin/#{@type}/#{@type}_#{@name}"
+      require "droonga/plugin/#{@type}_#{@name}"
     end
   end
 end
