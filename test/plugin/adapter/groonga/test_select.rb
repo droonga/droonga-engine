@@ -54,10 +54,10 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
     end
 
     class OutputColumnsTest < self
-      def test_multiple_columns
+      def assert_attributes(expected_attributes, output_columns)
         select_request = {
           "table" => "EmptyTable",
-          "output_columns" => "_id,_key",
+          "output_columns" => output_columns,
         }
 
         expected_search_request = {
@@ -72,41 +72,21 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
                   "attributes",
                   "records",
                 ],
-                "attributes" => ["_id", "_key"],
+                "attributes" => expected_attributes,
               },
             },
           },
         }
-
         assert_equal(expected_search_request, convert(select_request))
+      end
+
+      def test_multiple_columns
+        assert_attributes(["_id", "_key"], "_id,_key")
       end
 
       class FunctionTest < self
         def test_single_argument
-          select_request = {
-            "table" => "EmptyTable",
-            "output_columns" => "snippet_html(content)",
-          }
-
-          expected_search_request = {
-            "queries" => {
-              "EmptyTable" => {
-                "source"   => "EmptyTable",
-                "output"   => {
-                  "elements"   => [
-                    "startTime",
-                    "elapsedTime",
-                    "count",
-                    "attributes",
-                    "records",
-                  ],
-                  "attributes" => ["snippet_html(content)"],
-                },
-              },
-            },
-          }
-
-          assert_equal(expected_search_request, convert(select_request))
+          assert_attributes(["snippet_html(content)"], "snippet_html(content)")
         end
       end
     end
