@@ -80,6 +80,35 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
         assert_equal(expected_search_request, convert(select_request))
       end
+
+      class FunctionTest < self
+        def test_single_argument
+          select_request = {
+            "table" => "EmptyTable",
+            "output_columns" => "snippet_html(content)",
+          }
+
+          expected_search_request = {
+            "queries" => {
+              "EmptyTable" => {
+                "source"   => "EmptyTable",
+                "output"   => {
+                  "elements"   => [
+                    "startTime",
+                    "elapsedTime",
+                    "count",
+                    "attributes",
+                    "records",
+                  ],
+                  "attributes" => ["snippet_html(content)"],
+                },
+              },
+            },
+          }
+
+          assert_equal(expected_search_request, convert(select_request))
+        end
+      end
     end
   end
 
