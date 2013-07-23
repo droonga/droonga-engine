@@ -96,10 +96,10 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
     end
 
     class MatchColumnsTest < self
-      def test_single_column
+      def assert_matchTo(expected_matchTo, match_columns)
         select_request = {
           "table"          => "EmptyTable",
-          "match_columns"  => "_key",
+          "match_columns"  => match_columns,
           "query"          => "QueryTest",
           "output_columns" => "_id",
         }
@@ -110,7 +110,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
               "source"   => "EmptyTable",
               "condition"=> {
                 "query"  => "QueryTest",
-                "matchTo"=> ["_key"],
+                "matchTo"=> expected_matchTo,
                 "defaultOperator"=> "&&",
                 "allowPragma"=> false,
                 "allowColumn"=> true,
@@ -131,39 +131,12 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         assert_equal(expected_search_request, convert(select_request))
       end
 
-      def test_multiple_columns
-        select_request = {
-          "table"          => "EmptyTable",
-          "match_columns"  => "_key || content",
-          "query"          => "QueryTest",
-          "output_columns" => "_id",
-        }
+      def test_single_column
+        assert_matchTo(["_key"], "_key")
+      end
 
-        expected_search_request = {
-          "queries" => {
-            "EmptyTable" => {
-              "source"   => "EmptyTable",
-              "condition"=> {
-                "query"  => "QueryTest",
-                "matchTo"=> ["_key", "content"],
-                "defaultOperator"=> "&&",
-                "allowPragma"=> false,
-                "allowColumn"=> true,
-              },
-              "output"   => {
-                "elements"   => [
-                  "startTime",
-                  "elapsedTime",
-                  "count",
-                  "attributes",
-                  "records",
-                ],
-                "attributes" => ["_id"],
-              },
-            },
-          },
-        }
-        assert_equal(expected_search_request, convert(select_request))
+      def test_multiple_columns
+        assert_matchTo(["_key", "content"], "_key || content")
       end
     end
   end
