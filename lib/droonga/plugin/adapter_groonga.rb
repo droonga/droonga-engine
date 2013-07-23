@@ -22,11 +22,35 @@ module Droonga
     command :select
 
     def select(select_request)
-      search_request = select_request
+      search_request = select_convert_request(select_request)
       post(search_request) do |search_response|
         select_convert_response(search_response)
       end
       :selected
+    end
+
+    def select_convert_request(select_request)
+      table = select_request["table"]
+      output_columns = select_request["output_columns"]
+      attributes = output_columns.split(/, */)
+
+      {
+        "queries" => {
+          table => {
+            "source" => table,
+            "output" => {
+              "elements"   => [
+                "startTime",
+                "elapsedTime",
+                "count",
+                "attributes",
+                "records",
+              ],
+              "attributes" => attributes,
+            },
+          }
+        }
+      }
     end
 
     def select_convert_response(search_response)

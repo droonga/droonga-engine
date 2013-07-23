@@ -21,6 +21,40 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
     @groonga_adapter = Droonga::GroongaAdapter.new(@proxy)
   end
 
+  class RequestTest < self
+    def test_empty
+      select_request = {
+        "table" => "EmptyTable",
+        "output_columns" => "_id",
+      }
+
+      expected_search_request = {
+        "queries" => {
+          "EmptyTable" => {
+            "source"   => "EmptyTable",
+            "output"   => {
+              "elements"   => [
+                "startTime",
+                "elapsedTime",
+                "count",
+                "attributes",
+                "records",
+              ],
+              "attributes" => ["_id"],
+            },
+          },
+        },
+      }
+
+      assert_equal(expected_search_request, convert(select_request))
+    end
+
+    private
+    def convert(select_request)
+      @groonga_adapter.select_convert_request(select_request)
+    end
+  end
+
   class ResponseTest < self
     def test_empty
       start_time = "2001-08-02T10:45:23.5+09:00"
