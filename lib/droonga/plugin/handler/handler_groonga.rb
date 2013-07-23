@@ -44,5 +44,5 @@ module Droonga
   end
 end
 
-require "droonga/plugin/groonga/table_create"
-require "droonga/plugin/groonga/column_create"
+require "droonga/plugin/handler/groonga/table_create"
+require "droonga/plugin/handler/groonga/column_create"
