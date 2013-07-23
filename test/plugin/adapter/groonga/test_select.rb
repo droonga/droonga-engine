@@ -88,6 +88,10 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         def test_single_argument
           assert_attributes(["snippet_html(content)"], "snippet_html(content)")
         end
+
+        def test_with_columns
+          assert_attributes(["_id","_key","snippet_html(content)"], "_id,_key,snippet_html(content)")
+        end
       end
     end
   end
