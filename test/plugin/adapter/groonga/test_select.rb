@@ -52,6 +52,35 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
     def convert(select_request)
       @select.convert_request(select_request)
     end
+
+    class OutputColumnsTest < self
+      def test_multiple_columns
+        select_request = {
+          "table" => "EmptyTable",
+          "output_columns" => "_id,_key",
+        }
+
+        expected_search_request = {
+          "queries" => {
+            "EmptyTable" => {
+              "source"   => "EmptyTable",
+              "output"   => {
+                "elements"   => [
+                  "startTime",
+                  "elapsedTime",
+                  "count",
+                  "attributes",
+                  "records",
+                ],
+                "attributes" => ["_id", "_key"],
+              },
+            },
+          },
+        }
+
+        assert_equal(expected_search_request, convert(select_request))
+      end
+    end
   end
 
   class ResponseTest < self
