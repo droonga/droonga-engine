@@ -94,6 +94,43 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         end
       end
     end
+
+    class MatchColumnsTest < self
+      def test_single_column
+        select_request = {
+          "table"          => "EmptyTable",
+          "match_columns"  => "_key",
+          "query"          => "QueryTest",
+          "output_columns" => "_id",
+        }
+
+        expected_search_request = {
+          "queries" => {
+            "EmptyTable" => {
+              "source"   => "EmptyTable",
+              "condition"=> {
+                "query"  => "QueryTest",
+                "matchTo"=> ["_key"],
+                "defaultOperator"=> "&&",
+                "allowPragma"=> false,
+                "allowColumn"=> true,
+              },
+              "output"   => {
+                "elements"   => [
+                  "startTime",
+                  "elapsedTime",
+                  "count",
+                  "attributes",
+                  "records",
+                ],
+                "attributes" => ["_id"],
+              },
+            },
+          },
+        }
+        assert_equal(expected_search_request, convert(select_request))
+      end
+    end
   end
 
   class ResponseTest < self

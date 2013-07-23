@@ -18,10 +18,13 @@ module Droonga
     class Select
       def convert_request(select_request)
         table = select_request["table"]
+        match_columns = select_request["match_columns"]
+        match_to = match_columns ? match_columns.split(/ *\|\| */) : []
+        query = select_request["query"]
         output_columns = select_request["output_columns"]
         attributes = output_columns.split(/, */)
 
-        {
+        search_request = {
           "queries" => {
             table => {
               "source" => table,
@@ -38,6 +41,17 @@ module Droonga
             }
           }
         }
+        if query
+          condition = {
+            "query"  => query,
+            "matchTo"=> match_to,
+            "defaultOperator"=> "&&",
+            "allowPragma"=> false,
+            "allowColumn"=> true,
+          }
+          search_request["queries"][table]["condition"] = condition
+        end
+        search_request
       end
 
       def convert_response(search_response)
