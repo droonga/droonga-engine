@@ -130,6 +130,41 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         }
         assert_equal(expected_search_request, convert(select_request))
       end
+
+      def test_multiple_columns
+        select_request = {
+          "table"          => "EmptyTable",
+          "match_columns"  => "_key || content",
+          "query"          => "QueryTest",
+          "output_columns" => "_id",
+        }
+
+        expected_search_request = {
+          "queries" => {
+            "EmptyTable" => {
+              "source"   => "EmptyTable",
+              "condition"=> {
+                "query"  => "QueryTest",
+                "matchTo"=> ["_key", "content"],
+                "defaultOperator"=> "&&",
+                "allowPragma"=> false,
+                "allowColumn"=> true,
+              },
+              "output"   => {
+                "elements"   => [
+                  "startTime",
+                  "elapsedTime",
+                  "count",
+                  "attributes",
+                  "records",
+                ],
+                "attributes" => ["_id"],
+              },
+            },
+          },
+        }
+        assert_equal(expected_search_request, convert(select_request))
+      end
     end
   end
 
