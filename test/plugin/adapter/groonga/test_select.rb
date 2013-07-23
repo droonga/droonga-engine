@@ -17,7 +17,7 @@ require "droonga/plugin/adapter/groonga/select"
 
 class AdapterGroongaSelectTest < Test::Unit::TestCase
   def setup
-    @groonga_adapter = Droonga::GroongaAdapter::Select.new
+    @select = Droonga::GroongaAdapter::Select.new
   end
 
   class RequestTest < self
@@ -50,7 +50,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(select_request)
-      @groonga_adapter.convert_request(select_request)
+      @select.convert_request(select_request)
     end
   end
 
@@ -83,7 +83,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(search_response)
-      @groonga_adapter.convert_response(search_response)
+      @select.convert_response(search_response)
     end
   end
 end
