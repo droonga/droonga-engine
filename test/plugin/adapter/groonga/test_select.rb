@@ -13,12 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/adapter_groonga"
+require "droonga/plugin/adapter_select"
 
 class AdapterGroongaSelectTest < Test::Unit::TestCase
   def setup
-    @proxy = Object.new
-    @groonga_adapter = Droonga::GroongaAdapter.new(@proxy)
+    @groonga_adapter = Droonga::GroongaAdapter::Select.new
   end
 
   class RequestTest < self

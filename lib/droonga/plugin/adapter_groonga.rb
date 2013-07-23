@@ -22,60 +22,14 @@ module Droonga
     command :select
 
     def select(select_request)
-      search_request = select_convert_request(select_request)
+      command = Select.new
+      search_request = command.select_convert_request(select_request)
       post(search_request) do |search_response|
-        select_convert_response(search_response)
+        command.select_convert_response(search_response)
       end
       :selected
     end
-
-    def select_convert_request(select_request)
-      table = select_request["table"]
-      output_columns = select_request["output_columns"]
-      attributes = output_columns.split(/, */)
-
-      {
-        "queries" => {
-          table => {
-            "source" => table,
-            "output" => {
-              "elements"   => [
-                "startTime",
-                "elapsedTime",
-                "count",
-                "attributes",
-                "records",
-              ],
-              "attributes" => attributes,
-            },
-          }
-        }
-      }
-    end
-
-    def select_convert_response(search_response)
-      select_responses = search_response.collect do |key, value|
-        status_code = 0
-
-        start_time = value["startTime"]
-        start_time_in_unix_time = Time.parse(start_time).to_f
-        elapsed_time = value["elapsedTime"]
-        count = value["count"]
-
-        attributes = value["attributes"]
-        converted_attributes = attributes.collect do |attribute|
-          name = attribute["name"]
-          type = attribute["type"]
-          [name, type]
-        end
-
-        header = [status_code, start_time_in_unix_time, elapsed_time]
-        results = [[count], converted_attributes]
-        body = [results]
-
-        [header, body]
-      end
-      select_responses.first
-    end
   end
 end
+
+require "droonga/plugin/adapter_select"
