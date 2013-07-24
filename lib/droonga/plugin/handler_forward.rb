@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/handler"
+require "droonga/logger"
 
 module Droonga
   class MergeHandler < Droonga::Handler
@@ -32,13 +33,10 @@ module Droonga
       post(request,
            "to" => destination, "type" => command, "arguments" => arguments)
     rescue => exception
-      if $log
-        $log.error "error while handling #{command}",
-          request: request,
-          arguments: arguments,
-          exception: exception
-        $log.error_backtrace
-      end
+      Logger.error("error while handling #{command}",
+                   request: request,
+                   arguments: arguments,
+                   exception: exception)
     end
 
     def get_destination
@@ -65,10 +63,7 @@ module Droonga
       end
       @config_mtime = mtime
     rescue => exception
-      if $log
-        $log.error "error while refreshing config", exception: exception
-        $log.error_backtrace
-      end
+      Logger.error("error while refreshing config", exception: exception)
       @config = nil
     end
   end

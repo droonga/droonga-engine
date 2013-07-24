@@ -17,6 +17,7 @@
 
 require "droonga/handler_plugin"
 require "droonga/command_mapper"
+require "droonga/logger"
 
 module Droonga
   class Handler
@@ -66,13 +67,10 @@ module Droonga
     def handle(command, request, *arguments)
       __send__(self.class.method_name(command), request, *arguments)
     rescue => exception
-      if $log
-        $log.error "error while handling #{command}",
-          request: request,
-          arguments: arguments,
-          exception: exception
-        $log.error_backtrace
-      end
+      Logger.error("error while handling #{command}",
+                   request: request,
+                   arguments: arguments,
+                   exception: exception)
     end
 
     def prefer_synchronous?(command)
