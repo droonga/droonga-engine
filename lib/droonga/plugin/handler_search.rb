@@ -311,7 +311,7 @@ module Droonga
 
       def resolve_attributes(attribute, record)
         unless attribute[:target_attributes]
-          attribute[:target_attributes] = 
+          attribute[:target_attributes] =
             normalize_target_attributes(attribute[:attributes], record.table)
         end
         return attribute[:target_attributes]
