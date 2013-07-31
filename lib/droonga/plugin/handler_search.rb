@@ -39,7 +39,10 @@ module Droonga
     command :search
     def search(request)
       queries = request["queries"]
-      outputs = process_queries(queries)
+      outputs = nil
+      @context.push_memory_pool do
+        outputs = process_queries(queries)
+      end
       post(outputs)
     end
 
