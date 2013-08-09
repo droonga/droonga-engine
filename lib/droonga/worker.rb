@@ -22,6 +22,7 @@ require "groonga"
 require "droonga/job_queue"
 require "droonga/handler_plugin"
 require "droonga/plugin"
+require "droonga/catalog"
 
 module Droonga
   class Worker
