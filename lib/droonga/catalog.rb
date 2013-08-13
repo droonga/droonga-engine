@@ -54,13 +54,13 @@ module Droonga
       routes = []
       dataset = dataset(name)
       return routes unless dataset
-      case args[:type]
-      when :broadcast
+      case args["type"]
+      when "broadcast"
         dataset["ring"].each do |key, partition|
           select_range_and_replicas(partition, args, routes)
         end
-      when :scatter
-        name = get_partition(dataset, args[:key])
+      when "scatter"
+        name = get_partition(dataset, args["key"])
         partition = dataset["ring"][name]
         select_range_and_replicas(partition, args, routes)
       end
@@ -91,14 +91,14 @@ module Droonga
     end
 
     def select_range_and_replicas(partition, args, routes)
-      date_range = args[:date_range] || 0..-1
+      date_range = args["date_range"] || 0..-1
       partition["partitions"].sort[date_range].each do |time, replicas|
-        case args[:replica]
-        when :top
+        case args["replica"]
+        when "top"
           routes << replicas[0]
-        when :random
+        when "random"
           routes << replicas[rand(replicas.size)]
-        when :all
+        when "all"
           routes.concat(replicas)
         end
       end
