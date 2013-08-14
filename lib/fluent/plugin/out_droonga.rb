@@ -21,6 +21,7 @@ module Fluent
   class DroongaOutput < Output
     Plugin.register_output("droonga", self)
 
+    config_param :name, :string, :default => ""
     config_param :n_workers, :integer, :default => 1
     config_param :database, :string, :default => "droonga/db"
     config_param :queue_name, :string, :default => "DroongaQueue"
@@ -33,7 +34,8 @@ module Fluent
       @worker = Droonga::Worker.new(:database => @database,
                                     :queue_name => @queue_name,
                                     :pool_size => @n_workers,
-                                    :handlers => @handlers)
+                                    :handlers => @handlers,
+                                    :name => @name)
     end
 
     def shutdown

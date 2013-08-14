@@ -26,12 +26,13 @@ require "droonga/catalog"
 
 module Droonga
   class Worker
-    attr_reader :context, :envelope
+    attr_reader :context, :envelope, :name
 
     def initialize(options={})
       @pool = []
       @handlers = []
       @outputs = {}
+      @name = options[:name]
       @database_name = options[:database] || "droonga/db"
       @queue_name = options[:queue_name] || "DroongaQueue"
       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
