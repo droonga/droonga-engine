@@ -30,7 +30,7 @@ module Droonga
     command :proxy
 
     def proxy(request, *arguments)
-      @proxy.handle(request)
+      @proxy.handle(request, arguments)
     end
   end
 end
