@@ -32,5 +32,9 @@ module Droonga
     def proxy(request, *arguments)
       @proxy.handle(request, arguments)
     end
+
+    def prefer_synchronous?(command)
+      return true
+    end
   end
 end
