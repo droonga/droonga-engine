@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["droonga@groonga.org"]
   gem.description   = "droonga(distributed groonga) plugin for Fluent event collector"
   gem.summary       = gem.description
-  gem.homepage      = "https://github.com/groonga/fluent-plugin-droonga"
+  gem.homepage      = "https://github.com/droonga/fluent-plugin-droonga"
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})

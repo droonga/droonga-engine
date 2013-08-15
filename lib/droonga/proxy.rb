@@ -258,6 +258,7 @@ module Droonga
           end
           @n_dones += 1
           @proxy.collectors.delete(@id) if @n_dones == @tasks.size
+          p @proxy.collectors.size
         end
       end
     end
