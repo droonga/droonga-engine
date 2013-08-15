@@ -50,25 +50,22 @@ module Droonga
       end
     end
 
+    def handle_internal_message(message)
+      components = message["components"]
+      @planner = Planner.new(self, components) unless @planner
+      dispatch_internal(message)
+    end
+
     def dispatch(destination, message)
       if destination =~ @local
-        if message["input"]
-          collector = @collectors[message["id"]]
-          collector.handle(message["input"], message["value"])
-        else
-          collector = @planner.get_collector(message["id"], @local)
-          @collectors[message["id"]] = collector
-          collector.handle(nil, nil)
-        end
+        dispatch_internal(message)
       else
         destination =~ /\A.*:\d+\/[^\.]+/
         post($&, message)
       end
     end
 
-    def handle_internal_message(message)
-      components = message["components"]
-      @planner = Planner.new(self, components) unless @planner
+    def dispatch_internal(message)
       if message["input"]
         # received a piece of result
         collector = @collectors[message["id"]]
