@@ -39,44 +39,38 @@ module Droonga
 
     def handle_incoming_message(message)
       id = generate_id
-      @planner = Planner.new(self, message)
-      destinations = @planner.resolve(id)
-      message = {
-        "id" => id,
-        "components" => @planner.components
-      }
+      planner = Planner.new(self, message)
+      destinations = planner.resolve(id)
+      components = planner.components
+      message = { "id" => id, "components" => components }
       destinations.each do |destination, frequency|
         dispatch(destination, message)
       end
     end
 
     def handle_internal_message(message)
-      components = message["components"]
-      @planner = Planner.new(self, components) unless @planner
       dispatch_internal(message)
     end
 
     def dispatch(destination, message)
-      if destination =~ @local
+      if local?(destination)
         dispatch_internal(message)
       else
-        destination =~ /\A.*:\d+\/[^\.]+/
-        post($&, message)
+        post(farm_path(destination), message)
       end
     end
 
     def dispatch_internal(message)
-      if message["input"]
-        # received a piece of result
-        collector = @collectors[message["id"]]
-        collector.handle(message["input"], message["value"])
-      else
-        # received a query
-        # what if @collectors[message["id"]] ?
-        collector = @planner.get_collector(message["id"], @local)
-        @collectors[message["id"]] = collector
-        collector.handle(nil, nil)
+      id = message["id"]
+      collector = @collectors[id]
+      unless collector
+        components = message["components"]
+        if components
+          planner = Planner.new(self, components)
+          collector = planner.get_collector(id)
+        end
       end
+      collector.handle(message["input"], message["value"])
     end
 
     def post(route, message)
@@ -87,6 +81,18 @@ module Droonga
       id = @current_id
       @current_id = id.succ
       return [@name, id].join('.#')
+    end
+
+    def farm_path(route)
+      if route =~ /\A.*:\d+\/[^\.]+/
+        $&
+      else
+        route
+      end
+    end
+
+    def local?(route)
+      route =~ @local
     end
 
     class Planner
@@ -142,21 +148,20 @@ module Droonga
               local
             end
           routes.each do |route|
-            route =~ /\A.*:\d+\/[^\.]+/
-            destinations[$&] += 1
+            destinations[@proxy.farm_path(route)] += 1
           end
           component["routes"] = routes
         end
         return destinations
       end
 
-      def get_collector(id, local)
+      def get_collector(id)
         resolve_descendants
         tasks = []
         inputs = {}
         @components.each do |component|
           component["routes"].each do |route|
-            next unless route =~ local
+            next unless @proxy.local?(route)
             task = {
               "route" => route,
               "component" => component,
@@ -170,11 +175,12 @@ module Droonga
             end
           end
         end
-        Collector.new(id, @proxy, @components, tasks, inputs)
+        collector = Collector.new(id, @proxy, @components, tasks, inputs)
+        @proxy.collectors[id] = collector
+        return collector
       end
 
       def resolve_descendants
-        return if @descendants
         @descendants = {}
         @components.size.times do |index|
           component = @components[index]
