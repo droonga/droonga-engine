@@ -49,18 +49,6 @@ module Droonga
     end
 
     def handle_internal_message(message)
-      dispatch_internal(message)
-    end
-
-    def dispatch(destination, message)
-      if local?(destination)
-        dispatch_internal(message)
-      else
-        post(farm_path(destination), message)
-      end
-    end
-
-    def dispatch_internal(message)
       id = message["id"]
       collector = @collectors[id]
       unless collector
@@ -68,9 +56,19 @@ module Droonga
         if components
           planner = Planner.new(self, components)
           collector = planner.get_collector(id)
+        else
+          #todo: take cases receiving result before its query into account
         end
       end
       collector.handle(message["input"], message["value"])
+    end
+
+    def dispatch(destination, message)
+      if local?(destination)
+        handle_internal_message(message)
+      else
+        post(farm_path(destination), message)
+      end
     end
 
     def post(route, message)
