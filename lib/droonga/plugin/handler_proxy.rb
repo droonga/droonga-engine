@@ -16,25 +16,37 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/handler"
-require "droonga/proxy"
 
 module Droonga
   class ProxyHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("proxy", self)
 
-    def initialize(*arguments)
-      super
-      @proxy = Droonga::Proxy.new(@worker, @worker.name)
+    command :proxy_search
+    def proxy_search(request, *arguments)
+      task = request["task"]
+      task["value"] = "dummy"
     end
 
-    command :proxy
-
-    def proxy(request, *arguments)
-      @proxy.handle(request, arguments)
+    command :proxy_gather
+    def proxy_gather(request, *arguments)
+      task = request["task"]
+      name = request["name"]
+      value = request["value"]
+      component = task["component"]
+      task["value"] ||= {}
+      task["value"][name] ||= []
+      task["value"][name] << value
     end
 
-    def prefer_synchronous?(command)
-      return true
+    command :proxy_reduce
+    def proxy_reduce(request, *arguments)
+      task = request["task"]
+      name = request["name"]
+      value = request["value"]
+      component = task["component"]
+      task["value"] ||= {}
+      task["value"][name] ||= []
+      task["value"][name] << value
     end
   end
 end

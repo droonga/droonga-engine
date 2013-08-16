@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require 'tsort'
+require "droonga/handler"
 
 module Droonga
   class Proxy
@@ -235,10 +236,10 @@ module Droonga
       def handle(name, value)
         tasks = @inputs[name]
         tasks.each do |task|
+          task["n_of_inputs"] += 1 if name
           component = task["component"]
           type = component["type"]
-          args = component["args"]
-          command = component["command"]
+          command = component["command"] || ("proxy_" + type)
           if command
             message = {
               "task"=>task,
@@ -247,19 +248,12 @@ module Droonga
             }
             #todo: add_route and n_of_expects++ if it would run asynchronously
             @proxy.post(message, command)
-          else
-            task["value"] ||= {}
-            task["value"][name] ||= []
-            task["value"][name] << value
           end
-          task["n_of_inputs"] += 1 if name
           return if task["n_of_inputs"] < component["n_of_expects"]
           #the task is done
           result = task["value"]
-          case type
-          when "send"
-            @proxy.post(result, args)
-          end
+          post = component["post"]
+          @proxy.post(result, post) if post
           component["descendants"].each do |name, indices|
             message = {
               "id" => @id,
@@ -278,6 +272,22 @@ module Droonga
           @proxy.collectors.delete(@id) if @n_dones == @tasks.size
         end
       end
+    end
+  end
+  class ProxyMessageHandler < Droonga::Handler
+    Droonga::HandlerPlugin.register("proxy_message", self)
+    def initialize(*arguments)
+      super
+      @proxy = Droonga::Proxy.new(@worker, @worker.name)
+    end
+
+    command :proxy
+    def proxy(request, *arguments)
+      @proxy.handle(request, arguments)
+    end
+
+    def prefer_synchronous?(command)
+      return true
     end
   end
 end
