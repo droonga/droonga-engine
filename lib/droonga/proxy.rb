@@ -290,4 +290,16 @@ module Droonga
       return true
     end
   end
+  class ProxyHandler < Droonga::Handler
+    attr_reader :task, :name, :components, :args
+    def handle(command, request, *arguments)
+      @task = request["task"]
+      @name = request["name"]
+      @component = @task["component"]
+      @args = @component["args"]
+      value0 = @task["value"]
+      value1 = request["value"]
+      @task["value"] = super(command, [value0, value1], *arguments)
+    end
+  end
 end

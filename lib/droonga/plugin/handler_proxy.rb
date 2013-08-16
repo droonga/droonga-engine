@@ -18,35 +18,26 @@
 require "droonga/handler"
 
 module Droonga
-  class ProxyHandler < Droonga::Handler
+  class BasicProxyHandler < Droonga::ProxyHandler
     Droonga::HandlerPlugin.register("proxy", self)
 
     command :proxy_search
-    def proxy_search(request, *arguments)
-      task = request["task"]
-      task["value"] = "dummy"
+    def proxy_search(request)
+      "dummy"
     end
 
     command :proxy_gather
-    def proxy_gather(request, *arguments)
-      task = request["task"]
-      name = request["name"]
-      value = request["value"]
-      component = task["component"]
-      task["value"] ||= {}
-      task["value"][name] ||= []
-      task["value"][name] << value
+    def proxy_gather(request)
+      request.flatten
     end
 
     command :proxy_reduce
-    def proxy_reduce(request, *arguments)
-      task = request["task"]
-      name = request["name"]
-      value = request["value"]
-      component = task["component"]
-      task["value"] ||= {}
-      task["value"][name] ||= []
-      task["value"][name] << value
+    def proxy_reduce(request)
+      a, b = request
+      a ||= {}
+      a[name] ||= []
+      a[name] << b
+      a
     end
   end
 end
