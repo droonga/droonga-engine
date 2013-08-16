@@ -291,7 +291,7 @@ module Droonga
     end
   end
   class ProxyHandler < Droonga::Handler
-    attr_reader :task, :name, :components, :args
+    attr_reader :task, :name, :component, :args
     def handle(command, request, *arguments)
       @task = request["task"]
       @name = request["name"]
