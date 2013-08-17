@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/handler"
+require "droonga/searcher"
 
 module Droonga
   class BasicProxyHandler < Droonga::ProxyHandler
@@ -23,7 +24,8 @@ module Droonga
 
     command :proxy_search
     def proxy_search(request)
-      "dummy"
+      searcher = Droonga::Searcher.new(@context)
+      searcher.search(args)
     end
 
     command :proxy_gather
