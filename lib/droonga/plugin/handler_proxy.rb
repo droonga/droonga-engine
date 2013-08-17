@@ -25,21 +25,32 @@ module Droonga
     command :proxy_search
     def proxy_search(request)
       searcher = Droonga::Searcher.new(@context)
-      searcher.search(args)
+      searcher.search(body).each do |output, value|
+        emit(value, output)
+      end
     end
 
     command :proxy_gather
     def proxy_gather(request)
-      request.flatten
+      output = body ? body[name] : name
+      emit(request, output)
     end
 
     command :proxy_reduce
     def proxy_reduce(request)
-      a, b = request
-      a ||= {}
-      a[name] ||= []
-      a[name] << b
-      a
+      output = outputs.first
+      a = values[output]
+      b = request
+      return unless b
+      unless a
+        emit b
+        return
+      end
+      a.each do |key, value|
+        next unless b[key]
+        a[key] = value + b[key]
+      end
+      emit(a, output)
     end
   end
 end

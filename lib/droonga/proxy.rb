@@ -165,7 +165,7 @@ module Droonga
               "route" => route,
               "component" => component,
               "n_of_inputs" => 0,
-              "value" => nil
+              "values" => {}
             }
             tasks << task
             (component["inputs"] || [nil]).each do |input|
@@ -251,14 +251,14 @@ module Droonga
           end
           return if task["n_of_inputs"] < component["n_of_expects"]
           #the task is done
-          result = task["value"]
+          result = task["values"]
           post = component["post"]
           @proxy.post(result, post) if post
           component["descendants"].each do |name, indices|
             message = {
               "id" => @id,
               "input" => name,
-              "value" => result
+              "value" => result[name]
             }
             indices.each do |index|
               dest = @components[index]
@@ -293,15 +293,27 @@ module Droonga
   end
 
   class ProxyHandler < Droonga::Handler
-    attr_reader :task, :name, :component, :args
+    attr_reader :task, :name, :component, :values, :body, :outputs
     def handle(command, request, *arguments)
       @task = request["task"]
       @name = request["name"]
       @component = @task["component"]
-      @args = @component["args"]
-      value0 = @task["value"]
-      value1 = request["value"]
-      @task["value"] = super(command, [value0, value1], *arguments)
+      @outputs = @component["outputs"]
+      @body = @component["body"]
+      @values = @task["values"]
+      super(command, request["value"], *arguments)
+    end
+
+    def emit(value, name = nil)
+      unless name
+        if component["outputs"]
+          name = component["outputs"].first
+        else
+          @task["values"] = value
+          return
+        end
+      end
+      @task["values"][name] = value
     end
 
     def prefer_synchronous?(command)
