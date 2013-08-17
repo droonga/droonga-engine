@@ -274,6 +274,7 @@ module Droonga
       end
     end
   end
+
   class ProxyMessageHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("proxy_message", self)
     def initialize(*arguments)
@@ -290,6 +291,7 @@ module Droonga
       return true
     end
   end
+
   class ProxyHandler < Droonga::Handler
     attr_reader :task, :name, :component, :args
     def handle(command, request, *arguments)
@@ -300,6 +302,10 @@ module Droonga
       value0 = @task["value"]
       value1 = request["value"]
       @task["value"] = super(command, [value0, value1], *arguments)
+    end
+
+    def prefer_synchronous?(command)
+      return true
     end
   end
 end
