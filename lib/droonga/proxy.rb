@@ -293,21 +293,21 @@ module Droonga
   end
 
   class ProxyHandler < Droonga::Handler
-    attr_reader :task, :name, :component, :values, :body, :outputs
+    attr_reader :task, :input_name, :component, :output_values, :body, :output_names
     def handle(command, request, *arguments)
       @task = request["task"]
-      @name = request["name"]
+      @input_name = request["name"]
       @component = @task["component"]
-      @outputs = @component["outputs"]
+      @output_names = @component["outputs"]
       @body = @component["body"]
-      @values = @task["values"]
+      @output_values = @task["values"]
       super(command, request["value"], *arguments)
     end
 
     def emit(value, name = nil)
       unless name
-        if component["outputs"]
-          name = component["outputs"].first
+        if @output_names
+          name = @output_names.first
         else
           @task["values"] = value
           return
