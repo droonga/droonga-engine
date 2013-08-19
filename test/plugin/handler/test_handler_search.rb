@@ -137,7 +137,7 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   class SourceTest < self
     def test_non_existent
-      assert_raise(Droonga::SearchHandler::UndefinedSourceError) do
+      assert_raise(Droonga::Searcher::UndefinedSourceError) do
         search({
                  "queries" => {
                    "non-existent-result" => {
