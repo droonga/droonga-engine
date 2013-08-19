@@ -254,8 +254,7 @@ module Droonga
               descendants = {}
               component["descendants"].each do |name, indices|
                 descendants[name] = indices.collect do |index|
-                  dest = @components[index]
-                  dest["routes"].map do |route|
+                  @components[index]["routes"].map do |route|
                     @proxy.farm_path(route)
                   end
                 end
@@ -280,9 +279,7 @@ module Droonga
                 "value" => result[name]
               }
               indices.each do |index|
-                dest = @components[index]
-                routes = dest["routes"]
-                routes.each do |route|
+                @components[index]["routes"].each do |route|
                   @proxy.dispatch(message, route)
                 end
               end
