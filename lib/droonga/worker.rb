@@ -152,9 +152,9 @@ module Droonga
       return unless output
       if command
         message = envelope
-        message[:body] = body
-        message[:type] = command
-        message[:arguments] = arguments
+        message["body"] = body
+        message["type"] = command
+        message["arguments"] = arguments
       else
         message = {
           inReplyTo: envelope["id"],
