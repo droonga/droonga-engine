@@ -31,6 +31,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rroonga", ">= 3.0.3"
   gem.add_dependency "groonga-command", ">= 1.0.3"
   gem.add_dependency "fluent-logger"
+  gem.add_dependency "serverengine"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "test-unit"

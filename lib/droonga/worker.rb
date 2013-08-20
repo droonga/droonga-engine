@@ -26,40 +26,50 @@ require "droonga/catalog"
 require "droonga/proxy"
 
 module Droonga
-  class Worker
+  module Worker
     attr_reader :context, :envelope, :name
 
-    def initialize(options={})
-      @pool = []
+    def initialize
       @handlers = []
       @outputs = {}
-      @name = options[:name]
-      @database_name = options[:database] || "droonga/db"
-      @queue_name = options[:queue_name] || "DroongaQueue"
-      Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
-      @handler_names = options[:handlers] || ["proxy"]
+      @name = config[:name]
+      @database_name = config[:database] || "droonga/db"
+      @queue_name = config[:queue_name] || "DroongaQueue"
+      @handler_names = config[:handlers] || ["proxy"]
       load_handlers
-      @pool_size = options[:pool_size] || 1
-      @pool = spawn
       prepare
     end
 
-    def shutdown
-      shutdown_workers
+    def run
+      $log.trace("worker: run: start")
+      @queue = @context[@queue_name]
+      @running = true
+      while @running
+        $log.trace("worker: run: pull_message: start")
+        message = pull_message
+        $log.trace("worker: run: pull_message: done")
+        next unless message
+        body, command, arguments = parse_message(message)
+        handler = find_handler(command)
+        handler.handle(command, body, *arguments) if handler
+      end
       @handlers.each do |handler|
         handler.shutdown
       end
       @outputs.each do |dest, output|
         output[:logger].close if output[:logger]
       end
+      @queue = nil
       @database.close
       @context.close
       @database = @context = nil
+      $log.trace("worker: run: done")
     end
 
-    def dispatch(*message)
-      body, type, arguments = parse_message(message)
-      post_or_push(message, body, "type" => type, "arguments" => arguments)
+    def stop
+      $log.trace("worker: stop: start")
+      @running = false
+      $log.trace("worker: stop: done")
     end
 
     def add_handler(name)
@@ -192,9 +202,7 @@ module Droonga
 
     def pull_message
       packed_message = nil
-      @status = :IDLE
       @queue.pull do |record|
-        @status = :BUSY
         if record
           packed_message = record.message
           record.delete
@@ -202,43 +210,6 @@ module Droonga
       end
       return nil unless packed_message
       MessagePack.unpack(packed_message)
-    end
-
-    def start
-      @finish = false
-      @status = :IDLE
-      # TODO: doesn't work
-      Signal.trap(:TERM) do
-        @finish = true
-        exit! 0 if @status == :IDLE
-      end
-      @queue = @context[@queue_name]
-      while !@finish
-        message = pull_message
-        next unless message
-        body, command, arguments = parse_message(message)
-        handler = find_handler(command)
-        handler.handle(command, body, *arguments) if handler
-      end
-    end
-
-    def spawn
-      pool = []
-      @pool_size.times do
-        pid = Process.fork
-        if pid
-          pool << pid
-          next
-        end
-        # child process
-        begin
-          prepare
-          start
-          shutdown
-          exit! 0
-        end
-      end
-      pool
     end
 
     def load_handlers

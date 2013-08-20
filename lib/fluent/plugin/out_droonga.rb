@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/worker"
+require "droonga/engine"
 
 module Fluent
   class DroongaOutput < Output
@@ -31,21 +31,22 @@ module Fluent
 
     def start
       super
-      @worker = Droonga::Worker.new(:database => @database,
+      @engine = Droonga::Engine.new(:database => @database,
                                     :queue_name => @queue_name,
-                                    :pool_size => @n_workers,
+                                    :n_workers => @n_workers,
                                     :handlers => @handlers,
                                     :name => @name)
+      @engine.start
     end
 
     def shutdown
+      @engine.shutdown
       super
-      @worker.shutdown
     end
 
     def emit(tag, es, chain)
       es.each do |time, record|
-        @worker.dispatch(tag, time, record)
+        @engine.emit(tag, time, record)
       end
       chain.next
     end
