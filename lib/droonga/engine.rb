@@ -21,6 +21,7 @@ require "cool.io"
 
 require "droonga/server"
 require "droonga/worker"
+require "droonga/executor"
 
 module Droonga
   class Engine
@@ -29,6 +30,7 @@ module Droonga
       :queue_name => "DroongaQueue",
       :handlers   => ["proxy"],
       :n_workers  => 1,
+      :with_server  => false
     }
 
     def initialize(options={})
@@ -36,26 +38,38 @@ module Droonga
     end
 
     def start
-      @message_input, @message_output = IO.pipe
-      @message_input.sync = true
-      @message_output.sync = true
-      start_supervisor
-      start_emitter
+      if @options[:n_workers] > 0 || @options[:with_server]
+        @message_input, @message_output = IO.pipe
+        @message_input.sync = true
+        @message_output.sync = true
+        start_supervisor
+      end
+      if @options[:with_server]
+        start_emitter
+      else
+        @executor = Executor.new(@options)
+      end
     end
 
     def shutdown
       $log.trace("engine: shutdown: start")
-      shutdown_emitter
-      shutdown_supervisor
-      @message_input.close unless @message_input.closed?
-      @message_output.close unless @message_output.closed?
+      shutdown_emitter if @emitter
+      if @supervisor
+        shutdown_supervisor
+        @message_input.close unless @message_input.closed?
+        @message_output.close unless @message_output.closed?
+      end
       $log.trace("engine: shutdown: done")
     end
 
     def emit(tag, time, record)
       $log.trace("tag: <#{tag}>")
-      @emitter.write(MessagePack.pack([tag, time, record]))
-      @loop_breaker.signal
+      if @executor
+        @executor.dispatch(tag, time, record)
+      else
+        @emitter.write(MessagePack.pack([tag, time, record]))
+        @loop_breaker.signal
+      end
     end
 
     private
@@ -85,7 +99,8 @@ module Droonga
     end
 
     def start_supervisor
-      @supervisor = ServerEngine::Supervisor.new(Server, Worker) do
+      server = @options[:with_server] ? Server : nil
+      @supervisor = ServerEngine::Supervisor.new(server, Worker) do
         force_options = {
           :worker_type   => "process",
           :workers       => @options[:n_workers],

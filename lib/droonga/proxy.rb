@@ -245,6 +245,7 @@ module Droonga
           if command
             # TODO: should be controllable for each command respectively.
             synchronous = !n_of_expects.zero?
+            # TODO: check if asynchronous execution is available.
             message = {
               "task"=>task,
               "name"=>name,

@@ -20,6 +20,7 @@ require "cool.io"
 require "groonga"
 
 require "droonga/job_queue"
+require "droonga/executor"
 
 module Droonga
   module Server
@@ -70,6 +71,7 @@ module Droonga
       @database_name = config[:database] || "droonga/db"
       @queue_name = config[:queue_name] || "DroongaQueue"
       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
+      @executor = Executor.new(config)
     end
 
     def before_run
@@ -80,11 +82,7 @@ module Droonga
       @receiver_thread = Thread.new do
         @receiver.run do |message|
           $log.trace("received: start")
-          packed_message = message.to_msgpack
-          queue = @context[@queue_name]
-          queue.push do |record|
-            record.message = packed_message
-          end
+          @executor.dispatch(*message)
           $log.trace("received: done")
         end
       end

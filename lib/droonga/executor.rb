@@ -26,52 +26,21 @@ require "droonga/catalog"
 require "droonga/proxy"
 
 module Droonga
-  module Worker
+  class Executor
     attr_reader :context, :envelope, :name
 
-    def initialize
-      @handlers = []
-      @outputs = {}
-      @name = config[:name]
-      @database_name = config[:database] || "droonga/db"
-      @queue_name = config[:queue_name] || "DroongaQueue"
-      @handler_names = config[:handlers] || ["proxy"]
-      @pool_size = config[:n_workers]
-      load_handlers
-      prepare
-    end
-
-    def run
-      $log.trace("worker: run: start")
-      @queue = @context[@queue_name]
-      @running = true
-      while @running
-        $log.trace("worker: run: pull_message: start")
-        message = pull_message
-        $log.trace("worker: run: pull_message: done")
-        next unless message
-        body, command, arguments = parse_message(message)
-        handler = find_handler(command)
-        handler.handle(command, body, *arguments) if handler
-      end
-      @handlers.each do |handler|
-        handler.shutdown
-      end
-      @outputs.each do |dest, output|
-        output[:logger].close if output[:logger]
-      end
-      @queue = nil
-      @database.close
-      @context.close
-      @database = @context = nil
-      $log.trace("worker: run: done")
-    end
-
-    def stop
-      $log.trace("worker: stop: start")
-      @running = false
-      $log.trace("worker: stop: done")
-    end
+    def initialize(options={})
+       @handlers = []
+       @outputs = {}
+       @name = options[:name]
+       @database_name = options[:database] || "droonga/db"
+       @queue_name = options[:queue_name] || "DroongaQueue"
+       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
+       @handler_names = options[:handlers] || ["proxy"]
+       load_handlers
+       @pool_size = options[:pool_size] || 1
+       prepare
+     end
 
     def add_handler(name)
       plugin = HandlerPlugin.new(name)
@@ -82,29 +51,16 @@ module Droonga
       envelope["via"].push(route)
     end
 
+    def dispatch(*message)
+      body, type, arguments = parse_message(message)
+      post_or_push(message, body, "type" => type, "arguments" => arguments)
+    end
+
     def post(body, destination=nil)
       post_or_push(nil, body, destination)
     end
 
     private
-    def shutdown_workers
-      @pool.each do |pid|
-        Process.kill(:TERM, pid)
-      end
-      queue = @context[@queue_name]
-      3.times do |i|
-        break if @pool.empty?
-        queue.unblock
-        @pool.reject! do |pid|
-          not Process.waitpid(pid, Process::WNOHANG).nil?
-        end
-        sleep(i ** 2 * 0.1)
-      end
-      @pool.each do |pid|
-        Process.kill(:KILL, pid)
-      end
-    end
-
     def post_or_push(message, body, destination)
       route = nil
       unless destination
