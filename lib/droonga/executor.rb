@@ -55,6 +55,14 @@ module Droonga
       @database = @context = nil
     end
 
+    def unblock_queue
+      3.times do |i|
+        super
+        @queue.unblock
+        sleep(i ** 2 * 0.1)
+      end
+    end
+
     def add_handler(name)
       plugin = HandlerPlugin.new(name)
       @handlers << plugin.instantiate(self)

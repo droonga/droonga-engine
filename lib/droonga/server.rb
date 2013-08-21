@@ -19,7 +19,6 @@ require "msgpack"
 require "cool.io"
 require "groonga"
 
-require "droonga/job_queue"
 require "droonga/executor"
 
 module Droonga
@@ -65,19 +64,11 @@ module Droonga
 
     def initialize
       super
-      @name = config[:name]
-      @context = Groonga::Context.new
       @message_input = config[:message_input]
-      @database_name = config[:database] || "droonga/db"
-      @queue_name = config[:queue_name] || "DroongaQueue"
-      Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
       @executor = Executor.new(config)
     end
 
     def before_run
-      @database = @context.open_database(@database_name)
-      @context.encoding = :none
-
       @receiver = Receiver.new(@message_input)
       @receiver_thread = Thread.new do
         @receiver.run do |message|
@@ -96,9 +87,7 @@ module Droonga
       $log.trace("server: after_run: receiver: done")
 
       $log.trace("server: after_run: groonga: start")
-      @database.close
-      @context.close
-      @database = @context = nil
+      @executor.shutdown
       $log.trace("server: after_run: groonga: done")
 
       $log.trace("server: after_run: done")
@@ -112,12 +101,7 @@ module Droonga
       $log.trace("server: stop: receiver: stop: done")
 
       $log.trace("server: stop: queue: unblock: start")
-      queue = @context[@queue_name]
-      3.times do |i|
-        super
-        queue.unblock
-        sleep(i ** 2 * 0.1)
-      end
+      @executor.unblock_queue
       $log.trace("server: stop: queue: unblock: done")
 
       $log.trace("server: stop: done")
