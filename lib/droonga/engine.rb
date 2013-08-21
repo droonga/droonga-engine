@@ -54,6 +54,7 @@ module Droonga
     def shutdown
       $log.trace("engine: shutdown: start")
       shutdown_emitter if @emitter
+      @executor.shutdown if @executor
       if @supervisor
         shutdown_supervisor
         @message_input.close unless @message_input.closed?
