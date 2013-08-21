@@ -37,10 +37,23 @@ module Droonga
        @queue_name = options[:queue_name] || "DroongaQueue"
        Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
        @handler_names = options[:handlers] || ["proxy"]
+       @pool_size = options[:n_workers]
        load_handlers
-       @pool_size = options[:pool_size] || 1
        prepare
-     end
+    end
+
+    def shutdown
+      @handlers.each do |handler|
+        handler.shutdown
+      end
+      @outputs.each do |dest, output|
+        output[:logger].close if output[:logger]
+      end
+      @queue = nil
+      @database.close
+      @context.close
+      @database = @context = nil
+    end
 
     def add_handler(name)
       plugin = HandlerPlugin.new(name)
@@ -54,6 +67,14 @@ module Droonga
     def dispatch(*message)
       body, type, arguments = parse_message(message)
       post_or_push(message, body, "type" => type, "arguments" => arguments)
+    end
+
+    def execute_one
+      message = pull_message
+      return unless message
+      body, command, arguments = parse_message(message)
+      handler = find_handler(command)
+      handler.handle(command, body, *arguments) if handler
     end
 
     def post(body, destination=nil)
@@ -151,8 +172,7 @@ module Droonga
 
     def push_message(message)
       packed_message = message.to_msgpack
-      queue = @context[@queue_name]
-      queue.push do |record|
+      @queue.push do |record|
         record.message = packed_message
       end
     end
@@ -180,6 +200,7 @@ module Droonga
       @context = Groonga::Context.new
       @database = @context.open_database(@database_name)
       @context.encoding = :none
+      @queue = @context[@queue_name]
       @handler_names.each do |handler_name|
         add_handler(handler_name)
       end
