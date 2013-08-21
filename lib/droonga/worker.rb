@@ -15,15 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "msgpack"
-require "fluent-logger"
-require "groonga"
-
-require "droonga/job_queue"
-require "droonga/handler_plugin"
-require "droonga/plugin"
-require "droonga/catalog"
-require "droonga/proxy"
+require "droonga/executor"
 
 module Droonga
   module Worker
