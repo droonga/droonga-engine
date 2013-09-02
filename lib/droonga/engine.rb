@@ -26,7 +26,6 @@ require "droonga/executor"
 module Droonga
   class Engine
     DEFAULT_OPTIONS = {
-      :database   => "droonga/db",
       :queue_name => "DroongaQueue",
       :handlers   => ["proxy"],
       :n_workers  => 1,
@@ -38,6 +37,11 @@ module Droonga
     end
 
     def start
+      if !@options[:database] || @options[:database].empty?
+        name = @options[:name]
+        database = File.join([File.basename(name), 'db'])
+        @options[:database] = database
+      end
       if @options[:n_workers] > 0 || @options[:with_server]
         @message_input, @message_output = IO.pipe
         @message_input.sync = true
@@ -48,6 +52,7 @@ module Droonga
         start_emitter
       else
         @executor = Executor.new(@options)
+        @executor.add_handler("proxy_message") if @options[:name]
       end
     end
 
@@ -63,12 +68,12 @@ module Droonga
       $log.trace("engine: shutdown: done")
     end
 
-    def emit(tag, time, record)
+    def emit(tag, time, record, synchronous=nil)
       $log.trace("tag: <#{tag}>")
       if @executor
-        @executor.dispatch(tag, time, record)
+        @executor.dispatch(tag, time, record, synchronous)
       else
-        @emitter.write(MessagePack.pack([tag, time, record]))
+        @emitter.write(MessagePack.pack([tag, time, record, synchronous]))
         @loop_breaker.signal
       end
     end

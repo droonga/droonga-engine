@@ -22,11 +22,23 @@ module Droonga
   class Proxy
     attr_reader :collectors
     def initialize(worker, name)
+      @engines = {}
+      Droonga::catalog.get_engines(name).each do |name, options|
+        engine = Droonga::Engine.new(options.merge({:with_server => false}))
+        engine.start
+        @engines[name] = engine
+      end
       @worker = worker
       @name = name
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
+    end
+
+    def shutdown
+      @engines.each do |name, engine|
+        engine.shutdown
+      end
     end
 
     def handle(message, arguments)
@@ -69,6 +81,15 @@ module Droonga
         handle_internal_message(message)
       else
         post(message, "to"=>farm_path(destination), "type"=>"proxy")
+      end
+    end
+
+    def deliver(id, route, message, type, synchronous)
+      if id == route
+        post(message, "type" => type, "synchronous"=> synchronous)
+      else
+        envelope = @worker.envelope.merge("body" => message, "type" => type)
+        @engines[route].emit('', Time.now.to_f, envelope, synchronous)
       end
     end
 
@@ -263,9 +284,7 @@ module Droonga
               message["descendants"] = descendants
               message["id"] = @id
             end
-            @proxy.post(message,
-                        "type" => command,
-                        "synchronous"=> synchronous)
+            @proxy.deliver(@id, task["route"], message, command, synchronous)
           end
           return if task["n_of_inputs"] < n_of_expects
           #the task is done
@@ -298,6 +317,10 @@ module Droonga
     def initialize(*arguments)
       super
       @proxy = Droonga::Proxy.new(@worker, @worker.name)
+    end
+
+    def shutdown
+      @proxy.shutdown
     end
 
     command :proxy

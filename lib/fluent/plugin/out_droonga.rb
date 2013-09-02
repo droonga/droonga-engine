@@ -23,7 +23,7 @@ module Fluent
 
     config_param :name, :string, :default => ""
     config_param :n_workers, :integer, :default => 1
-    config_param :database, :string, :default => "droonga/db"
+    config_param :database, :string, :default => ""
     config_param :queue_name, :string, :default => "DroongaQueue"
     config_param :handlers, :default => [] do |value|
       value.split(/\s*,\s*/)

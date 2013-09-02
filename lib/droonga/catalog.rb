@@ -50,6 +50,26 @@ module Droonga
       end
     end
 
+    def get_engines(name)
+      device = @catalog["farms"][name]["device"]
+      pattern = Regexp.new("^#{name}\.")
+      results = {}
+      @catalog["datasets"].each do |key, dataset|
+        dataset["ring"].each do |key, part|
+          part["partitions"].each do |range, partitions|
+            partitions.each do |partition|
+              if partition =~ pattern
+                path = File.join([device, $POSTMATCH, 'db'])
+                options = { :database => path }
+                results[partition] = options
+              end
+            end
+          end
+        end
+      end
+      return results
+    end
+
     def get_routes(name, args)
       routes = []
       dataset = dataset(name)

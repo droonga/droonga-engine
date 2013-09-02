@@ -72,9 +72,13 @@ module Droonga
       envelope["via"].push(route)
     end
 
-    def dispatch(*message)
-      body, type, arguments = parse_message(message)
-      post_or_push(message, body, "type" => type, "arguments" => arguments)
+    def dispatch(tag, time, record, synchronous=nil)
+      message = [tag, time, record]
+      body, type, arguments = parse_message([tag, time, record])
+      post_or_push(message, body,
+                   "type" => type,
+                   "arguments" => arguments,
+                   "synchronous" => synchronous)
     end
 
     def execute_one
@@ -212,7 +216,6 @@ module Droonga
       @handler_names.each do |handler_name|
         add_handler(handler_name)
       end
-      add_handler("proxy_message")
     end
 
     def find_handler(command)
