@@ -55,12 +55,16 @@ module Droonga
       pattern = Regexp.new("^#{name}\.")
       results = {}
       @catalog["datasets"].each do |key, dataset|
+        workers = dataset["workers"]
         dataset["ring"].each do |key, part|
           part["partitions"].each do |range, partitions|
             partitions.each do |partition|
               if partition =~ pattern
                 path = File.join([device, $POSTMATCH, 'db'])
-                options = { :database => path }
+                options = {
+                  :database => path,
+                  :n_workers => workers
+                }
                 results[partition] = options
               end
             end
