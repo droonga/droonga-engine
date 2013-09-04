@@ -345,7 +345,7 @@ module Droonga
       @output_values = @task["values"]
       @descendants = request["descendants"]
       @id = request["id"]
-      super(command, request["value"], *arguments)
+      invoke(command, request["value"], *arguments)
       output if @descendants
     end
 

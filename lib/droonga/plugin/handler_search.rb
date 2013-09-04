@@ -25,8 +25,9 @@ module Droonga
     command :search
     def search(request)
       searcher = Droonga::Searcher.new(@context)
-      outputs = searcher.search(request["queries"])
-      post(outputs)
+      searcher.search(request["queries"]).each do |output, value|
+        emit(value, output)
+      end
     end
   end
 end
