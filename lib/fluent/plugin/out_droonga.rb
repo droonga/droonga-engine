@@ -22,6 +22,7 @@ module Fluent
     Plugin.register_output("droonga", self)
 
     config_param :name, :string, :default => ""
+    config_param :proxy, :bool, :default => false
     config_param :n_workers, :integer, :default => 1
     config_param :database, :string, :default => ""
     config_param :queue_name, :string, :default => "DroongaQueue"
@@ -35,7 +36,8 @@ module Fluent
                                     :queue_name => @queue_name,
                                     :n_workers => @n_workers,
                                     :handlers => @handlers,
-                                    :name => @name)
+                                    :name => @name,
+                                    :proxy => @proxy)
       @engine.start
     end
 

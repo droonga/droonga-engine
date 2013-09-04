@@ -24,7 +24,8 @@ module Droonga
     def initialize(worker, name)
       @engines = {}
       Droonga::catalog.get_engines(name).each do |name, options|
-        engine = Droonga::Engine.new(options.merge({:with_server => false}))
+        engine = Droonga::Engine.new(options.merge(:proxy => false,
+                                                   :with_server => false))
         engine.start
         @engines[name] = engine
       end

@@ -52,7 +52,7 @@ module Droonga
         start_emitter
       else
         @executor = Executor.new(@options)
-        @executor.add_handler("proxy_message") if @options[:name]
+        @executor.add_handler("proxy_message") if @options[:proxy]
       end
     end
 
