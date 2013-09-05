@@ -56,6 +56,7 @@ module Droonga
       results = {}
       @catalog["datasets"].each do |key, dataset|
         workers = dataset["workers"]
+        plugins = dataset["plugins"]
         dataset["ring"].each do |key, part|
           part["partitions"].each do |range, partitions|
             partitions.each do |partition|
@@ -63,7 +64,8 @@ module Droonga
                 path = File.join([device, $POSTMATCH, 'db'])
                 options = {
                   :database => path,
-                  :n_workers => workers
+                  :n_workers => workers,
+                  :handlers => plugins
                 }
                 results[partition] = options
               end
