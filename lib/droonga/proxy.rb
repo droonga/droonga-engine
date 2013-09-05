@@ -337,46 +337,21 @@ module Droonga
   class ProxyHandler < Droonga::Handler
     attr_reader :task, :input_name, :component, :output_values, :body, :output_names
     def handle(command, request, *arguments)
+      return false unless request.is_a? Hash
       @task = request["task"]
-      @input_name = request["name"]
+      return false unless @task.is_a? Hash
       @component = @task["component"]
-      @output_names = @component["outputs"]
-      @body = @component["body"]
+      return false unless @component.is_a? Hash
       @output_values = @task["values"]
-      @descendants = request["descendants"]
+      @body = @component["body"]
+      @output_names = @component["outputs"]
       @id = request["id"]
-      invoke(command, request["value"], *arguments)
+      @value = request["value"]
+      @input_name = request["name"]
+      @descendants = request["descendants"]
+      invoke(command, @value, *arguments)
       output if @descendants
-    end
-
-    def emit(value, name = nil)
-      unless name
-        if @output_names
-          name = @output_names.first
-        else
-          @task["values"] = value
-          return
-        end
-      end
-      @task["values"][name] = value
-    end
-
-    def output
-      result = @task["values"]
-      post = component["post"]
-      post(result, post) if post
-      @descendants.each do |name, dests|
-        message = {
-          "id" => @id,
-          "input" => name,
-          "value" => result[name]
-        }
-        dests.each do |routes|
-          routes.each do |route|
-            post(message, "to"=>route, "type"=>"proxy")
-          end
-        end
-      end
+      true
     end
 
     def prefer_synchronous?(command)
