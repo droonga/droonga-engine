@@ -19,16 +19,17 @@ require "droonga/handler"
 
 module Droonga
   class Adapter < Droonga::Handler
-    Droonga::HandlerPlugin.register("adapter", self)
-
-    command :table_create
-    def table_create(request)
-      broadcast_all(request)
-    end
-
-    command :column_create
-    def column_create(request)
-      broadcast_all(request)
+    def scatter_all(request, key)
+      message = [{
+        "command"=> envelope["type"],
+        "dataset"=> envelope["dataset"],
+        "body"=> request,
+        "key"=> key,
+        "type"=> "scatter",
+        "replica"=> "all",
+        "post"=> true
+      }]
+      post(message, "proxy")
     end
 
     def broadcast_all(request)
@@ -41,6 +42,27 @@ module Droonga
         "post"=> true
       }]
       post(message, "proxy")
+    end
+  end
+
+  class BasicAdapter < Adapter
+    Droonga::HandlerPlugin.register("adapter", self)
+
+    command :table_create
+    def table_create(request)
+      broadcast_all(request)
+    end
+
+    command :column_create
+    def column_create(request)
+      broadcast_all(request)
+    end
+
+    command :add
+    def add(request)
+      # TOOD: update event must be serialized in the primary node
+      key = request["key"] || rand.to_s
+      scatter_all(request, key)
     end
   end
 end
