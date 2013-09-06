@@ -27,14 +27,14 @@ module Droonga
     def table_create(request)
       command = TableCreate.new(@context)
       outputs = command.execute(request)
-      post(outputs)
+      emit(outputs)
     end
 
     command :column_create
     def column_create(request)
       command = ColumnCreate.new(@context)
       outputs = command.execute(request)
-      post(outputs)
+      emit(outputs)
     end
 
     module Status

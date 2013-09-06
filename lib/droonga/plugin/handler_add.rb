@@ -26,7 +26,7 @@ module Droonga
     command :add
     def add(request)
       outputs = process(request)
-      post(outputs)
+      emit(outputs)
     end
 
     private
