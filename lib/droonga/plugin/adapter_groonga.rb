@@ -32,4 +32,4 @@ module Droonga
   end
 end
 
-require "droonga/plugin/adapter_select"
+require "droonga/plugin/adapter/groonga/select"
