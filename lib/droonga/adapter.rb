@@ -15,35 +15,32 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/command_mapper"
+require "droonga/handler"
 
 module Droonga
-  class Adapter
-    class << self
-      def inherited(sub_class)
-        super
-        sub_class.instance_variable_set(:@command_mapper, CommandMapper.new)
-      end
+  class Adapter < Droonga::Handler
+    Droonga::HandlerPlugin.register("adapter", self)
 
-      def command(name_or_map)
-        @command_mapper.register(name_or_map)
-      end
-
-      def method_name(command)
-        @command_mapper[command]
-      end
+    command :table_create
+    def table_create(request)
+      broadcast_all(request)
     end
 
-    def initialize(proxy)
-      @proxy = proxy
+    command :column_create
+    def column_create(request)
+      broadcast_all(request)
     end
 
-    def adapt(command, request)
-      __send__(self.class.method_name(command), request)
-    end
-
-    def post(request, &block)
-      @proxy.post(request, &block)
+    def broadcast_all(request)
+      message = [{
+        "command"=> envelope["type"],
+        "dataset"=> envelope["dataset"],
+        "body"=> request,
+        "type"=> "broadcast",
+        "replica"=> "all",
+        "post"=> true
+      }]
+      post(message, "proxy")
     end
   end
 end

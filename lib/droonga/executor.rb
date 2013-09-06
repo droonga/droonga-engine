@@ -30,16 +30,17 @@ module Droonga
     attr_reader :context, :envelope, :name
 
     def initialize(options={})
-       @handlers = []
-       @outputs = {}
-       @name = options[:name]
-       @database_name = options[:database] || "droonga/db"
-       @queue_name = options[:queue_name] || "DroongaQueue"
-       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
-       @handler_names = options[:handlers] || ["proxy"]
-       @pool_size = options[:n_workers]
-       load_handlers
-       prepare
+      @handlers = []
+      @outputs = {}
+      @name = options[:name]
+      @database_name = options[:database] || "droonga/db"
+      @queue_name = options[:queue_name] || "DroongaQueue"
+      Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
+      @handler_names = options[:handlers] || ["proxy"]
+      @pool_size = options[:n_workers]
+#     load_handlers
+      Droonga::Plugin.load_all
+      prepare
     end
 
     def shutdown
