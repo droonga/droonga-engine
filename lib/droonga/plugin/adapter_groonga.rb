@@ -19,15 +19,20 @@ require "droonga/adapter"
 
 module Droonga
   class GroongaAdapter < Droonga::Adapter
+    # TODO: AdapterPlugin or something should be defined to avoid conflicts.
+    Droonga::HandlerPlugin.register("select", self)
     command :select
-
     def select(select_request)
       command = Select.new
       search_request = command.convert_request(select_request)
-      post(search_request) do |search_response|
-        command.convert_response(search_response)
-      end
-      :selected
+      add_route("select_response")
+      post(search_request, "search")
+    end
+
+    command :select_response
+    def select_response(search_response)
+      command = Select.new
+      emit(command.convert_response(search_response))
     end
   end
 end
