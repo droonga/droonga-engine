@@ -43,6 +43,10 @@ module Droonga
       }]
       post(message, "proxy")
     end
+
+    def prefer_synchronous?(command)
+      return true
+    end
   end
 
   class BasicAdapter < Adapter
@@ -60,9 +64,64 @@ module Droonga
 
     command :add
     def add(request)
-      # TOOD: update event must be serialized in the primary node
+      # TOOD: update events must be serialized in the primary node of replicas.
       key = request["key"] || rand.to_s
       scatter_all(request, key)
+    end
+
+    command :search
+    def search(request)
+      message = []
+      input_names = []
+      output_names = []
+      name_mapper = {}
+      request["queries"].each do |input_name, query|
+        output = query["output"]
+        next unless output
+        input_names << input_name
+        output_name = input_name + "_reduced"
+        output_names << output_name
+        name_mapper[output_name] = input_name
+        # TODO: offset & limit must be arranged here.
+        elements = {}
+        output["elements"].each do |element|
+          case element
+          when "count"
+            elements[element] = ["sum"]
+          when "records"
+            # TODO: must take "sortBy" section into account.
+            elements[element] = ["sort", "<"]
+          end
+        end
+        reducer = {
+          "inputs"=> [input_name],
+          "outputs"=> [output_name],
+          "type"=> "reduce",
+          "body"=> {
+            input_name=> {
+              output_name=> elements
+            }
+          }
+        }
+        message << reducer
+      end
+      gatherer = {
+        "inputs"=> output_names,
+        "type"=> "gather",
+        "body"=> name_mapper,
+        "post"=> true
+      }
+      message << gatherer
+      searcher = {
+        "dataset"=> envelope["dataset"] || request["dataset"],
+        "outputs"=> input_names,
+        "type"=> "broadcast",
+        "command"=> "search",
+        "replica"=> "random",
+        "body"=> request
+      }
+      message.push(searcher)
+      post(message, "proxy")
     end
   end
 end
