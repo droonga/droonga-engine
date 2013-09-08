@@ -33,9 +33,8 @@ module Droonga
       @outputs = {}
       @options = options
       @name = options[:name]
-      @database_name = options[:database] || "droonga/db"
-      @queue_name = options[:queue_name] || "DroongaQueue"
-      Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
+      @database_name = options[:database]
+      @queue_name = options[:queue_name]
       @handler_names = options[:handlers]
       @pool_size = options[:n_workers]
 #     load_handlers
@@ -51,9 +50,11 @@ module Droonga
         output[:logger].close if output[:logger]
       end
       @queue = nil
-      @database.close
-      @context.close
-      @database = @context = nil
+      if @database
+        @database.close
+        @context.close
+        @database = @context = nil
+      end
     end
 
     def unblock_queue
@@ -210,10 +211,12 @@ module Droonga
     end
 
     def prepare
-      @context = Groonga::Context.new
-      @database = @context.open_database(@database_name)
-      @context.encoding = :none
-      @queue = @context[@queue_name]
+      if @database_name && !@database_name.empty?
+        @context = Groonga::Context.new
+        @database = @context.open_database(@database_name)
+        @context.encoding = :none
+        @queue = @context[@queue_name]
+      end
       @handler_names.each do |handler_name|
         add_handler(handler_name)
       end

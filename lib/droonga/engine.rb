@@ -44,6 +44,10 @@ module Droonga
         database = File.join([File.basename(name), 'db'])
         @options[:database] = database
       end
+      if @options[:database] && !@options[:database].empty?
+        Droonga::JobQueue.ensure_schema(@options[:database],
+                                        @options[:queue_name])
+      end
       if @options[:n_workers] > 0 || @options[:with_server]
         @message_input, @message_output = IO.pipe
         @message_input.sync = true
