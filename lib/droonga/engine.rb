@@ -39,11 +39,6 @@ module Droonga
     end
 
     def start
-      if !@options[:database] || @options[:database].empty?
-        name = @options[:name]
-        database = File.join([File.basename(name), 'db'])
-        @options[:database] = database
-      end
       if @options[:database] && !@options[:database].empty?
         Droonga::JobQueue.ensure_schema(@options[:database],
                                         @options[:queue_name])
