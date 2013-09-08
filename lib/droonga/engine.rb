@@ -27,9 +27,12 @@ module Droonga
   class Engine
     DEFAULT_OPTIONS = {
       :queue_name => "DroongaQueue",
-      :n_workers  => 1,
+      :n_workers  => 0,
       :with_server  => false
     }
+    # TODO: It doesn't work fine when n_workers > 0 && number of databases > 1
+    #       since more than one ServerEngine instance can't be in a process.
+    #       It causes dump_uncaught_error in the SignalThread.
 
     def initialize(options={})
       @options = DEFAULT_OPTIONS.merge(options)
