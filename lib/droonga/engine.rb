@@ -22,13 +22,11 @@ require "cool.io"
 require "droonga/server"
 require "droonga/worker"
 require "droonga/executor"
-require "droonga/adapter"
 
 module Droonga
   class Engine
     DEFAULT_OPTIONS = {
       :queue_name => "DroongaQueue",
-      :handlers   => ["proxy"],
       :n_workers  => 1,
       :with_server  => false
     }
@@ -53,10 +51,6 @@ module Droonga
         start_emitter
       else
         @executor = Executor.new(@options)
-        if @options[:proxy]
-          @executor.add_handler("proxy_message")
-          @executor.add_handler("adapter")
-        end
       end
     end
 

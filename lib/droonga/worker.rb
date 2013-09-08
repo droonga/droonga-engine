@@ -22,7 +22,7 @@ module Droonga
     attr_reader :context, :envelope, :name
 
     def initialize
-      @executor = Executor.new(config)
+      @executor = Executor.new(config.merge(:proxy => false))
     end
 
     def run

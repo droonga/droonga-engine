@@ -50,6 +50,10 @@ module Droonga
       end
     end
 
+    def option(name)
+      @catalog["options"][name]
+    end
+
     def get_engines(name)
       device = @catalog["farms"][name]["device"]
       pattern = Regexp.new("^#{name}\.")

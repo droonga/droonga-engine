@@ -22,7 +22,6 @@ require "groonga"
 require "droonga/job_queue"
 require "droonga/handler_plugin"
 require "droonga/plugin"
-require "droonga/catalog"
 require "droonga/proxy"
 
 module Droonga
@@ -32,11 +31,12 @@ module Droonga
     def initialize(options={})
       @handlers = []
       @outputs = {}
+      @options = options
       @name = options[:name]
       @database_name = options[:database] || "droonga/db"
       @queue_name = options[:queue_name] || "DroongaQueue"
       Droonga::JobQueue.ensure_schema(@database_name, @queue_name)
-      @handler_names = options[:handlers] || ["proxy"]
+      @handler_names = options[:handlers]
       @pool_size = options[:n_workers]
 #     load_handlers
       Droonga::Plugin.load_all
@@ -217,6 +217,7 @@ module Droonga
       @handler_names.each do |handler_name|
         add_handler(handler_name)
       end
+      add_handler("proxy_message") if @options[:proxy]
     end
 
     def find_handler(command)

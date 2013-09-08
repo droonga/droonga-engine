@@ -66,10 +66,6 @@ module Droonga
       super
       @message_input = config[:message_input]
       @executor = Executor.new(config)
-      if config[:proxy]
-        @executor.add_handler("proxy_message")
-        @executor.add_handler("adapter")
-      end
     end
 
     def before_run

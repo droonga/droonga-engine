@@ -17,6 +17,8 @@
 
 require 'tsort'
 require "droonga/handler"
+require "droonga/adapter"
+require "droonga/catalog"
 
 module Droonga
   class Proxy
@@ -34,6 +36,10 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
+      plugins = ["proxy", "adapter"] + (Droonga::catalog.option("plugins")||[])
+      plugins.each do |plugin|
+        @worker.add_handler(plugin)
+      end
     end
 
     def shutdown
@@ -257,6 +263,10 @@ module Droonga
 
       def handle(name, value)
         tasks = @inputs[name]
+        unless tasks
+          #TODO: result arrived before its query
+          return
+        end
         tasks.each do |task|
           task["n_of_inputs"] += 1 if name
           component = task["component"]
