@@ -48,10 +48,11 @@ module Droonga
         end
         dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
       end
+      @options = @catalog["options"] || {}
     end
 
     def option(name)
-      @catalog["options"][name]
+      @options[name]
     end
 
     def get_engines(name)
