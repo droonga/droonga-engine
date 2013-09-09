@@ -64,7 +64,7 @@ module Droonga
 
     command :add
     def add(request)
-      # TOOD: update events must be serialized in the primary node of replicas.
+      # TODO: update events must be serialized in the primary node of replicas.
       key = request["key"] || rand.to_s
       scatter_all(request, key)
     end
