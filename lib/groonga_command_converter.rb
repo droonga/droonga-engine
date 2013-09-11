@@ -18,10 +18,12 @@
 require "groonga/command"
 
 module Droonga
-  module GroongaCommandConverter
+  class GroongaCommandConverter
     STATUS_OK = 200.freeze
 
-    module_function
+    def initialize
+    end
+
     def parse(input, &block)
       command = Groonga::Command::Parser.parse(input)
       case command.name
