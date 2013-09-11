@@ -24,7 +24,7 @@ module Droonga
     def initialize
     end
 
-    def parse(input, &block)
+    def convert(input, &block)
       command = Groonga::Command::Parser.parse(input)
       case command.name
       when "table_create"
