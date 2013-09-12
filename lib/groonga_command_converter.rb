@@ -25,6 +25,7 @@ module Droonga
 
     def initialize(options={})
       @options = options
+      @count = 0
     end
 
     def convert(input, &block)
@@ -43,14 +44,22 @@ module Droonga
 
     private
     def create_envelope(type, body)
+      id = @options[:id]
+      if id.nil?
+        id = new_unique_id
+      else
+        id = "#{id}:#{@count}"
+        @count += 1
+      end
+
       {
-        :id => @options[:id] || new_unique_id,
+        :id => id,
         :date => @options[:date] || current_date,
         :replyTo => @options[:reply_to],
         :statusCode => @options[:status_code] || STATUS_OK,
         :dataset => @options[:dataset],
         :type => type,
-        :body => body
+        :body => body,
       }
     end
 
