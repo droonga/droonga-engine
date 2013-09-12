@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "groonga/command"
+require "digest/sha1"
 
 module Droonga
   class GroongaCommandConverter
@@ -54,7 +55,10 @@ module Droonga
     end
 
     def new_unique_id
-      nil
+      now = Time.now
+      now_msec = now.to_i * 1000 + now.usec
+      random_string = rand(36 ** 16).to_s(36) # Base36
+      Digest::SHA1.hexdigest("#{now_msec}:#{random_string}")
     end
 
     def current_date
