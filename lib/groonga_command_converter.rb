@@ -41,13 +41,13 @@ module Droonga
     end
 
     private
-    def create_envelope(type, body, options={})
+    def create_envelope(type, body)
       {
-        :id => options[:id] || new_unique_id,
-        :date => options[:date] || current_date,
-        :replyTo => options[:reply_to],
-        :statusCode => options[:status_code] || STATUS_OK,
-        :dataset => options[:dataset],
+        :id => @options[:id] || new_unique_id,
+        :date => @options[:date] || current_date,
+        :replyTo => @options[:reply_to],
+        :statusCode => @options[:status_code] || STATUS_OK,
+        :dataset => @options[:dataset],
         :type => type,
         :body => body
       }
