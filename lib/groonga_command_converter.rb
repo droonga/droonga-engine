@@ -17,6 +17,7 @@
 
 require "groonga/command"
 require "digest/sha1"
+require "date"
 
 module Droonga
   class GroongaCommandConverter
@@ -62,7 +63,7 @@ module Droonga
     end
 
     def current_date
-      nil
+      DateTime.now.to_s
     end
 
     def create_table_create_command
