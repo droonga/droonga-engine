@@ -52,4 +52,4 @@ $LOAD_PATH.unshift(test_dir)
 
 require "helper"
 
-exit Test::Unit::AutoRunner.run(true, base_dir)
+exit Test::Unit::AutoRunner.run(true, test_dir)
