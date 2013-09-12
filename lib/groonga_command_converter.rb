@@ -70,7 +70,8 @@ module Droonga
       Digest::SHA1.hexdigest("#{now_msec}:#{random_string}")
     end
 
-    def formatted_date(time=Time.now)
+    def formatted_date(time)
+      time ||= Time.now
       time.iso8601
     end
 
