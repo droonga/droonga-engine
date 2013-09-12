@@ -17,7 +17,7 @@
 
 require "groonga/command"
 require "digest/sha1"
-require "date"
+require "time"
 
 module Droonga
   class GroongaCommandConverter
@@ -54,7 +54,7 @@ module Droonga
 
       {
         :id => id,
-        :date => @options[:date] || current_date,
+        :date => formatted_date(@options[:date]),
         :replyTo => @options[:reply_to],
         :statusCode => @options[:status_code] || STATUS_OK,
         :dataset => @options[:dataset],
@@ -70,8 +70,8 @@ module Droonga
       Digest::SHA1.hexdigest("#{now_msec}:#{random_string}")
     end
 
-    def current_date
-      DateTime.now.to_s
+    def formatted_date(time=Time.now)
+      time.iso8601
     end
 
     def create_table_create_command
