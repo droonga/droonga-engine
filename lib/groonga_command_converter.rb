@@ -106,14 +106,16 @@ module Droonga
           :table => @command[:table],
         }
 
+        record_values = {}
         record.each_with_index do |value, column_index|
           column = columns[column_index]
           if column == "_key"
             body[:key] = value
           else
-            body[:values][column.to_sym] = value
+            record_values[column.to_sym] = value
           end
         end
+        body[:values] = record_values unless record_values.empty?
 
         yield create_envelope("add", body)
       end
