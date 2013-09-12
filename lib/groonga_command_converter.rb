@@ -54,7 +54,7 @@ module Droonga
 
       {
         :id => id,
-        :date => format_date(@options[:date]),
+        :date => format_date(@options[:date] || Time.now),
         :replyTo => @options[:reply_to],
         :statusCode => @options[:status_code] || STATUS_OK,
         :dataset => @options[:dataset],
@@ -71,7 +71,6 @@ module Droonga
     end
 
     def format_date(time)
-      time ||= Time.now
       time.iso8601
     end
 
