@@ -81,6 +81,68 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                  results)
   end
 
+  def test_load
+    results = []
+    command = "load --table Users\n" +
+                "[\n" +
+                "[\"_key\",\"name\"],\n" +
+                "[\"user0\",\"Abe Shinzo\"],\n" +
+                "[\"user1\",\"Noda Yoshihiko\"],\n",
+                "[\"user2\",\"Kan Naoto\"]\n" +
+                "]"
+    @converter.convert(command) do |droonga_command|
+      results << droonga_command
+    end
+    assert_equal([
+                   {
+                     :id => "test:0",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "add",
+                     :body => {
+                       :table => "Users",
+                       :key => "user0",
+                       :values => {
+                         :name => "Abe Shinzo",
+                       },
+                     },
+                   },
+                   {
+                     :id => "test:1",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "add",
+                     :body => {
+                       :table => "Users",
+                       :key => "user1",
+                       :values => {
+                         :name => "Noda Yoshihiko",
+                       },
+                     },
+                   },
+                   {
+                     :id => "test:2",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "add",
+                     :body => {
+                       :table => "Users",
+                       :key => "user2",
+                       :values => {
+                         :name => "Kan Naoto",
+                       },
+                     },
+                   },
+                 ],
+                 results)
+  end
+
   private
   def date
     Time.new(2013, 11, 29, 0, 0, 0)
