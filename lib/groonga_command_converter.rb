@@ -54,7 +54,7 @@ module Droonga
 
       {
         :id => id,
-        :date => formatted_date(@options[:date]),
+        :date => format_date(@options[:date]),
         :replyTo => @options[:reply_to],
         :statusCode => @options[:status_code] || STATUS_OK,
         :dataset => @options[:dataset],
@@ -70,7 +70,7 @@ module Droonga
       Digest::SHA1.hexdigest("#{now_msec}:#{random_string}")
     end
 
-    def formatted_date(time)
+    def format_date(time)
       time ||= Time.now
       time.iso8601
     end
