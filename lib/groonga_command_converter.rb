@@ -81,6 +81,7 @@ module Droonga
         :key_type => @command[:key_type],
         :value_type => @command[:value_type],
         :default_tokenizer => @command[:default_tokenizer],
+        :normalizer => @command[:normalizer],
       }
       create_envelope("table_create", body)
     end
