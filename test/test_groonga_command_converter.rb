@@ -46,7 +46,6 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                        :name => "Terms",
                        :flags => "TABLE_PAT_KEY",
                        :key_type => "ShortText",
-                       :value_type => nil,
                        :default_tokenizer => "TokenBigram",
                        :normalizer => "NormalizerAuto",
                      },

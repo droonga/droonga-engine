@@ -75,26 +75,11 @@ module Droonga
     end
 
     def create_table_create_command
-      body = {
-        :name => @command[:name],
-        :flags => @command[:flags],
-        :key_type => @command[:key_type],
-        :value_type => @command[:value_type],
-        :default_tokenizer => @command[:default_tokenizer],
-        :normalizer => @command[:normalizer],
-      }
-      create_envelope("table_create", body)
+      create_envelope("table_create", @command.to_hash)
     end
 
     def create_column_create_command
-      body = {
-        :table => @command[:table],
-        :name => @command[:name],
-        :flags => @command[:flags],
-        :type => @command[:type],
-        :source => @command[:source],
-      }
-      create_envelope("column_create", body)
+      create_envelope("column_create", @command.to_hash)
     end
 
     def split_load_command_to_add_commands(&block)
@@ -122,17 +107,7 @@ module Droonga
     end
 
     def create_select_command
-      body = {
-        :table => @command[:table],
-        :sortby => @command[:sortby],
-        :scorer => @command[:scorer],
-        :query => @command[:query],
-        :filter => @command[:filter],
-        :conditions => @command[:conditions],
-        :drilldown => @command[:drilldown],
-        :output_columns => @command[:output_columns],
-      }
-      create_envelope("select", body)
+      create_envelope("select", @command.to_hash)
     end
   end
 end
