@@ -29,7 +29,7 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_table_create
     results = []
-    command = "table_create Term TABLE_PAT_KEY ShortText " +
+    command = "table_create Terms TABLE_PAT_KEY ShortText " +
                 "--default_tokenizer TokenBigram --normalizer NormalizerAuto"
     @converter.convert(command) do |droonga_command|
       results << droonga_command
@@ -43,7 +43,7 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                      :dataset => dataset,
                      :type => "table_create",
                      :body => {
-                       :name => "Term",
+                       :name => "Terms",
                        :flags => "TABLE_PAT_KEY",
                        :key_type => "ShortText",
                        :value_type => nil,
