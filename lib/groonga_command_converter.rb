@@ -24,8 +24,10 @@ module Droonga
     def initialize
     end
 
-    def convert(input, &block)
+    def convert(input, options={}, &block)
       command = Groonga::Command::Parser.parse(input)
+      @options = options
+
       case command.name
       when "table_create"
         yield create_table_create_command(command)
