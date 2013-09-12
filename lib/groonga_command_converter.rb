@@ -25,18 +25,18 @@ module Droonga
     end
 
     def convert(input, options={}, &block)
-      command = Groonga::Command::Parser.parse(input)
+      @command = Groonga::Command::Parser.parse(input)
       @options = options
 
-      case command.name
+      case @command.name
       when "table_create"
-        yield create_table_create_command(command)
+        yield create_table_create_command
       when "column_create"
-        yield create_column_create_command(command)
+        yield create_column_create_command
       when "load"
-        split_load_command_to_add_commands(command, &block)
+        split_load_command_to_add_commands(&block)
       when "select"
-        yield create_select_command(command)
+        yield create_select_command
       end
     end
 
@@ -61,35 +61,35 @@ module Droonga
       nil
     end
 
-    def create_table_create_command(table_create_command)
+    def create_table_create_command
       body = {
-        :name => table_create_command[:name],
-        :flags => table_create_command[:flags],
-        :key_type => table_create_command[:key_type],
-        :value_type => table_create_command[:value_type],
-        :default_tokenizer => table_create_command[:default_tokenizer],
+        :name => @command[:name],
+        :flags => @command[:flags],
+        :key_type => @command[:key_type],
+        :value_type => @command[:value_type],
+        :default_tokenizer => @command[:default_tokenizer],
       }
       create_envelope("table_create", body)
     end
 
-    def create_column_create_command(column_create_command)
+    def create_column_create_command
       body = {
-        :table => column_create_command[:table],
-        :name => column_create_command[:name],
-        :flags => column_create_command[:flags],
-        :type => column_create_command[:type],
-        :source => column_create_command[:source],
+        :table => @command[:table],
+        :name => @command[:name],
+        :flags => @command[:flags],
+        :type => @command[:type],
+        :source => @command[:source],
       }
       create_envelope("column_create", body)
     end
 
-    def split_load_command_to_add_commands(load_command, &block)
-      columns = load_command[:columns].split(",")
-      values = load_command[:values]
+    def split_load_command_to_add_commands(&block)
+      columns = @command[:columns].split(",")
+      values = @command[:values]
       values = JSON.parse(values)
       values.each do |record|
         body = {
-          :table => load_command[:table],
+          :table => @command[:table],
         }
 
         record.each_with_index do |value, column_index|
@@ -105,16 +105,16 @@ module Droonga
       end
     end
 
-    def create_select_command(select_command)
+    def create_select_command
       body = {
-        :table => select_command[:table],
-        :sortby => select_command[:sortby],
-        :scorer => select_command[:scorer],
-        :query => select_command[:query],
-        :filter => select_command[:filter],
-        :conditions => select_command[:conditions],
-        :drilldown => select_command[:drilldown],
-        :output_columns => select_command[:output_columns],
+        :table => @command[:table],
+        :sortby => @command[:sortby],
+        :scorer => @command[:scorer],
+        :query => @command[:query],
+        :filter => @command[:filter],
+        :conditions => @command[:conditions],
+        :drilldown => @command[:drilldown],
+        :output_columns => @command[:output_columns],
       }
       create_envelope("select", body)
     end
