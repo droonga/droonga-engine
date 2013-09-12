@@ -142,6 +142,31 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                  results)
   end
 
+  def test_select
+    results = []
+    command = "select --filter \"age<=30\" " +
+                 "--output_type \"json\" --table \"Users\""
+    @converter.convert(command) do |droonga_command|
+      results << droonga_command
+    end
+    assert_equal([
+                   {
+                     :id => "test:0",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "select",
+                     :body => {
+                       :table => "Users",
+                       :filter => "age<=30",
+                       :output_type => "json",
+                     },
+                   },
+                 ],
+                 results)
+  end
+
   private
   def date
     Time.new(2013, 11, 29, 0, 0, 0)
