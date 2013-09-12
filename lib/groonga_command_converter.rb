@@ -23,13 +23,12 @@ module Droonga
   class GroongaCommandConverter
     STATUS_OK = 200.freeze
 
-    def initialize
+    def initialize(options={})
+      @options = options
     end
 
-    def convert(input, options={}, &block)
+    def convert(input, &block)
       @command = Groonga::Command::Parser.parse(input)
-      @options = options
-
       case @command.name
       when "table_create"
         yield create_table_create_command
