@@ -18,10 +18,10 @@ require "droonga/groonga_command_converter"
 class GroongaCommandConverterTest < Test::Unit::TestCase
   def setup
     @converter = Droonga::GroongaCommandConverter.new(:id => "test",
-                                                      :date => default_date,
-                                                      :reply_to => default_reply_to,
-                                                      :status_code => default_status_code,
-                                                      :dataset => default_dataset)
+                                                      :date => date,
+                                                      :reply_to => reply_to,
+                                                      :status_code => status_code,
+                                                      :dataset => dataset)
   end
 
   def test_table_create
@@ -34,10 +34,10 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
     assert_equal([
                    {
                      :id => "test:0",
-                     :date => default_formatted_date,
-                     :replyTo => default_reply_to,
-                     :statusCode => default_status_code,
-                     :dataset => default_dataset,
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
                      :type => "table_create",
                      :body => {
                        :name => "Term",
@@ -53,23 +53,23 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
   end
 
   private
-  def default_date
+  def date
     Time.new(2013, 11, 29, 0, 0, 0)
   end
 
-  def default_formatted_date
+  def formatted_date
     "2013-11-29T00:00:00+09:00"
   end
 
-  def default_reply_to
+  def reply_to
     "localhost:20033"
   end
 
-  def default_status_code
+  def status_code
     200
   end
 
-  def default_dataset
+  def dataset
     "test-dataset"
   end
 end
