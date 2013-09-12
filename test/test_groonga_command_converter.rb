@@ -17,11 +17,14 @@ require "droonga/groonga_command_converter"
 
 class GroongaCommandConverterTest < Test::Unit::TestCase
   def setup
-    @converter = Droonga::GroongaCommandConverter.new(:id => "test",
-                                                      :date => date,
-                                                      :reply_to => reply_to,
-                                                      :status_code => status_code,
-                                                      :dataset => dataset)
+    options = {
+      :id => "test",
+      :date => date,
+      :reply_to => reply_to,
+      :status_code => status_code,
+      :dataset => dataset,
+    }
+    @converter = Droonga::GroongaCommandConverter.new(options)
   end
 
   def test_table_create
