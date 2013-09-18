@@ -75,11 +75,11 @@ module Droonga
     end
 
     def create_table_create_command
-      create_envelope("table_create", @command.to_hash)
+      create_envelope("table_create", @command.arguments)
     end
 
     def create_column_create_command
-      create_envelope("column_create", @command.to_hash)
+      create_envelope("column_create", @command.arguments)
     end
 
     def split_load_command_to_add_commands(&block)
@@ -107,7 +107,7 @@ module Droonga
     end
 
     def create_select_command
-      create_envelope("select", @command.to_hash)
+      create_envelope("select", @command.arguments)
     end
   end
 end
