@@ -26,20 +26,42 @@ module Droonga
     def initialize(options={})
       @options = options
       @count = 0
+
+      @command_parser = Groonga::Command::Parser.new
     end
 
     def convert(input, &block)
-      @command = Groonga::Command::Parser.parse(input)
-      case @command.name
-      when "table_create"
-        yield create_table_create_command
-      when "column_create"
-        yield create_column_create_command
-      when "load"
-        split_load_command_to_add_commands(&block)
-      when "select"
-        yield create_select_command
+      @command_parser.on_command do |command|
+        case command.name
+        when "table_create"
+          yield create_table_create_command(command)
+        when "column_create"
+          yield create_column_create_command(command)
+        when "select"
+          yield create_select_command(command)
+        end
       end
+
+      parsed_values = nil
+      parsed_columns = nil
+      @command_parser.on_load_start do |command|
+        parsed_values = []
+        parsed_columns = nil
+      end
+      @command_parser.on_load_columns do |command, columns|
+        parsed_columns = columns
+      end
+      @command_parser.on_load_value do |command, value|
+        parsed_values << value
+      end
+      @command_parser.on_load_complete do |command|
+        command[:columns] = parsed_columns.join(",")
+        command[:values] = parsed_values.to_json
+        split_load_command_to_add_commands(command, &block)
+      end
+
+      @command_parser << input
+      @command_parser.finish
     end
 
     private
@@ -74,21 +96,21 @@ module Droonga
       time.iso8601
     end
 
-    def create_table_create_command
-      create_envelope("table_create", @command.arguments)
+    def create_table_create_command(command)
+      create_envelope("table_create", command.arguments)
     end
 
-    def create_column_create_command
-      create_envelope("column_create", @command.arguments)
+    def create_column_create_command(command)
+      create_envelope("column_create", command.arguments)
     end
 
-    def split_load_command_to_add_commands(&block)
-      columns = @command[:columns].split(",")
-      values = @command[:values]
+    def split_load_command_to_add_commands(command, &block)
+      columns = command[:columns].split(",")
+      values = command[:values]
       values = JSON.parse(values)
       values.each do |record|
         body = {
-          :table => @command[:table],
+          :table => command[:table],
         }
 
         record_values = {}
@@ -106,8 +128,8 @@ module Droonga
       end
     end
 
-    def create_select_command
-      create_envelope("select", @command.arguments)
+    def create_select_command(command)
+      create_envelope("select", command.arguments)
     end
   end
 end
