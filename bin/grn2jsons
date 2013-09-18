@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
+require "groonga_command_converter"
+require "json"
+require "ostruct"
+require "optparse"
+
+options = OpenStruct.new
+option_parser = OptionParser.new do |parser|
+  parser.on("-i=ID", "--id=ID",
+            "base id. (optional)") do |id|
+    options.id = id
+  end
+
+  parser.on("-d=DATE", "--date=DATE",
+            "date. (optional)") do |date|
+    options.date = date
+  end
+
+  parser.on("-r=REPLYTO", "--reply-to=REPLYTO",
+            "value of replyTo field.") do |reply_to|
+    options.reply_to = reply_to
+  end
+
+  parser.on("-s=DATASET", "--dataset=DATASET",
+            "dataset.") do |dataset|
+    options.dataset = dataset
+  end
+end
+args = option_parser.parse!(ARGV)
+
+convert_options = {
+  :id => options.id,
+  :date => options.date,
+  :reply_to => options.reply_to,
+  :dataset => options.dataset,
+}
+
+source_file = args[0]
+result_file = args[1]
+
+input = nil
+if source_file.nil?
+  input = STDIN.read
+else
+  input = File.read(source_file)
+end
+
+result_file = args[1]
+if result_file.nil?
+  converter.convert(input, convert_options) do |command|
+    puts(JSON.generate(command))
+  end
+else
+  File.open("w", result_file) do |file|
+    converter.convert(input, convert_options) do |command|
+      file.puts(JSON.generate(command))
+    end
+  end
+end
