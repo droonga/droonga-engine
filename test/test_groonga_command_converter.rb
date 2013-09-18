@@ -86,7 +86,7 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                 "[\n" +
                 "[\"_key\",\"name\"],\n" +
                 "[\"user0\",\"Abe Shinzo\"],\n" +
-                "[\"user1\",\"Noda Yoshihiko\"],\n",
+                "[\"user1\",\"Noda Yoshihiko\"],\n" +
                 "[\"user2\",\"Kan Naoto\"]\n" +
                 "]"
     @converter.convert(command) do |droonga_command|
