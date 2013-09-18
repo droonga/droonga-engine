@@ -167,6 +167,49 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
                  results)
   end
 
+  def test_multiple_commands
+    results = []
+    command = "table_create Terms TABLE_PAT_KEY ShortText " +
+                "--default_tokenizer TokenBigram --normalizer NormalizerAuto\n" +
+                "column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name"
+    @converter.convert(command) do |droonga_command|
+      results << droonga_command
+    end
+    assert_equal([
+                   {
+                     :id => "test:0",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "table_create",
+                     :body => {
+                       :name => "Terms",
+                       :flags => "TABLE_PAT_KEY",
+                       :key_type => "ShortText",
+                       :default_tokenizer => "TokenBigram",
+                       :normalizer => "NormalizerAuto",
+                     },
+                   },
+                   {
+                     :id => "test:1",
+                     :date => formatted_date,
+                     :replyTo => reply_to,
+                     :statusCode => status_code,
+                     :dataset => dataset,
+                     :type => "column_create",
+                     :body => {
+                       :table => "Terms",
+                       :name => "Users_name",
+                       :flags => "COLUMN_INDEX|WITH_POSITION",
+                       :type => "Users",
+                       :source => "name",
+                     },
+                   },
+                 ],
+                 results)
+  end
+
   private
   def date
     Time.new(2013, 11, 29, 0, 0, 0)
