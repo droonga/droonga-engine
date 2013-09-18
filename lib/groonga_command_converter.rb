@@ -60,7 +60,9 @@ module Droonga
         split_load_command_to_add_commands(command, &block)
       end
 
-      @command_parser << input
+      input.each_line do |line|
+        @command_parser << line
+      end
       @command_parser.finish
     end
 
