@@ -60,11 +60,15 @@ module Droonga
           status_code = 0
 
           start_time = value["startTime"]
-          start_time_in_unix_time = Time.parse(start_time).to_f
-          elapsed_time = value["elapsedTime"]
+          start_time_in_unix_time = if start_time
+                                      Time.parse(start_time).to_f
+                                    else
+                                      Time.now.to_f
+                                    end
+          elapsed_time = value["elapsedTime"] || 0
           count = value["count"]
 
-          attributes = value["attributes"]
+          attributes = value["attributes"] || []
           converted_attributes = attributes.collect do |attribute|
             name = attribute["name"]
             type = attribute["type"]
@@ -72,7 +76,7 @@ module Droonga
           end
 
           header = [status_code, start_time_in_unix_time, elapsed_time]
-          results = [[count], converted_attributes]
+          results = [[count], converted_attributes, value["records"]]
           body = [results]
 
           [header, body]
