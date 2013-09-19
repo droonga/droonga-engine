@@ -77,6 +77,13 @@ module Droonga
     def dispatch(tag, time, record, synchronous=nil)
       message = [tag, time, record]
       body, type, arguments = parse_message([tag, time, record])
+      reply_to = envelope["replyTo"]
+      if reply_to.is_a? String
+        envelope["replyTo"] = {
+          "type" => type + ".result",
+          "to" => reply_to
+        }
+      end
       post_or_push(message, body,
                    "type" => type,
                    "arguments" => arguments,
@@ -98,9 +105,12 @@ module Droonga
     private
     def post_or_push(message, body, destination)
       route = nil
-      unless destination
+      unless is_route?(destination)
         route = envelope["via"].pop
         destination = route
+      end
+      unless is_route?(destination)
+        destination = envelope["replyTo"]
       end
       command = nil
       receiver = nil
@@ -114,8 +124,6 @@ module Droonga
         receiver = destination["to"]
         arguments = destination["arguments"]
         synchronous = destination["synchronous"]
-      else
-        receiver = envelope["replyTo"]
       end
       if receiver
         output(receiver, body, command, arguments)
@@ -141,8 +149,12 @@ module Droonga
       add_route(route) if route
     end
 
+    def is_route?(route)
+      route.is_a?(String) || route.is_a?(Hash)
+    end
+
     def output(receiver, body, command, arguments)
-      return nil unless receiver
+      return nil unless receiver.is_a?(String) && command.is_a?(String)
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"
       end
@@ -152,18 +164,19 @@ module Droonga
       params = $4
       output = get_output(host, port, params)
       return unless output
-      if command
-        message = envelope
-        message["body"] = body
-        message["type"] = command
-        message["arguments"] = arguments
-      else
+      if command =~ /\.result$/
         message = {
           inReplyTo: envelope["id"],
           statusCode: 200,
-          type: (envelope["type"] || "") + ".result",
+          type: command,
           body: body
         }
+      else
+        message = envelope.merge(
+          body: body,
+          type: command,
+          arguments: arguments
+        )
       end
       output.post(tag + ".message", message)
     end
