@@ -108,6 +108,7 @@ module Droonga
       def format
         formatted_result = {}
         format_count(formatted_result)
+        format_attributes(formatted_result)
         format_records(formatted_result)
         if need_element_output?("startTime")
           formatted_result["startTime"] = @start_time.iso8601
@@ -247,6 +248,12 @@ module Droonga
       def format_count(formatted_result)
         return unless need_element_output?("count")
         formatted_result["count"] = @count
+      end
+
+      def format_attributes(formatted_result)
+        return unless need_element_output?("attributes")
+        # XXX IMPLEMENT ME!!!
+        formatted_result["attributes"] = []
       end
 
       def format_records(formatted_result)
