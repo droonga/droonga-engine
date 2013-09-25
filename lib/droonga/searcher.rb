@@ -252,8 +252,16 @@ module Droonga
 
       def format_attributes(formatted_result)
         return unless need_element_output?("attributes")
+
         # XXX IMPLEMENT ME!!!
-        formatted_result["attributes"] = []
+        attributes = nil
+        if @query["output"]["format"] == "complex"
+          attributes = {}
+        else
+          attributes = []
+        end
+
+        formatted_result["attributes"] = attributes
       end
 
       def format_records(formatted_result)
