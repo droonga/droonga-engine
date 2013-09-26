@@ -42,24 +42,5 @@ module Droonga
       @running = false
       $log.trace("worker: stop: done")
     end
-
-    private
-    def shutdown_workers
-      @pool.each do |pid|
-        Process.kill(:TERM, pid)
-      end
-      queue = @context[@queue_name]
-      3.times do |i|
-        break if @pool.empty?
-        queue.unblock
-        @pool.reject! do |pid|
-          not Process.waitpid(pid, Process::WNOHANG).nil?
-        end
-        sleep(i ** 2 * 0.1)
-      end
-      @pool.each do |pid|
-        Process.kill(:KILL, pid)
-      end
-    end
   end
 end

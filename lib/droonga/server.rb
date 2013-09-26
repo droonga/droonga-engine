@@ -15,93 +15,38 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "msgpack"
-require "cool.io"
 require "groonga"
-
-require "droonga/executor"
 
 module Droonga
   module Server
-    class Receiver
-      def initialize(input)
-        @input = input
-      end
-
-      def run
-        $log.trace
-        @io = Coolio::IO.new(@input)
-        unpacker = MessagePack::Unpacker.new
-        @io.on_read do |data|
-          $log.trace("receiver: received: <#{data.bytesize}>")
-          unpacker.feed_each(data) do |message|
-            yield message
-          end
-        end
-        @loop = Coolio::Loop.new
-        @loop.attach(@io)
-        @loop_breaker = Coolio::AsyncWatcher.new
-        @loop.attach(@loop_breaker)
-        @running = true
-        @loop.run
-      end
-
-      def stop
-        unless @running
-          $log.trace("receiver: stop: not needed")
-          return
-        end
-
-        $log.trace("receiver: stop: start")
-        @io.close
-        $log.trace("receiver: stop: closed")
-        @loop.stop
-        @running = false
-        @loop_breaker.signal
-        $log.trace("receiver: stop: done")
-      end
-    end
-
-    def initialize
-      super
-      @message_input = config[:message_input]
-      @executor = Executor.new(config)
-    end
-
     def before_run
-      @receiver = Receiver.new(@message_input)
-      @receiver_thread = Thread.new do
-        @receiver.run do |message|
-          $log.trace("received: start")
-          @executor.dispatch(*message)
-          $log.trace("received: done")
-        end
-      end
+      $log.trace("server: before_run: start")
+      # TODO: Use JobQueue object
+      @context = Groonga::Context.new
+      @database = @context.open_database(config[:database])
+      @queue = @context[config[:queue_name]]
+      $log.trace("server: before_run: done")
     end
 
     def after_run
       $log.trace("server: after_run: start")
-
-      $log.trace("server: after_run: receiver: start")
-      @receiver_thread.join
-      $log.trace("server: after_run: receiver: done")
-
-      $log.trace("server: after_run: groonga: start")
-      @executor.shutdown
-      $log.trace("server: after_run: groonga: done")
-
+      @queue.close
+      @database.close
+      @context.close
       $log.trace("server: after_run: done")
     end
 
     def stop(stop_graceful)
       $log.trace("server: stop: start")
 
-      $log.trace("server: stop: receiver: stop: start")
-      @receiver.stop
-      $log.trace("server: stop: receiver: stop: done")
-
       $log.trace("server: stop: queue: unblock: start")
-      @executor.unblock_queue
+      3.times do |i|
+        $log.trace("server: stop: queue: unblock: #{i}: start")
+        super(stop_graceful)
+        @queue.unblock
+        sleep(i ** 2 * 0.1)
+        $log.trace("server: stop: queue: unblock: #{i}: done")
+      end
       $log.trace("server: stop: queue: unblock: done")
 
       $log.trace("server: stop: done")

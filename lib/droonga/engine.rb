@@ -28,11 +28,7 @@ module Droonga
     DEFAULT_OPTIONS = {
       :queue_name => "DroongaQueue",
       :n_workers  => 0,
-      :with_server  => false
     }
-    # TODO: It doesn't work fine when n_workers > 0 && number of databases > 1
-    #       since more than one ServerEngine instance can't be in a process.
-    #       It causes dump_uncaught_error in the SignalThread.
 
     def initialize(options={})
       @options = DEFAULT_OPTIONS.merge(options)
@@ -43,74 +39,28 @@ module Droonga
         Droonga::JobQueue.ensure_schema(@options[:database],
                                         @options[:queue_name])
       end
-      if @options[:n_workers] > 0 || @options[:with_server]
-        @message_input, @message_output = IO.pipe
-        @message_input.sync = true
-        @message_output.sync = true
-        start_supervisor
-      end
-      if @options[:with_server]
-        start_emitter
-      else
-        @executor = Executor.new(@options)
-      end
+      start_supervisor if @options[:n_workers] > 0
+      @executor = Executor.new(@options)
     end
 
     def shutdown
       $log.trace("engine: shutdown: start")
-      shutdown_emitter if @emitter
       @executor.shutdown if @executor
-      if @supervisor
-        shutdown_supervisor
-        @message_input.close unless @message_input.closed?
-        @message_output.close unless @message_output.closed?
-      end
+      shutdown_supervisor if @supervisor
       $log.trace("engine: shutdown: done")
     end
 
     def emit(tag, time, record, synchronous=nil)
       $log.trace("tag: <#{tag}>")
-      if @executor
-        @executor.dispatch(tag, time, record, synchronous)
-      else
-        @emitter.write(MessagePack.pack([tag, time, record, synchronous]))
-        @loop_breaker.signal
-      end
+      @executor.dispatch(tag, time, record, synchronous)
     end
 
     private
-    def start_emitter
-      @loop = Coolio::Loop.new
-      @emitter = Coolio::IO.new(@message_output)
-      @emitter.on_write_complete do
-        $log.trace("emitter: written")
-      end
-      @emitter.attach(@loop)
-      @loop_breaker = Coolio::AsyncWatcher.new
-      @loop_breaker.attach(@loop)
-      @emitter_thread = Thread.new do
-        @loop.run
-      end
-    end
-
-    def shutdown_emitter
-      $log.trace("emitter: shutdown: start")
-      @emitter.close
-      $log.trace("emitter: shutdown: emitter: closed")
-      @loop.stop
-      @loop_breaker.signal
-      $log.trace("emitter: shutdown: loop: stopped")
-      @emitter_thread.join
-      $log.trace("emitter: shutdown: done")
-    end
-
     def start_supervisor
-      server = @options[:with_server] ? Server : nil
-      @supervisor = ServerEngine::Supervisor.new(server, Worker) do
+      @supervisor = ServerEngine::Supervisor.new(Server, Worker) do
         force_options = {
           :worker_type   => "process",
           :workers       => @options[:n_workers],
-          :message_input => @message_input,
           :log_level     => $log.level,
         }
         @options.merge(force_options)
