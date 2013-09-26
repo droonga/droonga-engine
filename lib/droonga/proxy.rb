@@ -36,7 +36,7 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      plugins = ["proxy", "adapter"] + (Droonga::catalog.option("plugins")||[])
+      plugins = ["proxy"] + (Droonga::catalog.option("plugins")||[]) + ["adapter"]
       plugins.each do |plugin|
         @worker.add_handler(plugin)
       end
