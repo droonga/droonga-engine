@@ -29,8 +29,6 @@ module Droonga
     CATALOG_FILE_PATH = 'catalog.json'
 
     def initialize
-      catalog_path = ENV["DROONGA_CATALOG"] || CATALOG_FILE_PATH
-      catalog_path = File.expand_path(catalog_path)
       open(catalog_path) do |file|
         @catalog = JSON.parse(file.read)
       end
@@ -51,6 +49,12 @@ module Droonga
         dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
       end
       @options = @catalog["options"] || {}
+    end
+
+    def catalog_path
+      return @catalog_path unless @catalog_path.nil?
+      catalog_path = ENV["DROONGA_CATALOG"] || CATALOG_FILE_PATH
+      @catalog_path = File.expand_path(catalog_path)
     end
 
     def option(name)
