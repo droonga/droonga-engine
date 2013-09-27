@@ -29,7 +29,9 @@ module Droonga
     CATALOG_FILE_PATH = 'catalog.json'
 
     def initialize
-      open(CATALOG_FILE_PATH) do |file|
+      catalog_path = ENV["DROONGA_CATALOG"] || CATALOG_FILE_PATH
+      catalog_path = File.expand_path("~/groonga/")
+      open(catalog_path) do |file|
         @catalog = JSON.parse(file.read)
       end
       @catalog["datasets"].each do |name, dataset|
