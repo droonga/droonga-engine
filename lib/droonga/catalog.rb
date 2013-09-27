@@ -15,8 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require 'digest/sha1'
-require 'zlib'
+require "digest/sha1"
+require "zlib"
 
 module Droonga
   class << self
@@ -32,7 +32,7 @@ module Droonga
   end
 
   class Catalog
-    CATALOG_FILE_PATH = 'catalog.json'
+    CATALOG_FILE_PATH = "catalog.json"
 
     def initialize(path)
       @catalog_path = path
@@ -78,7 +78,7 @@ module Droonga
           part["partitions"].each do |range, partitions|
             partitions.each do |partition|
               if partition =~ pattern
-                path = File.join([device, $POSTMATCH, 'db'])
+                path = File.join([device, $POSTMATCH, "db"])
                 path = File.expand_path(path, base_path)
                 options = {
                   :database => path,
