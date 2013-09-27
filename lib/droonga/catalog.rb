@@ -77,7 +77,7 @@ module Droonga
             partitions.each do |partition|
               if partition =~ pattern
                 path = File.join([device, $POSTMATCH, 'db'])
-                path = File.expand_path(base_path)
+                path = File.expand_path(path, base_path)
                 options = {
                   :database => path,
                   :n_workers => workers,
