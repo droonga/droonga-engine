@@ -30,7 +30,7 @@ module Droonga
 
     def initialize
       catalog_path = ENV["DROONGA_CATALOG"] || CATALOG_FILE_PATH
-      catalog_path = File.expand_path("~/groonga/")
+      catalog_path = File.expand_path(catalog_path)
       open(catalog_path) do |file|
         @catalog = JSON.parse(file.read)
       end
