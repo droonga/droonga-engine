@@ -100,10 +100,13 @@ module Droonga
 
     def try_handle_as_internal_message(command, request, arguments)
       return false unless request.is_a? Hash
+
       @task = request["task"]
       return false unless @task.is_a? Hash
+
       @component = @task["component"]
       return false unless @component.is_a? Hash
+
       @output_values = @task["values"]
       @body = @component["body"]
       @output_names = @component["outputs"]
@@ -111,6 +114,7 @@ module Droonga
       @value = request["value"]
       @input_name = request["name"]
       @descendants = request["descendants"]
+
       invoke(command, @body, *arguments)
       output if @descendants
       true
