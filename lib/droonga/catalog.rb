@@ -57,6 +57,10 @@ module Droonga
       @catalog_path = File.expand_path(catalog_path)
     end
 
+    def base_path
+      @base_path ||= File.dirname(catalog_path)
+    end
+
     def option(name)
       @options[name]
     end
@@ -73,6 +77,7 @@ module Droonga
             partitions.each do |partition|
               if partition =~ pattern
                 path = File.join([device, $POSTMATCH, 'db'])
+                path = File.expand_path(base_path)
                 options = {
                   :database => path,
                   :n_workers => workers,
