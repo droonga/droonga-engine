@@ -28,6 +28,8 @@ module Droonga
   class Catalog
     CATALOG_FILE_PATH = "catalog.json"
 
+    attr_reader :path
+
     def initialize(path=nil)
       @path = path || default_path
 
