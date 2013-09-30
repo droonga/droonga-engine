@@ -21,21 +21,15 @@ require "zlib"
 module Droonga
   class << self
     def catalog
-      @catalog ||= Catalog.new(catalog_path)
-    end
-
-    def catalog_path
-      return @catalog_path unless @catalog_path.nil?
-      catalog_path = ENV["DROONGA_CATALOG"] || Catalog::CATALOG_FILE_PATH
-      @catalog_path = File.expand_path(catalog_path)
+      @catalog ||= Catalog.new
     end
   end
 
   class Catalog
     CATALOG_FILE_PATH = "catalog.json"
 
-    def initialize(path)
-      @catalog_path = path
+    def initialize(path=nil)
+      @catalog_path = path || default_path
 
       open(@catalog_path) do |file|
         @catalog = JSON.parse(file.read)
@@ -146,6 +140,12 @@ module Droonga
           routes.concat(replicas)
         end
       end
+    end
+
+    private
+    def default_path
+      path = ENV["DROONGA_CATALOG"] || Catalog::CATALOG_FILE_PATH
+      File.expand_path(path)
     end
   end
 end
