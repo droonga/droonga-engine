@@ -17,8 +17,9 @@ source "https://rubygems.org"
 
 gemspec
 
-local_rroonga_path = File.join(File.dirname(__FILE__), "..", "rroonga")
-local_groonga_command_parser_path = File.join(File.dirname(__FILE__), "..", "groonga-command-parser")
+parent_dir = File.join(File.dirname(__FILE__), "..")
+local_rroonga_path = File.join(parent_dir, "rroonga")
+local_groonga_command_parser_path = File.join(parent_dir, "groonga-command-parser")
 if File.exist?(local_rroonga_path)
   gem "rroonga", :path => local_rroonga_path
   gem "groonga-command-parser", :path => local_groonga_command_parser_path
