@@ -19,13 +19,17 @@ gemspec
 
 parent_dir = File.join(File.dirname(__FILE__), "..")
 local_rroonga_path = File.join(parent_dir, "rroonga")
+local_groonga_command_path = File.join(parent_dir, "groonga-command")
 local_groonga_command_parser_path = File.join(parent_dir,
                                               "groonga-command-parser")
 if File.exist?(local_rroonga_path)
   gem "rroonga", :path => local_rroonga_path
+  gem "groonga-command", :path => local_groonga_command_path
   gem "groonga-command-parser", :path => local_groonga_command_parser_path
 elsif ENV["TRAVIS"] == "true"
   gem "rroonga", :git => "git://github.com/ranguba/rroonga.git"
+  gem "groonga-command",
+      :git => "git://github.com/groonga/groonga-command.git"
   gem "groonga-command-parser",
       :git => "git://github.com/groonga/groonga-command-parser.git"
 end
