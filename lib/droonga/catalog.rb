@@ -29,9 +29,9 @@ module Droonga
     CATALOG_FILE_PATH = "catalog.json"
 
     def initialize(path=nil)
-      @catalog_path = path || default_path
+      @path = path || default_path
 
-      open(@catalog_path) do |file|
+      open(@path) do |file|
         @catalog = JSON.parse(file.read)
       end
       @catalog["datasets"].each do |name, dataset|
@@ -54,7 +54,7 @@ module Droonga
     end
 
     def base_path
-      @base_path ||= File.dirname(@catalog_path)
+      @base_path ||= File.dirname(@path)
     end
 
     def option(name)
