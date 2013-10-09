@@ -79,7 +79,7 @@ class AddHandlerTest < Test::Unit::TestCase
       request = {
         "table"  => "Users",
         "key"    => "asami",
-        "values" => { "country" => "japan" },
+        "values" => {"country" => "japan"},
       }
       @handler.add(request)
       table = @worker.context["Users"]
@@ -110,7 +110,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_with_values
       request = {
         "table"  => "Books",
-        "values" => { "title" => "CSS" },
+        "values" => {"title" => "CSS"},
       }
       @handler.add(request)
       table = @worker.context["Books"]
