@@ -22,14 +22,6 @@ module Droonga
   class BasicProxyHandler < Droonga::ProxyHandler
     Droonga::HandlerPlugin.register("proxy", self)
 
-    command :proxy_search
-    def proxy_search(request)
-      searcher = Droonga::Searcher.new(@context)
-      searcher.search(body).each do |output, value|
-        emit(value, output)
-      end
-    end
-
     command :proxy_gather
     def proxy_gather(request)
       output = body ? body[input_name] : input_name
