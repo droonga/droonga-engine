@@ -29,8 +29,10 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_table_create
     results = []
-    command = "table_create Terms TABLE_PAT_KEY ShortText " +
-                "--default_tokenizer TokenBigram --normalizer NormalizerAuto"
+    command = <<-COMMAND.chomp
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram --normalizer NormalizerAuto
+    COMMAND
     @converter.convert(command) do |droonga_command|
       results << droonga_command
     end
@@ -56,7 +58,9 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_column_create
     results = []
-    command = "column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name"
+    command = <<-COMMAND.chomp
+column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
+    COMMAND
     @converter.convert(command) do |droonga_command|
       results << droonga_command
     end
@@ -82,13 +86,15 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_load
     results = []
-    command = "load --table Users\n" +
-                "[\n" +
-                "[\"_key\",\"name\"],\n" +
-                "[\"user0\",\"Abe Shinzo\"],\n" +
-                "[\"user1\",\"Noda Yoshihiko\"],\n" +
-                "[\"user2\",\"Kan Naoto\"]\n" +
-                "]"
+    command = <<-COMMAND.chomp
+load --table Users
+[
+["_key","name"],
+["user0","Abe Shinzo"],
+["user1","Noda Yoshihiko"],
+["user2","Kan Naoto"]
+]
+    COMMAND
     @converter.convert(command) do |droonga_command|
       results << droonga_command
     end
@@ -144,8 +150,9 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_select
     results = []
-    command = "select --filter \"age<=30\" " +
-                 "--output_type \"json\" --table \"Users\""
+    command = <<-COMMAND.chomp
+select --filter "age<=30" --output_type "json" --table "Users"
+    COMMAND
     @converter.convert(command) do |droonga_command|
       results << droonga_command
     end
@@ -169,9 +176,11 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
 
   def test_multiple_commands
     results = []
-    command = "table_create Terms TABLE_PAT_KEY ShortText " +
-                "--default_tokenizer TokenBigram --normalizer NormalizerAuto\n" +
-                "column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name"
+    command = <<-COMMAND.chomp
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram --normalizer NormalizerAuto
+column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
+    COMMAND
     @converter.convert(command) do |droonga_command|
       results << droonga_command
     end
