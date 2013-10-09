@@ -57,8 +57,8 @@ class AddHandlerTest < Test::Unit::TestCase
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Users",
-          :type => :hash,
-          :key_type => :short_text) do |table|
+                            :type => :hash,
+                            :key_type => :short_text) do |table|
           table.short_text("country")
         end
       end
@@ -70,6 +70,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Users"]
       assert_equal(["mori"], table.collect(&:key))
@@ -79,8 +80,9 @@ class AddHandlerTest < Test::Unit::TestCase
       request = {
         "table"  => "Users",
         "key"    => "asami",
-        "values" => { "country" => "japan" },
+        "values" => {"country" => "japan"},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
@@ -91,7 +93,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Books",
-          :type => :array) do |table|
+                            :type => :array) do |table|
           table.short_text("title")
         end
       end
@@ -102,6 +104,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Books"]
       assert_equal([nil], table.collect(&:title))
@@ -110,8 +113,9 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_with_values
       request = {
         "table"  => "Books",
-        "values" => { "title" => "CSS" },
+        "values" => {"title" => "CSS"},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Books"]
       assert_equal(["CSS"], table.collect(&:title))
@@ -124,8 +128,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Nonexistent",
         "values" => {},
       }
+      mock(@handler).emit([false])
       @handler.add(request)
-      assert_equal([false], @worker.body)
     end
   end
 end
