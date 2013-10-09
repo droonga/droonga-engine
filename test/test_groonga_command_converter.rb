@@ -28,13 +28,13 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
   end
 
   def test_table_create
-    results = []
+    droonga_commands = []
     command = <<-COMMAND.chomp
 table_create Terms TABLE_PAT_KEY ShortText \
   --default_tokenizer TokenBigram --normalizer NormalizerAuto
     COMMAND
     @converter.convert(command) do |droonga_command|
-      results << droonga_command
+      droonga_commands << droonga_command
     end
     assert_equal([
                    {
@@ -53,16 +53,16 @@ table_create Terms TABLE_PAT_KEY ShortText \
                      },
                    },
                  ],
-                 results)
+                 droonga_commands)
   end
 
   def test_column_create
-    results = []
+    droonga_commands = []
     command = <<-COMMAND.chomp
 column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
     COMMAND
     @converter.convert(command) do |droonga_command|
-      results << droonga_command
+      droonga_commands << droonga_command
     end
     assert_equal([
                    {
@@ -81,11 +81,11 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
                      },
                    },
                  ],
-                 results)
+                 droonga_commands)
   end
 
   def test_load
-    results = []
+    droonga_commands = []
     command = <<-COMMAND.chomp
 load --table Users
 [
@@ -96,7 +96,7 @@ load --table Users
 ]
     COMMAND
     @converter.convert(command) do |droonga_command|
-      results << droonga_command
+      droonga_commands << droonga_command
     end
     assert_equal([
                    {
@@ -145,16 +145,16 @@ load --table Users
                      },
                    },
                  ],
-                 results)
+                 droonga_commands)
   end
 
   def test_select
-    results = []
+    droonga_commands = []
     command = <<-COMMAND.chomp
 select --filter "age<=30" --output_type "json" --table "Users"
     COMMAND
     @converter.convert(command) do |droonga_command|
-      results << droonga_command
+      droonga_commands << droonga_command
     end
     assert_equal([
                    {
@@ -171,18 +171,18 @@ select --filter "age<=30" --output_type "json" --table "Users"
                      },
                    },
                  ],
-                 results)
+                 droonga_commands)
   end
 
   def test_multiple_commands
-    results = []
+    droonga_commands = []
     commands = <<-COMMANDS.chomp
 table_create Terms TABLE_PAT_KEY ShortText \
   --default_tokenizer TokenBigram --normalizer NormalizerAuto
 column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
     COMMANDS
     @converter.convert(commands) do |droonga_command|
-      results << droonga_command
+      droonga_commands << droonga_command
     end
     assert_equal([
                    {
@@ -216,7 +216,7 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
                      },
                    },
                  ],
-                 results)
+                 droonga_commands)
   end
 
   private
