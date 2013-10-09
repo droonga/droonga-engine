@@ -70,6 +70,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Users"]
       assert_equal(["mori"], table.collect(&:key))
@@ -81,6 +82,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "asami",
         "values" => {"country" => "japan"},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
@@ -102,6 +104,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Books"]
       assert_equal([nil], table.collect(&:title))
@@ -112,6 +115,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {"title" => "CSS"},
       }
+      mock(@handler).emit([true])
       @handler.add(request)
       table = @worker.context["Books"]
       assert_equal(["CSS"], table.collect(&:title))
@@ -124,8 +128,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Nonexistent",
         "values" => {},
       }
+      mock(@handler).emit([false])
       @handler.add(request)
-      assert_equal([false], @worker.body)
     end
   end
 end
