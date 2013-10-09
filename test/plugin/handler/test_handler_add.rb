@@ -57,8 +57,8 @@ class AddHandlerTest < Test::Unit::TestCase
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Users",
-          :type => :hash,
-          :key_type => :short_text) do |table|
+                            :type => :hash,
+                            :key_type => :short_text) do |table|
           table.short_text("country")
         end
       end
@@ -91,7 +91,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Books",
-          :type => :array) do |table|
+                            :type => :array) do |table|
           table.short_text("title")
         end
       end
