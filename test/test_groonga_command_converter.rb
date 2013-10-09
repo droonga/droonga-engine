@@ -176,12 +176,12 @@ select --filter "age<=30" --output_type "json" --table "Users"
 
   def test_multiple_commands
     results = []
-    command = <<-COMMAND.chomp
+    commands = <<-COMMANDS.chomp
 table_create Terms TABLE_PAT_KEY ShortText \
   --default_tokenizer TokenBigram --normalizer NormalizerAuto
 column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
-    COMMAND
-    @converter.convert(command) do |droonga_command|
+    COMMANDS
+    @converter.convert(commands) do |droonga_command|
       results << droonga_command
     end
     assert_equal([
