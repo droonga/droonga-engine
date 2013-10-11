@@ -63,6 +63,7 @@ module Droonga
         query != query_record
       end
       user_record.subscriptions = subscriptions
+      # TODO return unwatch result to client
     end
 
     command "feed"
