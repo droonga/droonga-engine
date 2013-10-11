@@ -54,12 +54,13 @@ module Droonga
 
     command "feed"
     def feed(request)
-      values = request["values"]
+      targets = request["targets"]
 
       hits = []
-      values.each do |key, value|
-        scan_body(hits, value)
+      targets.each do |key, target|
+        scan_body(hits, target)
       end
+
       publish(hits, request)
     end
 
