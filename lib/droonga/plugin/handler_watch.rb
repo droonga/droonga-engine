@@ -17,8 +17,6 @@
 
 require "droonga/handler"
 
-# TODO User -> Subscriber
-
 module Droonga
   class WatchHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("watch", self)
@@ -26,24 +24,24 @@ module Droonga
 
     command "watch"
     def watch(request)
-      user, condition, query, route = parse_request(request)
+      subscriber, condition, query, route = parse_request(request)
       query_table = @context["Query"]
       query_record = query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)
         query_record = query_table.add(query, :keywords => keywords)
       end
-      user_table = @context["User"]
-      user_record = user_table[user]
-      if user_record
-        subscriptions = user_record.subscriptions.collect do |query|
+      subscriber_table = @context["Subscriber"]
+      subscriber_record = subscriber_table[subscriber]
+      if subscriber_record
+        subscriptions = subscriber_record.subscriptions.collect do |query|
           return if query == query_record
           query
         end
         subscriptions << query_record
-        user_record.subscriptions = subscriptions
+        subscriber_record.subscriptions = subscriptions
       else
-        user_table.add(user,
+        subscriber_table.add(subscriber,
                        :subscriptions => [query_record],
                        :route => route)
       end
@@ -52,17 +50,17 @@ module Droonga
 
     command "unwatch"
     def unwatch(request)
-      user, condition, query, route = parse_request(request)
+      subscriber, condition, query, route = parse_request(request)
       query_table = @context["Query"]
       query_record = query_table[query]
       return unless query_record
-      user_table = @context["User"]
-      user_record = user_table[user]
-      return unless user_record
-      subscriptions = user_record.subscriptions.select do |query|
+      subscriber_table = @context["Subscriber"]
+      subscriber_record = subscriber_table[subscriber]
+      return unless subscriber_record
+      subscriptions = subscriber_record.subscriptions.select do |query|
         query != query_record
       end
-      user_record.subscriptions = subscriptions
+      subscriber_record.subscriptions = subscriptions
       # TODO return unwatch result to client
     end
 
@@ -80,13 +78,13 @@ module Droonga
 
     private
     def parse_request(request)
-      user = request["user"]
+      subscriber = request["subscriber"]
       condition = request["condition"]
       route = request["route"]
-      raise "invalid request" if user.nil? || user.empty? || condition.nil?
+      raise "invalid request" if subscriber.nil? || subscriber.empty? || condition.nil?
       query = condition.to_json
       raise "too long query" if query.size > 4095
-      [user, condition, query, route]
+      [subscriber, condition, query, route]
     end
 
     def pick_keywords(memo, condition)
@@ -166,16 +164,16 @@ module Droonga
     def publish(hits, request)
       routes = {}
       hits.each do |query|
-        @context["User"].select do |user|
-          user.subscriptions =~ query
-        end.each do |user|
-          routes[user.route.key] ||= []
-          routes[user.route.key] << user.key.key
+        @context["Subscriber"].select do |subscriber|
+          subscriber.subscriptions =~ query
+        end.each do |subscriber|
+          routes[subscriber.route.key] ||= []
+          routes[subscriber.route.key] << subscriber.key.key
         end
       end
-      routes.each do |route, users|
+      routes.each do |route, subscribers|
         message = request # return request itself
-        envelope["to"] = users
+        envelope["to"] = subscribers
         post(message, "to" => route, "type" => "watch.notification")
       end
     end
