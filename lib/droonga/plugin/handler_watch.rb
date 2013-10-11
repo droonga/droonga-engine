@@ -160,7 +160,7 @@ module Droonga
         end
       end
       routes.each do |route, users|
-        message = request
+        message = request # return request itself
         envelope["to"] = users
         post(message, "to" => route, "type" => "watch.notification")
       end
