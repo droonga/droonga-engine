@@ -55,9 +55,7 @@ module Droonga
       values.each do |key, value|
         scan_body(hits, value)
       end
-      #publish(hits, request)
-      p [hits, request]
-      # TODO publish
+      publish(hits, request)
     end
 
     private
@@ -142,6 +140,21 @@ module Droonga
           end
           true
         end
+      end
+    end
+
+    def publish(hits, request)
+      routes = {}
+      hits.each do |query|
+        @context['User'].select do |user|
+          user.subscriptions =~ query
+        end.each do |user|
+          routes[user.route.key] ||= []
+          routes[user.route.key] << user.key.key
+        end
+      end
+      routes.each do |route, users|
+        p [route, users, request] # TODO dispatch to correct destination
       end
     end
   end
