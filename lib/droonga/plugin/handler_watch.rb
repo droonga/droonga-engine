@@ -154,7 +154,9 @@ module Droonga
         end
       end
       routes.each do |route, users|
-        p [route, users, request] # TODO dispatch to correct destination
+        message = request
+        envelope["to"] = users
+        post(message, "to" => route, "type" => "watch.notification")
       end
     end
   end
