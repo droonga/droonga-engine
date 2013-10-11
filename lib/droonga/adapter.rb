@@ -62,7 +62,39 @@ module Droonga
       broadcast_all(request)
     end
 
+    command :feed
+    def subscribe(request)
+      puts "adapter received #{request}"
+      broadcast_all(request)
+    end
+
+    command :watch
+    def watch(request)
+      puts "adapter received #{request}"
+      broadcast_all(request)
+    end
+
+    command :unwatch
+    def watch(request)
+      puts "adapter received #{request}"
+      broadcast_all(request)
+    end
+
     command :add
+    def add(request)
+      # TODO: update events must be serialized in the primary node of replicas.
+      key = request["key"] || rand.to_s
+      scatter_all(request, key)
+    end
+
+    command :update
+    def update(request)
+      # TODO: update events must be serialized in the primary node of replicas.
+      key = request["key"] || rand.to_s
+      scatter_all(request, key)
+    end
+
+    command :reset
     def add(request)
       # TODO: update events must be serialized in the primary node of replicas.
       key = request["key"] || rand.to_s
