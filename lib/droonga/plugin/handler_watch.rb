@@ -27,13 +27,13 @@ module Droonga
     command "watch"
     def watch(request)
       user, condition, query, route = parse_request(request)
-      query_table = @context['Query']
+      query_table = @context["Query"]
       query_record = query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)
         query_record = query_table.add(query, :keywords => keywords)
       end
-      user_table = @context['User']
+      user_table = @context["User"]
       user_record = user_table[user]
       if user_record
         subscriptions = user_record.subscriptions.collect do |query|
@@ -53,10 +53,10 @@ module Droonga
     command "unwatch"
     def unwatch(request)
       user, condition, query, route = parse_request(request)
-      query_table = @context['Query']
+      query_table = @context["Query"]
       query_record = query_table[query]
       return unless query_record
-      user_table = @context['User']
+      user_table = @context["User"]
       user_record = user_table[user]
       return unless user_record
       subscriptions = user_record.subscriptions.select do |query|
@@ -105,8 +105,8 @@ module Droonga
     def scan_body(hits, body)
       trimmed = body.strip
       candidates = {}
-      @context['Keyword'].scan(trimmed).each do |keyword, word, start, length|
-        @context['Query'].select do |query|
+      @context["Keyword"].scan(trimmed).each do |keyword, word, start, length|
+        @context["Query"].select do |query|
           query.keywords =~ keyword
         end.each do |record|
           candidates[record.key] ||= []
@@ -165,7 +165,7 @@ module Droonga
     def publish(hits, request)
       routes = {}
       hits.each do |query|
-        @context['User'].select do |user|
+        @context["User"].select do |user|
           user.subscriptions =~ query
         end.each do |user|
           routes[user.route.key] ||= []
