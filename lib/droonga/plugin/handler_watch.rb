@@ -50,7 +50,20 @@ module Droonga
       # TODO return watch result to client
     end
 
-    # TODO unwatch
+    command "unwatch"
+    def unwatch(request)
+      user, condition, query, route = parse_request(request)
+      query_table = @context['Query']
+      query_record = query_table[query]
+      return unless query_record
+      user_table = @context['User']
+      user_record = user_table[user]
+      return unless user_record
+      subscriptions = user_record.subscriptions.select do |query|
+        query != query_record
+      end
+      user_record.subscriptions = subscriptions
+    end
 
     command "feed"
     def feed(request)
