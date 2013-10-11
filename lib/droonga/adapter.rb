@@ -63,7 +63,7 @@ module Droonga
     end
 
     command :feed
-    def subscribe(request)
+    def feed(request)
       puts "adapter received #{request}"
       broadcast_all(request)
     end
@@ -75,7 +75,7 @@ module Droonga
     end
 
     command :unwatch
-    def watch(request)
+    def unwatch(request)
       puts "adapter received #{request}"
       broadcast_all(request)
     end
