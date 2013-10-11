@@ -50,7 +50,7 @@ module Droonga
       # TODO return watch result to client
     end
 
-    # TODO unsubscribe
+    # TODO unwatch
 
     command "feed"
     def feed(request)
