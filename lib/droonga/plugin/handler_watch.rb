@@ -22,8 +22,8 @@ module Droonga
     Droonga::HandlerPlugin.register("watch", self)
     EXACT_MATCH = false
 
-    command "watch"
-    def watch(request)
+    command "watch.subscribe" => :subscribe
+    def subscribe(request)
       subscriber, condition, query, route = parse_request(request)
       query_table = @context["Query"]
       query_record = query_table[query]
@@ -48,8 +48,8 @@ module Droonga
       # TODO return watch result to client
     end
 
-    command "unwatch"
-    def unwatch(request)
+    command "watch.unsubscribe" => :unsubscribe
+    def unsubscribe(request)
       subscriber, condition, query, route = parse_request(request)
       query_table = @context["Query"]
       query_record = query_table[query]
@@ -64,7 +64,7 @@ module Droonga
       # TODO return unwatch result to client
     end
 
-    command "feed"
+    command "watch.feed" => :feed
     def feed(request)
       targets = request["targets"]
 
