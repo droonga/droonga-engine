@@ -17,6 +17,8 @@
 
 require "droonga/handler"
 
+# TODO User -> Subscriber
+
 module Droonga
   class WatchHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("watch", self)
@@ -45,7 +47,10 @@ module Droonga
                        :subscriptions => [query_record],
                        :route => route)
       end
+      # TODO return watch result to client
     end
+
+    # TODO unsubscribe
 
     command "feed"
     def feed(request)
