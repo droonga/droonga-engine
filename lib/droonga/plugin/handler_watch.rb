@@ -20,6 +20,7 @@ require "droonga/handler"
 module Droonga
   class WatchHandler < Droonga::Handler
     Droonga::HandlerPlugin.register("watch", self)
+    EXACT_MATCH = false
 
     command "watch"
     def watch(request)
@@ -46,6 +47,19 @@ module Droonga
       end
     end
 
+    command "feed"
+    def feed(request)
+      values = request["values"]
+
+      hits = []
+      values.each do |key, value|
+        scan_body(hits, value)
+      end
+      #publish(hits, request)
+      p [hits, request]
+      # TODO publish
+    end
+
     private
     def parse_request(request)
       user = request["user"]
@@ -69,6 +83,66 @@ module Droonga
         end
       end
       memo
+    end
+
+    def scan_body(hits, body)
+      trimmed = body.strip
+      candidates = {}
+      @context['Keyword'].scan(trimmed).each do |keyword, word, start, length|
+        @context['Query'].select do |query|
+          query.keywords =~ keyword
+        end.each do |record|
+          candidates[record.key] ||= []
+          candidates[record.key] << keyword
+        end
+      end
+      candidates.each do |query, keywords|
+        hits << query if query_match(query, keywords)
+      end
+    end
+
+    def query_match(query, keywords)
+      return true unless EXACT_MATCH
+      @conditions = {} unless @conditions
+      condition = @conditions[query.id]
+      unless condition
+        condition = JSON.parse(query.key)
+        @conditions[query.id] = condition
+        # CAUTION: @conditions can be huge.
+      end
+      words = {}
+      keywords.each do |keyword|
+        words[keyword.key] = true
+      end
+      eval_condition(condition, words)
+    end
+
+    def eval_condition(condition, words)
+      case condition
+      when Hash
+        # todo
+      when String
+        words[condition]
+      when Array
+        case condition.first
+        when "||"
+          condition[1..-1].each do |element|
+            return true if eval_condition(element, words)
+          end
+          false
+        when "&&"
+          condition[1..-1].each do |element|
+            return false unless eval_condition(element, words)
+          end
+          true
+        when "-"
+          return false unless eval_condition(condition[1], words)
+          condition[2..-1].each do |element|
+            return false if eval_condition(element, words)
+          end
+          true
+        end
+      end
     end
   end
 end
