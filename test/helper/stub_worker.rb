@@ -14,10 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class StubWorker
-  attr_reader :context, :body
+  attr_reader :context, :body, :envelope
 
   def initialize()
     @context = Groonga::Context.default
+    @envelope = {}
   end
 
   def post(body, destination=nil)

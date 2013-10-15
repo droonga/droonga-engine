@@ -121,4 +121,43 @@ class WatchHandlerTest < Test::Unit::TestCase
       @handler.subscribe(request)
     end
   end
+
+  class TestFeed < self
+    def setup
+      super
+      setup_subscription
+    end
+
+    def test_feed_match
+      request = {
+        "targets" => {
+          "text" => "たいやきおいしいです"
+        }
+      }
+      @handler.feed(request)
+      assert_equal(request, @worker.body)
+      assert_equal({"to" => ["localhost"]}, @worker.envelope)
+    end
+
+    def test_feed_not_match
+      request = {
+        "targets" => {
+          "text" => "たこやきおいしいです"
+        }
+      }
+      @handler.feed(request)
+      assert_nil(@worker.body)
+    end
+
+    private
+    def setup_subscription
+      request = {
+        "route" => "localhost:23003/output",
+        "condition" => "たいやき",
+        "subscriber" => "localhost"
+      }
+      stub(@handler).emit([true])
+      @handler.subscribe(request)
+    end
+  end
 end
