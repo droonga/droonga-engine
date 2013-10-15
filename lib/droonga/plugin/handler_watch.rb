@@ -45,7 +45,7 @@ module Droonga
                        :subscriptions => [query_record],
                        :route => route)
       end
-      # TODO return watch result to client
+      emit([true])
     end
 
     command "watch.unsubscribe" => :unsubscribe
@@ -61,7 +61,7 @@ module Droonga
         query != query_record
       end
       subscriber_record.subscriptions = subscriptions
-      # TODO return unwatch result to client
+      emit([true])
     end
 
     command "watch.feed" => :feed
