@@ -93,4 +93,32 @@ class WatchHandlerTest < Test::Unit::TestCase
       @handler.subscribe(request)
     end
   end
+
+  class TestUnsubscribe < self
+    def setup
+      super
+      setup_subscription
+    end
+
+    def test_unsubscribe
+      request = {
+        "route" => "localhost:23003/output",
+        "condition" => "たいやき",
+        "subscriber" => "localhost"
+      }
+      mock(@handler).emit([true])
+      @handler.unsubscribe(request)
+    end
+
+    private
+    def setup_subscription
+      request = {
+        "route" => "localhost:23003/output",
+        "condition" => "たいやき",
+        "subscriber" => "localhost"
+      }
+      stub(@handler).emit([true])
+      @handler.subscribe(request)
+    end
+  end
 end
