@@ -103,7 +103,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      @worker.envelope["From"] = "localhost:23004/output"
+      @worker.envelope["from"] = "localhost:23004/output"
       mock(@handler).emit([true])
       @handler.subscribe(request)
 
@@ -119,7 +119,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost",
         "route" => "localhost:23003/output"
       }
-      @worker.envelope["From"] = "localhost:23004/output"
+      @worker.envelope["from"] = "localhost:23004/output"
       mock(@handler).emit([true])
       @handler.subscribe(request)
 
