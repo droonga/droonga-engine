@@ -38,23 +38,55 @@ module Droonga
 
     def stop(stop_graceful)
       $log.trace("#{log_tag}: stop: start")
-
-      $log.trace("#{log_tag}: stop: queue: unblock: start")
-      3.times do |i|
-        $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
-        super(stop_graceful)
-        @queue.unblock
-        sleep(i ** 2 * 0.1)
-        $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done")
-      end
-      $log.trace("#{log_tag}: stop: queue: unblock: done")
-
+      super(stop_graceful)
       $log.trace("#{log_tag}: stop: done")
     end
 
     private
     def log_tag
       "[#{Process.ppid}][#{Process.pid}] server"
+    end
+
+    def start_worker(wid)
+      worker = super(wid)
+      worker.extend(WorkerStopper)
+      worker.queue = @queue
+      worker
+    end
+
+    module WorkerStopper
+      attr_writer :queue
+
+      def send_stop(stop_graceful)
+        $log.trace("#{log_tag}: stop: start")
+
+        $log.trace("#{log_tag}: stop: queue: unblock: start")
+        max_n_retries = 10
+        max_n_retries.times do |i|
+          $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
+          super(stop_graceful)
+          @queue.unblock
+          alive_p = alive?
+          $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done: #{alive_p}")
+          break unless alive_p
+          sleep(i * 0.1)
+        end
+        $log.trace("#{log_tag}: stop: queue: unblock: done")
+
+        $log.trace("#{log_tag}: stop: done")
+      end
+
+      def send_reload
+        $log.trace("#{log_tag}: reload: start")
+        super
+        @queue.unblock
+        $log.trace("#{log_tag}: reload: done")
+      end
+
+      private
+      def log_tag
+        "[#{Process.ppid}][#{Process.pid}][#{@wid}] server: worker-stopper"
+      end
     end
   end
 end
