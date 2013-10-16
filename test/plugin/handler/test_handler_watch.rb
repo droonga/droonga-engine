@@ -91,6 +91,51 @@ class WatchHandlerTest < Test::Unit::TestCase
       }
       mock(@handler).emit([true])
       @handler.subscribe(request)
+
+      assert_equal(
+        ["localhost:23003/output"],
+        actual_routes_for_query("たいやき")
+      )
+    end
+
+    def test_subscribe_route_omitted_from_specified
+      request = {
+        "condition" => "たいやき",
+        "subscriber" => "localhost"
+      }
+      @worker.envelope["From"] = "localhost:23004/output"
+      mock(@handler).emit([true])
+      @handler.subscribe(request)
+
+      assert_equal(
+        ["localhost:23004/output"],
+        actual_routes_for_query("たいやき")
+      )
+    end
+
+    def test_subscribe_both_route_and_from_specified
+      request = {
+        "condition" => "たいやき",
+        "subscriber" => "localhost",
+        "route" => "localhost:23003/output"
+      }
+      @worker.envelope["From"] = "localhost:23004/output"
+      mock(@handler).emit([true])
+      @handler.subscribe(request)
+
+      assert_equal(
+        ["localhost:23003/output"],
+        actual_routes_for_query("たいやき")
+      )
+    end
+
+    private
+    def actual_routes_for_query(query)
+      @worker.context["Subscriber"].select {|record|
+        record[:subscriptions] =~ query.to_json
+      }.map {|subscriber|
+        subscriber.route.key
+      }
     end
   end
 

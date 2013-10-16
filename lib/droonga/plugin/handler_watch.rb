@@ -80,7 +80,7 @@ module Droonga
     def parse_request(request)
       subscriber = request["subscriber"]
       condition = request["condition"]
-      route = request["route"]
+      route = request["route"] || envelope["From"]
       raise "invalid request" if subscriber.nil? || subscriber.empty? || condition.nil?
       query = condition.to_json
       raise "too long query" if query.size > 4095
