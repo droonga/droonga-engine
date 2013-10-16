@@ -64,19 +64,16 @@ module Droonga
 
     command "watch.feed" => :feed
     def feed(request)
-      puts "adapter received #{request}"
       broadcast_all(request)
     end
 
     command "watch.subscribe" => :subscribe
     def subscribe(request)
-      puts "adapter received #{request}"
       broadcast_all(request)
     end
 
     command "watch.unsubscribe" => :unsubscribe
     def unsubscribe(request)
-      puts "adapter received #{request}"
       broadcast_all(request)
     end
 
