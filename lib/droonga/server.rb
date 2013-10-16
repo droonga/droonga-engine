@@ -20,36 +20,41 @@ require "groonga"
 module Droonga
   module Server
     def before_run
-      $log.trace("server: before_run: start")
+      $log.trace("#{log_tag}: before_run: start")
       # TODO: Use JobQueue object
       @context = Groonga::Context.new
       @database = @context.open_database(config[:database])
       @queue = @context[config[:queue_name]]
-      $log.trace("server: before_run: done")
+      $log.trace("#{log_tag}: before_run: done")
     end
 
     def after_run
-      $log.trace("server: after_run: start")
+      $log.trace("#{log_tag}: after_run: start")
       @queue.close
       @database.close
       @context.close
-      $log.trace("server: after_run: done")
+      $log.trace("#{log_tag}: after_run: done")
     end
 
     def stop(stop_graceful)
-      $log.trace("server: stop: start")
+      $log.trace("#{log_tag}: stop: start")
 
-      $log.trace("server: stop: queue: unblock: start")
+      $log.trace("#{log_tag}: stop: queue: unblock: start")
       3.times do |i|
-        $log.trace("server: stop: queue: unblock: #{i}: start")
+        $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
         super(stop_graceful)
         @queue.unblock
         sleep(i ** 2 * 0.1)
-        $log.trace("server: stop: queue: unblock: #{i}: done")
+        $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done")
       end
-      $log.trace("server: stop: queue: unblock: done")
+      $log.trace("#{log_tag}: stop: queue: unblock: done")
 
-      $log.trace("server: stop: done")
+      $log.trace("#{log_tag}: stop: done")
+    end
+
+    private
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] server:"
     end
   end
 end

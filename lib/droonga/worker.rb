@@ -26,21 +26,26 @@ module Droonga
     end
 
     def run
-      $log.trace("worker: run: start")
+      $log.trace("#{log_tag}: run: start")
       @running = true
       while @running
-        $log.trace("worker: run: pull_message: start")
+        $log.trace("#{log_tag}: run: pull_message: start")
         @executor.execute_one
-        $log.trace("worker: run: pull_message: done")
+        $log.trace("#{log_tag}: run: pull_message: done")
       end
       @executor.shutdown
-      $log.trace("worker: run: done")
+      $log.trace("#{log_tag}: run: done")
     end
 
     def stop
-      $log.trace("worker: stop: start")
+      $log.trace("#{log_tag}: stop: start")
       @running = false
-      $log.trace("worker: stop: done")
+      $log.trace("#{log_tag}: stop: done")
+    end
+
+    private
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] worker"
     end
   end
 end
