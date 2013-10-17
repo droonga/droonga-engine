@@ -48,6 +48,7 @@ module Droonga
 
     module WorkerStopper
       def send_stop(stop_graceful)
+        in_signal_sending do
         open_queue do |queue|
           $log.trace("#{log_tag}: stop: start")
 
@@ -67,20 +68,29 @@ module Droonga
 
           $log.trace("#{log_tag}: stop: done")
         end
+        end
       end
 
       def send_reload
+        in_signal_sending do
         open_queue do |queue|
           $log.trace("#{log_tag}: reload: start")
           super
           queue.unblock
           $log.trace("#{log_tag}: reload: done")
         end
+        end
       end
 
       private
       def log_tag
         "[#{Process.ppid}][#{Process.pid}][#{@wid}] server: worker-stopper"
+      end
+
+      def in_signal_sending
+        Thread.new do
+          yield
+        end
       end
 
       def open_queue
