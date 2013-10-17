@@ -58,7 +58,8 @@ module Droonga
             super(stop_graceful)
             queue.unblock
             alive_p = alive?
-            $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done: #{alive_p}")
+            $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done: " +
+                       "#{alive_p}")
             break unless alive_p
             sleep(i * 0.1)
           end
