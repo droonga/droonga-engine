@@ -49,36 +49,36 @@ module Droonga
     module WorkerStopper
       def send_stop(stop_graceful)
         in_signal_sending do
-        open_queue do |queue|
-          $log.trace("#{log_tag}: stop: start")
+          open_queue do |queue|
+            $log.trace("#{log_tag}: stop: start")
 
-          $log.trace("#{log_tag}: stop: queue: unblock: start")
-          max_n_retries = 10
-          max_n_retries.times do |i|
-            $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
-            super(stop_graceful)
-            queue.unblock
-            alive_p = alive?
-            $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done: " +
-                       "#{alive_p}")
-            break unless alive_p
-            sleep(i * 0.1)
+            $log.trace("#{log_tag}: stop: queue: unblock: start")
+            max_n_retries = 10
+            max_n_retries.times do |i|
+              $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
+              super(stop_graceful)
+              queue.unblock
+              alive_p = alive?
+              $log.trace("#{log_tag}: stop: queue: unblock: #{i}: done: " +
+                         "#{alive_p}")
+              break unless alive_p
+              sleep(i * 0.1)
+            end
+            $log.trace("#{log_tag}: stop: queue: unblock: done")
+
+            $log.trace("#{log_tag}: stop: done")
           end
-          $log.trace("#{log_tag}: stop: queue: unblock: done")
-
-          $log.trace("#{log_tag}: stop: done")
-        end
         end
       end
 
       def send_reload
         in_signal_sending do
-        open_queue do |queue|
-          $log.trace("#{log_tag}: reload: start")
-          super
-          queue.unblock
-          $log.trace("#{log_tag}: reload: done")
-        end
+          open_queue do |queue|
+            $log.trace("#{log_tag}: reload: start")
+            super
+            queue.unblock
+            $log.trace("#{log_tag}: reload: done")
+          end
         end
       end
 
