@@ -104,6 +104,7 @@ module Droonga
     def scan_body(hits, body)
       trimmed = body.strip
       candidates = {}
+      # FIXME scan reports the longest keyword matched only
       @context["Keyword"].scan(trimmed).each do |keyword, word, start, length|
         @context["Query"].select do |query|
           query.keywords =~ keyword
