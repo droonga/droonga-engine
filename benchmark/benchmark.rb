@@ -21,12 +21,12 @@ class Benchmark
   class Terms
     class << self
       def generate
-        new.to_enum(:terms)
+        new.to_enum(:each)
       end
     end
 
     FIRST_INITIAL_LETTER = "㐀"
-    def terms
+    def each
       initial_letter = FIRST_INITIAL_LETTER
       while true do
         yield "#{initial_letter}#{random_term}"
