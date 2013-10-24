@@ -1,0 +1,11 @@
+table_create Keyword TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
+
+table_create Query TABLE_PAT_KEY ShortText
+column_create Query keywords COLUMN_VECTOR Keyword
+
+column_create Keyword queries COLUMN_INDEX Query keywords
+
+load --table Query
+[
+{"_key": "This comment", "keywords": ["This", "comment"]}
+]
