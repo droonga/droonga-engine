@@ -35,7 +35,7 @@ watch = Droonga::WatchHandler.new(worker)
 
 n = 100
 Benchmark.bmbm do |benchmark|
-  benchmark.report("") do
+  benchmark.report("TODO: LABEL") do
     hits = []
     n.times do
       watch.send(:scan_body, hits, "This is a comment.")
