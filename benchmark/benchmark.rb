@@ -16,9 +16,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class Benchmark
-  class TermsList
+  class Terms
     class << self
-      def terms
+      def generate
         new.to_enum(:terms)
       end
     end
