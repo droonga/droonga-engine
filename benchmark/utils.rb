@@ -31,7 +31,7 @@ module DroongaBenchmark
       @context = Groonga::Context.new
       @context.open_database(@database_path)
       File.open(@ddl_path) do |ddl|
-       @context.restore(ddl)
+        @context.restore(ddl)
       end
     end
 
