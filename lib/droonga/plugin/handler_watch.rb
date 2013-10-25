@@ -42,8 +42,8 @@ module Droonga
         subscriber_record.subscriptions = subscriptions
       else
         subscriber_table.add(subscriber,
-                       :subscriptions => [query_record],
-                       :route => route)
+                             :subscriptions => [query_record],
+                             :route => route)
       end
       emit([true])
     end
