@@ -105,7 +105,7 @@ module DroongaBenchmark
       n_unmatched_targets = (n_targets - n_matched_targets)
 
       n_matched_targets.times do
-        targets << generate_target(@terms.sample(1))
+        targets << generate_target(@terms.sample(1).first)
       end
 
       n_unmatched_targets.times do
