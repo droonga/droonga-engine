@@ -27,7 +27,7 @@ class ScanBenchmark
   def initialize(n_times)
     @n_times = n_times
 
-    @database = WatchDatabase.new
+    @database = DroongaBenchmark::WatchDatabase.new
 
     @worker = DroongaBenchmark::StubWorker.new(@database.context)
     @watch_handler = Droonga::WatchHandler.new(@worker)
