@@ -17,6 +17,7 @@
 
 require "droonga/client"
 
+module Droonga
 class Benchmark
   class Terms
     class << self
@@ -114,4 +115,5 @@ class Benchmark
       },
     }
   end
+end
 end
