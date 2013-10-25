@@ -20,7 +20,7 @@ require "fileutils"
 
 require "groonga"
 
-require "droonga/plugin/handler_watch"
+require "droonga/watcher"
 require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 
 class ScanBenchmark
@@ -29,8 +29,7 @@ class ScanBenchmark
 
     @database = DroongaBenchmark::WatchDatabase.new
 
-    @worker = DroongaBenchmark::StubWorker.new(@database.context)
-    @watch_handler = Droonga::WatchHandler.new(@worker)
+    @watcher = Droonga::Watcher.new(@database.context)
 
     @terms = DroongaBenchmark::TermsGenerator.generate(@n_times)
     @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
@@ -51,7 +50,7 @@ class ScanBenchmark
   end
 
   def scan(target)
-    @watch_handler.send(:scan_body, @hits, target)
+    @watcher.scan_body(@hits, target)
     @hits.clear
   end
 end
