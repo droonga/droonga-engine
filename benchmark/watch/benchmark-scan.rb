@@ -34,11 +34,14 @@ database_path = "/tmp/watch-benchmark"
 ddl_path = File.expand_path(File.join(__FILE__, "..", "benchmark-watch-ddl.grn"))
 FileUtils.rm_rf(database_path)
 FileUtils.mkdir_p(database_path)
-`cat #{ddl_path} | groonga -n #{database_path}/db`
 
-Groonga::Database.open("#{database_path}/db")
+Groonga::Database.create(:path => "#{database_path}/db")
+context = Groonga::Context.default
+File.open(ddl_path) do |ddl|
+  context.restore(ddl)
+end
 
-worker = StubWorker.new(Groonga::Context.default)
+worker = StubWorker.new(context)
 watch = Droonga::WatchHandler.new(worker)
 
 n = 100
