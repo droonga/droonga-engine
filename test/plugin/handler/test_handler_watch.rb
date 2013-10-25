@@ -59,7 +59,7 @@ class WatchHandlerTest < Test::Unit::TestCase
   end
 
   public
-  class TestSubscribe < self
+  class SubscribeTest < self
     def test_subscribe
       request = {
         "route" => "localhost:23003/output",
@@ -116,7 +116,7 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestUnsubscribe < self
+  class UnsubscribeTest < self
     def setup
       super
       setup_subscription
@@ -144,7 +144,7 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestFeed < self
+  class FeedTest < self
     def setup
       super
       setup_subscription
