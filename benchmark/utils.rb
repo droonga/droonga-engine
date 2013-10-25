@@ -16,13 +16,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module DroongaBenchmark
-  class StubWorker
-    attr_reader :context
-    def initialize(context)
-      @context = context
-    end
-  end
-
   class WatchDatabase
     attr_reader :context
 
