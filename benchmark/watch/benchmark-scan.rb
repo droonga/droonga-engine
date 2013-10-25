@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "benchmark"
+require "fileutils"
 
 require "groonga"
 
@@ -28,7 +29,14 @@ class StubWorker
   end
 end
 
-Groonga::Database.open("/tmp/watch/db")
+
+database_path = "/tmp/watch-benchmark"
+ddl_path = File.expand_path(File.join(__FILE__, "..", "benchmark-watch-ddl.grn"))
+FileUtils.rm_rf(database_path)
+FileUtils.mkdir_p(database_path)
+`cat #{ddl_path} | groonga -n #{database_path}/db`
+
+Groonga::Database.open("#{database_path}/db")
 
 worker = StubWorker.new(Groonga::Context.default)
 watch = Droonga::WatchHandler.new(worker)
