@@ -29,25 +29,44 @@ class StubWorker
   end
 end
 
+class ScanBenchmark
+  def initialize(n_times)
+    @n_times = n_times
+    setup
+  end
 
-database_path = "/tmp/watch-benchmark"
-ddl_path = File.expand_path(File.join(__FILE__, "..", "benchmark-watch-ddl.grn"))
-FileUtils.rm_rf(database_path)
-FileUtils.mkdir_p(database_path)
-`cat #{ddl_path} | groonga -n #{database_path}/db`
+  def setup
+    setup_database
+    @context = Groonga::Context.new
+    @context.open_database("#{@database_path}/db")
+    @worker = StubWorker.new(@context)
+    @watch = Droonga::WatchHandler.new(@worker)
+    @hits = []
+  end
 
-Groonga::Database.open("#{database_path}/db")
+  def setup_database
+    @database_path = "/tmp/watch-benchmark"
+    @ddl_path = File.expand_path(File.join(__FILE__, "..", "benchmark-watch-ddl.grn"))
+    FileUtils.rm_rf(@database_path)
+    FileUtils.mkdir_p(@database_path)
+    `cat #{@ddl_path} | groonga -n #{@database_path}/db`
+  end
 
-worker = StubWorker.new(Groonga::Context.default)
-watch = Droonga::WatchHandler.new(worker)
-
-n = 100
-Benchmark.bmbm do |benchmark|
-  benchmark.report("TODO: LABEL") do
-    hits = []
-    n.times do
-      watch.send(:scan_body, hits, "This is a comment.")
-      hits.clear
+  def run
+    @n_times.times do
+      scan("This is a comment.")
     end
+  end
+
+  def scan(target)
+    @watch.send(:scan_body, @hits, target)
+    @hits.clear
+  end
+end
+
+Benchmark.bmbm do |benchmark|
+  scan_benchmark = ScanBenchmark.new(100)
+  benchmark.report("TODO: LABEL") do
+    scan_benchmark.run
   end
 end
