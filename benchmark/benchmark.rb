@@ -26,39 +26,50 @@ class Benchmark
     end
 
     FIRST_INITIAL_LETTER = "㐀"
+    SUFFIX = "あいうえおかきくけこ"
     def each
       initial_letter = FIRST_INITIAL_LETTER
       while true do
-        yield "#{initial_letter}#{random_term}"
+        yield "#{initial_letter}#{SUFFIX}"
         initial_letter.succ!
       end
-    end
-
-    def random_term
-      (("a".."z").to_a + ("A".."Z").to_a + (0..9).to_a).shuffle[0..7].join
     end
   end
 
   TERMS_STEP = 1000
 
+  N_TARGETS         = 1000
+  TARGET_PADDING    = "パディング"
+  TARGET_TITLE_SIZE = 100
+  TARGET_BODY_SIZE  = 1000
+
   def initialize(params)
     @params = params
     @terms = Terms.generate
     @client = Droonga::Client.new(tag: @params[:tag], port: @params[:port])
-    @watching_terms = []
   end
 
   def run
-    TERMS_STEP.times do
-      add_subscriber
+    prepare_watching_subscribers(TERMS_STEP)
+    populate_feeds(0.1)
+    start_at = Time.now
+    @feeds.each do |feed|
+      @client.send(feed)
+    end
+    end_at = Time.now
+  end
+
+  def prepare_watching_subscribers(step)
+    step.times do
+      term = @terms.next
+      add_subscriber(term)
+      @watching_terms << term
     end
   end
 
-  def add_subscriber
-    term = @terms.next
+  def add_subscriber(term)
     subscribe_envelope = envelope_to_subscribe(term)
     @client.connection.send_receive(subscribe_envelope)
-    @watching_terms << term
   end
 
   def envelope_to_subscribe(term)
@@ -70,6 +81,36 @@ class Benchmark
       "body" => {
         "condition" => term,
         "subscriber" => term,
+      },
+    }
+  end
+
+  def populate_feeds(incidence)
+    @feeds = []
+
+    n_matched_targets = (N_TARGETS.to_f * incidence).to_i
+    n_unmatched_targets = (N_TARGETS - n_matched_targets)
+
+    n_matched_targets.times do
+      @feeds << envelope_to_feed(@watching_terms.sample(1))
+    end
+
+    n_unmatched_targets.times do
+      @feeds << envelope_to_feed(@terms.next)
+    end
+  end
+
+  def envelope_to_feed(term)
+    {
+      "id" => Time.now.to_f.to_s,
+      "date" => Time.now,
+      "statusCode" => 200,
+      "type" => "watch.feed",
+      "body" => {
+        "targets" => {
+          "title" => TARGET_PADDING * (TARGET_TITLE_SIZE / TARGET_PADDING.size),
+          "body"  => term + (TARGET_PADDING * (TARGET_BODY_SIZE / TARGET_PADDING.size)),
+        },
       },
     }
   end
