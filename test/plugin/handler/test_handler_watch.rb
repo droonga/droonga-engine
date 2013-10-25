@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2013 droonga project
 #
 # This library is free software; you can redistribute it and/or
@@ -35,34 +37,10 @@ class WatchHandlerTest < Test::Unit::TestCase
   end
 
   def setup_schema
-    Groonga::Schema.define do |schema|
-      schema.create_table("Route",
-                          :type => :hash) do |table|
-      end
-
-      schema.create_table("Keyword",
-                          :type => :patricia_trie,
-                          :normalizer => "NormalizerAuto") do |table|
-      end
-
-      schema.create_table("Query",
-                          :type => :hash) do |table|
-        table.column("keywords", "Keyword", :type => :vector)
-      end
-
-      schema.create_table("Subscriber",
-                          :type => :hash) do |table|
-        table.column("subscriptions", "Query", :type => :vector)
-        table.column("route", "Route")
-      end
-
-      schema.change_table("Query") do |table|
-        table.index("Subscriber.subscriptions", :name => "subscribers")
-      end
-
-      schema.change_table("Keyword") do |table|
-        table.index("Query.keywords", :name => "queries")
-      end
+    top_directory_path = File.join(File.dirname(__FILE__), "..", "..", "..")
+    ddl_path = File.join(top_directory_path, "ddl", "watchdb.grn")
+    File.open(ddl_path) do |ddl|
+      Groonga::Context.default.restore(ddl)
     end
   end
 
@@ -82,7 +60,7 @@ class WatchHandlerTest < Test::Unit::TestCase
   end
 
   public
-  class TestSubscribe < self
+  class SubscribeTest < self
     def test_subscribe
       request = {
         "route" => "localhost:23003/output",
@@ -139,7 +117,7 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestUnsubscribe < self
+  class UnsubscribeTest < self
     def setup
       super
       setup_subscription
@@ -167,7 +145,7 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestFeed < self
+  class FeedTest < self
     def setup
       super
       setup_subscription

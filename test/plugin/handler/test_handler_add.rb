@@ -53,7 +53,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   public
-  class TestHasKey < self
+  class HasKeyTest < self
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Users",
@@ -89,7 +89,7 @@ class AddHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestNoKey < self
+  class NoKeyTest < self
     def setup_schema
       Groonga::Schema.define do |schema|
         schema.create_table("Books",
@@ -122,7 +122,7 @@ class AddHandlerTest < Test::Unit::TestCase
     end
   end
 
-  class TestFailure < self
+  class FailureTest < self
     def test_nonexistent_table
       request = {
         "table"  => "Nonexistent",
