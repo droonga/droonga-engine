@@ -28,7 +28,7 @@ module DroongaBenchmark
 
     def initialize
       @database_dir = "/tmp/watch-benchmark"
-      @database_path = "#{database_dir}/db"
+      @database_path = "#{@database_dir}/db"
       @ddl_path = File.expand_path(File.join(__FILE__, "..", "..", "ddl", "watchdb.grn"))
       FileUtils.rm_rf(@database_dir)
       FileUtils.mkdir_p(@database_dir)
