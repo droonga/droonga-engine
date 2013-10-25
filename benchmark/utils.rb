@@ -26,18 +26,20 @@ module DroongaBenchmark
   class WatchDatabase
     attr_reader :context
 
-    def initialize(n_times)
-      setup_database
-      @context = Groonga::Context.new
-      @context.open_database("#{@database_path}/db")
-    end
-
-    def setup_database
-      @database_path = "/tmp/watch-benchmark"
+    def initialize
+      @database_dir = "/tmp/watch-benchmark"
+      @database_path = "#{database_dir}/db"
       @ddl_path = File.expand_path(File.join(__FILE__, "..", "..", "ddl", "watchdb.grn"))
-      FileUtils.rm_rf(@database_path)
-      FileUtils.mkdir_p(@database_path)
-      `cat #{@ddl_path} | groonga -n #{@database_path}/db`
+      FileUtils.rm_rf(@database_dir)
+      FileUtils.mkdir_p(@database_dir)
+
+      Groonga::Database.create(:path => @database_path)
+
+      @context = Groonga::Context.new
+      @context.open_database(@database_path)
+      File.open(@ddl_path) do |ddl|
+       @context.restore(ddl)
+      end
     end
 
     def subscribe(term)
