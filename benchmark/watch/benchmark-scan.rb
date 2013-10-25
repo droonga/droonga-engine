@@ -21,45 +21,37 @@ require "fileutils"
 require "groonga"
 
 require "droonga/plugin/handler_watch"
-
-class StubWorker
-  attr_reader :context
-  def initialize(context)
-    @context = context
-  end
-end
+require File.join(__FILE__, "..", "..", "utils.rb")
 
 class ScanBenchmark
   def initialize(n_times)
     @n_times = n_times
-    setup
-  end
 
-  def setup
-    setup_database
-    @context = Groonga::Context.new
-    @context.open_database("#{@database_path}/db")
-    @worker = StubWorker.new(@context)
-    @watch = Droonga::WatchHandler.new(@worker)
+    @database = WatchDatabase.new
+
+    @worker = DroongaBenchmark::StubWorker.new(@database.context)
+    @watch_handler = Droonga::WatchHandler.new(@worker)
+
+    @terms = DroongaBenchmark::TermsGenerator.generate(@n_times)
+    @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
+                                                           :terms => @terms,
+                                                           :incidence => 0.1)
+
+    @terms.each do |term|
+      @database.subscribe(term)
+    end
+
     @hits = []
   end
 
-  def setup_database
-    @database_path = "/tmp/watch-benchmark"
-    @ddl_path = File.expand_path(File.join(__FILE__, "..", "benchmark-watch-ddl.grn"))
-    FileUtils.rm_rf(@database_path)
-    FileUtils.mkdir_p(@database_path)
-    `cat #{@ddl_path} | groonga -n #{@database_path}/db`
-  end
-
   def run
-    @n_times.times do
-      scan("This is a comment.")
+    @targets.each do |target|
+      scan(target)
     end
   end
 
   def scan(target)
-    @watch.send(:scan_body, @hits, target)
+    @watch_handler.send(:scan_body, @hits, target)
     @hits.clear
   end
 end
