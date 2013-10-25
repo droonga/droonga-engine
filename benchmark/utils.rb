@@ -65,6 +65,10 @@ module DroongaBenchmark
       terms
     end
 
+    def next
+      @generator.next
+    end
+
     FIRST_INITIAL_LETTER = "㐀"
     SUFFIX = "あいうえおかきくけこ"
     def each

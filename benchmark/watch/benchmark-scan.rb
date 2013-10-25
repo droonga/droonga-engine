@@ -24,21 +24,26 @@ require "droonga/watcher"
 require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 
 class ScanBenchmark
-  def initialize(n_times)
+  attr_reader :n_terms
+
+  def initialize(n_times, incidence)
     @n_times = n_times
+    @incidence = incidence
 
     @database = DroongaBenchmark::WatchDatabase.new
 
     @watcher = Droonga::Watcher.new(@database.context)
 
-    @terms = DroongaBenchmark::TermsGenerator.generate(@n_times)
+    @terms_generator = DroongaBenchmark::TermsGenerator.new
+    @terms = @terms_generator.generate(@n_times)
     @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
                                                            :terms => @terms,
-                                                           :incidence => 0.1)
+                                                           :incidence => @incidence)
 
     @terms.each do |term|
       @database.subscribe(term)
     end
+    @n_terms = @terms.size
 
     @hits = []
   end
@@ -49,15 +54,32 @@ class ScanBenchmark
     end
   end
 
+  def add_terms(n_terms)
+    n_terms.times do
+      @database.subscribe(@terms_generator.next)
+    end
+    @n_terms += n_terms
+  end
+
+  private
   def scan(target)
     @watcher.scan_body(@hits, target)
     @hits.clear
   end
 end
 
+n_watching_terms = 1000
+step             = 1000
+n_tests          = 20
+incidences       = [0.1, 0.5, 0.9]
 Benchmark.bmbm do |benchmark|
-  scan_benchmark = ScanBenchmark.new(100)
-  benchmark.report("TODO: LABEL") do
-    scan_benchmark.run
+  incidences.each do |incidence|
+    scan_benchmark = ScanBenchmark.new(n_watching_terms, incidence)
+    n_tests.times do |try_count|
+      scan_benchmark.add_terms(step) if try_count > 0
+      benchmark.report("incidence #{incidence}, #{scan_benchmark.n_terms} keywords") do
+        scan_benchmark.run
+      end
+    end
   end
 end
