@@ -21,7 +21,7 @@ require "fileutils"
 require "groonga"
 
 require "droonga/plugin/handler_watch"
-require File.join(__FILE__, "..", "..", "utils.rb")
+require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 
 class ScanBenchmark
   def initialize(n_times)
