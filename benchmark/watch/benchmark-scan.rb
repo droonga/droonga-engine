@@ -17,6 +17,8 @@
 
 require "benchmark"
 require "fileutils"
+require "optparse"
+require "csv"
 
 require "groonga"
 
@@ -68,19 +70,56 @@ class ScanBenchmark
   end
 end
 
-n_watching_terms = 1000
-step             = 1000
-n_tests          = 20
-incidences       = [0.1, 0.5, 0.9]
+options = {
+  :n_watching_terms => 1000,
+  :n_steps          => 10,
+  :incidences       => "0.1,0.5,0.9",
+  :output_path      => "/tmp/watch-benchmark-scan.csv",
+}
+option_parser = OptionParser.new do |parser|
+  parser.on("--terms=N", Integer,
+            "number of watching terms (optional)") do |n_watching_terms|
+    options[:n_watching_terms] = n_watching_terms
+  end
+  parser.on("--steps=N", Integer,
+            "number of benchmark steps (optional)") do |n_steps|
+    options[:n_steps] = n_steps
+  end
+  parser.on("--incidences=INCIDENCES", String,
+            "list of matching incidences (optional)") do |incidences|
+    options[:incidences] = incidences
+  end
+  parser.on("--output-path=PATH", String,
+            "path to the output CSV file (optional)") do |output_path|
+    options[:output_path] = output_path
+  end
+end
+args = option_parser.parse!(ARGV)
 
-incidences.each do |incidence|
-  scan_benchmark = ScanBenchmark.new(n_watching_terms, incidence)
-  n_tests.times do |try_count|
-    Benchmark.bmbm do |benchmark|
-      scan_benchmark.add_terms(step) if try_count > 0
-      benchmark.report("incidence #{incidence}, #{scan_benchmark.n_terms} keywords") do
+
+results = [
+  ["case", "user", "system", "total", "real"],
+]
+options[:incidences].split(/[,\s]+/).each do |incidence|
+  scan_benchmark = ScanBenchmark.new(options[:n_watching_terms], incidence.to_f)
+  options[:n_steps].times do |try_count|
+    label = "incidence #{incidence}/#{scan_benchmark.n_terms} keywords"
+    result = Benchmark.bmbm do |benchmark|
+      scan_benchmark.add_terms(scan_benchmark.n_terms) if try_count > 0
+      benchmark.report(label) do
         scan_benchmark.run
       end
     end
+    result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
+    results << [label] + result
+  end
+end
+
+puts ""
+puts "Results (saved to #{options[:output_path]}):"
+File.open(options[:output_path], "w") do |file|
+  results.each do |row|
+    file.puts(CSV.generate_line(row))
+    puts row.join(",")
   end
 end
