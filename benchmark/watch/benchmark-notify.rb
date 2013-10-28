@@ -40,7 +40,7 @@ class NotifyBenchmark
     @n_subscribers = 0
 
     @client = Droonga::Client.new(tag: "droonga", port: 23003)
-    @receiver = Droonga::Client::Connection::DroongaProtocol::Receiver.new
+    @receiver = DroongaBenchmark::MessageReceiver.new
     @route = "#{@receiver.host}:#{@receiver.port}/droonga"
     setup
   end
@@ -55,14 +55,12 @@ class NotifyBenchmark
   end
 
   def run
+    notifications = []
     @n_times.times do |index|
       do_feed("#{WATCHING_KEYWORD} #{index}")
     end
-    notifications = []
-    @n_times.times do
-      notification = @receiver.receive(:timeout => @timeout)
-      notifications << notification unless notification.nil?
-    end
+    received = @receiver.receive(:timeout => @timeout, :wait_for => @n_times)
+    notifications += received if received.is_a?(Array)
     notifications
   end
 

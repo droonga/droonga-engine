@@ -199,4 +199,44 @@ module DroongaBenchmark
       end
     end
   end
+
+  class MessageReceiver
+    def initialize(options={})
+      default_options = {
+        :host => "0.0.0.0",
+        :port => 0,
+      }
+      options = default_options.merge(options)
+      @socket = TCPServer.new(options[:host], options[:port])
+    end
+
+    def close
+      @socket.close
+    end
+
+    def host
+      @socket.addr[3]
+    end
+
+    def port
+      @socket.addr[1]
+    end
+
+    def receive(options={})
+      waiting_count = options[:wait_for] || 1
+      if IO.select([@socket], nil, nil, options[:timeout])
+        client = @socket.accept
+        messages = []
+        unpacker = MessagePack::Unpacker.new(client)
+        unpacker.each do |object|
+          messages << object
+          break if messages.size >= waiting_count
+        end
+        client.close
+        messages
+      else
+        nil
+      end
+    end
+  end
 end
