@@ -104,12 +104,15 @@ results_by_incidence = {}
 scan_benchmark = ScanBenchmark.new(options[:n_watching_terms])
 options[:n_steps].times do |try_count|
   scan_benchmark.add_terms(scan_benchmark.n_terms) if try_count > 0
+  puts "\n=============== #{scan_benchmark.n_terms} keywords ===============\n"
   options[:incidences].split(/[,\s]+/).each do |incidence|
     results_by_incidence[incidence] ||= []
-    scan_benchmark.prepare_targets(incidence.to_f)
     label = "incidence #{incidence}/#{scan_benchmark.n_terms} keywords"
     result = Benchmark.bmbm do |benchmark|
+      puts "\n>>>>> targets for #{incidence}\n"
+      scan_benchmark.prepare_targets(incidence.to_f)
       benchmark.report(label) do
+        puts "\n>>>>>>>>>>> #{label}\n"
         scan_benchmark.run
       end
     end
