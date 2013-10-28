@@ -28,6 +28,5 @@
     }
   },
   "options": {
-    "plugins": ["select"]
   }
 }
