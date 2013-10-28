@@ -163,4 +163,39 @@ module DroongaBenchmark
      (PADDING * (SIZE / PADDING.size)) + keyword
     end
   end
+
+  class MessageCreator
+    class << self
+      def envelope_to_subscribe(term, route=nil)
+        message = {
+          "id" => Time.now.to_f.to_s,
+          "date" => Time.now,
+          "statusCode" => 200,
+          "type" => "watch.subscribe",
+          "body" => {
+            "condition" => keyword,
+            "subscriber" => "subscriber for #{keyword}",
+          },
+        }
+        unless route.nil?
+          message["body"]["route"] = route
+        end
+        message
+      end
+
+      def envelope_to_feed(keyword)
+        {
+          "id" => Time.now.to_f.to_s,
+          "date" => Time.now,
+          "statusCode" => 200,
+          "type" => "watch.feed",
+          "body" => {
+            "targets" => {
+              "keyword"  => keyword,
+            },
+          },
+        }
+      end
+    end
+  end
 end
