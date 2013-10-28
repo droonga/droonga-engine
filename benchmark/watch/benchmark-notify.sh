@@ -12,7 +12,7 @@ FLUENTD_PID=$!
 
 sleep 1
 
-bundle exec fluent-cat -p 23003 droonga < $base_dir/ddl/watchdb.jsons 
+bundle exec fluent-cat -p 23003 droonga < $base_dir/../../ddl/watchdb.jsons 
 
 bundle exec ruby $base_dir/benchmark-notify.rb
 
