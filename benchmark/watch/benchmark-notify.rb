@@ -55,15 +55,21 @@ class NotifyBenchmark
   end
 
   def run
-    @n_times.times do
-      do_feed(WATCHING_KEYWORD)
+    @n_times.times do |index|
+      do_feed("#{WATCHING_KEYWORD} #{index}")
     end
-    p @receiver.receive(:timeout => @timeout)
+    notifications = []
+    @n_times.times do
+      notification = @receiver.receive(:timeout => @timeout)
+      notifications << notification unless notification.nil?
+    end
+    notifications
   end
 
   def add_subscribers(n_subscribers)
-    n_subscribers.times do
+    n_subscribers.times do |index|
       message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD)
+      message["body"]["subscriber"] += " #{@n_subscribers + index}"
       message["body"]["route"] = @route
       @client.connection.send_receive(message)
     end
@@ -114,11 +120,14 @@ results = []
 options[:n_steps].times do |try_count|
   notify_benchmark.add_subscribers(notify_benchmark.n_subscribers) if try_count > 0
   label = "#{notify_benchmark.n_subscribers} subscribers"
+  percentage = nil
   result = Benchmark.bmbm do |benchmark|
     benchmark.report(label) do
-      notify_benchmark.run
+      sent_notifications = notify_benchmark.run
+      percentage = sent_notifications.size.to_f / options[:n_times] * 100
     end
   end
+  puts "=> #{percentage} % feeds are notified"
   result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
   results << [label] + result
 end
