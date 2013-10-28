@@ -72,16 +72,15 @@ n_watching_terms = 1000
 step             = 1000
 n_tests          = 20
 incidences       = [0.1, 0.5, 0.9]
-  puts "starting..."
-  incidences.each do |incidence|
-    scan_benchmark = ScanBenchmark.new(n_watching_terms, incidence)
-    n_tests.times do |try_count|
-Benchmark.bmbm do |benchmark|
+
+incidences.each do |incidence|
+  scan_benchmark = ScanBenchmark.new(n_watching_terms, incidence)
+  n_tests.times do |try_count|
+    Benchmark.bmbm do |benchmark|
       scan_benchmark.add_terms(step) if try_count > 0
       benchmark.report("incidence #{incidence}, #{scan_benchmark.n_terms} keywords") do
         scan_benchmark.run
       end
-end
     end
   end
-
+end
