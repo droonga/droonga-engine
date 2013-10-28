@@ -54,6 +54,33 @@ module DroongaBenchmark
       @context.send("]")
     end
 
+=begin
+# this is slower than above...
+    def subscribe_to_with_single_loop(terms)
+      queries = []
+      subscribers = []
+      terms.each do |term|
+        queries << {:_key => term,
+                    :keywords => [term]}
+        subscribers << {:_key => "subscriber for #{term}",
+                        :subscriptions => [term],
+                        :route => "0.0.0.0:0/benchamrk"}
+      end
+
+      command_load_queries = [
+        "load --table Query",
+        JSON.generate(queries)
+      ]
+      command_load_subscribers = [
+        "load --table Subscriber",
+        JSON.generate(subscribers)
+      ]
+
+      @context.restore(command_load_queries.join("\n"))
+      @context.restore(command_load_subscribers.join("\n"))
+    end
+=end
+
     def subscribe(term)
       queries = @context["Query"]
       query = queries.add(term, :keywords => [term])
