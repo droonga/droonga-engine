@@ -28,7 +28,7 @@ require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 class ScanBenchmark
   attr_reader :n_terms
 
-  def initialize(n_times, incidence)
+  def initialize(n_times, incidence=0)
     @n_times = n_times
     @incidence = incidence
 
@@ -38,9 +38,7 @@ class ScanBenchmark
 
     @terms_generator = DroongaBenchmark::TermsGenerator.new
     @terms = @terms_generator.generate(@n_times)
-    @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
-                                                           :terms => @terms,
-                                                           :incidence => @incidence)
+    prepare_targets(@incidence)
 
     @terms.each do |term|
       @database.subscribe(term)
@@ -54,6 +52,13 @@ class ScanBenchmark
     @targets.each do |target|
       scan(target)
     end
+  end
+
+  def prepare_targets(incidence=0)
+    @incidence = incidence
+    @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
+                                                           :terms => @terms.sample(@n_times),
+                                                           :incidence => @incidence)
   end
 
   def add_terms(n_terms)
@@ -97,28 +102,34 @@ end
 args = option_parser.parse!(ARGV)
 
 
-results = [
-  ["case", "user", "system", "total", "real"],
-]
-options[:incidences].split(/[,\s]+/).each do |incidence|
-  scan_benchmark = ScanBenchmark.new(options[:n_watching_terms], incidence.to_f)
-  options[:n_steps].times do |try_count|
+results_by_incidence = {}
+scan_benchmark = ScanBenchmark.new(options[:n_watching_terms])
+options[:n_steps].times do |try_count|
+  scan_benchmark.add_terms(scan_benchmark.n_terms) if try_count > 0
+  options[:incidences].split(/[,\s]+/).each do |incidence|
+    results_by_incidence[incidence] ||= []
+    scan_benchmark.prepare_targets(incidence.to_f)
     label = "incidence #{incidence}/#{scan_benchmark.n_terms} keywords"
     result = Benchmark.bmbm do |benchmark|
-      scan_benchmark.add_terms(scan_benchmark.n_terms) if try_count > 0
       benchmark.report(label) do
         scan_benchmark.run
       end
     end
     result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
-    results << [label] + result
+    results_by_incidence[incidence] << [label] + result
   end
+end
+total_results = [
+  ["case", "user", "system", "total", "real"],
+]
+results_by_incidence.values.each do |results|
+  total_results += results
 end
 
 puts ""
 puts "Results (saved to #{options[:output_path]}):"
 File.open(options[:output_path], "w") do |file|
-  results.each do |row|
+  total_results.each do |row|
     file.puts(CSV.generate_line(row))
     puts row.join(",")
   end
