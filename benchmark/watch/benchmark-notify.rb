@@ -63,8 +63,9 @@ class NotifyBenchmark
 
   def add_subscribers(n_subscribers)
     n_subscribers.times do
-      message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD, @route)
-      @client.connection.send(message)
+      message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD)
+      message["body"]["route"] = @route
+      @client.connection.send_receive(message)
     end
     @n_subscribers += n_subscribers
   end

@@ -18,6 +18,8 @@
 require "json"
 
 module DroongaBenchmark
+  WATCH_DATASET = "Watch"
+
   class WatchDatabase
     attr_reader :context
 
@@ -169,6 +171,7 @@ module DroongaBenchmark
       def envelope_to_subscribe(keyword, route=nil)
         message = {
           "id" => Time.now.to_f.to_s,
+          "dataset" => WATCH_DATASET,
           "date" => Time.now,
           "statusCode" => 200,
           "type" => "watch.subscribe",
@@ -177,15 +180,13 @@ module DroongaBenchmark
             "subscriber" => "subscriber for #{keyword}",
           },
         }
-        unless route.nil?
-          message["body"]["route"] = route
-        end
         message
       end
 
       def envelope_to_feed(keyword)
         {
           "id" => Time.now.to_f.to_s,
+          "dataset" => WATCH_DATASET,
           "date" => Time.now,
           "statusCode" => 200,
           "type" => "watch.feed",
