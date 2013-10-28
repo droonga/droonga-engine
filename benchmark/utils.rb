@@ -113,7 +113,7 @@ module DroongaBenchmark
     end
 
     def generate_target(term="")
-      term + (PADDING * (SIZE / PADDING.size))
+     (PADDING * (SIZE / PADDING.size)) + term
     end
   end
 end
