@@ -47,8 +47,7 @@ class NotifyBenchmark
 
   def setup
     ddl_path = File.expand_path(File.join(__FILE__, "..", "..", "..", "ddl", "watchdb.jsons"))
-    ddl_jsons = File.read(ddl_path)
-    ddl_jsons.split("\n").each do |part|
+    File.read(ddl_path).each_line do |part|
       message = JSON.parse(part)
       @client.connection.send_receive(message)
     end
