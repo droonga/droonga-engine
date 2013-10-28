@@ -2,8 +2,8 @@
 
 base_dir=$(cd $(dirname $0); pwd)
 
-# commands to remove temporary db
-# commands to create temporary db
+rm -rf $base_dir/watch
+mkdir -p $base_dir/watch
 
 DROONGA_CATALOG=$base_dir/catalog.json \
   bundle exec fluentd \
