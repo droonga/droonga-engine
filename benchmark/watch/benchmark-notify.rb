@@ -21,6 +21,7 @@ require "benchmark"
 require "fileutils"
 require "optparse"
 require "csv"
+require "json"
 
 require "droonga/client"
 
@@ -41,6 +42,16 @@ class NotifyBenchmark
     @client = Droonga::Client.new(tag: "droonga", port: 23003)
     @receiver = Droonga::Client::Connection::DroongaProtocol::Receiver.new
     @route = "#{@receiver.host}:#{@receiver.port}/droonga"
+    setup
+  end
+
+  def setup
+    ddl_path = File.expand_path(File.join(__FILE__, "..", "..", "..", "ddl", "watchdb.jsons"))
+    ddl_jsons = File.read(ddl_path)
+    ddl_jsons.split("\n").each do |part|
+      message = JSON.parse(part)
+      @client.connection.send_receive(message)
+    end
     add_subscribers(@params[:n_initial_subscribers])
   end
 
@@ -48,12 +59,13 @@ class NotifyBenchmark
     @n_times.times do
       do_feed(WATCHING_KEYWORD)
     end
+    p @receiver.receive(:timeout => @timeout)
   end
 
   def add_subscribers(n_subscribers)
     n_subscribers.times do
       message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD, @route)
-      @client.connection.send_receive(message)
+      @client.connection.send(message)
     end
     @n_subscribers += n_subscribers
   end
@@ -61,7 +73,6 @@ class NotifyBenchmark
   def do_feed(target)
     message = DroongaBenchmark::MessageCreator.envelope_to_feed(target)
     @client.connection.send(message)
-    @receiver.receive(:timeout => @timeout)
   end
 end
 
