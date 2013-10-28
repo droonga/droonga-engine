@@ -15,52 +15,53 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+# this benchmark must be done by benchmark-notify.sh.
+
 require "benchmark"
 require "fileutils"
 require "optparse"
 require "csv"
 
-require "groonga"
+require "droonga/client"
 
-require "droonga/watcher"
 require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 
 class NotifyBenchmark
   attr_reader :n_subscribers
 
-  def initialize(n_initial_subscribers)
-    @database = DroongaBenchmark::WatchDatabase.new
-    @watcher = Droonga::Watcher.new(@database.context)
-    @keywords_generator = DroongaBenchmark::KeywordsGenerator.new
-    @keywords = []
+  WATCHING_KEYWORD = "a"
+
+  def initialize(params)
+    @params = params || {}
+    @n_times = params[:n_times] || 0
+    @timeout = params[:timeout] || 0
+
     @n_subscribers = 0
-    add_subscribers(n_initial_subscribers)
+
+    @client = Droonga::Client.new(tag: "droonga", port: 23003)
+    @receiver = Droonga::Client::Connection::DroongaProtocol::Receiver.new
+    @route = "#{@receiver.host}:#{@receiver.port}/droonga"
+    add_subscribers(@params[:n_initial_subscribers])
   end
 
   def run
-    @matched_keywords.each do |keyword|
-      publish(keyword)
+    @n_times.times do
+      do_feed(WATCHING_KEYWORD)
     end
-  end
-
-  def prepare_keywords(n_keywords)
-    @matched_keywords = @keywords.sample(n_keywords)
   end
 
   def add_subscribers(n_subscribers)
-    new_keywords = []
     n_subscribers.times do
-      new_keywords << @keywords_generator.next
+      message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD, @route)
+      @client.connection.send_receive(message)
     end
-    @database.subscribe_to(new_keywords)
-    @keywords += new_keywords
     @n_subscribers += n_subscribers
   end
 
-  private
-  def publish(matched_keyword)
-    @watcher.publish([matched_keyword], {}) do |route, subscribers|
-    end
+  def do_feed(target)
+    message = DroongaBenchmark::MessageCreator.envelope_to_feed(target)
+    @client.connection.send(message)
+    @receiver.receive(:timeout => @timeout)
   end
 end
 
@@ -83,6 +84,10 @@ option_parser = OptionParser.new do |parser|
             "number of benchmark steps (optional)") do |n_steps|
     options[:n_steps] = n_steps
   end
+  parser.on("--timeout=N", Float,
+            "timeout for receiving (optional)") do |timeout|
+    options[:timeout] = timeout
+  end
   parser.on("--output-path=PATH", String,
             "path to the output CSV file (optional)") do |output_path|
     options[:output_path] = output_path
@@ -91,13 +96,14 @@ end
 args = option_parser.parse!(ARGV)
 
 
-notify_benchmark = NotifyBenchmark.new(options[:n_subscribers])
+notify_benchmark = NotifyBenchmark.new(:n_initial_subscribers => options[:n_subscribers],
+                                       :n_times => options[:n_times],
+                                       :timeout => options[:timeout])
 results = []
 options[:n_steps].times do |try_count|
   notify_benchmark.add_subscribers(notify_benchmark.n_subscribers) if try_count > 0
   label = "#{notify_benchmark.n_subscribers} subscribers"
   result = Benchmark.bmbm do |benchmark|
-    notify_benchmark.prepare_keywords(options[:n_times])
     benchmark.report(label) do
       notify_benchmark.run
     end

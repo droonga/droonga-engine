@@ -73,8 +73,8 @@ module Droonga
       @client.connection.send_receive(subscribe_envelope)
     end
 
-    def envelope_to_subscribe(term)
-      {
+    def envelope_to_subscribe(term, route=nil)
+      message = {
         "id" => Time.now.to_f.to_s,
         "date" => Time.now,
         "statusCode" => 200,
@@ -84,6 +84,10 @@ module Droonga
           "subscriber" => term,
         },
       }
+      unless route.nil?
+        message["body"]["route"] = route
+      end
+      message
     end
 
     def populate_feeds(incidence)
