@@ -166,7 +166,7 @@ module DroongaBenchmark
 
   class MessageCreator
     class << self
-      def envelope_to_subscribe(term, route=nil)
+      def envelope_to_subscribe(keyword, route=nil)
         message = {
           "id" => Time.now.to_f.to_s,
           "date" => Time.now,
