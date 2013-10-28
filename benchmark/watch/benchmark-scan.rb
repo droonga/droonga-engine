@@ -80,7 +80,7 @@ options = {
   :n_watching_keywords => 1000,
   :n_steps          => 10,
   :incidences       => "0.1,0.5,0.9",
-  :output_path      => "/tmp/watch-benchmark-scan.csv",
+  :output_path      => "/tmp/watch-benchmark-scan",
 }
 option_parser = OptionParser.new do |parser|
   parser.on("--keywords=N", Integer,
@@ -123,17 +123,60 @@ options[:n_steps].times do |try_count|
     results_by_incidence[incidence] << [label] + result
   end
 end
-total_results = [
+
+FileUtils.mkdir_p(options[:output_path])
+
+puts ""
+all_output = File.join(options[:output_path], "all.csv")
+all_results = [
   ["case", "user", "system", "total", "real"],
 ]
 results_by_incidence.values.each do |results|
-  total_results += results
+  all_results += results
+end
+puts "All (saved to #{all_output}):"
+File.open(all_output, "w") do |file|
+  all_results.each do |row|
+    file.puts(CSV.generate_line(row))
+    puts row.join(",")
+  end
 end
 
 puts ""
-puts "Results (saved to #{options[:output_path]}):"
-File.open(options[:output_path], "w") do |file|
+total_output = File.join(options[:output_path], "total.csv")
+total_results_header = ["case"]
+total_results = []
+results_by_incidence.each do |incidence, results|
+  total_results_header << "incidence #{incidence}"
+  results.each_index do |index|
+    total_results[index] ||= [results[index].first.split("/").last]
+    total_results[index] << results[index][3]
+  end
+end
+total_results.unshift(total_results_header)
+puts "Total (saved to #{total_output}):"
+File.open(total_output, "w") do |file|
   total_results.each do |row|
+    file.puts(CSV.generate_line(row))
+    puts row.join(",")
+  end
+end
+
+puts ""
+real_output = File.join(options[:output_path], "real.csv")
+real_results_header = ["case"]
+real_results = []
+results_by_incidence.each do |incidence, results|
+  real_results_header << "incidence #{incidence}"
+  results.each_index do |index|
+    real_results[index] ||= [results[index].first.split("/").last]
+    real_results[index] << results[index][4]
+  end
+end
+real_results.unshift(real_results_header)
+puts "Real (saved to #{real_output}):"
+File.open(real_output, "w") do |file|
+  real_results.each do |row|
     file.puts(CSV.generate_line(row))
     puts row.join(",")
   end
