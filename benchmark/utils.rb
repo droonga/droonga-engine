@@ -35,6 +35,25 @@ module DroongaBenchmark
       end
     end
 
+    def subscribe_to(terms)
+      @context.send("load --table Query")
+      @context.send("[")
+      terms.each do |term|
+        @context.send("{'_key':#{term}," +
+                        "'keywords':['#{term}']},")
+      end
+      @context.send("]")
+
+      @context.send("load --table Subscriber")
+      @context.send("[")
+      terms.each do |term|
+        @context.send("{'_key':'subscriber for #{term}'," +
+                        "'subscriptions':['#{term}']," +
+                        "'route':'0.0.0.0:0/benchamrk'},")
+      end
+      @context.send("]")
+    end
+
     def subscribe(term)
       queries = @context["Query"]
       query = queries.add(term, :keywords => [term])

@@ -40,9 +40,7 @@ class ScanBenchmark
     @terms = @terms_generator.generate(@n_times)
     prepare_targets(@incidence)
 
-    @terms.each do |term|
-      @database.subscribe(term)
-    end
+    @database.subscribe_to(@terms)
     @n_terms = @terms.size
 
     @hits = []
