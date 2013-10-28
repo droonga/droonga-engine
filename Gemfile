@@ -36,3 +36,5 @@ elsif ENV["TRAVIS"] == "true"
         :git => "git://github.com/groonga/groonga-command-parser.git"
   end
 end
+
+gem "droonga-client", github: "droonga/droonga-client-ruby"
