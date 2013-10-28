@@ -14,7 +14,7 @@ sleep 1
 
 bundle exec fluent-cat -p 23003 droonga.message < $base_dir/../../ddl/watchdb.jsons 
 
-bundle exec ruby $base_dir/benchmark-notify.rb
+bundle exec ruby $base_dir/benchmark-notify.rb "$@"
 
 kill $FLUENTD_PID
 wait $FLUENTD_PID
