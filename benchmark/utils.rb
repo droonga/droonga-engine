@@ -15,6 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "json"
+
 module DroongaBenchmark
   class WatchDatabase
     attr_reader :context
@@ -35,11 +37,12 @@ module DroongaBenchmark
       end
     end
 
+=begin
     def subscribe_to(terms)
       @context.send("load --table Query")
       @context.send("[")
       terms.each do |term|
-        @context.send("{'_key':#{term}," +
+        @context.send("{'_key':'#{term}'," +
                         "'keywords':['#{term}']},")
       end
       @context.send("]")
@@ -53,10 +56,9 @@ module DroongaBenchmark
       end
       @context.send("]")
     end
+=end
 
-=begin
-# this is slower than above...
-    def subscribe_to_with_single_loop(terms)
+    def subscribe_to(terms)
       queries = []
       subscribers = []
       terms.each do |term|
@@ -79,7 +81,6 @@ module DroongaBenchmark
       @context.restore(command_load_queries.join("\n"))
       @context.restore(command_load_subscribers.join("\n"))
     end
-=end
 
     def subscribe(term)
       queries = @context["Query"]

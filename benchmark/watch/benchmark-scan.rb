@@ -60,9 +60,12 @@ class ScanBenchmark
   end
 
   def add_terms(n_terms)
+    new_terms = []
     n_terms.times do
-      @database.subscribe(@terms_generator.next)
+      new_terms << @terms_generator.next
     end
+    @database.subscribe_to(new_terms)
+    @terms += new_terms
     @n_terms += n_terms
   end
 
