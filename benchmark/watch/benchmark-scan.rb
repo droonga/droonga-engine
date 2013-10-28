@@ -26,7 +26,7 @@ require "droonga/watcher"
 require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 
 class ScanBenchmark
-  attr_reader :n_terms
+  attr_reader :n_keywords
 
   def initialize(n_times, incidence=0)
     @n_times = n_times
@@ -36,12 +36,12 @@ class ScanBenchmark
 
     @watcher = Droonga::Watcher.new(@database.context)
 
-    @terms_generator = DroongaBenchmark::TermsGenerator.new
-    @terms = @terms_generator.generate(@n_times)
+    @keywords_generator = DroongaBenchmark::KeywordsGenerator.new
+    @keywords = @keywords_generator.generate(@n_times)
     prepare_targets(@incidence)
 
-    @database.subscribe_to(@terms)
-    @n_terms = @terms.size
+    @database.subscribe_to(@keywords)
+    @n_keywords = @keywords.size
 
     @hits = []
   end
@@ -55,18 +55,18 @@ class ScanBenchmark
   def prepare_targets(incidence=0)
     @incidence = incidence
     @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
-                                                           :terms => @terms.sample(@n_times),
+                                                           :keywords => @keywords.sample(@n_times),
                                                            :incidence => @incidence)
   end
 
-  def add_terms(n_terms)
-    new_terms = []
-    n_terms.times do
-      new_terms << @terms_generator.next
+  def add_keywords(n_keywords)
+    new_keywords = []
+    n_keywords.times do
+      new_keywords << @keywords_generator.next
     end
-    @database.subscribe_to(new_terms)
-    @terms += new_terms
-    @n_terms += n_terms
+    @database.subscribe_to(new_keywords)
+    @keywords += new_keywords
+    @n_keywords += n_keywords
   end
 
   private
@@ -77,15 +77,15 @@ class ScanBenchmark
 end
 
 options = {
-  :n_watching_terms => 1000,
+  :n_watching_keywords => 1000,
   :n_steps          => 10,
   :incidences       => "0.1,0.5,0.9",
   :output_path      => "/tmp/watch-benchmark-scan.csv",
 }
 option_parser = OptionParser.new do |parser|
-  parser.on("--terms=N", Integer,
-            "number of watching terms (optional)") do |n_watching_terms|
-    options[:n_watching_terms] = n_watching_terms
+  parser.on("--keywords=N", Integer,
+            "number of watching keywords (optional)") do |n_watching_keywords|
+    options[:n_watching_keywords] = n_watching_keywords
   end
   parser.on("--steps=N", Integer,
             "number of benchmark steps (optional)") do |n_steps|
@@ -104,13 +104,13 @@ args = option_parser.parse!(ARGV)
 
 
 results_by_incidence = {}
-scan_benchmark = ScanBenchmark.new(options[:n_watching_terms])
+scan_benchmark = ScanBenchmark.new(options[:n_watching_keywords])
 options[:n_steps].times do |try_count|
-  scan_benchmark.add_terms(scan_benchmark.n_terms) if try_count > 0
-  puts "\n=============== #{scan_benchmark.n_terms} keywords ===============\n"
+  scan_benchmark.add_keywords(scan_benchmark.n_keywords) if try_count > 0
+  puts "\n=============== #{scan_benchmark.n_keywords} keywords ===============\n"
   options[:incidences].split(/[,\s]+/).each do |incidence|
     results_by_incidence[incidence] ||= []
-    label = "incidence #{incidence}/#{scan_benchmark.n_terms} keywords"
+    label = "incidence #{incidence}/#{scan_benchmark.n_keywords} keywords"
     result = Benchmark.bmbm do |benchmark|
       puts "\n>>>>> targets for #{incidence}\n"
       scan_benchmark.prepare_targets(incidence.to_f)

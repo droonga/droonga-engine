@@ -38,34 +38,34 @@ module DroongaBenchmark
     end
 
 =begin
-    def subscribe_to(terms)
+    def subscribe_to(keywords)
       @context.send("load --table Query")
       @context.send("[")
-      terms.each do |term|
-        @context.send("{'_key':'#{term}'," +
-                        "'keywords':['#{term}']},")
+      keywords.each do |keyword|
+        @context.send("{'_key':'#{keyword}'," +
+                        "'keywords':['#{keyword}']},")
       end
       @context.send("]")
 
       @context.send("load --table Subscriber")
       @context.send("[")
-      terms.each do |term|
-        @context.send("{'_key':'subscriber for #{term}'," +
-                        "'subscriptions':['#{term}']," +
+      keywords.each do |keyword|
+        @context.send("{'_key':'subscriber for #{keyword}'," +
+                        "'subscriptions':['#{keyword}']," +
                         "'route':'0.0.0.0:0/benchamrk'},")
       end
       @context.send("]")
     end
 =end
 
-    def subscribe_to(terms)
+    def subscribe_to(keywords)
       queries = []
       subscribers = []
-      terms.each do |term|
-        queries << {:_key => term,
-                    :keywords => [term]}
-        subscribers << {:_key => "subscriber for #{term}",
-                        :subscriptions => [term],
+      keywords.each do |keyword|
+        queries << {:_key => keyword,
+                    :keywords => [keyword]}
+        subscribers << {:_key => "subscriber for #{keyword}",
+                        :subscriptions => [keyword],
                         :route => "0.0.0.0:0/benchamrk"}
       end
 
@@ -82,21 +82,21 @@ module DroongaBenchmark
       @context.restore(command_load_subscribers.join("\n"))
     end
 
-    def subscribe(term)
+    def subscribe(keyword)
       queries = @context["Query"]
-      query = queries.add(term, :keywords => [term])
+      query = queries.add(keyword, :keywords => [keyword])
 
       subscribers = @context["Subscriber"]
-      subscribers.add("subscriber for #{term}",
+      subscribers.add("subscriber for #{keyword}",
                       :subscriptions => [query],
                       :route => "0.0.0.0:0/benchamrk")
     end
   end
 
-  class TermsGenerator
+  class KeywordsGenerator
     class << self
-      def generate(n_terms)
-        new.generate(n_terms)
+      def generate(n_keywords)
+        new.generate(n_keywords)
       end
     end
 
@@ -104,12 +104,12 @@ module DroongaBenchmark
       @generator = to_enum(:each)
     end
 
-    def generate(n_terms)
-      terms = []
-      n_terms.times do
-        terms << @generator.next
+    def generate(n_keywords)
+      keywords = []
+      n_keywords.times do
+        keywords << @generator.next
       end
-      terms
+      keywords
     end
 
     def next
@@ -129,8 +129,8 @@ module DroongaBenchmark
 
   class TargetsGenerator
     class << self
-      def generate(n_terms, params)
-        new(params).generate(n_terms)
+      def generate(n_keywords, params)
+        new(params).generate(n_keywords)
       end
     end
 
@@ -138,7 +138,7 @@ module DroongaBenchmark
     SIZE    = 1000
 
     def initialize(params)
-      @terms     = params[:terms]
+      @keywords  = params[:keywords]
       @incidence = params[:incidence]
     end
 
@@ -149,7 +149,7 @@ module DroongaBenchmark
       n_unmatched_targets = (n_targets - n_matched_targets)
 
       n_matched_targets.times do
-        targets << generate_target(@terms.sample(1).first)
+        targets << generate_target(@keywords.sample(1).first)
       end
 
       n_unmatched_targets.times do
@@ -159,8 +159,8 @@ module DroongaBenchmark
       targets
     end
 
-    def generate_target(term="")
-     (PADDING * (SIZE / PADDING.size)) + term
+    def generate_target(keyword="")
+     (PADDING * (SIZE / PADDING.size)) + keyword
     end
   end
 end

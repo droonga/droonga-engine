@@ -31,35 +31,35 @@ class NotifyBenchmark
   def initialize(n_initial_subscribers)
     @database = DroongaBenchmark::WatchDatabase.new
     @watcher = Droonga::Watcher.new(@database.context)
-    @terms_generator = DroongaBenchmark::TermsGenerator.new
-    @terms = []
+    @keywords_generator = DroongaBenchmark::KeywordsGenerator.new
+    @keywords = []
     @n_subscribers = 0
     add_subscribers(n_initial_subscribers)
   end
 
   def run
-    @matched_terms.each do |term|
-      publish(term)
+    @matched_keywords.each do |keyword|
+      publish(keyword)
     end
   end
 
-  def prepare_terms(n_terms)
-    @matched_terms = @terms.sample(n_terms)
+  def prepare_keywords(n_keywords)
+    @matched_keywords = @keywords.sample(n_keywords)
   end
 
   def add_subscribers(n_subscribers)
-    new_terms = []
+    new_keywords = []
     n_subscribers.times do
-      new_terms << @terms_generator.next
+      new_keywords << @keywords_generator.next
     end
-    @database.subscribe_to(new_terms)
-    @terms += new_terms
+    @database.subscribe_to(new_keywords)
+    @keywords += new_keywords
     @n_subscribers += n_subscribers
   end
 
   private
-  def publish(matched_term)
-    @watcher.publish([matched_term], {}) do |route, subscribers|
+  def publish(matched_keyword)
+    @watcher.publish([matched_keyword], {}) do |route, subscribers|
     end
   end
 end
@@ -97,7 +97,7 @@ options[:n_steps].times do |try_count|
   notify_benchmark.add_subscribers(notify_benchmark.n_subscribers) if try_count > 0
   label = "#{notify_benchmark.n_subscribers} subscribers"
   result = Benchmark.bmbm do |benchmark|
-    notify_benchmark.prepare_terms(options[:n_times])
+    notify_benchmark.prepare_keywords(options[:n_times])
     benchmark.report(label) do
       notify_benchmark.run
     end
