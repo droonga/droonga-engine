@@ -61,7 +61,8 @@ class NotifyBenchmark
     @n_times.times do |index|
       do_feed("#{WATCHING_KEYWORD} #{index}")
     end
-    received = @receiver.receive(:timeout => @timeout, :wait_for => @n_times)
+    received = []
+    received << @receiver.receive(:timeout => @timeout)
     notifications += received if received.is_a?(Array)
     notifications
   end

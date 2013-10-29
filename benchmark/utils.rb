@@ -223,17 +223,16 @@ module DroongaBenchmark
     end
 
     def receive(options={})
-      waiting_count = options[:wait_for] || 1
       if IO.select([@socket], nil, nil, options[:timeout])
         client = @socket.accept
-        messages = []
+        message = nil
         unpacker = MessagePack::Unpacker.new(client)
         unpacker.each do |object|
-          messages << object
-          break if messages.size >= waiting_count
+          message = object
+          break
         end
         client.close
-        messages
+        message
       else
         nil
       end
