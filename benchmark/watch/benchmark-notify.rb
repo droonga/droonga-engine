@@ -88,23 +88,23 @@ options = {
 }
 option_parser = OptionParser.new do |parser|
   parser.on("--subscribers=N", Integer,
-            "initial number of subscribers (optional)") do |n_subscribers|
+            "initial number of subscribers") do |n_subscribers|
     options[:n_subscribers] = n_subscribers
   end
   parser.on("--times=N", Integer,
-            "number of publish times (optional)") do |n_times|
+            "number of publish times") do |n_times|
     options[:n_times] = n_times
   end
   parser.on("--steps=N", Integer,
-            "number of benchmark steps (optional)") do |n_steps|
+            "number of benchmark steps") do |n_steps|
     options[:n_steps] = n_steps
   end
   parser.on("--timeout=N", Float,
-            "timeout for receiving (optional)") do |timeout|
+            "timeout for receiving") do |timeout|
     options[:timeout] = timeout
   end
   parser.on("--output-path=PATH", String,
-            "path to the output CSV file (optional)") do |output_path|
+            "path to the output CSV file") do |output_path|
     options[:output_path] = output_path
   end
 end
