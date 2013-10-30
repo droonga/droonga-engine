@@ -51,7 +51,7 @@ module Droonga
     end
 
     def emit(tag, time, record, synchronous=nil)
-      $log.trace("tag: <#{tag}>")
+      $log.trace("[#{Process.pid}] tag: <#{tag}> caller: <#{caller.first}>")
       @executor.dispatch(tag, time, record, synchronous)
     end
 
