@@ -209,7 +209,7 @@ module Droonga
     def sweep_orphan_queries(queries)
       queries.each do |query|
         if subscriber_table.select do |subscriber|
-             subscriber.queries =~ query
+             subscriber.subscriptions =~ query
            end.empty?
           delete_query(query)
         end
