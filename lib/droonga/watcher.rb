@@ -18,12 +18,9 @@
 module Droonga
   class Watcher
     EXACT_MATCH = false
-    GARBAGE_COLLECTION_INTERVAL_SECONDS = 20 * 60 # 20 min
-    SUBSCRIBER_LIFETIME_SECONDS = 10 * 60 # 10 min
 
     def initialize(context)
       @context = context
-      activate_garbage_collection
     end
 
     def subscribe(request)
@@ -172,21 +169,6 @@ module Droonga
       routes.each do |route, subscribers|
         yield(route, subscribers)
       end
-    end
-
-    def activate_garbage_collection(options={})
-      interval = options[:interval] || GARBAGE_COLLECTION_INTERVAL_SECONDS
-      @gc_thread = Thread.new do
-        while true
-          clear_expired_subscribers
-          sleep(interval)
-        end
-      end
-    end
-
-    def clear_expired_subscribers
-      # implement me!
-      boundary = Time.now - SUBSCRIBER_LIFETIME_SECONDS
     end
   end
 end
