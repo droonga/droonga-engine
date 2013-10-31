@@ -20,8 +20,8 @@ require "droonga/plugin/handler_watch"
 class WatchHandlerTest < Test::Unit::TestCase
   def setup
     setup_database
-    setup_handler
     setup_schema
+    setup_handler
   end
 
   def teardown
