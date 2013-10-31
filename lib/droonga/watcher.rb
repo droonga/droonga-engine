@@ -40,12 +40,11 @@ module Droonga
       end
       subscriber_record = @subscriber_table[subscriber]
       if subscriber_record
-        subscriptions = subscriber_record.subscriptions.collect do |query|
-          return if query == query_record
-          query
+        subscriptions = subscriber_record.subscriptions
+        unless subscriptions.include?(query_record)
+          subscriptions << query_record
+          subscriber_record.subscriptions = subscriptions
         end
-        subscriptions << query_record
-        subscriber_record.subscriptions = subscriptions
         subscriber_record.last_modified = Time.now
       else
         @subscriber_table.add(subscriber,
