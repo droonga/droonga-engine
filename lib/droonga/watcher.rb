@@ -200,9 +200,10 @@ module Droonga
 
     def sweep_orphan_queries(queries)
       queries.each do |query|
-        if @subscriber_table.select do |subscriber|
-             subscriber.subscriptions =~ query
-           end.empty?
+        related_subscribers = @subscriber_table.select do |subscriber|
+          subscriber.subscriptions =~ query
+        end
+        if related_subscribers.empty?
           delete_query(query)
         end
       end
@@ -210,18 +211,20 @@ module Droonga
 
     def sweep_orphan_keywords(keywords)
       keywords.each do |keyword|
-        if @query_table.select do |query|
-             query.keywords =~ keyword
-           end.empty?
+        related_queries = @query_table.select do |query|
+          query.keywords =~ keyword
+        end
+        if related_queries.empty?
           keyword.delete
         end
       end
     end
 
     def sweep_orphan_route(route)
-      if @subscriber_table.select do |subscriber|
-           subscriber.route == route
-         end.empty?
+      related_subscribers = @subscriber_table.select do |subscriber|
+        subscriber.route == route
+      end
+      if related_subscribers.empty?
         route.delete
       end
     end
