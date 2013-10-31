@@ -96,9 +96,11 @@ module Droonga
       body, command, arguments = parse_message(message)
       handler = find_handler(command)
       if handler
-        $log.trace("#{log_tag}: execute_one: handle: start")
+        $log.trace("#{log_tag}: execute_one: handle: start",
+                   :hander => handler.class)
         handler.handle(command, body, *arguments)
-        $log.trace("#{log_tag}: execute_one: handle: done")
+        $log.trace("#{log_tag}: execute_one: handle: done",
+                   :hander => handler.class)
       end
       $log.trace("#{log_tag}: execute_one: done")
     end
