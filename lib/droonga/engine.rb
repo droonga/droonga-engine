@@ -67,7 +67,6 @@ module Droonga
         }
         @options.merge(force_options)
       end
-      @supervisor.logger = $log
       @supervisor_thread = Thread.new do
         @supervisor.main
       end
