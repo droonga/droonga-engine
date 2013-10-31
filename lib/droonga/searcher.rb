@@ -38,33 +38,57 @@ module Droonga
 
     def search(queries)
       outputs = nil
+      $log.trace("#{log_tag}: search: start", :queries => queries)
       @context.push_memory_pool do
         outputs = process_queries(queries)
       end
+      $log.trace("#{log_tag}: search: done")
       return outputs
     end
 
     private
     def process_queries(queries)
-      return {} unless queries
+      $log.trace("#{log_tag}: process_queries: start")
+      unless queries
+        $log.trace("#{log_tag}: process_queries: done")
+        return {}
+      end
+      $log.trace("#{log_tag}: process_queries: sort: start")
       query_sorter = QuerySorter.new
       queries.each do |name, query|
         query_sorter.add(name, [query["source"]])
       end
+      sorted_queries = query_sorter.tsort
+      $log.trace("#{log_tag}: process_queries: sort: done")
       outputs = {}
       results = {}
-      query_sorter.tsort.each do |name|
+      sorted_queries.each do |name|
         if queries[name]
+          $log.trace("#{log_tag}: process_queries: search: start",
+                     :name => name)
           searcher = QuerySearcher.new(@context, queries[name])
           results[name] = searcher.search(results)
-          outputs[name] = searcher.format if searcher.need_output?
+          $log.trace("#{log_tag}: process_queries: search: done",
+                     :name => name)
+          if searcher.need_output?
+            $log.trace("#{log_tag}: process_queries: format: start",
+                       :name => name)
+            outputs[name] = searcher.format
+            $log.trace("#{log_tag}: process_queries: format: done",
+                       :name => name)
+          end
         elsif @context[name]
           results[name] = @context[name]
         else
           raise UndefinedSourceError.new(name)
         end
       end
+      $log.trace("#{log_tag}: process_queries: done")
       return outputs
+    end
+
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] searcher"
     end
 
     class QuerySorter
