@@ -44,6 +44,7 @@ module Droonga
         end
         subscriptions << query_record
         subscriber_record.subscriptions = subscriptions
+        subscriber_record.last_modified = Time.now
       else
         subscriber_table.add(subscriber,
                              :subscriptions => [query_record],
