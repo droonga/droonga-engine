@@ -21,6 +21,10 @@ module Droonga
 
     def initialize(context)
       @context = context
+
+      @subscriber_table = @context["Subscriber"]
+      @query_table      = @context["Query"]
+      @keyword_table    = @context["Keyword"]
     end
 
     def subscribe(request)
@@ -29,12 +33,12 @@ module Droonga
       query      = request[:query]
       route      = request[:route]
 
-      query_record = query_table[query]
+      query_record = @query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)
-        query_record = query_table.add(query, :keywords => keywords)
+        query_record = @query_table.add(query, :keywords => keywords)
       end
-      subscriber_record = subscriber_table[subscriber]
+      subscriber_record = @subscriber_table[subscriber]
       if subscriber_record
         subscriptions = subscriber_record.subscriptions.collect do |query|
           return if query == query_record
@@ -44,10 +48,10 @@ module Droonga
         subscriber_record.subscriptions = subscriptions
         subscriber_record.last_modified = Time.now
       else
-        subscriber_table.add(subscriber,
-                             :subscriptions => [query_record],
-                             :route => route,
-                             :last_modified => Time.now)
+        @subscriber_table.add(subscriber,
+                              :subscriptions => [query_record],
+                              :route => route,
+                              :last_modified => Time.now)
       end
     end
 
@@ -55,13 +59,13 @@ module Droonga
       subscriber = request[:subscriber]
       query      = request[:query]
 
-      subscriber_record = subscriber_table[subscriber]
+      subscriber_record = @subscriber_table[subscriber]
       return unless subscriber_record
 
       if query.nil?
         delete_subscriber(subscriber_record)
       else
-        query_record = query_table[query]
+        query_record = @query_table[query]
         return unless query_record
 
         subscriptions = subscriber_record.subscriptions
@@ -107,8 +111,8 @@ module Droonga
       trimmed = body.strip
       candidates = {}
       # FIXME scan reports the longest keyword matched only
-      keyword_table.scan(trimmed).each do |keyword, word, start, length|
-        query_table.select do |query|
+      @keyword_table.scan(trimmed).each do |keyword, word, start, length|
+       @ query_table.select do |query|
           query.keywords =~ keyword
         end.each do |record|
           candidates[record.key] ||= []
@@ -167,7 +171,7 @@ module Droonga
     def publish(hits, request)
       routes = {}
       hits.each do |query|
-        subscriber_table.select do |subscriber|
+        @subscriber_table.select do |subscriber|
           subscriber.subscriptions =~ query
         end.each do |subscriber|
           routes[subscriber.route.key] ||= []
@@ -180,18 +184,6 @@ module Droonga
     end
 
     private
-    def subscriber_table
-      @subscriber_table ||= @context["Subscriber"]
-    end
-
-    def query_table
-      @query_table ||= @context["Query"]
-    end
-
-    def keyword_table
-      @keyword_table ||= @context["Keyword"]
-    end
-
     def delete_subscriber(subscriber)
       queries = subscriber.subscriptions
       route = subscriber.route
@@ -208,7 +200,7 @@ module Droonga
 
     def sweep_orphan_queries(queries)
       queries.each do |query|
-        if subscriber_table.select do |subscriber|
+        if @subscriber_table.select do |subscriber|
              subscriber.subscriptions =~ query
            end.empty?
           delete_query(query)
@@ -218,7 +210,7 @@ module Droonga
 
     def sweep_orphan_keywords(keywords)
       keywords.each do |keyword|
-        if query_table.select do |query|
+        if @query_table.select do |query|
              query.keywords =~ keyword
            end.empty?
           keyword.delete
@@ -227,7 +219,7 @@ module Droonga
     end
 
     def sweep_orphan_route(route)
-      if subscriber_table.select do |subscriber|
+      if @subscriber_table.select do |subscriber|
            subscriber.route == route
          end.empty?
         route.delete
