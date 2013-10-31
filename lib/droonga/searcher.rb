@@ -222,41 +222,55 @@ module Droonga
       end
 
       def search_query(results)
+        $log.trace("#{log_tag}: search_query: start")
         @start_time = Time.now
         @result = source = results[@query["source"]]
         if @query["condition"]
           expression = Groonga::Expression.new(context: @context)
           expression.define_variable(:domain => source)
           parseCondition(source, expression, @query["condition"])
+          $log.trace("#{log_tag}: search_query: select: start")
           @result = source.select(expression)
+          $log.trace("#{log_tag}: search_query: select: done")
           @condition = expression
         end
-        if @query["groupBy"]
-          if @query["groupBy"].is_a? String
-            @result = @result.group(@query["groupBy"])
-          elsif @query["groupBy"].is_a? Hash
-            key = @query["groupBy"]["key"]
-            max_n_sub_records = @query["groupBy"]["maxNSubRecords"]
+        group_by = @query["groupBy"]
+        if group_by
+          $log.trace("#{log_tag}: search_query: group: start",
+                     :by => group_by)
+          if group_by.is_a? String
+            @result = @result.group(group_by)
+          elsif group_by.is_a? Hash
+            key = group_by["key"]
+            max_n_sub_records = group_by["maxNSubRecords"]
             @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
           else
             raise '"groupBy" parameter must be a Hash or a String'
           end
+          $log.trace("#{log_tag}: search_query: group: done",
+                     :by => group_by)
         end
         @count = @result.size
-        if @query["sortBy"]
-          if @query["sortBy"].is_a? Array
-            keys = parse_order_keys(@query["sortBy"])
+        sort_by = @query["sortBy"]
+        if sort_by
+          $log.trace("#{log_tag}: search_query: sort: start",
+                     :by => sort_by)
+          if sort_by.is_a? Array
+            keys = parse_order_keys(sort_by)
             offset = 0
             limit = -1
-          elsif @query["sortBy"].is_a? Hash
-            keys = parse_order_keys(@query["sortBy"]["keys"])
-            offset = @query["sortBy"]["offset"]
-            limit = @query["sortBy"]["limit"]
+          elsif sort_by.is_a? Hash
+            keys = parse_order_keys(sort_by["keys"])
+            offset = sort_by["offset"]
+            limit = sort_by["limit"]
           else
             raise '"sortBy" parameter must be a Hash or an Array'
           end
           @result = @result.sort(keys, :offset => offset, :limit => limit)
+          $log.trace("#{log_tag}: search_query: sort: done",
+                     :by => sort_by)
         end
+        $log.trace("#{log_tag}: search_query: done")
         @result
       end
 
@@ -389,6 +403,10 @@ module Droonga
             attributes: attribute["attributes"]
           }
         end
+      end
+
+      def log_tag
+        "[#{Process.ppid}][#{Process.pid}] query_searcher"
       end
     end
   end
