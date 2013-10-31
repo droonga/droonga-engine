@@ -34,8 +34,9 @@ module Droonga
       end
     end
 
-    def sweep_expired_subscribers
-      boundary = Time.now - SUBSCRIBER_LIFETIME_SECONDS
+    def sweep_expired_subscribers(options={})
+      now = options[:now] || Time.now
+      boundary = now - SUBSCRIBER_LIFETIME_SECONDS
       expired_subscribers = @context["Subscriber"].select do |subscriber|
         subscriber.last_modified < boundary
       end
@@ -44,6 +45,7 @@ module Droonga
       end
     end
 
+    private
     def watcher
       @watcher ||= Watcher.new(@context)
     end
