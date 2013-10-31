@@ -18,6 +18,8 @@
 require "droonga/plugin/handler_watch"
 
 class WatchHandlerTest < Test::Unit::TestCase
+  include WatchHelper
+
   def setup
     setup_database
     setup_schema
@@ -30,26 +32,6 @@ class WatchHandlerTest < Test::Unit::TestCase
   end
 
   private
-  def setup_database
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-    FileUtils.mkdir_p(@database_path.dirname.to_s)
-    @database = Groonga::Database.create(:path => @database_path.to_s)
-  end
-
-  def setup_schema
-    top_directory_path = File.join(File.dirname(__FILE__), "..", "..", "..")
-    ddl_path = File.join(top_directory_path, "ddl", "watchdb.grn")
-    File.open(ddl_path) do |ddl|
-      Groonga::Context.default.restore(ddl)
-    end
-  end
-
-  def teardown_database
-    @database.close
-    @database = nil
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-  end
-
   def setup_handler
     @worker = StubWorker.new
     @handler = Droonga::WatchHandler.new(@worker)
