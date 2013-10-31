@@ -24,7 +24,7 @@ module Droonga
       @context = context
     end
 
-    def activate_periodical_sleep(options={})
+    def activate_periodical_sweep(options={})
       interval = options[:interval] || PERIODICAL_SWEEP_INTERVAL_SECONDS
       @sweeper_thread = Thread.new do
         while true
