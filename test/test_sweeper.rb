@@ -18,7 +18,7 @@
 require "droonga/watcher"
 require "droonga/sweeper"
 
-class SqeeperTest < Test::Unit::TestCase
+class SweeperTest < Test::Unit::TestCase
   include WatchHelper
 
   def setup
