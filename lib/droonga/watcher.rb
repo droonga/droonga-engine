@@ -33,6 +33,8 @@ module Droonga
       query      = request[:query]
       route      = request[:route]
 
+      raise "too long query" if query.size > 4095
+
       query_record = @query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)

@@ -68,7 +68,6 @@ module Droonga
       route = request["route"] || envelope["from"]
       raise "invalid request" if subscriber.nil? || subscriber.empty? || condition.nil?
       query = condition.to_json
-      raise "too long query" if query.size > 4095
       [subscriber, condition, query, route]
     end
   end
