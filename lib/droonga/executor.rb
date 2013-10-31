@@ -43,6 +43,7 @@ module Droonga
     end
 
     def shutdown
+      $log.trace("#{log_tag}: shutdown: start")
       @handlers.each do |handler|
         handler.shutdown
       end
@@ -55,6 +56,7 @@ module Droonga
         @context.close
         @database = @context = nil
       end
+      $log.trace("#{log_tag}: shutdown: done")
     end
 
     def add_handler(name)
@@ -67,6 +69,7 @@ module Droonga
     end
 
     def dispatch(tag, time, record, synchronous=nil)
+      $log.trace("#{log_tag}: dispatch: start")
       message = [tag, time, record]
       body, type, arguments = parse_message([tag, time, record])
       reply_to = envelope["replyTo"]
@@ -80,18 +83,30 @@ module Droonga
                    "type" => type,
                    "arguments" => arguments,
                    "synchronous" => synchronous)
+      $log.trace("#{log_tag}: dispatch: done")
     end
 
     def execute_one
+      $log.trace("#{log_tag}: execute_one: start")
       message = pull_message
-      return unless message
+      unless message
+        $log.trace("#{log_tag}: execute_one: abort: no message")
+        return
+      end
       body, command, arguments = parse_message(message)
       handler = find_handler(command)
-      handler.handle(command, body, *arguments) if handler
+      if handler
+        $log.trace("#{log_tag}: execute_one: handle: start")
+        handler.handle(command, body, *arguments)
+        $log.trace("#{log_tag}: execute_one: handle: done")
+      end
+      $log.trace("#{log_tag}: execute_one: done")
     end
 
     def post(body, destination=nil)
+      $log.trace("#{log_tag}: post: start")
       post_or_push(nil, body, destination)
+      $log.trace("#{log_tag}: post: done")
     end
 
     private
@@ -126,7 +141,9 @@ module Droonga
             synchronous = handler.prefer_synchronous?(command)
           end
           if route || @pool_size.zero? || synchronous
+            $log.trace("#{log_tag}: post_or_push: handle: start")
             handler.handle(command, body, *arguments)
+            $log.trace("#{log_tag}: post_or_push: handle: done")
           else
             unless message
               envelope["body"] = body
@@ -146,7 +163,13 @@ module Droonga
     end
 
     def output(receiver, body, command, arguments)
-      return nil unless receiver.is_a?(String) && command.is_a?(String)
+      $log.trace("#{log_tag}: output: start")
+      unless receiver.is_a?(String) && command.is_a?(String)
+        $log.trace("#{log_tag}: output: abort: invalid argument",
+                   :receiver => receiver,
+                   :command  => command)
+        return
+      end
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"
       end
@@ -155,7 +178,13 @@ module Droonga
       tag  = $3
       params = $4
       output = get_output(host, port, params)
-      return unless output
+      unless output
+        $log.trace("#{log_tag}: output: abort: no output",
+                   :host   => host,
+                   :port   => port,
+                   :params => params)
+        return
+      end
       if command =~ /\.result$/
         message = {
           inReplyTo: envelope["id"],
@@ -170,7 +199,11 @@ module Droonga
           arguments: arguments
         )
       end
-      output.post(tag + ".message", message)
+      output_tag = "#{tag}.message"
+      $log.trace("#{log_tag}: output: post: start: <#{output_tag}>")
+      output.post(output_tag, message)
+      $log.trace("#{log_tag}: output: post: done: <#{output_tag}>")
+      $log.trace("#{log_tag}: output: done")
     end
 
     def parse_message(message)
@@ -190,10 +223,12 @@ module Droonga
     end
 
     def push_message(message)
+      $log.trace("#{log_tag}: push_message: start")
       packed_message = message.to_msgpack
       @queue.push do |record|
         record.message = packed_message
       end
+      $log.trace("#{log_tag}: push_message: done")
     end
 
     def pull_message
@@ -263,6 +298,10 @@ module Droonga
 
     def create_logger(options)
       Fluent::Logger::FluentLogger.new(nil, options)
+    end
+
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] executor"
     end
   end
 end
