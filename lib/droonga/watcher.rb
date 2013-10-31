@@ -67,7 +67,11 @@ module Droonga
       subscriptions = subscriber_record.subscriptions.select do |query|
         query != query_record
       end
-      subscriber_record.subscriptions = subscriptions
+      if subscriptions.empty?
+        subscriber_record.delete
+      else
+        subscriber_record.subscriptions = subscriptions
+      end
     end
 
     def feed(request, &block)
