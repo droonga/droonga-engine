@@ -56,6 +56,11 @@ module Droonga
         @context.close
         @database = @context = nil
       end
+      if @queue_database
+        @queue_database.close
+        @queue_context.close
+        @queue_database = @queue_context = nil
+      end
       $log.trace("#{log_tag}: shutdown: done")
     end
 
@@ -256,8 +261,12 @@ module Droonga
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
-        @context.encoding = :none
-        @queue = @context[@queue_name]
+
+        @queue_context = Groonga::Context.new
+        @queue_database = @queue_context.open_database(@database_name)
+        @queue_context.encoding = :none
+
+        @queue = @queue_context[@queue_name]
       end
       @handler_names.each do |handler_name|
         add_handler(handler_name)
