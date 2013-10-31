@@ -21,7 +21,7 @@ module WatchHelper
   end
 
   def setup_schema
-    top_directory_path = File.join(File.dirname(__FILE__), "..", "..", "..")
+    top_directory_path = File.join(File.dirname(__FILE__), "..", "..")
     ddl_path = File.join(top_directory_path, "ddl", "watchdb.grn")
     File.open(ddl_path) do |ddl|
       Groonga::Context.default.restore(ddl)
