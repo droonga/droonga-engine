@@ -33,8 +33,7 @@ module Droonga
       query_record = query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)
-        query_record = query_table.add(query, :keywords => keywords,
-                                              :last_modified => Time.now)
+        query_record = query_table.add(query, :keywords => keywords)
       end
       subscriber_table = @context["Subscriber"]
       subscriber_record = subscriber_table[subscriber]
@@ -48,7 +47,8 @@ module Droonga
       else
         subscriber_table.add(subscriber,
                              :subscriptions => [query_record],
-                             :route => route)
+                             :route => route,
+                             :last_modified => Time.now)
       end
     end
 
