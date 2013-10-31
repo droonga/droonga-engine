@@ -225,11 +225,13 @@ module Droonga
         $log.trace("#{log_tag}: search_query: start")
         @start_time = Time.now
         @result = source = results[@query["source"]]
-        if @query["condition"]
+        condition = @query["condition"]
+        if condition
           expression = Groonga::Expression.new(context: @context)
           expression.define_variable(:domain => source)
-          parseCondition(source, expression, @query["condition"])
-          $log.trace("#{log_tag}: search_query: select: start")
+          parseCondition(source, expression, condition)
+          $log.trace("#{log_tag}: search_query: select: start",
+                     :condition => condition)
           @result = source.select(expression)
           $log.trace("#{log_tag}: search_query: select: done")
           @condition = expression
