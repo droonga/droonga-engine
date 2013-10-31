@@ -66,8 +66,7 @@ module Droonga
       subscriber = request["subscriber"]
       condition = request["condition"]
       route = request["route"] || envelope["from"]
-      raise "invalid request" if subscriber.nil? || subscriber.empty? || condition.nil?
-      query = condition.to_json
+      query = condition && condition.to_json
       [subscriber, condition, query, route]
     end
   end

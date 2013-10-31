@@ -33,6 +33,9 @@ module Droonga
       query      = request[:query]
       route      = request[:route]
 
+      if subscriber.nil? || subscriber.empty? || condition.nil? || query.nil?
+        raise "invalid request"
+      end
       raise "too long query" if query.size > 4095
 
       query_record = @query_table[query]
@@ -60,10 +63,14 @@ module Droonga
       subscriber = request[:subscriber]
       query      = request[:query]
 
+      if subscriber.nil? || subscriber.empty?
+        raise "invalid request"
+      end
+
       subscriber_record = @subscriber_table[subscriber]
       return unless subscriber_record
 
-      if query.nil?
+      if query.nil? || query.empty?
         delete_subscriber(subscriber_record)
       else
         query_record = @query_table[query]
