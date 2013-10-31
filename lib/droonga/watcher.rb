@@ -33,7 +33,9 @@ module Droonga
       query      = request[:query]
       route      = request[:route]
 
-      if subscriber.nil? || subscriber.empty? || condition.nil? || query.nil?
+      # XXX better validation and error class must be written!!
+      if subscriber.nil? || subscriber.empty? || condition.nil? ||
+         query.nil? || route.nil?
         raise "invalid request"
       end
       raise "too long query" if query.size > 4095
