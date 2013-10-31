@@ -17,7 +17,7 @@
 
 module Droonga
   class Sweeper
-    GARBAGE_COLLECTION_INTERVAL_SECONDS = 20 * 60 # 20 min
+    PERIODICAL_SWEEP_INTERVAL_SECONDS = 20 * 60 # 20 min
     SUBSCRIBER_LIFETIME_SECONDS = 10 * 60 # 10 min
 
     def initialize(context)
@@ -25,7 +25,7 @@ module Droonga
     end
 
     def activate_periodical_sleep(options={})
-      interval = options[:interval] || GARBAGE_COLLECTION_INTERVAL_SECONDS
+      interval = options[:interval] || PERIODICAL_SWEEP_INTERVAL_SECONDS
       @sweeper_thread = Thread.new do
         while true
           sweep_expired_subscribers
