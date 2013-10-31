@@ -65,6 +65,14 @@ class WatcherTest < Test::Unit::TestCase
     keyword_table.select.collect(&:_key)
   end
 
+  def existing_records
+    {
+      :subscribers => existing_subscribers,
+      :queries => existing_queries,
+      :keywords => existing_keywords,
+     }
+  end
+
   def normalize_subscriber(subscriber)
     return nil if subscriber.nil?
     {
@@ -100,7 +108,12 @@ class WatcherTest < Test::Unit::TestCase
       }
       @watcher.subscribe(request)
 
-      assert_equal(["localhost"], existing_subscribers)
+      assert_equal(
+        {:subscribers => ["localhost"],
+         :queries => ["たいやき".to_json],
+         :keywords => ["たいやき"]},
+        existing_records
+      )
       assert_equal(
         {:_key => "localhost",
          :subscriptions => ["たいやき".to_json],
@@ -111,7 +124,6 @@ class WatcherTest < Test::Unit::TestCase
         [{:_key => "たいやき".to_json, :keywords => ["たいやき"]}],
         normalize_queries(subscriber_table.first.subscriptions)
       )
-      assert_equal(["たいやき"], existing_keywords)
     end
 
 =begin
@@ -146,9 +158,12 @@ class WatcherTest < Test::Unit::TestCase
       }
       @watcher.subscribe(request)
       @watcher.subscribe(request)
-      assert_equal(["localhost"], existing_subscribers)
-      assert_equal(["たいやき".to_json], existing_queries)
-      assert_equal(["たいやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["localhost"],
+         :queries => ["たいやき".to_json],
+         :keywords => ["たいやき"]},
+        existing_records
+      )
     end
 
     def test_different_conditions
@@ -166,15 +181,18 @@ class WatcherTest < Test::Unit::TestCase
         :subscriber => "localhost",
       }
       @watcher.subscribe(request2)
-      assert_equal(["localhost"], existing_subscribers)
+      assert_equal(
+        {:subscribers => ["localhost"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
       assert_equal(
         {:_key => "localhost",
          :subscriptions => ["たいやき".to_json, "たこやき".to_json],
          :route => "localhost:23003/output"},
         normalize_subscriber(subscriber_table.first)
       )
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
     end
 
     def test_multiple_subscribers
@@ -192,7 +210,12 @@ class WatcherTest < Test::Unit::TestCase
         :subscriber => "subscriber2",
       }
       @watcher.subscribe(request)
-      assert_equal(["subscriber1", "subscriber2"], existing_subscribers)
+      assert_equal(
+        {:subscribers => ["subscriber1", "subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
       assert_equal([["たいやき".to_json],
                     ["たこやき".to_json]],
                    [subscriber_table["subscriber1"].subscriptions.collect(&:_key),
@@ -212,18 +235,24 @@ class WatcherTest < Test::Unit::TestCase
         :query => "たいやき".to_json,
         :subscriber => "subscriber1",
       )
-      assert_equal(["subscriber1", "subscriber2"], existing_subscribers)
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber1", "subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
 
       @watcher.unsubscribe(
         :route => "localhost:23003/output",
         :query => "たこやき".to_json,
         :subscriber => "subscriber1",
       )
-      assert_equal(["subscriber2"], existing_subscribers)
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
     end
 
     def test_with_query_watched_by_multiple_subscribers
@@ -232,18 +261,24 @@ class WatcherTest < Test::Unit::TestCase
         :query => "たいやき".to_json,
         :subscriber => "subscriber1",
       )
-      assert_equal(["subscriber1", "subscriber2"], existing_subscribers)
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber1", "subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
 
       @watcher.unsubscribe(
         :route => "localhost:23003/output",
         :query => "たいやき".to_json,
         :subscriber => "subscriber2",
       )
-      assert_equal(["subscriber1", "subscriber2"], existing_subscribers)
-      assert_equal(["たこやき".to_json], existing_queries)
-      assert_equal(["たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber1", "subscriber2"],
+         :queries => ["たこやき".to_json],
+         :keywords => ["たこやき"]},
+        existing_records
+      )
     end
 
     def test_without_query
@@ -252,9 +287,12 @@ class WatcherTest < Test::Unit::TestCase
         :subscriber => "subscriber1",
       }
       @watcher.unsubscribe(request)
-      assert_equal(["subscriber2"], existing_subscribers)
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
     end
 
     private
@@ -287,9 +325,12 @@ class WatcherTest < Test::Unit::TestCase
         :subscriber => "subscriber2",
       }
       @watcher.subscribe(request2_2)
-      assert_equal(["subscriber1", "subscriber2"], existing_subscribers)
-      assert_equal(["たいやき".to_json, "たこやき".to_json], existing_queries)
-      assert_equal(["たいやき", "たこやき"], existing_keywords)
+      assert_equal(
+        {:subscribers => ["subscriber1", "subscriber2"],
+         :queries => ["たいやき".to_json, "たこやき".to_json],
+         :keywords => ["たいやき", "たこやき"]},
+        existing_records
+      )
     end
   end
 end
