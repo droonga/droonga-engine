@@ -227,7 +227,6 @@ module Droonga
     end
 
     def sweep_orphan_route(route)
-      subscriber_table = @contest["Subscriber"]
       if subscriber_table.select do |subscriber|
            subscriber.route == route
          end.empty?
