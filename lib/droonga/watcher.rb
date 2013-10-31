@@ -29,13 +29,11 @@ module Droonga
       query      = request[:query]
       route      = request[:route]
 
-      query_table = @context["Query"]
       query_record = query_table[query]
       unless query_record
         keywords = pick_keywords([], condition)
         query_record = query_table.add(query, :keywords => keywords)
       end
-      subscriber_table = @context["Subscriber"]
       subscriber_record = subscriber_table[subscriber]
       if subscriber_record
         subscriptions = subscriber_record.subscriptions.collect do |query|
@@ -57,24 +55,25 @@ module Droonga
       subscriber = request[:subscriber]
       query      = request[:query]
 
-      subscriber_table = @context["Subscriber"]
       subscriber_record = subscriber_table[subscriber]
       return unless subscriber_record
 
-      query_table = @context["Query"]
       if query.nil?
-        subscriber_record.delete
+        delete_subscriber(subscriber_record)
       else
         query_record = query_table[query]
         return unless query_record
 
-        subscriptions = subscriber_record.subscriptions.select do |query|
+        subscriptions = subscriber_record.subscriptions
+        new_subscriptions = subscriptions.select do |query|
           query != query_record
         end
-        if subscriptions.empty?
-          subscriber_record.delete
+
+        if new_subscriptions.empty?
+          delete_subscriber(subscriber_record)
         else
-          subscriber_record.subscriptions = subscriptions
+          subscriber_record.subscriptions = new_subscriptions
+          sweep_orphan_queries(subscriptions)
         end
       end
     end
@@ -108,8 +107,8 @@ module Droonga
       trimmed = body.strip
       candidates = {}
       # FIXME scan reports the longest keyword matched only
-      @context["Keyword"].scan(trimmed).each do |keyword, word, start, length|
-        @context["Query"].select do |query|
+      keyword_table.scan(trimmed).each do |keyword, word, start, length|
+        query_table.select do |query|
           query.keywords =~ keyword
         end.each do |record|
           candidates[record.key] ||= []
@@ -168,7 +167,7 @@ module Droonga
     def publish(hits, request)
       routes = {}
       hits.each do |query|
-        @context["Subscriber"].select do |subscriber|
+        subscriber_table.select do |subscriber|
           subscriber.subscriptions =~ query
         end.each do |subscriber|
           routes[subscriber.route.key] ||= []
@@ -177,6 +176,62 @@ module Droonga
       end
       routes.each do |route, subscribers|
         yield(route, subscribers)
+      end
+    end
+
+    private
+    def subscriber_table
+      @subscriber_table ||= @context["Subscriber"]
+    end
+
+    def query_table
+      @query_table ||= @context["Query"]
+    end
+
+    def keyword_table
+      @keyword_table ||= @context["Keyword"]
+    end
+
+    def delete_subscriber(subscriber)
+      queries = subscriber.subscriptions
+      route = subscriber.route
+      subscriber.delete
+      sweep_orphan_queries(queries)
+      sweep_orphan_route(route)
+    end
+
+    def delete_query(query)
+      keywords = query.keywords
+      query.delete
+      sweep_orphan_keywords(keywords)
+    end
+
+    def sweep_orphan_queries(queries)
+      queries.each do |query|
+        if subscriber_table.select do |subscriber|
+             subscriber.queries @ query
+           end.empty?
+          delete_query(query)
+        end
+      end
+    end
+
+    def sweep_orphan_keywords(keywords)
+      keywords.each do |keyword|
+        if query_table.select do |query|
+             query.keywords @ keyword
+           end.empty?
+          keyword.delete
+        end
+      end
+    end
+
+    def sweep_orphan_route(route)
+      subscriber_table = @contest["Subscriber"]
+      if subscriber_table.select do |subscriber|
+           subscriber.route == route
+         end.empty?
+        route.delete
       end
     end
   end
