@@ -62,6 +62,8 @@ module Droonga
           :worker_type   => "process",
           :workers       => @options[:n_workers],
           :log_level     => $log.level,
+          :server_process_name => "Server[#{@options[:database]}] #$0",
+          :worker_process_name => "Worker[#{@options[:database]}] #$0"
         }
         @options.merge(force_options)
       end
