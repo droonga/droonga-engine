@@ -112,7 +112,7 @@ module Droonga
       candidates = {}
       # FIXME scan reports the longest keyword matched only
       @keyword_table.scan(trimmed).each do |keyword, word, start, length|
-       @ query_table.select do |query|
+        @query_table.select do |query|
           query.keywords =~ keyword
         end.each do |record|
           candidates[record.key] ||= []
