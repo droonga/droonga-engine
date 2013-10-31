@@ -55,22 +55,27 @@ module Droonga
 
     def unsubscribe(request)
       subscriber = request[:subscriber]
-      condition  = request[:condition]
       query      = request[:query]
 
-      query_table = @context["Query"]
-      query_record = query_table[query]
-      return unless query_record
       subscriber_table = @context["Subscriber"]
       subscriber_record = subscriber_table[subscriber]
       return unless subscriber_record
-      subscriptions = subscriber_record.subscriptions.select do |query|
-        query != query_record
-      end
-      if subscriptions.empty?
+
+      query_table = @context["Query"]
+      if query.nil?
         subscriber_record.delete
       else
-        subscriber_record.subscriptions = subscriptions
+        query_record = query_table[query]
+        return unless query_record
+
+        subscriptions = subscriber_record.subscriptions.select do |query|
+          query != query_record
+        end
+        if subscriptions.empty?
+          subscriber_record.delete
+        else
+          subscriber_record.subscriptions = subscriptions
+        end
       end
     end
 
