@@ -19,6 +19,7 @@ module Droonga
   class Watcher
     EXACT_MATCH = false
     GARBAGE_COLLECTION_INTERVAL_SECONDS = 20 * 60 # 20 min
+    SUBSCRIBER_LIFETIME_SECONDS = 10 * 60 # 10 min
 
     def initialize(context)
       @context = context
@@ -185,6 +186,7 @@ module Droonga
 
     def clear_expired_subscribers
       # implement me!
+      boundary = Time.now - SUBSCRIBER_LIFETIME_SECONDS
     end
   end
 end
