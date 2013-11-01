@@ -117,9 +117,9 @@ options[:n_steps].times do |try_count|
   puts "\n=============== #{scan_benchmark.n_keywords} keywords ===============\n"
   options[:incidences].split(/[,\s]+/).each do |incidence|
     options[:matched_keywords].split(/[,\s]+/).each do |matched_keywords|
-      condition = "#{incidence}%/#{matched_keywords}match"
+      condition = "#{incidence * 100}%/#{matched_keywords}match"
       results_for_specific_condition[condition] ||= []
-      label = "#{incidence} %/#{matched_keywords} match/#{scan_benchmark.n_keywords} keywords"
+      label = "#{incidence * 100} %/#{matched_keywords} match/#{scan_benchmark.n_keywords} keywords"
       result = Benchmark.bmbm do |benchmark|
         scan_benchmark.prepare_targets(:incidence => incidence.to_f,
                                        :matched_keywords => matched_keywords.to_i)
