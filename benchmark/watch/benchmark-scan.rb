@@ -109,7 +109,6 @@ option_parser = OptionParser.new do |parser|
 end
 args = option_parser.parse!(ARGV)
 
-
 results_for_specific_condition = {}
 scan_benchmark = ScanBenchmark.new(options[:n_watching_keywords])
 options[:n_steps].times do |try_count|
@@ -120,13 +119,16 @@ options[:n_steps].times do |try_count|
       condition = "#{incidence * 100}%/#{matched_keywords}match"
       results_for_specific_condition[condition] ||= []
       label = "#{incidence * 100} %/#{matched_keywords} match/#{scan_benchmark.n_keywords} keywords"
-      result = Benchmark.bmbm do |benchmark|
+      GC.disable
+      result = Benchmark.bm do |benchmark|
         scan_benchmark.prepare_targets(:incidence => incidence.to_f,
                                        :matched_keywords => matched_keywords.to_i)
         benchmark.report(label) do
           scan_benchmark.run
         end
       end
+      GC.enable
+      GC.start
 
       result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
       results_for_specific_condition[condition] << [label] + result
