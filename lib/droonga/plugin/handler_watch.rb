@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/watcher"
+require "droonga/sweeper"
 require "droonga/handler"
 
 module Droonga
@@ -25,6 +26,8 @@ module Droonga
     def initialize(*args)
       super
       @watcher = Watcher.new(@context)
+      @sweeper = Sweeper.new(@context)
+      @sweeper.activate_periodical_sweep
     end
 
     command "watch.subscribe" => :subscribe
