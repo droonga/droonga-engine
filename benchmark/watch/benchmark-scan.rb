@@ -73,8 +73,7 @@ class ScanBenchmark
 
   def memory_usage
     /^VmRSS:\s*(\d+) kB/ =~ File.read("/proc/self/status")
-      $1.to_i * 1024
-    end
+    $1.to_i * 1024
   end
 
   private
