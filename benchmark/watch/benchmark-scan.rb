@@ -71,6 +71,12 @@ class ScanBenchmark
     @n_keywords += n_keywords
   end
 
+  def memory_usage
+    /^VmRSS:\s*(\d+) kB/ =~ File.read("/proc/self/status")
+      $1.to_i * 1024
+    end
+  end
+
   private
   def scan(target)
     @watcher.scan_body(@hits, target)
@@ -136,6 +142,7 @@ options[:n_steps].times do |try_count|
       end
 
       result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
+      result << scan_benchmark.memory_usage
       results_for_specific_condition[condition] << [label] + result
 
       GC.enable
