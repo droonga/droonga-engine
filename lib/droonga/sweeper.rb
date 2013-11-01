@@ -17,23 +17,10 @@
 
 module Droonga
   class Sweeper
-    PERIODICAL_SWEEP_INTERVAL_SECONDS = 20 * 60 # 20 min
     SUBSCRIBER_LIFETIME_SECONDS = 10 * 60 # 10 min
 
     def initialize(context)
       @context = context
-    end
-
-    def activate_periodical_sweep(options={})
-      interval = options[:interval] || PERIODICAL_SWEEP_INTERVAL_SECONDS
-      # XXX this should be re-implemented with more better way
-      # because the thread is never stopped.
-      @sweeper_thread = Thread.new do
-        while true
-          sweep_expired_subscribers
-          sleep(interval)
-        end
-      end
     end
 
     def sweep_expired_subscribers(options={})
