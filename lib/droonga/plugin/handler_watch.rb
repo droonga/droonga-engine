@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/watcher"
+require "droonga/sweeper"
 require "droonga/handler"
 
 module Droonga
@@ -25,6 +26,7 @@ module Droonga
     def initialize(*args)
       super
       @watcher = Watcher.new(@context)
+      @sweeper = Sweeper.new(@context)
     end
 
     command "watch.subscribe" => :subscribe
@@ -59,6 +61,11 @@ module Droonga
         envelope["to"] = subscribers
         post(message, "to" => route, "type" => "watch.notification")
       end
+    end
+
+    command "watch.sweep" => :sweep
+    def sweep(request)
+      @sweeper.sweep_expired_subscribers
     end
 
     private
