@@ -115,14 +115,16 @@ options[:n_steps].times do |try_count|
   scan_benchmark.add_keywords(scan_benchmark.n_keywords) if try_count > 0
   puts "\n=============== #{scan_benchmark.n_keywords} keywords ===============\n"
   options[:incidences].split(/[,\s]+/).each do |incidence|
+    incidence = incidence.to_f
     options[:matched_keywords].split(/[,\s]+/).each do |matched_keywords|
+      matched_keywords = matched_keywords.to_i
       condition = "#{incidence * 100}%/#{matched_keywords}match"
       results_for_specific_condition[condition] ||= []
       label = "#{incidence * 100} %/#{matched_keywords} match/#{scan_benchmark.n_keywords} keywords"
       GC.disable
       result = Benchmark.bm do |benchmark|
-        scan_benchmark.prepare_targets(:incidence => incidence.to_f,
-                                       :matched_keywords => matched_keywords.to_i)
+        scan_benchmark.prepare_targets(:incidence => incidence,
+                                       :matched_keywords => matched_keywords)
         benchmark.report(label) do
           scan_benchmark.run
         end
