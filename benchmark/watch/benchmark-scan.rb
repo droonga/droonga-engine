@@ -84,19 +84,19 @@ options = {
 }
 option_parser = OptionParser.new do |parser|
   parser.on("--keywords=N", Integer,
-            "number of watching keywords (optional)") do |n_watching_keywords|
+            "number of watching keywords") do |n_watching_keywords|
     options[:n_watching_keywords] = n_watching_keywords
   end
   parser.on("--steps=N", Integer,
-            "number of benchmark steps (optional)") do |n_steps|
+            "number of benchmark steps") do |n_steps|
     options[:n_steps] = n_steps
   end
   parser.on("--incidences=INCIDENCES", String,
-            "list of matching incidences (optional)") do |incidences|
+            "list of matching incidences") do |incidences|
     options[:incidences] = incidences
   end
   parser.on("--output-path=PATH", String,
-            "path to the output CSV file (optional)") do |output_path|
+            "path to the output CSV file") do |output_path|
     options[:output_path] = output_path
   end
 end
