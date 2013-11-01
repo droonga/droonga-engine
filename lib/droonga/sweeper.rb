@@ -26,6 +26,8 @@ module Droonga
 
     def activate_periodical_sweep(options={})
       interval = options[:interval] || PERIODICAL_SWEEP_INTERVAL_SECONDS
+      # XXX this should be re-implemented with more better way
+      # because the thread is never stopped.
       @sweeper_thread = Thread.new do
         while true
           sweep_expired_subscribers
