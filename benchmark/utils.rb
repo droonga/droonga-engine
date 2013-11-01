@@ -142,6 +142,7 @@ module DroongaBenchmark
     def initialize(params)
       @keywords  = params[:keywords]
       @incidence = params[:incidence]
+      @matched_keywords = params[:matched_keywords] || 1
     end
 
     def generate(n_targets)
@@ -151,7 +152,7 @@ module DroongaBenchmark
       n_unmatched_targets = (n_targets - n_matched_targets)
 
       n_matched_targets.times do
-        targets << generate_target(@keywords.sample(1).first)
+        targets << generate_target(@keywords.sample(@matched_keywords))
       end
 
       n_unmatched_targets.times do
@@ -161,8 +162,8 @@ module DroongaBenchmark
       targets
     end
 
-    def generate_target(keyword="")
-     (PADDING * (SIZE / PADDING.size)) + keyword
+    def generate_target(keywords=[])
+     (PADDING * (SIZE / PADDING.size)) + keywords.join("/")
     end
   end
 

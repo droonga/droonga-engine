@@ -28,9 +28,9 @@ require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
 class ScanBenchmark
   attr_reader :n_keywords
 
-  def initialize(n_times, incidence=0)
+  def initialize(n_times, options={})
     @n_times = n_times
-    @incidence = incidence
+    @incidence = options[:incidence]
 
     @database = DroongaBenchmark::WatchDatabase.new
 
@@ -38,7 +38,7 @@ class ScanBenchmark
 
     @keywords_generator = DroongaBenchmark::KeywordsGenerator.new
     @keywords = @keywords_generator.generate(@n_times)
-    prepare_targets(@incidence)
+    prepare_targets(options)
 
     @database.subscribe_to(@keywords)
     @n_keywords = @keywords.size
@@ -52,11 +52,13 @@ class ScanBenchmark
     end
   end
 
-  def prepare_targets(incidence=0)
-    @incidence = incidence
+  def prepare_targets(options={})
+    @incidence = options[:incidence] || 0
+    @matched_keywords = options[:matched_keywords] || 0
     @targets = DroongaBenchmark::TargetsGenerator.generate(@n_times,
                                                            :keywords => @keywords.sample(@n_times),
-                                                           :incidence => @incidence)
+                                                           :incidence => @incidence,
+                                                           :matched_keywords => @matched_keywords)
   end
 
   def add_keywords(n_keywords)
@@ -80,6 +82,7 @@ options = {
   :n_watching_keywords => 1000,
   :n_steps          => 10,
   :incidences       => "0.1,0.5,0.9",
+  :matched_keywords => "1,5,10",
   :output_path      => "/tmp/watch-benchmark-scan",
 }
 option_parser = OptionParser.new do |parser|
@@ -95,6 +98,10 @@ option_parser = OptionParser.new do |parser|
             "list of matching incidences") do |incidences|
     options[:incidences] = incidences
   end
+  parser.on("--matched-keywords=MATCHED_KEYWORDS", String,
+            "number of keywords which is matched per a target") do |matched_keywords|
+    options[:matched_keywords] = matched_keywords
+  end
   parser.on("--output-path=PATH", String,
             "path to the output CSV file") do |output_path|
     options[:output_path] = output_path
@@ -103,24 +110,27 @@ end
 args = option_parser.parse!(ARGV)
 
 
-results_by_incidence = {}
+results_for_specific_condition = {}
 scan_benchmark = ScanBenchmark.new(options[:n_watching_keywords])
 options[:n_steps].times do |try_count|
   scan_benchmark.add_keywords(scan_benchmark.n_keywords) if try_count > 0
   puts "\n=============== #{scan_benchmark.n_keywords} keywords ===============\n"
   options[:incidences].split(/[,\s]+/).each do |incidence|
-    results_by_incidence[incidence] ||= []
-    label = "incidence #{incidence}/#{scan_benchmark.n_keywords} keywords"
-    result = Benchmark.bmbm do |benchmark|
-      puts "\n>>>>> targets for #{incidence}\n"
-      scan_benchmark.prepare_targets(incidence.to_f)
-      benchmark.report(label) do
-        puts "\n>>>>>>>>>>> #{label}\n"
-        scan_benchmark.run
+    options[:matched_keywords].split(/[,\s]+/).each do |matched_keywords|
+      condition = "#{incidence}%/#{matched_keywords}match"
+      results_for_specific_condition[condition] ||= []
+      label = "#{incidence} %/#{matched_keywords} match/#{scan_benchmark.n_keywords} keywords"
+      result = Benchmark.bmbm do |benchmark|
+        scan_benchmark.prepare_targets(:incidence => incidence.to_f,
+                                       :matched_keywords => matched_keywords.to_i)
+        benchmark.report(label) do
+          scan_benchmark.run
+        end
       end
+
+      result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
+      results_for_specific_condition[condition] << [label] + result
     end
-    result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
-    results_by_incidence[incidence] << [label] + result
   end
 end
 
@@ -131,7 +141,7 @@ all_output = File.join(options[:output_path], "all.csv")
 all_results = [
   ["case", "user", "system", "total", "real"],
 ]
-results_by_incidence.values.each do |results|
+results_for_specific_condition.values.each do |results|
   all_results += results
 end
 puts "All (saved to #{all_output}):"
@@ -146,8 +156,8 @@ puts ""
 total_output = File.join(options[:output_path], "total.csv")
 total_results_header = ["case"]
 total_results = []
-results_by_incidence.each do |incidence, results|
-  total_results_header << "incidence #{incidence}"
+results_for_specific_condition.each do |condition, results|
+  total_results_header << condition
   results.each_index do |index|
     total_results[index] ||= [results[index].first.split("/").last]
     total_results[index] << results[index][3]
@@ -166,8 +176,8 @@ puts ""
 real_output = File.join(options[:output_path], "real.csv")
 real_results_header = ["case"]
 real_results = []
-results_by_incidence.each do |incidence, results|
-  real_results_header << "incidence #{incidence}"
+results_for_specific_condition.each do |condition, results|
+  real_results_header << condition
   results.each_index do |index|
     real_results[index] ||= [results[index].first.split("/").last]
     real_results[index] << results[index][4]
