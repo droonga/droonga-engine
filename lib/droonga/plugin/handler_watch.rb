@@ -17,6 +17,7 @@
 
 require "droonga/watcher"
 require "droonga/sweeper"
+require "droonga/watch_schema"
 require "droonga/handler"
 
 module Droonga
@@ -25,6 +26,7 @@ module Droonga
 
     def initialize(*args)
       super
+      ensure_schema_created
       @watcher = Watcher.new(@context)
       @sweeper = Sweeper.new(@context)
     end
@@ -75,6 +77,11 @@ module Droonga
       route = request["route"] || envelope["from"]
       query = condition && condition.to_json
       [subscriber, condition, query, route]
+    end
+
+    def ensure_schema_created
+      schema = WatchSchema.new(@context)
+      schema.ensure_created
     end
   end
 end
