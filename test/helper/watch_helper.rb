@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/watch_schema"
+
 module WatchHelper
   def setup_database
     FileUtils.rm_rf(@database_path.dirname.to_s)
@@ -21,11 +23,8 @@ module WatchHelper
   end
 
   def setup_schema
-    top_directory_path = File.join(File.dirname(__FILE__), "..", "..")
-    ddl_path = File.join(top_directory_path, "ddl", "watchdb.grn")
-    File.open(ddl_path) do |ddl|
-      Groonga::Context.default.restore(ddl)
-    end
+    schema = Droonga::WatchSchema.new(Groonga::Context.default)
+    schema.ensure_created
   end
 
   def teardown_database
