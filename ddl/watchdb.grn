@@ -2,7 +2,6 @@ table_create Subscriber TABLE_HASH_KEY ShortText
 table_create Route TABLE_HASH_KEY ShortText
 table_create Query TABLE_HASH_KEY ShortText
 table_create Keyword TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
-table_create Times TABLE_PAT_KEY Time
 column_create Subscriber subscriptions COLUMN_VECTOR Query
 column_create Subscriber route COLUMN_SCALAR Route
 column_create Subscriber last_modified COLUMN_SCALAR Time
