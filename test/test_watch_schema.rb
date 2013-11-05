@@ -20,22 +20,20 @@ require "droonga/watch_schema"
 class WatchSchemaTest < Test::Unit::TestCase
   def setup
     @database_path = @temporary_directory + "droonga/watch/db"
+    @context = Groonga::Context.default
+    FileUtils.mkdir_p(File.dirname(@database_path))
+    @context.create_database(@database_path.to_s)
   end
 
   def test_ensure_created
-    schema = Droonga::WatchSchema.new(@database_path.to_s)
-
-    assert_not_predicate(@database_path, :exist?)
+    schema = Droonga::WatchSchema.new(@context)
     schema.ensure_created
-    assert_predicate(@database_path, :exist?)
 
-    context = Groonga::Context.new
     dumped_commands = nil
-    context.open_database(@database_path.to_s) do |database|
-      dumped_commands = Groonga::DatabaseDumper.dump(:context => context,
+    @context.open_database(@database_path.to_s) do |database|
+      dumped_commands = Groonga::DatabaseDumper.dump(:context => @context,
                                                      :database => database)
     end
-    context.close
     assert_equal(<<-SCHEMA, dumped_commands)
 table_create Keyword TABLE_PAT_KEY|KEY_NORMALIZE --key_type ShortText
 
