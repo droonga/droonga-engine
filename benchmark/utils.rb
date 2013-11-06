@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "json"
+require "thread"
 require "droonga/watch_schema"
 
 module DroongaBenchmark
@@ -208,6 +209,7 @@ module DroongaBenchmark
       }
       options = default_options.merge(options)
       @socket = TCPServer.new(options[:host], options[:port])
+      start
     end
 
     def close
@@ -222,19 +224,19 @@ module DroongaBenchmark
       @socket.addr[1]
     end
 
-    def receive(options={})
-      if IO.select([@socket], nil, nil, options[:timeout])
+    def new_message
+      @messages.pop
+    end
+
+    def start
+      @messages = Queue.new
+      Thread.new do
         client = @socket.accept
-        message = nil
         unpacker = MessagePack::Unpacker.new(client)
         unpacker.each do |object|
-          message = object
-          break
+          @messages.push(object)
         end
         client.close
-        message
-      else
-        nil
       end
     end
   end

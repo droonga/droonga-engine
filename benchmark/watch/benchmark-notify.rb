@@ -50,13 +50,14 @@ class NotifyBenchmark
   end
 
   def run
-    notifications = []
     @n_times.times do |index|
       do_feed("#{WATCHING_KEYWORD} #{index}")
     end
-    received = []
-    received << @receiver.receive(:timeout => @timeout)
-    notifications += received if received.is_a?(Array)
+
+    notifications = []
+    while notifications.size != @n_times do
+      notifications << @receiver.new_message
+    end
     notifications
   end
 
@@ -115,7 +116,7 @@ options[:n_steps].times do |try_count|
   notify_benchmark.add_subscribers(notify_benchmark.n_subscribers) if try_count > 0
   label = "#{notify_benchmark.n_subscribers} subscribers"
   percentage = nil
-  result = Benchmark.bmbm do |benchmark|
+  result = Benchmark.bm do |benchmark|
     benchmark.report(label) do
       sent_notifications = notify_benchmark.run
       percentage = sent_notifications.size.to_f / options[:n_times] * 100
