@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "json"
+require "droonga/watch_schema"
 
 module DroongaBenchmark
   WATCH_DATASET = "Watch"
@@ -26,7 +27,6 @@ module DroongaBenchmark
     def initialize
       @database_dir = "/tmp/watch-benchmark"
       @database_path = "#{@database_dir}/db"
-      @ddl_path = File.expand_path(File.join(__FILE__, "..", "..", "ddl", "watchdb.grn"))
       FileUtils.rm_rf(@database_dir)
       FileUtils.mkdir_p(@database_dir)
 
@@ -34,9 +34,8 @@ module DroongaBenchmark
 
       @context = Groonga::Context.new
       @context.open_database(@database_path)
-      File.open(@ddl_path) do |ddl|
-        @context.restore(ddl)
-      end
+      schema = Droonga::WatchSchema.new(@context)
+      schema.ensure_created
     end
 
 =begin
