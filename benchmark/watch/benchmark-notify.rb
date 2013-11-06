@@ -124,10 +124,12 @@ options[:n_steps].times do |try_count|
   end
   puts "=> #{percentage} % feeds are notified"
   result = result.join("").strip.gsub(/[()]/, "").split(/\s+/)
-  results << [label] + result
+  qps = options[:n_times].to_f / result.last.to_f
+  puts "   (#{qps} queries per second)"
+  results << [label, qps]
 end
 total_results = [
-  ["case", "user", "system", "total", "real"],
+  ["case", "qps"],
 ]
 total_results += results
 
