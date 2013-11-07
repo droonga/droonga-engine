@@ -185,8 +185,9 @@ module Droonga
           subscriber.subscriptions =~ query
         end
         subscribers.each do |subscriber|
-          routes[subscriber.route.key] ||= []
-          routes[subscriber.route.key] << subscriber.key.key
+          route = subscriber.route.key
+          routes[route] ||= []
+          routes[route] << subscriber.key.key
         end
       end
       routes.each do |route, subscribers|
