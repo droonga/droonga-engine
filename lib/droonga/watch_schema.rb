@@ -24,6 +24,10 @@ module Droonga
     end
 
     def ensure_created
+      if @context["Keyword"]
+        $log.trace "[#{Process.pid}] Watch tables exists. Skipping creation"
+        return
+      end
       $log.trace "[#{Process.pid}] Creating Watch tables"
       ensure_tables
       $log.trace "[#{Process.pid}] Created Watch tables"
