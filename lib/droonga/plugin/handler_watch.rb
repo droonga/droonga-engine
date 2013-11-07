@@ -26,7 +26,23 @@ module Droonga
 
     def initialize(*args)
       super
-      ensure_schema_created
+
+      # XXX just workaround. This must be re-written.
+      # When secondary and later processes opens the database,
+      # creation processes of tables by the first process is
+      # not finished yet. Then secondary and others tries to
+      # create tables and raises errors. To avoid such a problem,
+      # the creation processes of tables is disabled on workers.
+      try to create
+      if $0 !~ /\AServer/
+        ensure_schema_created
+      else
+        until @context["Keyword"]
+          sleep 0.1
+        end
+        sleep 1
+      end
+
       @watcher = Watcher.new(@context)
       @sweeper = Sweeper.new(@context)
     end
