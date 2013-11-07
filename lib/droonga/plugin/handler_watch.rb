@@ -33,7 +33,6 @@ module Droonga
       # not finished yet. Then secondary and others tries to
       # create tables and raises errors. To avoid such a problem,
       # the creation processes of tables is disabled on workers.
-      try to create
       if $0 !~ /\AServer/
         ensure_schema_created
       else
