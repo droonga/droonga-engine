@@ -189,6 +189,18 @@ module Droonga
           routes[route] ||= []
           routes[route] << subscriber.key.key
         end
+=begin
+# "group" version. This is slower than above...
+        route_records = subscribers.group("route",
+                                          :max_n_sub_records => subscribers.size)
+        route_records.each do |route_record|
+          route = route_record._key
+          routes[route] ||= []
+          route_record.sub_records.each do |subscriber|
+            routes[route] << subscriber.key.key
+          end
+        end
+=end
       end
       routes.each do |route, subscribers|
         yield(route, subscribers)
