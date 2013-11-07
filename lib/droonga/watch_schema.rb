@@ -25,12 +25,12 @@ module Droonga
 
     def ensure_created
       if @context["Keyword"]
-        $log.trace "[#{Process.pid}] Watch tables exists. Skipping creation"
+        $log.trace "#{log_tag} skip table creation"
         return
       end
-      $log.trace "[#{Process.pid}] Creating Watch tables"
+      $log.trace "#{log_tag} ensure_tables: start"
       ensure_tables
-      $log.trace "[#{Process.pid}] Created Watch tables"
+      $log.trace "#{log_tag} ensure_tables: done"
     end
 
     private
@@ -79,6 +79,10 @@ module Droonga
           table.index("Subscriber", "subscriptions", :name => "subscribers")
         end
       end
+    end
+
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] watch_schema"
     end
   end
 end
