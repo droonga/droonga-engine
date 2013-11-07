@@ -181,9 +181,10 @@ module Droonga
     def publish(hits, request)
       routes = {}
       hits.each do |query|
-        @subscriber_table.select do |subscriber|
+        subscribers = @subscriber_table.select do |subscriber|
           subscriber.subscriptions =~ query
-        end.each do |subscriber|
+        end
+        subscribers.each do |subscriber|
           routes[subscriber.route.key] ||= []
           routes[subscriber.route.key] << subscriber.key.key
         end
