@@ -24,7 +24,9 @@ module Droonga
     end
 
     def ensure_created
+      $log.trace "[#{Process.pid}] Creating Watch tables"
       ensure_tables
+      $log.trace "[#{Process.pid}] Created Watch tables"
     end
 
     private
