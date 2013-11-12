@@ -37,6 +37,10 @@ module Droonga
       emit(outputs)
     end
 
+    def prefer_synchronous?(command)
+      return true
+    end
+
     module Status
       SUCCESS          = 0
       INVALID_ARGUMENT = -22
