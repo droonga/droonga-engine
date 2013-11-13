@@ -92,7 +92,7 @@ module Droonga
     end
 
     command :reset
-    def add(request)
+    def reset(request)
       # TODO: update events must be serialized in the primary node of replicas.
       key = request["key"] || rand.to_s
       scatter_all(request, key)
