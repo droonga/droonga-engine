@@ -13,6 +13,6 @@ TODO: Write usage.
 
 ## Copyright
 
-* Copyright (c) 2013 droonga project
+* Copyright (c) 2013 Droonga Project
 * License
   * GNU Lesser General Public License version 2.1
