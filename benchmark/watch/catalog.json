@@ -9,7 +9,7 @@
   },
   "datasets": {
     "Watch": {
-      "workers": 0,
+      "workers": 2,
       "plugins": ["search", "groonga", "add", "watch"],
       "number_of_replicas": 1,
       "number_of_partitions": 1,
