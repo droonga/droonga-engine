@@ -231,12 +231,15 @@ module DroongaBenchmark
     def start
       @messages = Queue.new
       Thread.new do
-        client = @socket.accept
-        unpacker = MessagePack::Unpacker.new(client)
-        unpacker.each do |object|
-          @messages.push(object)
+        loop do
+          Thread.new(@socket.accept) do |client|
+            unpacker = MessagePack::Unpacker.new(client)
+            unpacker.each do |object|
+              @messages.push(object)
+            end
+            client.close
+          end
         end
-        client.close
       end
     end
   end
