@@ -159,8 +159,8 @@ module Droonga
           end
           if condition["query"]
             options[:syntax] = :query
-            if condition["default_operator"]
-              case condition["default_operator"]
+            if condition["defaultOperator"]
+              case condition["defaultOperator"]
               when "||"
                 options[:default_operator] = Groonga::Operator::OR
               when "&&"
@@ -171,17 +171,17 @@ module Droonga
                 raise "undefined operator assigned #{condition["default_operator"]}"
               end
             end
-            if condition["allow_pragma"]
+            if condition["allowPragma"]
               options[:allow_pragma] = true
             end
-            if condition["allow_column"]
+            if condition["allowColumn"]
               options[:allow_column] = true
             end
             expression.parse(condition["query"], options)
           elsif condition["script"]
             # "script" is ignored when "query" is also assigned.
             options[:syntax] = :script
-            if condition["allow_update"]
+            if condition["allowUpdate"]
               options[:allow_update] = true
             end
             expression.parse(condition["script"], options)
