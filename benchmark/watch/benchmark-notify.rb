@@ -55,7 +55,7 @@ class NotifyBenchmark
     end
 
     notifications = []
-    while notifications.size != @n_times do
+    while notifications.size != @n_times
       notifications << @receiver.new_message
     end
     notifications
