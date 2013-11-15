@@ -17,7 +17,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-droonga"
-  gem.version       = "0.0.2"
+  gem.version       = "0.7.0"
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
   gem.description   = "Droonga(distributed Groonga) plugin for Fluent event collector"
