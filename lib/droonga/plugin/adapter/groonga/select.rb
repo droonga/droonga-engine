@@ -76,7 +76,12 @@ module Droonga
           end
 
           header = [status_code, start_time_in_unix_time, elapsed_time]
-          results = [[count], converted_attributes, value["records"]]
+          records = value["records"]
+          if records.empty?
+            results = [[count], converted_attributes]
+          else
+            results = [[count], converted_attributes, records]
+          end
           body = [results]
 
           [header, body]
