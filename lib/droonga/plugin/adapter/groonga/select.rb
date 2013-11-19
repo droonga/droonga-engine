@@ -20,7 +20,7 @@ module Droonga
         table = select_request["table"]
         result_name = table + "_result"
         match_columns = select_request["match_columns"]
-        match_to = match_columns
+        match_to = match_columns ? match_columns.split(/ *\|\| */) : []
         query = select_request["query"]
         output_columns = select_request["output_columns"]
         attributes = output_columns.split(/, */)
