@@ -29,7 +29,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
       expected_search_request = {
         "queries" => {
-          "EmptyTable" => {
+          "EmptyTable_result" => {
             "source"   => "EmptyTable",
             "output"   => {
               "elements"   => [
@@ -62,7 +62,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
         expected_search_request = {
           "queries" => {
-            "EmptyTable" => {
+            "EmptyTable_result" => {
               "source"   => "EmptyTable",
               "output"   => {
                 "elements"   => [
@@ -106,7 +106,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
         expected_search_request = {
           "queries" => {
-            "EmptyTable" => {
+            "EmptyTable_result" => {
               "source"   => "EmptyTable",
               "condition"=> {
                 "query"  => "QueryTest",
