@@ -32,15 +32,22 @@ class SearchHandlerTest < Test::Unit::TestCase
   private
   def search(request)
     @handler.search(request)
-    normalize_result_set(@messages.last)
+    results_to_result_set(@messages)
   end
 
-  def normalize_result_set(result_set)
-    result_set.each do |name, result|
-      result["startTime"] = start_time if result["startTime"]
-      result["elapsedTime"] = elapsed_time if result["elapsedTime"]
+  def results_to_result_set(results)
+    result_set = {}
+    results.each do |result_and_name|
+      result, name = result_and_name
+      result_set[name] = normalize_result(result)
     end
     result_set
+  end
+
+  def normalize_result(result)
+    result["startTime"] = start_time if result["startTime"]
+    result["elapsedTime"] = elapsed_time if result["elapsedTime"]
+    result
   end
 
   def start_time
