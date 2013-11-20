@@ -19,7 +19,7 @@ module HandlerHelper
     @handler = handler_class.new(@worker)
 
     @messages = []
-    stub(@handler).emit do |message|
+    stub(@handler).emit do |*message|
       @messages << message
     end
   end
