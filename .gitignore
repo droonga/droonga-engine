@@ -1,1 +1,5 @@
 /Gemfile.lock
+/test/command/.bundle/
+/test/command/Gemfile.lock
+/test/command/bin/
+/test/command/vendor/
