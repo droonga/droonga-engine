@@ -16,8 +16,6 @@
 require "droonga/watch_schema"
 
 module WatchHelper
-  include DatabaseHelper
-
   def setup_schema
     schema = Droonga::WatchSchema.new(Groonga::Context.default)
     schema.ensure_created

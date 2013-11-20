@@ -29,12 +29,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   private
   def setup_database
     restore(fixture_data("document.grn"))
-    @database = Groonga::Database.open(@database_path.to_s)
-  end
-
-  def teardown_database
-    @database.close
-    @database = nil
+    super
   end
 
   def setup_handler

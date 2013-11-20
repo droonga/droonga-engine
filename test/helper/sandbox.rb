@@ -51,6 +51,15 @@ module Sandbox
     Groonga::Context.default_options = nil
   end
 
+  def setup_database
+    @database = Groonga::Database.create(:path => @database_path.to_s)
+  end
+
+  def teardown_database
+    @database.close
+    @database = nil
+  end
+
   def restore(dumped_command)
     context = Groonga::Context.new
     database = context.create_database(@database_path.to_s)

@@ -16,8 +16,6 @@
 require "droonga/plugin/handler_add"
 
 class AddHandlerTest < Test::Unit::TestCase
-  include DatabaseHelper
-
   def setup
     setup_database
     setup_schema
