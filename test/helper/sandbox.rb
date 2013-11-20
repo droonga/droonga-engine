@@ -61,11 +61,15 @@ module Sandbox
   end
 
   def restore(dumped_command)
-    context = Groonga::Context.new
-    database = context.create_database(@database_path.to_s)
-    context.restore(dumped_command)
-    database.close
-    context.close
+    if @database
+      Groonga::Context.default.restore(dumped_command)
+    else
+      context = Groonga::Context.new
+      database = context.create_database(@database_path.to_s)
+      context.restore(dumped_command)
+      database.close
+      context.close
+    end
   end
 
   def teardown_sandbox

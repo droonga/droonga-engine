@@ -20,6 +20,7 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def setup
     setup_database
+    restore(fixture_data("document.grn"))
     setup_handler(Droonga::SearchHandler)
   end
 
@@ -29,11 +30,6 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   private
-  def setup_database
-    restore(fixture_data("document.grn"))
-    super
-  end
-
   def search(request)
     @handler.search(request)
     normalize_result_set(@messages.last)
