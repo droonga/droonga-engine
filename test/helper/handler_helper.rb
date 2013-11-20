@@ -13,13 +13,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require_relative "helper/sandbox"
-require_relative "helper/fixture"
-require_relative "helper/stub_worker"
-require_relative "helper/handler_helper"
-require_relative "helper/watch_helper"
+module HandlerHelper
+  attr_reader :emitted
 
-class Test::Unit::TestCase
-  include Sandbox
-  include Fixture
+  def setup_stub_emit(handler)
+    @emitted = nil
+    stub(handler).emit do |response|
+      @emitted = response
+    end
+  end
 end

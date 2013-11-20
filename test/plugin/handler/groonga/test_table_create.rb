@@ -15,25 +15,25 @@
 
 class TableCreateTest < GroongaHandlerTest
   def test_success
-    mock(@handler).emit([true])
+    setup_stub_emit(@handler)
     @handler.table_create({"name" => "Books"})
     assert_equal(
       [[Droonga::GroongaHandler::Status::SUCCESS, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
-      [normalize_header(@worker.body.first), @worker.body.last]
+      [normalize_header(emitted.first), emitted.last]
     )
   end
 
   def test_failure
-    mock(@handler).emit([false])
+    setup_stub_emit(@handler)
     @handler.table_create({})
     assert_equal(
       [[Droonga::GroongaHandler::Status::INVALID_ARGUMENT, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], false],
-      [normalize_header(@worker.body.first), @worker.body.last]
+      [normalize_header(emitted.first), emitted.last]
     )
   end
 
   def test_name
-    mock(@handler).emit([true])
+    setup_stub_emit(@handler)
     @handler.table_create({"name" => "Books"})
     assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
@@ -84,7 +84,7 @@ table_create Books TABLE_NO_KEY
         "name" => "Books",
         "flags" => data[:flags],
       }
-      mock(@handler).emit([true])
+      setup_stub_emit(@handler)
       @handler.table_create(request)
       assert_equal(data[:schema], dump)
     end
@@ -96,7 +96,7 @@ table_create Books TABLE_NO_KEY
         "name"  => "Books",
         "key_type" => "Int32",
       }
-      mock(@handler).emit([true])
+      setup_stub_emit(@handler)
       @handler.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type Int32
@@ -110,7 +110,7 @@ table_create Books TABLE_HASH_KEY --key_type Int32
         "name"  => "Books",
         "value_type" => "Int32",
       }
-      mock(@handler).emit([true])
+      setup_stub_emit(@handler)
       @handler.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
@@ -124,7 +124,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
         "name"  => "Books",
         "default_tokenizer" => "TokenBigram",
       }
-      mock(@handler).emit([true])
+      setup_stub_emit(@handler)
       @handler.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer TokenBigram
@@ -138,7 +138,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
         "name"  => "Books",
         "normalizer" => "NormalizerAuto",
       }
-      mock(@handler).emit([true])
+      setup_stub_emit(@handler)
       @handler.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY|KEY_NORMALIZE --key_type ShortText

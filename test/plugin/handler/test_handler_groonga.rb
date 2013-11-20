@@ -16,6 +16,8 @@
 require "droonga/plugin/handler_groonga"
 
 class GroongaHandlerTest < Test::Unit::TestCase
+  include HandlerHelper
+
   def setup
     setup_database
     setup_handler
