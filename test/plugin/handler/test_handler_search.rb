@@ -35,6 +35,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   def setup_handler
     @worker = StubWorker.new
     @handler = Droonga::SearchHandler.new(@worker)
+    setup_stub_emit(@handler)
   end
 
   def teardown_handler
@@ -43,7 +44,7 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def search(request)
     @handler.search(request)
-    normalize_result_set(@worker.body)
+    normalize_result_set(last_emitted)
   end
 
   def normalize_result_set(result_set)
