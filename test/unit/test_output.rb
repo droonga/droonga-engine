@@ -16,14 +16,14 @@
 require "fluent/plugin/out_droonga"
 
 module OutputStub
-  class Worker
+  class Engine
     attr_reader :processed_record
     def initialize(response)
       @response = response
       @processed_record = nil
     end
 
-    def dispatch(tag, time, record)
+    def emit(tag, time, record)
       @processed_record = record
       @response
     end
@@ -50,14 +50,14 @@ module OutputStub
   end
 
   class Output < Fluent::DroongaOutput
-    attr_reader :worker
+    attr_reader :engine
     def initialize(response)
       @response = response
       super()
     end
 
     def start
-      @worker = Worker.new(@response)
+      @engine = Engine.new(@response)
     end
 
     def create_logger(tag, options)
@@ -80,7 +80,7 @@ class OutputTest < Test::Unit::TestCase
     driver.run do
       driver.emit(request, time)
     end
-    assert_equal(request, @output.worker.processed_record)
+    assert_equal(request, @output.engine.processed_record)
   end
 
   private
