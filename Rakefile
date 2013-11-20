@@ -19,7 +19,7 @@ require "bundler/gem_tasks"
 
 desc "Run test"
 task :test do
-  ruby(File.join(File.dirname(__FILE__), "test", "run-test.rb"))
+  ruby(File.join(File.dirname(__FILE__), "test", "unit", "run-test.rb"))
 end
 
 task :default => :test
