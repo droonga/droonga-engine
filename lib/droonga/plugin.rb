@@ -20,10 +20,14 @@ module Droonga
     class << self
       def load_all
         $LOAD_PATH.each do |load_path|
-          Dir.glob("#{load_path}/droonga/plugin/*_*.rb") do |path|
-            type, name = File.basename(path, ".rb").split(/_/, 2)
-            plugin = new(type, name)
-            plugin.load
+          Dir.glob("#{load_path}/droonga/plugin/*") do |type_path|
+            next unless File.directory?(type_path)
+            type = File.basename(type_path)
+            Dir.glob("#{type_path}/*.rb") do |path|
+              name = File.basename(path, ".rb")
+              plugin = new(type, name)
+              plugin.load
+            end
           end
         end
       end
@@ -35,7 +39,7 @@ module Droonga
     end
 
     def load
-      require "droonga/plugin/#{@type}_#{@name}"
+      require "droonga/plugin/#{@type}/#{@name}"
     end
   end
 end
