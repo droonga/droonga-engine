@@ -16,16 +16,7 @@
 require "droonga/watch_schema"
 
 module WatchHelper
-  def setup_database
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-    FileUtils.mkdir_p(@database_path.dirname.to_s)
-    @database = Groonga::Database.create(:path => @database_path.to_s)
-  end
-
-  def setup_schema
-    schema = Droonga::WatchSchema.new(Groonga::Context.default)
-    schema.ensure_created
-  end
+  include DatabaseHelper
 
   def teardown_database
     @database.close
