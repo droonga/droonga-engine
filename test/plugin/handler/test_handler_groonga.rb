@@ -32,6 +32,7 @@ class GroongaHandlerTest < Test::Unit::TestCase
   def setup_handler
     @worker = StubWorker.new
     @handler = Droonga::GroongaHandler.new(@worker)
+    setup_stub_emit(@handler)
   end
 
   def teardown_handler
