@@ -42,7 +42,7 @@ end
 
 ENV["BUNDLE_GEMFILE"] = File.expand_path(gemfile)
 
-drntest_options = []
+drntest_options = ARGV.dup
 drntest_options << File.join(base_dir, "suite")
 
 run(File.join(base_dir, "bin", "drntest"),
