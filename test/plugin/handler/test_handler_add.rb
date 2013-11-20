@@ -16,6 +16,8 @@
 require "droonga/plugin/handler_add"
 
 class AddHandlerTest < Test::Unit::TestCase
+  include DatabaseHelper
+
   def setup
     setup_database
     setup_schema
@@ -28,19 +30,7 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   private
-  def setup_database
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-    FileUtils.mkdir_p(@database_path.dirname.to_s)
-    @database = Groonga::Database.create(:path => @database_path.to_s)
-  end
-
   def setup_schema
-  end
-
-  def teardown_database
-    @database.close
-    @database = nil
-    FileUtils.rm_rf(@database_path.dirname.to_s)
   end
 
   def setup_handler
