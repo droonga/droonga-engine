@@ -27,18 +27,6 @@ class GroongaHandlerTest < Test::Unit::TestCase
   end
 
   private
-  def setup_database
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-    FileUtils.mkdir_p(@database_path.dirname.to_s)
-    @database = Groonga::Database.create(:path => @database_path.to_s)
-  end
-
-  def teardown_database
-    @database.close
-    @database = nil
-    FileUtils.rm_rf(@database_path.dirname.to_s)
-  end
-
   def setup_handler
     @worker = StubWorker.new
     @handler = Droonga::GroongaHandler.new(@worker)
