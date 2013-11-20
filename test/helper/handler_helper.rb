@@ -17,9 +17,13 @@ module HandlerHelper
   attr_reader :emitted
 
   def setup_stub_emit(handler)
-    @emitted = nil
+    @emitted = []
     stub(handler).emit do |response|
-      @emitted = response
+      @emitted << response
     end
+  end
+
+  def last_emitted
+    @emitted.last
   end
 end
