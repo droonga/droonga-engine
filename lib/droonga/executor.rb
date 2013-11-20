@@ -21,7 +21,7 @@ require "groonga"
 require "droonga/job_queue"
 require "droonga/handler_plugin"
 require "droonga/plugin"
-require "droonga/proxy"
+require "droonga/dispatcher"
 
 module Droonga
   class Executor
