@@ -1,0 +1,7 @@
+{
+  "type": "table_create",
+  "body": {
+    "name"  : "User",
+    "flags" : "TABLE_NO_KEY"
+  }
+}
