@@ -17,7 +17,7 @@ class ColumnCreateTest < GroongaHandlerTest
   def test_success
     @handler.table_create({"name" => "Books"})
     @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
-    assert_equal([true], last_emitted)
+    assert_equal([true], messages.last)
   end
 
   def test_name

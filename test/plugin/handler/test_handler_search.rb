@@ -44,7 +44,7 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def search(request)
     @handler.search(request)
-    normalize_result_set(last_emitted)
+    normalize_result_set(messages.last)
   end
 
   def normalize_result_set(result_set)

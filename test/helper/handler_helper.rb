@@ -14,16 +14,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module HandlerHelper
-  attr_reader :emitted
+  attr_reader :messages
 
   def setup_stub_emit(handler)
-    @emitted = []
-    stub(handler).emit do |response|
-      @emitted << response
+    @messages = []
+    stub(handler).emit do |message|
+      @messages << message
     end
-  end
-
-  def last_emitted
-    @emitted.last
   end
 end
