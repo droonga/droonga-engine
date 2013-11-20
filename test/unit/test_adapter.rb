@@ -28,17 +28,20 @@ class AdapterTest < Test::Unit::TestCase
     end
 
     def setup
+      omit("Pending")
       @dispatcher = Object.new
       @groonga_adapter = GroongaAdapter.new(@dispatcher)
     end
 
     def test_called
+      omit("Pending")
       request = nil
       stub(@dispatcher).post
       assert_equal(:selected, @groonga_adapter.adapt(:select, request))
     end
 
     def test_post
+      omit("Pending")
       request = nil
       response = nil
       mock(@dispatcher).post(:search).yields(response)
