@@ -24,7 +24,7 @@ else
   gem "drntest", :github => "droonga/drntest"
 end
 
-droonga_client_dir = File.join(endor_dir, "droonga-client-ruby")
+droonga_client_dir = File.join(vendor_dir, "droonga-client-ruby")
 if File.exist?(droonga_client_dir)
   gem "droonga-client", :path => droonga_client_dir
 else
