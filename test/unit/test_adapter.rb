@@ -28,12 +28,13 @@ class AdapterTest < Test::Unit::TestCase
     end
 
     def setup
-      @worker = StubWorker.new
-      @groonga_adapter = GroongaAdapter.new(@worker)
+      @dispatcher = Object.new
+      @groonga_adapter = GroongaAdapter.new(@dispatcher)
     end
 
     def test_called
       request = nil
+      stub(@dispatcher).post
       assert_equal(:selected, @groonga_adapter.adapt(:select, request))
     end
 
