@@ -37,7 +37,7 @@ module Fluent
                                     :n_workers => @n_workers,
                                     :handlers => @handlers,
                                     :name => @name,
-                                    :proxy => @proxy)
+                                    :standalone => !@proxy)
       @engine.start
     end
 

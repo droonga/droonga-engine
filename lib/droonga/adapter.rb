@@ -29,7 +29,7 @@ module Droonga
         "replica"=> "all",
         "post"=> true
       }]
-      post(message, "proxy")
+      post(message, "dispatcher")
     end
 
     def broadcast_all(request)
@@ -41,7 +41,7 @@ module Droonga
         "replica"=> "all",
         "post"=> true
       }]
-      post(message, "proxy")
+      post(message, "dispatcher")
     end
 
     def prefer_synchronous?(command)
@@ -150,7 +150,7 @@ module Droonga
         "body"=> request
       }
       message.push(searcher)
-      post(message, "proxy")
+      post(message, "dispatcher")
     end
   end
 end

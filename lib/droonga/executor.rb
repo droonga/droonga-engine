@@ -242,7 +242,7 @@ module Droonga
       @handler_names.each do |handler_name|
         add_handler(handler_name)
       end
-      add_handler("proxy_message") if @options[:proxy]
+      add_handler("dispatcher_message") unless @options[:standalone]
     end
 
     def find_handler(command)

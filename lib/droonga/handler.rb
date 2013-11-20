@@ -131,7 +131,7 @@ module Droonga
         }
         dests.each do |routes|
           routes.each do |route|
-            post(message, "to"=>route, "type"=>"proxy")
+            post(message, "to"=>route, "type"=>"dispatcher")
           end
         end
       end

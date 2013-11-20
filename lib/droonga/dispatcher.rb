@@ -21,12 +21,12 @@ require "droonga/adapter"
 require "droonga/catalog"
 
 module Droonga
-  class Proxy
+  class Dispatcher
     attr_reader :collectors
     def initialize(worker, name)
       @engines = {}
       Droonga::catalog.get_engines(name).each do |name, options|
-        engine = Droonga::Engine.new(options.merge(:proxy => false,
+        engine = Droonga::Engine.new(options.merge(:standalone => true,
                                                    :with_server => false))
         engine.start
         @engines[name] = engine
@@ -36,7 +36,7 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      plugins = ["proxy"] + (Droonga::catalog.option("plugins")||[]) + ["adapter"]
+      plugins = ["collector"] + (Droonga::catalog.option("plugins")||[]) + ["adapter"]
       plugins.each do |plugin|
         @worker.add_handler(plugin)
       end
@@ -87,7 +87,7 @@ module Droonga
       if local?(destination)
         handle_internal_message(message)
       else
-        post(message, "to"=>farm_path(destination), "type"=>"proxy")
+        post(message, "to"=>farm_path(destination), "type"=>"dispatcher")
       end
     end
 
@@ -141,8 +141,8 @@ module Droonga
       end
 
       include TSort
-      def initialize(proxy, components)
-        @proxy = proxy
+      def initialize(dispatcher, components)
+        @dispatcher = dispatcher
         @components = components
       end
 
@@ -175,7 +175,7 @@ module Droonga
               local
             end
           routes.each do |route|
-            destinations[@proxy.farm_path(route)] += 1
+            destinations[@dispatcher.farm_path(route)] += 1
           end
           component["routes"] = routes
         end
@@ -188,7 +188,7 @@ module Droonga
         inputs = {}
         @components.each do |component|
           component["routes"].each do |route|
-            next unless @proxy.local?(route)
+            next unless @dispatcher.local?(route)
             task = {
               "route" => route,
               "component" => component,
@@ -202,8 +202,8 @@ module Droonga
             end
           end
         end
-        collector = Collector.new(id, @proxy, @components, tasks, inputs)
-        @proxy.collectors[id] = collector
+        collector = Collector.new(id, @dispatcher, @components, tasks, inputs)
+        @dispatcher.collectors[id] = collector
         return collector
       end
 
@@ -252,9 +252,9 @@ module Droonga
     end
 
     class Collector
-      def initialize(id, proxy, components, tasks, inputs)
+      def initialize(id, dispatcher, components, tasks, inputs)
         @id = id
-        @proxy = proxy
+        @dispatcher = dispatcher
         @components = components
         @tasks = tasks
         @n_dones = 0
@@ -271,7 +271,7 @@ module Droonga
           task["n_of_inputs"] += 1 if name
           component = task["component"]
           type = component["type"]
-          command = component["command"] || ("proxy_" + type)
+          command = component["command"] || ("collector_" + type)
           n_of_expects = component["n_of_expects"]
           synchronous = nil
           if command
@@ -288,21 +288,21 @@ module Droonga
               component["descendants"].each do |name, indices|
                 descendants[name] = indices.collect do |index|
                   @components[index]["routes"].map do |route|
-                    @proxy.farm_path(route)
+                    @dispatcher.farm_path(route)
                   end
                 end
               end
               message["descendants"] = descendants
               message["id"] = @id
             end
-            @proxy.deliver(@id, task["route"], message, command, synchronous)
+            @dispatcher.deliver(@id, task["route"], message, command, synchronous)
           end
           return if task["n_of_inputs"] < n_of_expects
           #the task is done
           if synchronous
             result = task["values"]
             post = component["post"]
-            @proxy.post(result, post) if post
+            @dispatcher.post(result, post) if post
             component["descendants"].each do |name, indices|
               message = {
                 "id" => @id,
@@ -311,32 +311,32 @@ module Droonga
               }
               indices.each do |index|
                 @components[index]["routes"].each do |route|
-                  @proxy.dispatch(message, route)
+                  @dispatcher.dispatch(message, route)
                 end
               end
             end
           end
           @n_dones += 1
-          @proxy.collectors.delete(@id) if @n_dones == @tasks.size
+          @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
         end
       end
     end
   end
 
-  class ProxyMessageHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("proxy_message", self)
+  class DispatcherMessageHandler < Droonga::Handler
+    Droonga::HandlerPlugin.register("dispatcher_message", self)
     def initialize(*arguments)
       super
-      @proxy = Droonga::Proxy.new(@worker, @worker.name)
+      @dispatcher = Droonga::Dispatcher.new(@worker, @worker.name)
     end
 
     def shutdown
-      @proxy.shutdown
+      @dispatcher.shutdown
     end
 
-    command :proxy
-    def proxy(request, *arguments)
-      @proxy.handle(request, arguments)
+    command :dispatcher
+    def dispatcher(request, *arguments)
+      @dispatcher.handle(request, arguments)
     end
 
     def prefer_synchronous?(command)
@@ -344,7 +344,7 @@ module Droonga
     end
   end
 
-  class ProxyHandler < Droonga::Handler
+  class CollectorHandler < Droonga::Handler
     attr_reader :task, :input_name, :component, :output_values, :body, :output_names
     def handle(command, request, *arguments)
       return false unless request.is_a? Hash

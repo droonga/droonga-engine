@@ -19,17 +19,17 @@ require "droonga/handler"
 require "droonga/searcher"
 
 module Droonga
-  class BasicProxyHandler < Droonga::ProxyHandler
-    Droonga::HandlerPlugin.register("proxy", self)
+  class BasicCollectorHandler < Droonga::CollectorHandler
+    Droonga::HandlerPlugin.register("collector", self)
 
-    command :proxy_gather
-    def proxy_gather(request)
+    command :collector_gather
+    def collector_gather(request)
       output = body ? body[input_name] : input_name
       emit(request, output)
     end
 
-    command :proxy_reduce
-    def proxy_reduce(request)
+    command :collector_reduce
+    def collector_reduce(request)
       return unless request
       body[input_name].each do |output, elements|
         value = request
