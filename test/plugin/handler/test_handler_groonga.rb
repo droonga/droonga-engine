@@ -20,23 +20,12 @@ class GroongaHandlerTest < Test::Unit::TestCase
 
   def setup
     setup_database
-    setup_handler
+    setup_handler(Droonga::GroongaHandler)
   end
 
   def teardown
     teardown_handler
     teardown_database
-  end
-
-  private
-  def setup_handler
-    @worker = StubWorker.new
-    @handler = Droonga::GroongaHandler.new(@worker)
-    setup_stub_emit
-  end
-
-  def teardown_handler
-    @handler = nil
   end
 
   private

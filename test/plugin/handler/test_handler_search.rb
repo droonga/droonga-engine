@@ -16,9 +16,11 @@
 require "droonga/plugin/handler_search"
 
 class SearchHandlerTest < Test::Unit::TestCase
+  include HandlerHelper
+
   def setup
     setup_database
-    setup_handler
+    setup_handler(Droonga::SearchHandler)
   end
 
   def teardown
@@ -30,16 +32,6 @@ class SearchHandlerTest < Test::Unit::TestCase
   def setup_database
     restore(fixture_data("document.grn"))
     super
-  end
-
-  def setup_handler
-    @worker = StubWorker.new
-    @handler = Droonga::SearchHandler.new(@worker)
-    setup_stub_emit
-  end
-
-  def teardown_handler
-    @handler = nil
   end
 
   def search(request)

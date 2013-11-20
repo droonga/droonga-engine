@@ -14,10 +14,19 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module HandlerHelper
-  def setup_stub_emit
+  def setup_handler(handler_class)
+    @worker = StubWorker.new
+    @handler = handler_class.new(@worker)
+
     @messages = []
     stub(@handler).emit do |message|
       @messages << message
     end
+  end
+
+  def teardown_handler
+    @handler = nil
+    @worker = nil
+    @messages = nil
   end
 end
