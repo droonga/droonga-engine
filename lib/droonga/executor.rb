@@ -205,9 +205,10 @@ module Droonga
         )
       end
       output_tag = "#{tag}.message"
-      $log.trace("#{log_tag}: output: post: start: <#{output_tag}>")
+      log_info = "<#{receiver}>:<#{output_tag}>"
+      $log.trace("#{log_tag}: output: post: start: #{log_info}")
       output.post(output_tag, message)
-      $log.trace("#{log_tag}: output: post: done: <#{output_tag}>")
+      $log.trace("#{log_tag}: output: post: done: #{log_info}")
       $log.trace("#{log_tag}: output: done")
     end
 
