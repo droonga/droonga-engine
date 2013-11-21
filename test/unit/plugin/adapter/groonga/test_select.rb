@@ -220,11 +220,11 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
       end
 
       def test_large
-        assert_offset(100, "100")
+        assert_limit(100, "100")
       end
 
       def test_negative
-        assert_offset(-1, "-1")
+        assert_limit(-1, "-1")
       end
     end
   end
