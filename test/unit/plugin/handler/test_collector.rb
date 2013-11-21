@@ -61,18 +61,24 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "task" => {
           "values" => {
             output_name => {
-              "my_number_key" => 1,
-              "my_string_key" => "a",
-              "my_array_key" => [1, 2, 3],
+              "numeric_key_records" => [
+                create_record(1),
+                create_record(2),
+                create_record(3),
+              ],
+              "string_key_records" => [
+                create_record("a"),
+                create_record("b"),
+                create_record("c"),
+              ],
             },
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "my_number_key" => ["sum"],
-                  "my_string_key" => ["sum"],
-                  "my_array_key" => ["sum"],
+                  "numeric_key_records" => ["sum"],
+                  "string_key_records" => ["sum"],
                 },
               },
             },
@@ -81,9 +87,16 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         },
         "id" => nil,
         "value" => {
-          "my_number_key" => 2,
-          "my_string_key" => "b",
-          "my_array_key" => [4, 5, 6],
+          "numeric_key_records" => [
+            create_record(4),
+            create_record(5),
+            create_record(6),
+          ],
+          "string_key_records" => [
+            create_record("d"),
+            create_record("e"),
+            create_record("f"),
+          ],
         },
         "name" => input_name,
         "descendants" => nil,
@@ -91,13 +104,33 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
       @handler.handle("collector_reduce", request)
       assert_equal([
                      {
-                       "my_number_key" => 3,
-                       "my_string_key" => "ab",
-                       "my_array_key" => [1, 2, 3, 4, 5, 6],
+                       "numeric_key_records" => [
+                         create_record(1),
+                         create_record(2),
+                         create_record(3),
+                         create_record(4),
+                         create_record(5),
+                         create_record(6),
+                       ],
+                       "string_key_records" => [
+                         create_record("a"),
+                         create_record("b"),
+                         create_record("c"),
+                         create_record("d"),
+                         create_record("e"),
+                         create_record("f"),
+                       ],
                      },
                      output_name
                    ],
                    @messages.last)
+    end
+
+    private
+    def create_record(key)
+      {
+        "_key" => key,
+      }
     end
   end
 end
