@@ -221,11 +221,11 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
 
   private
   def date
-    Time.new(2013, 11, 29, 0, 0, 0)
+    Time.utc(2013, 11, 29, 0, 0, 0)
   end
 
   def formatted_date
-    "2013-11-29T00:00:00+09:00"
+    "2013-11-29T00:00:00Z"
   end
 
   def reply_to
