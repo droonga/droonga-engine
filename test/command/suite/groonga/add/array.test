@@ -1,5 +1,6 @@
 {
   "type": "table_create",
+  "dataset": "Droonga",
   "body": {
     "name"  : "User",
     "flags" : "TABLE_NO_KEY"
