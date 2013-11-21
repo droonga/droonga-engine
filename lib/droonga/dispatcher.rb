@@ -26,7 +26,7 @@ module Droonga
     attr_reader :collectors
     def initialize(worker, name)
       @engines = {}
-      Droonga::catalog.get_engines(name).each do |name, options|
+      Droonga.catalog.get_engines(name).each do |name, options|
         engine = Droonga::Engine.new(options.merge(:standalone => true,
                                                    :with_server => false))
         engine.start
@@ -37,7 +37,7 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      plugins = ["collector"] + (Droonga::catalog.option("plugins")||[]) + ["adapter"]
+      plugins = ["collector"] + (Droonga.catalog.option("plugins")||[]) + ["adapter"]
       plugins.each do |plugin|
         @worker.add_handler(plugin)
       end
@@ -171,7 +171,7 @@ module Droonga
           dataset = component["dataset"]
           routes =
             if dataset
-              Droonga::catalog.get_routes(dataset, component)
+              Droonga.catalog.get_routes(dataset, component)
             else
               local
             end
