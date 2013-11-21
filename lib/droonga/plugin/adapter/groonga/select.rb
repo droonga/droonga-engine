@@ -24,6 +24,8 @@ module Droonga
         query = select_request["query"]
         output_columns = select_request["output_columns"]
         attributes = output_columns.split(/, */)
+        offset = (select_request["offset"] || "0").to_i
+        limit = (select_request["limit"] || "10").to_i
 
         search_request = {
           "queries" => {
@@ -38,6 +40,8 @@ module Droonga
                   "records",
                 ],
                 "attributes" => attributes,
+                "offset" => offset,
+                "limit" => limit,
               },
             }
           }
