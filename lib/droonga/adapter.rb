@@ -54,6 +54,9 @@ module Droonga
 
     command :table_create
     def table_create(request)
+      unless envelope["dataset"]
+        raise "dataset must be set. FIXME: This error should return client."
+      end
       broadcast_all(request)
     end
 
