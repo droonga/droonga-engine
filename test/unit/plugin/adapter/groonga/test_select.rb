@@ -151,8 +151,8 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         select_request = {
           "table"          => "EmptyTable",
           "output_columns" => "_id",
-          "offset"         => offset,
         }
+        select_request["offset"] = offset unless offset.nil?
 
         expected_search_request = {
           "queries" => {
@@ -183,6 +183,14 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
       def test_large
         assert_offset(100, "100")
       end
+
+      def test_integer
+        assert_offset(100, 100)
+      end
+
+      def test_default
+        assert_offset(0, nil)
+      end
     end
 
     class LimitTest < self
@@ -190,8 +198,8 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         select_request = {
           "table"          => "EmptyTable",
           "output_columns" => "_id",
-          "limit"          => limit,
         }
+        select_request["limit"] = limit unless limit.nil?
 
         expected_search_request = {
           "queries" => {
@@ -225,6 +233,14 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
       def test_negative
         assert_limit(-1, "-1")
+      end
+
+      def test_integer
+        assert_limit(100, 100)
+      end
+
+      def test_default
+        assert_limit(10, nil)
       end
     end
   end
