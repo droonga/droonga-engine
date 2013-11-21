@@ -145,6 +145,88 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
         assert_matchTo(["_key", "content"], "_key || content")
       end
     end
+
+    class OffsetTest < self
+      def assert_offset(expected_offset, offset)
+        select_request = {
+          "table"          => "EmptyTable",
+          "output_columns" => "_id",
+          "offset"         => offset,
+        }
+
+        expected_search_request = {
+          "queries" => {
+            "EmptyTable_result" => {
+              "source"   => "EmptyTable",
+              "output"   => {
+                "elements"   => [
+                  "startTime",
+                  "elapsedTime",
+                  "count",
+                  "attributes",
+                  "records",
+                ],
+                "attributes" => ["_id"],
+                "offset" => expected_offset,
+                "limit" => 10,
+              },
+            },
+          },
+        }
+        assert_equal(expected_search_request, convert(select_request))
+      end
+
+      def test_zero
+        assert_offset(0, "0")
+      end
+
+      def test_large
+        assert_offset(100, "100")
+      end
+    end
+
+    class LimitTest < self
+      def assert_limit(expected_limit, limit)
+        select_request = {
+          "table"          => "EmptyTable",
+          "output_columns" => "_id",
+          "limit"          => limit,
+        }
+
+        expected_search_request = {
+          "queries" => {
+            "EmptyTable_result" => {
+              "source"   => "EmptyTable",
+              "output"   => {
+                "elements"   => [
+                  "startTime",
+                  "elapsedTime",
+                  "count",
+                  "attributes",
+                  "records",
+                ],
+                "attributes" => ["_id"],
+                "offset" => 0,
+                "limit" => expected_limit,
+              },
+            },
+          },
+        }
+        assert_equal(expected_search_request, convert(select_request))
+      end
+
+      def test_zero
+        assert_limit(0, "0")
+      end
+
+      def test_large
+        assert_offset(100, "100")
+      end
+
+      def test_negative
+        assert_offset(-1, "-1")
+      end
+    end
   end
 
   class ResponseTest < self
