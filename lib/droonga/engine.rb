@@ -15,69 +15,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "serverengine"
-require "msgpack"
-require "cool.io"
-
-require "droonga/server"
-require "droonga/worker"
 require "droonga/executor"
 
 module Droonga
   class Engine
-    DEFAULT_OPTIONS = {
-      :queue_name => "DroongaQueue",
-      :n_workers  => 0,
-    }
-
     def initialize(options={})
-      @options = DEFAULT_OPTIONS.merge(options)
+      @options = options
     end
 
     def start
-      if @options[:database] && !@options[:database].empty?
-        Droonga::JobQueue.ensure_schema(@options[:database],
-                                        @options[:queue_name])
-      end
-      start_supervisor if @options[:n_workers] > 0
       @executor = Executor.new(@options)
     end
 
     def shutdown
       $log.trace("engine: shutdown: start")
       @executor.shutdown if @executor
-      shutdown_supervisor if @supervisor
       $log.trace("engine: shutdown: done")
     end
 
     def emit(tag, time, record, synchronous=nil)
       $log.trace("[#{Process.pid}] tag: <#{tag}> caller: <#{caller.first}>")
       @executor.dispatch(tag, time, record, synchronous)
-    end
-
-    private
-    def start_supervisor
-      @supervisor = ServerEngine::Supervisor.new(Server, Worker) do
-        force_options = {
-          :worker_type   => "process",
-          :workers       => @options[:n_workers],
-          :log_level     => $log.level,
-          :server_process_name => "Server[#{@options[:database]}] #$0",
-          :worker_process_name => "Worker[#{@options[:database]}] #$0"
-        }
-        @options.merge(force_options)
-      end
-      @supervisor_thread = Thread.new do
-        @supervisor.main
-      end
-    end
-
-    def shutdown_supervisor
-      $log.trace("supervisor: shutdown: start")
-      @supervisor.stop(true)
-      $log.trace("supervisor: shutdown: stopped")
-      @supervisor_thread.join
-      $log.trace("supervisor: shutdown: done")
     end
   end
 end

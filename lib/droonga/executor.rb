@@ -34,9 +34,9 @@ module Droonga
       @options = options
       @name = options[:name]
       @database_name = options[:database]
-      @queue_name = options[:queue_name]
-      @handler_names = options[:handlers]
-      @pool_size = options[:n_workers]
+      @queue_name = options[:queue_name] || "DroongaQueue"
+      @handler_names = options[:handlers] || []
+      @pool_size = options[:n_workers] || 0
 #     load_handlers
       Droonga::Plugin.load_all
       prepare
