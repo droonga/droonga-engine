@@ -29,7 +29,7 @@ module Droonga
 
     def shutdown
       $log.trace("engine: shutdown: start")
-      @executor.shutdown if @executor
+      @executor.shutdown
       $log.trace("engine: shutdown: done")
     end
 
