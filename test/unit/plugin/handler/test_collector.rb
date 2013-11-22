@@ -199,8 +199,8 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
     end
 
     private
-    def create_record(key)
-      [key]
+    def create_record(*columns)
+      columns
     end
   end
 end
