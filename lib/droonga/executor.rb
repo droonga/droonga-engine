@@ -21,7 +21,7 @@ require "groonga"
 
 require "droonga/job_queue"
 require "droonga/handler_plugin"
-require "droonga/plugin"
+require "droonga/plugin_loader"
 require "droonga/dispatcher"
 
 module Droonga
@@ -38,7 +38,7 @@ module Droonga
       @handler_names = options[:handlers] || []
       @pool_size = options[:n_workers] || 0
 #     load_handlers
-      Droonga::Plugin.load_all
+      Droonga::PluginLoader.load_all
       prepare
     end
 
@@ -230,8 +230,8 @@ module Droonga
 
     def load_handlers
       @handler_names.each do |handler_name|
-        plugin = Droonga::Plugin.new("handler", handler_name)
-        plugin.load
+        loader = Droonga::PluginLoader.new("handler", handler_name)
+        loader.load
       end
     end
 

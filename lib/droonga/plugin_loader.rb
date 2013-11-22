@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class Plugin
+  class PluginLoader
     class << self
       def load_all
         $LOAD_PATH.each do |load_path|
