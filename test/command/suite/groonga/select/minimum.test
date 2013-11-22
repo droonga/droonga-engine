@@ -1,0 +1,7 @@
+{
+  "type"    : "select",
+  "dataset" : "Droonga",
+  "body"    : {
+    "table" : "User"
+  }
+}

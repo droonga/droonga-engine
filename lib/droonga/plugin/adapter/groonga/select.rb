@@ -22,7 +22,7 @@ module Droonga
         match_columns = select_request["match_columns"]
         match_to = match_columns ? match_columns.split(/ *\|\| */) : []
         query = select_request["query"]
-        output_columns = select_request["output_columns"]
+        output_columns = select_request["output_columns"] || ""
         attributes = output_columns.split(/, */)
         offset = (select_request["offset"] || "0").to_i
         limit = (select_request["limit"] || "10").to_i

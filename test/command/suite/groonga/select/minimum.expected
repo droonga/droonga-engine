@@ -1,0 +1,26 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 200,
+    "type": "select.result",
+    "body": [
+      [
+        0,
+        1385104295.6934159,
+        0
+      ],
+      [
+        [
+          [
+            0
+          ],
+          [
+
+          ]
+        ]
+      ]
+    ]
+  }
+]
