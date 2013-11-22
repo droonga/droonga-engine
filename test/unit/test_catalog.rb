@@ -24,8 +24,8 @@ class CatalogTest < Test::Unit::TestCase
     assert_equal(["for_global"], @catalog.option("plugins"))
   end
 
-  def test_get_engines
-    engines = @catalog.get_engines("localhost:23003/test")
+  def test_get_partitions
+    partitions = @catalog.get_partitions("localhost:23003/test")
     base_path = File.expand_path("../fixtures", __FILE__)
     assert_equal({
                    "localhost:23003/test.000" => {
@@ -49,7 +49,7 @@ class CatalogTest < Test::Unit::TestCase
                      :n_workers => 0
                    },
                  },
-                 engines)
+                 partitions)
   end
 
   private
