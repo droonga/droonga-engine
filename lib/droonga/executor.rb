@@ -63,8 +63,8 @@ module Droonga
     end
 
     def add_handler(name)
-      plugin = HandlerPlugin.new(name)
-      @handlers << plugin.instantiate(self)
+      handler = HandlerPlugin.instantiate(name, self)
+      @handlers << handler
     end
 
     def add_route(route)

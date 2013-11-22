@@ -15,21 +15,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/plugin_repository"
+
 module Droonga
   class HandlerPlugin
-    @@plugins = {}
+    @@repository = PluginRepository.new
+
     class << self
       def register(name, handler_class)
-        @@plugins[name] = handler_class
+        @@repository.register(name, handler_class)
       end
-    end
 
-    def initialize(name)
-      @name = name
-    end
-
-    def instantiate(*args)
-      @@plugins[@name].new(*args)
+      def instantiate(name, *args, &block)
+        @@repository.instantiate(name, *args, &block)
+      end
     end
   end
 end
