@@ -20,18 +20,14 @@ require "droonga/handler"
 require "droonga/adapter"
 require "droonga/catalog"
 require "droonga/collector"
-require "droonga/partition"
+require "droonga/farm"
 
 module Droonga
   class Dispatcher
     attr_reader :collectors
     def initialize(worker, name)
-      @partitions = {}
-      Droonga.catalog.get_partitions(name).each do |name, options|
-        partition = Droonga::Partition.new(options)
-        partition.start
-        @partitions[name] = partition
-      end
+      @farm = Farm.new(name)
+      @farm.start
       @worker = worker
       @name = name
       @collectors = {}
@@ -44,9 +40,7 @@ module Droonga
     end
 
     def shutdown
-      @partitions.each do |name, partition|
-        partition.shutdown
-      end
+      @farm.shutdown
     end
 
     def handle(message, arguments)
@@ -97,7 +91,7 @@ module Droonga
         post(message, "type" => type, "synchronous"=> synchronous)
       else
         envelope = @worker.envelope.merge("body" => message, "type" => type)
-        @partitions[route].emit('', Time.now.to_f, envelope, synchronous)
+        @farm.emit(route, envelope, synchronous)
       end
     end
 
