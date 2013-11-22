@@ -20,7 +20,7 @@ require "droonga/adapter"
 module Droonga
   class GroongaAdapter < Droonga::Adapter
     # TODO: AdapterPlugin or something should be defined to avoid conflicts.
-    Droonga::HandlerPlugin.register("select", self)
+    Droonga::HandlerPlugin.repository.register("select", self)
     command :select
     def select(select_request)
       command = Select.new

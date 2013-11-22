@@ -21,7 +21,7 @@ require "droonga/handler"
 
 module Droonga
   class AddHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("add", self)
+    Droonga::HandlerPlugin.repository.register("add", self)
 
     command :add
     def add(request)

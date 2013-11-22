@@ -63,7 +63,7 @@ module Droonga
     end
 
     def add_handler(name)
-      handler = HandlerPlugin.instantiate(name, self)
+      handler = HandlerPlugin.repository.instantiate(name, self)
       @handlers << handler
     end
 

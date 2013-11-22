@@ -22,7 +22,7 @@ require "droonga/handler"
 
 module Droonga
   class WatchHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("watch", self)
+    Droonga::HandlerPlugin.repository.register("watch", self)
 
     def initialize(*args)
       super

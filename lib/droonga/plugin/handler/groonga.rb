@@ -21,7 +21,7 @@ require "droonga/handler"
 
 module Droonga
   class GroongaHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("groonga", self)
+    Droonga::HandlerPlugin.repository.register("groonga", self)
 
     command :table_create
     def table_create(request)

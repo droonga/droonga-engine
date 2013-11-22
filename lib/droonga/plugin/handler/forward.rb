@@ -20,7 +20,7 @@ require "droonga/logger"
 
 module Droonga
   class MergeHandler < Droonga::Handler
-    Droonga::HandlerPlugin.register("forward", self)
+    Droonga::HandlerPlugin.repository.register("forward", self)
 
     CONFIG_FILE_PATH = 'config.json'
 

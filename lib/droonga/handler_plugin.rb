@@ -22,12 +22,8 @@ module Droonga
     @@repository = PluginRepository.new
 
     class << self
-      def register(name, handler_class)
-        @@repository.register(name, handler_class)
-      end
-
-      def instantiate(name, *args, &block)
-        @@repository.instantiate(name, *args, &block)
+      def repository
+        @@repository
       end
     end
   end
