@@ -38,4 +38,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "test-unit"
   gem.add_development_dependency "test-unit-notify"
   gem.add_development_dependency "test-unit-rr"
+  gem.add_development_dependency "packnga"
+  gem.add_development_dependency "kramdown"
 end
