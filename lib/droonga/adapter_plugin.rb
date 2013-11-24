@@ -39,7 +39,7 @@ module Droonga
         if @output_names
           name = @output_names.first
         else
-          @output_values = @task["values"] = value
+          @output_values = value
           return
         end
       end
@@ -47,7 +47,6 @@ module Droonga
     end
 
     def process(command, message)
-      @task = {}
       @output_values = {}
       super(command, message)
       post(@output_values) unless @output_values.empty?
