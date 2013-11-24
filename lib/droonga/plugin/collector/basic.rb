@@ -15,12 +15,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/legacy_plugin"
-require "droonga/searcher"
+require "droonga/collector_plugin"
 
 module Droonga
-  class BasicCollectorHandler < Droonga::CollectorHandler
-    Droonga::LegacyPlugin.repository.register("collector", self)
+  class BasicCollector < Droonga::CollectorPlugin
+    repository.register("basic", self)
 
     command :collector_gather
     def collector_gather(request)

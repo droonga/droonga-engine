@@ -33,7 +33,7 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      plugins = ["collector"] + (Droonga.catalog.option("plugins")||[])
+      plugins = (Droonga.catalog.option("plugins")||[])
       plugins.each do |plugin|
         @worker.add_legacy_plugin(plugin)
       end

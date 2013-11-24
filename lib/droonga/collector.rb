@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/legacy_plugin"
+require "droonga/collector_plugin"
 
 module Droonga
   class Collector
@@ -26,6 +26,7 @@ module Droonga
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
+      @plugins = load_plugins(["basic"]) # TODO: make customizable
     end
 
     def handle(name, value)
@@ -62,7 +63,11 @@ module Droonga
             message["descendants"] = descendants
             message["id"] = @id
           end
-          @dispatcher.deliver(@id, task["route"], message, command, synchronous)
+          if @id == task["route"]
+            process(command, message)
+          else
+            @dispatcher.deliver(@id, task["route"], message, command, synchronous)
+          end
         end
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
@@ -87,30 +92,27 @@ module Droonga
         @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
     end
-  end
 
-  class CollectorHandler < Droonga::LegacyPlugin
-    attr_reader :task, :input_name, :component, :output_values, :body, :output_names
-    def handle(command, request, *arguments)
-      return false unless request.is_a? Hash
-      @task = request["task"]
-      return false unless @task.is_a? Hash
-      @component = @task["component"]
-      return false unless @component.is_a? Hash
-      @output_values = @task["values"]
-      @body = @component["body"]
-      @output_names = @component["outputs"]
-      @id = request["id"]
-      @value = request["value"]
-      @input_name = request["name"]
-      @descendants = request["descendants"]
-      invoke(command, @value, *arguments)
-      output if @descendants
-      true
+    private
+    def process(command, message)
+      plugin = find_plugin(command)
+      if plugin.nil?
+        raise "unknown collector plugin: <#{command}>: " +
+                "TODO: improve error hndling"
+      end
+      plugin.process(command, message)
     end
 
-    def prefer_synchronous?(command)
-      return true
+    def load_plugins(names)
+      names.collect do |name|
+        CollectorPlugin.repository.instantiate(name, @dispatcher)
+      end
+    end
+
+    def find_plugin(command)
+      @plugins.find do |plugin|
+        plugin.processable?(command)
+      end
     end
   end
 end
