@@ -35,15 +35,11 @@ module Droonga
     end
 
     def emit(value, name=nil)
-      unless name
-        if @output_names
-          name = @output_names.first
-        else
-          @output_values = value
-          return
-        end
+      if name
+        @output_values[name] = value
+      else
+        @output_values = value
       end
-      @output_values[name] = value
     end
 
     def process(command, message)
