@@ -50,11 +50,10 @@ module Droonga
         if synchronous.nil?
           synchronous = @handler.prefer_synchronous?(command)
         end
-        message = ["", Time.now.to_f, envelope]
         if @n_workers.zero? or synchronous
-          @handler.process(message)
+          @handler.process(envelope)
         else
-          @job_queue.push_message(message)
+          @job_queue.push_message(envelope)
         end
       else
         $log.trace("proessor: process: ignore #{command}")
