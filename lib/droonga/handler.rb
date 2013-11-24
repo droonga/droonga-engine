@@ -58,12 +58,12 @@ module Droonga
 
     def execute_one
       $log.trace("#{log_tag}: execute_one: start")
-      message = @job_queue.pull_message
-      unless message
+      envelope = @job_queue.pull_message
+      unless envelope
         $log.trace("#{log_tag}: execute_one: abort: no message")
         return
       end
-      process(message)
+      process(envelope)
       $log.trace("#{log_tag}: execute_one: done")
     end
 
@@ -71,9 +71,9 @@ module Droonga
       find_plugin(command).prefer_synchronous?(command)
     end
 
-    def process(message)
+    def process(envelope)
       $log.trace("#{log_tag}: process: start")
-      body, command, arguments = parse_message(message)
+      body, command, arguments = parse_envelope(envelope)
       plugin = find_plugin(command)
       if plugin.nil?
         $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
@@ -119,8 +119,7 @@ module Droonga
         envelope["body"] = body
         envelope["type"] = command
         envelope["arguments"] = arguments
-        message = ['', Time.now.to_f, envelope]
-        @job_queue.push_message(message)
+        @job_queue.push_message(envelope)
       end
     end
 
@@ -170,18 +169,8 @@ module Droonga
       $log.trace("#{log_tag}: output: done")
     end
 
-    def parse_message(message)
-      tag, time, record = message
-      prefix, type, *arguments = tag.split(/\./)
-      if type.nil? || type.empty? || type == 'message'
-        @envelope = record
-      else
-        @envelope = {
-          "type" => type,
-          "arguments" => arguments,
-          "body" => record
-        }
-      end
+    def parse_envelope(envelope)
+      @envelope = envelope
       envelope["via"] ||= []
       [envelope["body"], envelope["type"], envelope["arguments"]]
     end
