@@ -120,7 +120,6 @@ module Droonga
     end
 
     def parse_message(message)
-      @message = message # TODO: remove me
       tag, time, record = message
       prefix, type, *arguments = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
