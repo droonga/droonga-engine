@@ -28,9 +28,6 @@ module Droonga
     def initialize(options={})
       @options = options
       @name = options[:name]
-      @database_name = options[:database]
-      @queue_name = options[:queue_name] || "DroongaQueue"
-      @pool_size = options[:n_workers] || 0
       prepare
     end
 
@@ -38,11 +35,6 @@ module Droonga
       $log.trace("#{log_tag}: shutdown: start")
       @distributor.shutdown
       @forwarder.shutdown
-      if @database
-        @database.close
-        @context.close
-        @database = @context = nil
-      end
       $log.trace("#{log_tag}: shutdown: done")
     end
 
@@ -136,10 +128,6 @@ module Droonga
     end
 
     def prepare
-      if @database_name && !@database_name.empty?
-        @context = Groonga::Context.new
-        @database = @context.open_database(@database_name)
-      end
       @dispatcher = Dispatcher.new(self, name)
       @distributor = Distributor.new(@dispatcher, @options)
       @forwarder = Forwarder.new
