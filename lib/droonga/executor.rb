@@ -19,8 +19,7 @@ require "fluent-logger"
 require "fluent/logger/fluent_logger"
 require "groonga"
 
-require "droonga/job_queue"
-require "droonga/handler_plugin"
+require "droonga/legacy_plugin"
 require "droonga/plugin_loader"
 require "droonga/dispatcher"
 
@@ -36,9 +35,8 @@ module Droonga
       @database_name = options[:database]
       @queue_name = options[:queue_name] || "DroongaQueue"
       @pool_size = options[:n_workers] || 0
-#     load_handlers
+#     load_plugins
       Droonga::PluginLoader.load_all
-      @handler = Handler.new(@options)
       prepare
     end
 
@@ -47,7 +45,6 @@ module Droonga
       @legacy_plugins.each do |legacy_plugin|
         legacy_plugin.shutdown
       end
-      @handler.shutdown
       @outputs.each do |dest, output|
         output[:logger].close if output[:logger]
       end
@@ -55,10 +52,6 @@ module Droonga
         @database.close
         @context.close
         @database = @context = nil
-      end
-      if @job_queue
-        @job_queue.close
-        @job_queue = nil
       end
       $log.trace("#{log_tag}: shutdown: done")
     end
@@ -88,25 +81,6 @@ module Droonga
                    "arguments" => arguments,
                    "synchronous" => synchronous)
       $log.trace("#{log_tag}: dispatch: done")
-    end
-
-    def execute_one
-      $log.trace("#{log_tag}: execute_one: start")
-      message = @job_queue.pull_message
-      unless message
-        $log.trace("#{log_tag}: execute_one: abort: no message")
-        return
-      end
-      body, command, arguments = parse_message(message)
-      legacy_plugin = find_legacy_plugin(command)
-      if legacy_plugin
-        $log.trace("#{log_tag}: execute_one: handle: start",
-                   :hander => legacy_plugin.class)
-        legacy_plugin.handle(command, body, *arguments)
-        $log.trace("#{log_tag}: execute_one: handle: done",
-                   :hander => legacy_plugin.class)
-      end
-      $log.trace("#{log_tag}: execute_one: done")
     end
 
     def post(body, destination=nil)
@@ -148,21 +122,6 @@ module Droonga
           legacy_plugin.handle(command, body, *arguments)
           $log.trace("#{log_tag}: post_or_push: handle: done: <#{command}>",
                      :plugin => legacy_plugin.class)
-        elsif @handler.handlable?(command)
-          if synchronous.nil?
-            synchronous = @handler.prefer_synchronous?(command)
-          end
-          if route || @pool_size.zero? || synchronous
-            @handler.handle(@message)
-          else
-            unless message
-              envelope["body"] = body
-              envelope["type"] = command
-              envelope["arguments"] = arguments
-              message = ['', Time.now.to_f, envelope]
-            end
-            @job_queue.push_message(message)
-          end
         end
       end
       add_route(route) if route
@@ -238,7 +197,6 @@ module Droonga
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
-        @job_queue = JobQueue.open(@database_name, @queue_name)
       end
       add_legacy_plugin("dispatcher_message")
     end
