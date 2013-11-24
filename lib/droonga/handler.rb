@@ -15,11 +15,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "fluent-logger"
-require "fluent/logger/fluent_logger"
 require "groonga"
 
 require "droonga/job_queue"
+require "droonga/forwarder"
 require "droonga/pluggable"
 require "droonga/handler_plugin"
 
@@ -30,7 +29,6 @@ module Droonga
     attr_reader :context, :envelope, :name
 
     def initialize(options={})
-      @outputs = {}
       @options = options
       @name = options[:name]
       @database_name = options[:database]
@@ -41,9 +39,7 @@ module Droonga
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       super
-      @outputs.each do |dest, output|
-        output[:logger].close if output[:logger]
-      end
+      @forwarder.shutdown
       if @database
         @database.close
         @context.close
@@ -96,14 +92,8 @@ module Droonga
       @output_values[name] = value
     end
 
-    def post(body, destination)
-      $log.trace("#{log_tag}: post: start")
-      command = destination["type"]
-      receiver = destination["to"]
-      arguments = destination["arguments"]
-      synchronous = destination["synchronous"]
-      output(receiver, body, command, arguments)
-      $log.trace("#{log_tag}: post: done")
+    def post(message, destination)
+      @forwarder.forward(envelope, message, destination)
     end
 
     def handle(command, body, synchronous=nil)
@@ -124,51 +114,6 @@ module Droonga
     end
 
     private
-    def output(receiver, body, command, arguments)
-      $log.trace("#{log_tag}: output: start")
-      unless receiver.is_a?(String) && command.is_a?(String)
-        $log.trace("#{log_tag}: output: abort: invalid argument",
-                   :receiver => receiver,
-                   :command  => command)
-        return
-      end
-      unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
-        raise "format: hostname:port/tag(?params)"
-      end
-      host = $1
-      port = $2
-      tag  = $3
-      params = $4
-      output = get_output(host, port, params)
-      unless output
-        $log.trace("#{log_tag}: output: abort: no output",
-                   :host   => host,
-                   :port   => port,
-                   :params => params)
-        return
-      end
-      if command =~ /\.result$/
-        message = {
-          inReplyTo: envelope["id"],
-          statusCode: 200,
-          type: command,
-          body: body
-        }
-      else
-        message = envelope.merge(
-          body: body,
-          type: command,
-          arguments: arguments
-        )
-      end
-      output_tag = "#{tag}.message"
-      log_info = "<#{receiver}>:<#{output_tag}>"
-      $log.trace("#{log_tag}: output: post: start: #{log_info}")
-      output.post(output_tag, message)
-      $log.trace("#{log_tag}: output: post: done: #{log_info}")
-      $log.trace("#{log_tag}: output: done")
-    end
-
     def parse_envelope(envelope)
       @envelope = envelope
       envelope["via"] ||= []
@@ -182,37 +127,11 @@ module Droonga
         @job_queue = JobQueue.open(@database_name, @queue_name)
       end
       load_plugins(@options[:handlers] || [])
+      @forwarder = Forwarder.new
     end
 
     def instantiate_plugin(name)
       HandlerPlugin.repository.instantiate(name, self)
-    end
-
-    def get_output(host, port, params)
-      host_port = "#{host}:#{port}"
-      @outputs[host_port] ||= {}
-      output = @outputs[host_port]
-
-      has_connection_id = (not params.nil? \
-                           and params =~ /[\?&;]connection_id=([^&;]+)/)
-      if output[:logger].nil? or has_connection_id
-        connection_id = $1
-        if not has_connection_id or output[:connection_id] != connection_id
-          output[:connection_id] = connection_id
-          logger = create_logger(:host => host, :port => port.to_i)
-          # output[:logger] should be closed if it exists beforehand?
-          output[:logger] = logger
-        end
-      end
-
-      has_client_session_id = (not params.nil? \
-                               and params =~ /[\?&;]client_session_id=([^&;]+)/)
-      if has_client_session_id
-        client_session_id = $1
-        # some generic way to handle client_session_id is expected
-      end
-
-      output[:logger]
     end
 
     def process_command(plugin, command, request, arguments)
@@ -256,10 +175,6 @@ module Droonga
           end
         end
       end
-    end
-
-    def create_logger(options)
-      Fluent::Logger::FluentLogger.new(nil, options)
     end
 
     def log_tag
