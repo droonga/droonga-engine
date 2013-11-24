@@ -240,7 +240,7 @@ module Droonga
         @database = @context.open_database(@database_name)
         @job_queue = JobQueue.open(@database_name, @queue_name)
       end
-      add_legacy_plugin("dispatcher_message") unless @options[:standalone]
+      add_legacy_plugin("dispatcher_message")
     end
 
     def find_legacy_plugin(command)
