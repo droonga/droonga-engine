@@ -30,7 +30,7 @@ module Droonga
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       @plugins.each do |plugin|
-        plugins.shutdown
+        plugin.shutdown
       end
       $log.trace("#{log_tag}: shutdown: done")
     end
