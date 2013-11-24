@@ -15,47 +15,21 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/pluggable"
 require "droonga/adapter_plugin"
 
 module Droonga
   class Adapter
+    include Pluggable
+
     def initialize(executor, options={})
       @executor = executor
       load_plugins(options[:adapters] || [])
     end
 
-    def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
-      @plugins.each do |plugin|
-        plugins.shutdown
-      end
-      $log.trace("#{log_tag}: shutdown: done")
-    end
-
-    def processable?(command)
-      not find_plugin(command).nil?
-    end
-
-    def process(command, body)
-      plugin = find_plugin(command)
-      $log.trace("#{log_tag}: process: start: <#{command}>",
-                 :plugin => plugin.class)
-      plugin.process(command, body)
-      $log.trace("#{log_tag}: process: done: <#{command}>",
-                 :plugin => plugin.class)
-    end
-
     private
-    def load_plugins(names)
-      @plugins = names.collect do |name|
-        AdapterPlugin.repository.instantiate(name, @executor)
-      end
-    end
-
-    def find_plugin(command)
-      @plugins.find do |plugin|
-        plugin.processable?(command)
-      end
+    def instantiate_plugin(name)
+      AdapterPlugin.repository.instantiate(name, @executor)
     end
 
     def log_tag

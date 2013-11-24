@@ -20,31 +20,27 @@ require "fluent/logger/fluent_logger"
 require "groonga"
 
 require "droonga/job_queue"
+require "droonga/pluggable"
 require "droonga/handler_plugin"
-require "droonga/plugin_loader"
 
 module Droonga
   class Handler
+    include Pluggable
+
     attr_reader :context, :envelope, :name
 
     def initialize(options={})
-      @plugins = []
       @outputs = {}
       @options = options
       @name = options[:name]
       @database_name = options[:database]
       @queue_name = options[:queue_name] || "DroongaQueue"
-      @plugin_names = options[:handlers] || []
-#     load_plugins
-      Droonga::PluginLoader.load_all
       prepare
     end
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      @plugins.each do |plugin|
-        plugins.shutdown
-      end
+      super
       @outputs.each do |dest, output|
         output[:logger].close if output[:logger]
       end
@@ -60,11 +56,6 @@ module Droonga
       $log.trace("#{log_tag}: shutdown: done")
     end
 
-    def add_plugin(name)
-      plugin = HandlerPlugin.repository.instantiate(name, self)
-      @plugins << plugin
-    end
-
     def execute_one
       $log.trace("#{log_tag}: execute_one: start")
       message = @job_queue.pull_message
@@ -74,10 +65,6 @@ module Droonga
       end
       process(message)
       $log.trace("#{log_tag}: execute_one: done")
-    end
-
-    def processable?(command)
-      not find_plugin(command).nil?
     end
 
     def prefer_synchronous?(command)
@@ -243,28 +230,17 @@ module Droonga
       [envelope["body"], envelope["type"], envelope["arguments"]]
     end
 
-    def load_plugins
-      @plugin_names.each do |plugin_name|
-        loader = Droonga::PluginLoader.new("handler", plugin_name)
-        loader.load
-      end
-    end
-
     def prepare
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
         @job_queue = JobQueue.open(@database_name, @queue_name)
       end
-      @plugin_names.each do |plugin_name|
-        add_plugin(plugin_name)
-      end
+      load_plugins(@options[:handlers] || [])
     end
 
-    def find_plugin(command)
-      @plugins.find do |plugin|
-        plugin.processable?(command)
-      end
+    def instantiate_plugin(name)
+      HandlerPlugin.repository.instantiate(name, self)
     end
 
     def get_output(host, port, params)

@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/engine"
+require "droonga/plugin_loader"
 
 module Fluent
   class DroongaOutput < Output
@@ -28,6 +29,7 @@ module Fluent
 
     def start
       super
+      Droonga::PluginLoader.load_all
       @engine = Droonga::Engine.new(:name => @name)
       @engine.start
     end

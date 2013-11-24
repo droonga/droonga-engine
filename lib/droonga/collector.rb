@@ -15,10 +15,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/pluggable"
 require "droonga/collector_plugin"
 
 module Droonga
   class Collector
+    include Pluggable
+
     def initialize(id, dispatcher, components, tasks, inputs)
       @id = id
       @dispatcher = dispatcher
@@ -26,7 +29,7 @@ module Droonga
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
-      @plugins = load_plugins(["basic"]) # TODO: make customizable
+      load_plugins(["basic"]) # TODO: make customizable
     end
 
     def handle(name, value)
@@ -94,25 +97,12 @@ module Droonga
     end
 
     private
-    def process(command, message)
-      plugin = find_plugin(command)
-      if plugin.nil?
-        raise "unknown collector plugin: <#{command}>: " +
-                "TODO: improve error hndling"
-      end
-      plugin.process(command, message)
+    def instantiate_plugin(name)
+      CollectorPlugin.repository.instantiate(name, @dispatcher)
     end
 
-    def load_plugins(names)
-      names.collect do |name|
-        CollectorPlugin.repository.instantiate(name, @dispatcher)
-      end
-    end
-
-    def find_plugin(command)
-      @plugins.find do |plugin|
-        plugin.processable?(command)
-      end
+    def log_tag
+      "collector"
     end
   end
 end

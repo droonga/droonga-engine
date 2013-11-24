@@ -31,11 +31,6 @@ module Droonga
       @distributor.post(message)
     end
 
-    def process(envelope, *arguments)
-      command = envelope["type"]
-      super(command, envelope, *arguments)
-    end
-
     def scatter_all(envelope, key)
       message = [{
         "command"=> envelope["type"],
