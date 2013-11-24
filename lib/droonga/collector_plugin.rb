@@ -59,7 +59,7 @@ module Droonga
     end
 
     def post(message, destination=nil)
-      @distributor.post(message, destination)
+      @dispatcher.post(message, destination)
     end
 
     def output
