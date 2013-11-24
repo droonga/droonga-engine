@@ -37,7 +37,6 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      synchronous = destination["synchronous"]
       output(receiver, envelope, body, command, arguments)
       $log.trace("#{log_tag}: post: done")
     end
