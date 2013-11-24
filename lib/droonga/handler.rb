@@ -152,11 +152,11 @@ module Droonga
       @descendants = request["descendants"]
 
       plugin.process(command, @body, *arguments)
-      output_xxx if @descendants
+      output if @descendants
       true
     end
 
-    def output_xxx
+    def output
       result = @task["values"]
       if @component["post"]
         destination = @component["post"]
