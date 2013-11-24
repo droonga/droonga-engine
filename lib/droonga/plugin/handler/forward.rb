@@ -15,11 +15,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler"
+require "droonga/legacy_plugin"
 require "droonga/logger"
 
 module Droonga
-  class MergeHandler < Droonga::Handler
+  class MergeHandler < Droonga::LegacyPlugin
     Droonga::HandlerPlugin.repository.register("forward", self)
 
     CONFIG_FILE_PATH = 'config.json'

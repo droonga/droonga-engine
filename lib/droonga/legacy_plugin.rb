@@ -20,7 +20,7 @@ require "droonga/command_mapper"
 require "droonga/logger"
 
 module Droonga
-  class Handler
+  class LegacyPlugin
     class << self
       def inherited(sub_class)
         super

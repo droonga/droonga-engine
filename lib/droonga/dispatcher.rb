@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require 'tsort'
-require "droonga/handler"
+require "droonga/legacy_plugin"
 require "droonga/adapter"
 require "droonga/catalog"
 require "droonga/collector"
@@ -247,7 +247,7 @@ module Droonga
     end
   end
 
-  class DispatcherMessageHandler < Droonga::Handler
+  class DispatcherMessageHandler < Droonga::LegacyPlugin
     Droonga::HandlerPlugin.repository.register("dispatcher_message", self)
     def initialize(*arguments)
       super
