@@ -15,7 +15,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/distributor_plugin"
+
 module Droonga
-  class Adapter
+  class WatchDistributor < Droonga::DistributorPlugin
+    repository.register("watch", self)
+
+    command "watch.feed" => :feed
+    def feed(envelope)
+      broadcast_all(envelope)
+    end
+
+    command "watch.subscribe" => :subscribe
+    def subscribe(envelope)
+      broadcast_all(envelope)
+    end
+
+    command "watch.unsubscribe" => :unsubscribe
+    def unsubscribe(envelope)
+      broadcast_all(envelope)
+    end
   end
 end

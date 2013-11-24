@@ -15,7 +15,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/distributor_plugin"
+
 module Droonga
-  class Adapter
+  class GroongaDistributor < Droonga::DistributorPlugin
+    repository.register("groonga", self)
+
+    command :table_create
+    def table_create(envelope)
+      unless envelope["dataset"]
+        raise "dataset must be set. FIXME: This error should return client."
+      end
+      broadcast_all(envelope)
+    end
+
+    command :column_create
+    def column_create(envelope)
+      broadcast_all(envelope)
+    end
   end
 end

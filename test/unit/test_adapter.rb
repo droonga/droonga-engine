@@ -17,15 +17,15 @@ require "droonga/adapter"
 
 class AdapterTest < Test::Unit::TestCase
   class AdaptTest < self
-    class GroongaAdapter < Droonga::Adapter
-      command :select
-      def select(request)
-        post(:search) do |response|
-          # do nothing
-        end
-        :selected
-      end
-    end
+    # class GroongaAdapter < Droonga::Adapter
+    #   command :select
+    #   def select(request)
+    #     post(:search) do |response|
+    #       # do nothing
+    #     end
+    #     :selected
+    #   end
+    # end
 
     def setup
       omit("Pending")

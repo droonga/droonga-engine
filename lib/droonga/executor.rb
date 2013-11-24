@@ -22,6 +22,7 @@ require "groonga"
 require "droonga/legacy_plugin"
 require "droonga/plugin_loader"
 require "droonga/dispatcher"
+require "droonga/distributor"
 
 module Droonga
   class Executor
@@ -42,6 +43,7 @@ module Droonga
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
+      @distributor.shutdown
       @legacy_plugins.each do |legacy_plugin|
         legacy_plugin.shutdown
       end
@@ -122,6 +124,9 @@ module Droonga
           legacy_plugin.handle(command, body, *arguments)
           $log.trace("#{log_tag}: post_or_push: handle: done: <#{command}>",
                      :plugin => legacy_plugin.class)
+        else
+          @distributor.distribute(envelope.merge("type" => command,
+                                                 "body" => body))
         end
       end
       add_route(route) if route
@@ -198,6 +203,7 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
+      @distributor = Distributor.new(self, @options)
       add_legacy_plugin("dispatcher_message")
     end
 

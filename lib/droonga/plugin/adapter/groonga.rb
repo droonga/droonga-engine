@@ -15,10 +15,10 @@
 
 require "groonga"
 
-require "droonga/adapter"
+require "droonga/legacy_plugin"
 
 module Droonga
-  class GroongaAdapter < Droonga::Adapter
+  class GroongaAdapter < Droonga::LegacyPlugin
     # TODO: AdapterPlugin or something should be defined to avoid conflicts.
     Droonga::LegacyPlugin.repository.register("select", self)
     command :select
