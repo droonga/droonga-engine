@@ -16,7 +16,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require 'tsort'
-require "droonga/legacy_plugin"
 require "droonga/adapter"
 require "droonga/catalog"
 require "droonga/collector"
@@ -33,28 +32,21 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      Droonga::PluginLoader.load_all
-      load_legacy_plugins(Droonga.catalog.option("plugins")||[])
+      @adapter = Adapter.new(@worker,
+                             :adapters => Droonga.catalog.option("plugins"))
     end
 
     def shutdown
-      @legacy_plugins.each do |legacy_plugin|
-        legacy_plugin.shutdown
-      end
+      @adapter.shutdown
       @farm.shutdown
     end
 
     def processable?(command)
-      not find_legacy_plugin(command).nil?
+      @adapter.processable?(command)
     end
 
     def process(command, body, *arguments)
-      legacy_plugin = find_legacy_plugin(command)
-      $log.trace("#{log_tag}: process: start: <#{command}>",
-                 :plugin => legacy_plugin.class)
-      legacy_plugin.handle(command, body, *arguments)
-      $log.trace("#{log_tag}: process: done: <#{command}>",
-                 :plugin => legacy_plugin.class)
+      @adapter.process(command, body)
     end
 
     def handle(message, arguments)
@@ -132,18 +124,6 @@ module Droonga
     end
 
     private
-    def find_legacy_plugin(command)
-      @legacy_plugins.find do |plugin|
-        plugin.handlable?(command)
-      end
-    end
-
-    def load_legacy_plugins(names)
-      @legacy_plugins = names.collect do |name|
-        LegacyPlugin.repository.instantiate(name, @worker)
-      end
-    end
-
     def log_tag
       "[#{Process.ppid}][#{Process.pid}] dispatcher"
     end

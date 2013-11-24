@@ -13,14 +13,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "groonga"
-
-require "droonga/legacy_plugin"
+require "droonga/adapter_plugin"
 
 module Droonga
-  class GroongaAdapter < Droonga::LegacyPlugin
-    # TODO: AdapterPlugin or something should be defined to avoid conflicts.
-    Droonga::LegacyPlugin.repository.register("select", self)
+  class GroongaAdapter < Droonga::AdapterPlugin
+    repository.register("select", self)
+
     command :select
     def select(select_request)
       command = Select.new
