@@ -22,9 +22,63 @@ module Droonga
     @@repository = PluginRepository.new
 
     class << self
+      def inherited(sub_class)
+        super
+        sub_class.instance_variable_set(:@command_mapper, CommandMapper.new)
+      end
+
       def repository
         @@repository
       end
+
+      def command(name_or_map)
+        @command_mapper.register(name_or_map)
+      end
+
+      def method_name(command)
+        @command_mapper[command]
+      end
+
+      def handlable?(command)
+        not method_name(command).nil?
+      end
+    end
+
+    def initialize(handler)
+      @handler = handler
+      @context = @handler.context
+    end
+
+    def envelope
+      @handler.envelope
+    end
+
+    def shutdown
+    end
+
+    def handlable?(command)
+      self.class.handlable?(command)
+    end
+
+    def handle(command, request, *arguments)
+      __send__(self.class.method_name(command), request, *arguments)
+    rescue => exception
+      Logger.error("error while handling #{command}",
+                   request: request,
+                   arguments: arguments,
+                   exception: exception)
+    end
+
+    def emit(value, name=nil)
+      @handler.emit(value, name)
+    end
+
+    def post(body, destination=nil)
+      @handler.post(body, destination)
+    end
+
+    def prefer_synchronous?(command)
+      false
     end
   end
 end

@@ -17,11 +17,11 @@
 
 require "groonga"
 
-require "droonga/legacy_plugin"
+require "droonga/handler_plugin"
 
 module Droonga
-  class GroongaHandler < Droonga::LegacyPlugin
-    Droonga::LegacyPlugin.repository.register("groonga", self)
+  class GroongaHandler < Droonga::HandlerPlugin
+    repository.register("groonga", self)
 
     command :table_create
     def table_create(request)

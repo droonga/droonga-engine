@@ -18,11 +18,11 @@
 require "droonga/watcher"
 require "droonga/sweeper"
 require "droonga/watch_schema"
-require "droonga/legacy_plugin"
+require "droonga/handler_plugin"
 
 module Droonga
-  class WatchHandler < Droonga::LegacyPlugin
-    Droonga::LegacyPlugin.repository.register("watch", self)
+  class WatchHandler < Droonga::HandlerPlugin
+    repository.register("watch", self)
 
     def initialize(*args)
       super

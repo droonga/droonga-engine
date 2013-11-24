@@ -15,14 +15,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/executor"
+require "droonga/handler"
 
 module Droonga
   module Worker
     attr_reader :context, :envelope, :name
 
     def initialize
-      @executor = Executor.new(config.merge(:standalone => true))
+      @handler = Handler.new(config)
     end
 
     def run
@@ -30,10 +30,10 @@ module Droonga
       @running = true
       while @running
         $log.trace("#{log_tag}: run: pull_message: start")
-        @executor.execute_one
+        @handler.execute_one
         $log.trace("#{log_tag}: run: pull_message: done")
       end
-      @executor.shutdown
+      @handler.shutdown
       $log.trace("#{log_tag}: run: done")
     end
 

@@ -17,11 +17,11 @@
 
 require "groonga"
 
-require "droonga/legacy_plugin"
+require "droonga/handler_plugin"
 
 module Droonga
-  class AddHandler < Droonga::LegacyPlugin
-    Droonga::LegacyPlugin.repository.register("add", self)
+  class AddHandler < Droonga::HandlerPlugin
+    repository.register("add", self)
 
     command :add
     def add(request)

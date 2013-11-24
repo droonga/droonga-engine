@@ -40,7 +40,17 @@ module Droonga
     end
 
     def instantiate(name, *args, &block)
-      self[name].new(*args, &block)
+      plugin_class = self[name]
+      if plugin_class.nil?
+        # TODO: use the original error
+        raise ArgumentError, "unknown plugin: <#{name}>"
+      end
+      begin
+        plugin_class.new(*args, &block)
+      rescue
+        p [plugin_class, plugin_class.method(:new), plugin_class.method(:new).arity, args.size]
+        raise
+      end
     end
   end
 end

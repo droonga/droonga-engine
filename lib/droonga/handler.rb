@@ -22,32 +22,29 @@ require "groonga"
 require "droonga/job_queue"
 require "droonga/handler_plugin"
 require "droonga/plugin_loader"
-require "droonga/dispatcher"
 
 module Droonga
-  class Executor
+  class Handler
     attr_reader :context, :envelope, :name
 
     def initialize(options={})
-      @legacy_plugins = []
+      @plugins = []
       @outputs = {}
       @options = options
       @name = options[:name]
       @database_name = options[:database]
       @queue_name = options[:queue_name] || "DroongaQueue"
-      @pool_size = options[:n_workers] || 0
-#     load_handlers
+      @plugin_names = options[:handlers] || []
+#     load_plugins
       Droonga::PluginLoader.load_all
-      @handler = Handler.new(@options)
       prepare
     end
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      @legacy_plugins.each do |legacy_plugin|
-        legacy_plugin.shutdown
+      @plugins.each do |plugin|
+        plugins.shutdown
       end
-      @handler.shutdown
       @outputs.each do |dest, output|
         output[:logger].close if output[:logger]
       end
@@ -63,31 +60,9 @@ module Droonga
       $log.trace("#{log_tag}: shutdown: done")
     end
 
-    def add_legacy_plugin(name)
-      legacy_plugin = LegacyPlugin.repository.instantiate(name, self)
-      @legacy_plugins << legacy_plugin
-    end
-
-    def add_route(route)
-      envelope["via"].push(route)
-    end
-
-    def dispatch(tag, time, record, synchronous=nil)
-      $log.trace("#{log_tag}: dispatch: start")
-      message = [tag, time, record]
-      body, type, arguments = parse_message([tag, time, record])
-      reply_to = envelope["replyTo"]
-      if reply_to.is_a? String
-        envelope["replyTo"] = {
-          "type" => type + ".result",
-          "to" => reply_to
-        }
-      end
-      post_or_push(message, body,
-                   "type" => type,
-                   "arguments" => arguments,
-                   "synchronous" => synchronous)
-      $log.trace("#{log_tag}: dispatch: done")
+    def add_plugin(name)
+      plugin = HandlerPlugin.repository.instantiate(name, self)
+      @plugins << plugin
     end
 
     def execute_one
@@ -97,16 +72,55 @@ module Droonga
         $log.trace("#{log_tag}: execute_one: abort: no message")
         return
       end
-      body, command, arguments = parse_message(message)
-      legacy_plugin = find_legacy_plugin(command)
-      if legacy_plugin
-        $log.trace("#{log_tag}: execute_one: handle: start",
-                   :hander => legacy_plugin.class)
-        legacy_plugin.handle(command, body, *arguments)
-        $log.trace("#{log_tag}: execute_one: handle: done",
-                   :hander => legacy_plugin.class)
-      end
+      handle(message)
       $log.trace("#{log_tag}: execute_one: done")
+    end
+
+    def handlable?(command)
+      not find_plugin(command).nil?
+    end
+
+    def prefer_synchronous?(command)
+      find_plugin(command).prefer_synchronous?(command)
+    end
+
+    def handle(message)
+      $log.trace("#{log_tag}: handle: start")
+      body, command, arguments = parse_message(message)
+      plugin = find_plugin(command)
+      if plugin.nil?
+        $log.trace("#{log_tag}: handle: done: no plugin: <#{command}>")
+        return
+      end
+
+      unless try_handle_as_internal_message(plugin, command, body, arguments)
+        @task = {}
+        @output_values = {}
+        $log.trace("#{log_tag}: handle: plugin: handle: start",
+                   :hander => plugin.class)
+        plugin.handle(command, body, *arguments)
+        $log.trace("#{log_tag}: handle: plugin: handle: done",
+                   :hander => plugin.class)
+        unless @output_values.empty?
+          $log.trace("#{log_tag}: handle: output: start")
+          post(@output_values)
+          $log.trace("#{log_tag}: handle: output: done")
+        end
+      end
+      $log.trace("#{log_tag}: handle: done: <#{command}>",
+                 :plugin => plugin.class)
+    end
+
+    def emit(value, name = nil)
+      unless name
+        if @output_names
+          name = @output_names.first
+        else
+          @output_values = @task["values"] = value
+          return
+        end
+      end
+      @output_values[name] = value
     end
 
     def post(body, destination=nil)
@@ -141,19 +155,15 @@ module Droonga
       if receiver
         output(receiver, body, command, arguments)
       else
-        legacy_plugin = find_legacy_plugin(command)
-        if legacy_plugin
-          $log.trace("#{log_tag}: post_or_push: handle: start: <#{command}>",
-                     :plugin => legacy_plugin.class)
-          legacy_plugin.handle(command, body, *arguments)
-          $log.trace("#{log_tag}: post_or_push: handle: done: <#{command}>",
-                     :plugin => legacy_plugin.class)
-        elsif @handler.handlable?(command)
+        plugin = find_plugin(command)
+        if plugin
           if synchronous.nil?
-            synchronous = @handler.prefer_synchronous?(command)
+            synchronous = plugin.prefer_synchronous?(command)
           end
           if route || @pool_size.zero? || synchronous
-            @handler.handle(@message)
+            $log.trace("#{log_tag}: post_or_push: handle: start")
+            plugin.handle(command, body, *arguments)
+            $log.trace("#{log_tag}: post_or_push: handle: done")
           else
             unless message
               envelope["body"] = body
@@ -218,7 +228,6 @@ module Droonga
     end
 
     def parse_message(message)
-      @message = message # TODO: remove me
       tag, time, record = message
       prefix, type, *arguments = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
@@ -234,18 +243,27 @@ module Droonga
       [envelope["body"], envelope["type"], envelope["arguments"]]
     end
 
+    def load_plugins
+      @plugin_names.each do |plugin_name|
+        loader = Droonga::PluginLoader.new("handler", plugin_name)
+        loader.load
+      end
+    end
+
     def prepare
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
         @job_queue = JobQueue.open(@database_name, @queue_name)
       end
-      add_legacy_plugin("dispatcher_message") unless @options[:standalone]
+      @plugin_names.each do |plugin_name|
+        add_plugin(plugin_name)
+      end
     end
 
-    def find_legacy_plugin(command)
-      @legacy_plugins.find do |legacy_plugin|
-        legacy_plugin.handlable?(command)
+    def find_plugin(command)
+      @plugins.find do |plugin|
+        plugin.handlable?(command)
       end
     end
 
@@ -274,6 +292,47 @@ module Droonga
       end
 
       output[:logger]
+    end
+
+    # TODO: move to dispatcher
+    def try_handle_as_internal_message(plugin, command, request, arguments)
+      return false unless request.is_a? Hash
+
+      @task = request["task"]
+      return false unless @task.is_a? Hash
+
+      @component = @task["component"]
+      return false unless @component.is_a? Hash
+
+      @output_values = @task["values"]
+      @body = @component["body"]
+      @output_names = @component["outputs"]
+      @id = request["id"]
+      @value = request["value"]
+      @input_name = request["name"]
+      @descendants = request["descendants"]
+
+      plugin.handle(command, @body, *arguments)
+      output_xxx if @descendants
+      true
+    end
+
+    # TODO: move to dispatcher
+    def output_xxx
+      result = @task["values"]
+      post(result, @component["post"]) if @component["post"]
+      @descendants.each do |name, dests|
+        message = {
+          "id" => @id,
+          "input" => name,
+          "value" => result[name]
+        }
+        dests.each do |routes|
+          routes.each do |route|
+            post(message, "to"=>route, "type"=>"dispatcher")
+          end
+        end
+      end
     end
 
     def create_logger(options)
