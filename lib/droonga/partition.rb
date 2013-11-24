@@ -19,38 +19,33 @@ require "serverengine"
 
 require "droonga/server"
 require "droonga/worker"
-require "droonga/executor"
+require "droonga/processor"
 
 module Droonga
   class Partition
-    DEFAULT_OPTIONS = {
-      :queue_name => "DroongaQueue",
-      :n_workers  => 0,
-    }
-
     def initialize(options={})
-      @options = DEFAULT_OPTIONS.merge(options)
+      @options = options
+      @n_workers = @options[:n_workers] || 0
+      @processor = Processor.new(@options)
+      @supervisor = nil
     end
 
     def start
-      if @options[:database] && !@options[:database].empty?
-        Droonga::JobQueue.ensure_schema(@options[:database],
-                                        @options[:queue_name])
-      end
-      start_supervisor if @options[:n_workers] > 0
-      @executor = Executor.new(@options.merge(:standalone => true))
+      start_supervisor if @n_workers > 0
+      @processor.start
     end
 
     def shutdown
       $log.trace("partition: shutdown: start")
-      @executor.shutdown if @executor
+      @processor.shutdown
       shutdown_supervisor if @supervisor
       $log.trace("partition: shutdown: done")
     end
 
-    def emit(tag, time, record, synchronous=nil)
-      $log.trace("[#{Process.pid}] tag: <#{tag}> caller: <#{caller.first}>")
-      @executor.dispatch(tag, time, record, synchronous)
+    def process(envelope, synchronous=nil)
+      $log.trace("partition: process: start")
+      @processor.process(envelope, synchronous)
+      $log.trace("partition: process: done")
     end
 
     private

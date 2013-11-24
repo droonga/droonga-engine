@@ -91,7 +91,7 @@ module Droonga
         post(message, "type" => type, "synchronous"=> synchronous)
       else
         envelope = @worker.envelope.merge("body" => message, "type" => type)
-        @farm.emit(route, envelope, synchronous)
+        @farm.process(route, envelope, synchronous)
       end
     end
 

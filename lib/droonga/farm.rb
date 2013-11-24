@@ -40,9 +40,8 @@ module Droonga
       end
     end
 
-    # TODO: fix method name
-    def emit(partition_name, envelope, synchronous)
-      @partitions[partition_name].emit('', Time.now.to_f, envelope, synchronous)
+    def process(partition_name, envelope, synchronous)
+      @partitions[partition_name].process(envelope, synchronous)
     end
   end
 end
