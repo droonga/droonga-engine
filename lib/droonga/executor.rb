@@ -19,7 +19,6 @@ require "fluent-logger"
 require "fluent/logger/fluent_logger"
 require "groonga"
 
-require "droonga/legacy_plugin"
 require "droonga/plugin_loader"
 require "droonga/dispatcher"
 require "droonga/distributor"
@@ -29,24 +28,18 @@ module Droonga
     attr_reader :context, :envelope, :name
 
     def initialize(options={})
-      @legacy_plugins = []
       @outputs = {}
       @options = options
       @name = options[:name]
       @database_name = options[:database]
       @queue_name = options[:queue_name] || "DroongaQueue"
       @pool_size = options[:n_workers] || 0
-#     load_plugins
-      Droonga::PluginLoader.load_all
       prepare
     end
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       @distributor.shutdown
-      @legacy_plugins.each do |legacy_plugin|
-        legacy_plugin.shutdown
-      end
       @outputs.each do |dest, output|
         output[:logger].close if output[:logger]
       end
@@ -56,11 +49,6 @@ module Droonga
         @database = @context = nil
       end
       $log.trace("#{log_tag}: shutdown: done")
-    end
-
-    def add_legacy_plugin(name)
-      legacy_plugin = LegacyPlugin.repository.instantiate(name, self)
-      @legacy_plugins << legacy_plugin
     end
 
     def add_route(route)
@@ -117,13 +105,10 @@ module Droonga
       if receiver
         output(receiver, body, command, arguments)
       else
-        legacy_plugin = find_legacy_plugin(command)
-        if legacy_plugin
-          $log.trace("#{log_tag}: post_or_push: handle: start: <#{command}>",
-                     :plugin => legacy_plugin.class)
-          legacy_plugin.handle(command, body, *arguments)
-          $log.trace("#{log_tag}: post_or_push: handle: done: <#{command}>",
-                     :plugin => legacy_plugin.class)
+        if command == "dispatcher"
+          @dispatcher.handle(body, arguments)
+        elsif @dispatcher.processable?(command)
+          @dispatcher.process(command, body, *arguments)
         else
           @distributor.distribute(envelope.merge("type" => command,
                                                  "body" => body))
@@ -203,14 +188,8 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
-      @distributor = Distributor.new(self, @options)
-      add_legacy_plugin("dispatcher_message")
-    end
-
-    def find_legacy_plugin(command)
-      @legacy_plugins.find do |legacy_plugin|
-        legacy_plugin.handlable?(command)
-      end
+      @dispatcher = Dispatcher.new(self, name)
+      @distributor = Distributor.new(@dispatcher, @options)
     end
 
     def get_output(host, port, params)

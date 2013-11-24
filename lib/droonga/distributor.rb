@@ -19,8 +19,8 @@ require "droonga/distributor_plugin"
 
 module Droonga
   class Distributor
-    def initialize(executor, options={})
-      @executor = executor
+    def initialize(dispatcher, options={})
+      @dispatcher = dispatcher
       @plugins = []
       @options = options
       # TODO: don't put the default distributions
@@ -46,7 +46,7 @@ module Droonga
     end
 
     def post(message)
-      @executor.post(message, "dispatcher")
+      @dispatcher.handle(message, [])
     end
 
     private

@@ -33,14 +33,28 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      plugins = (Droonga.catalog.option("plugins")||[])
-      plugins.each do |plugin|
-        @worker.add_legacy_plugin(plugin)
-      end
+      Droonga::PluginLoader.load_all
+      load_legacy_plugins(Droonga.catalog.option("plugins")||[])
     end
 
     def shutdown
+      @legacy_plugins.each do |legacy_plugin|
+        legacy_plugin.shutdown
+      end
       @farm.shutdown
+    end
+
+    def processable?(command)
+      not find_legacy_plugin(command).nil?
+    end
+
+    def process(command, body, *arguments)
+      legacy_plugin = find_legacy_plugin(command)
+      $log.trace("#{log_tag}: process: start: <#{command}>",
+                 :plugin => legacy_plugin.class)
+      legacy_plugin.handle(command, body, *arguments)
+      $log.trace("#{log_tag}: process: done: <#{command}>",
+                 :plugin => legacy_plugin.class)
     end
 
     def handle(message, arguments)
@@ -115,6 +129,23 @@ module Droonga
 
     def local?(route)
       route =~ @local
+    end
+
+    private
+    def find_legacy_plugin(command)
+      @legacy_plugins.find do |plugin|
+        plugin.handlable?(command)
+      end
+    end
+
+    def load_legacy_plugins(names)
+      @legacy_plugins = names.collect do |name|
+        LegacyPlugin.repository.instantiate(name, @worker)
+      end
+    end
+
+    def log_tag
+      "[#{Process.ppid}][#{Process.pid}] dispatcher"
     end
 
     class Planner
@@ -244,27 +275,6 @@ module Droonga
           @dependency[node].each(&block)
         end
       end
-    end
-  end
-
-  class DispatcherMessageHandler < Droonga::LegacyPlugin
-    Droonga::LegacyPlugin.repository.register("dispatcher_message", self)
-    def initialize(*arguments)
-      super
-      @dispatcher = Droonga::Dispatcher.new(@worker, @worker.name)
-    end
-
-    def shutdown
-      @dispatcher.shutdown
-    end
-
-    command :dispatcher
-    def dispatcher(request, *arguments)
-      @dispatcher.handle(request, arguments)
-    end
-
-    def prefer_synchronous?(command)
-      return true
     end
   end
 end
