@@ -15,34 +15,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin_repository"
+require "droonga/plugin_registerable"
 
 module Droonga
   class DistributorPlugin
-    @@repository = PluginRepository.new
-
-    class << self
-      def inherited(sub_class)
-        super
-        sub_class.instance_variable_set(:@command_mapper, CommandMapper.new)
-      end
-
-      def repository
-        @@repository
-      end
-
-      def command(name_or_map)
-        @command_mapper.register(name_or_map)
-      end
-
-      def method_name(command)
-        @command_mapper[command]
-      end
-
-      def processable?(command)
-        not method_name(command).nil?
-      end
-    end
+    extend PluginRegisterable
 
     def initialize(distributor)
       @distributor = distributor
