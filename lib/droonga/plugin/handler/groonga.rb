@@ -21,7 +21,7 @@ require "droonga/legacy_plugin"
 
 module Droonga
   class GroongaHandler < Droonga::LegacyPlugin
-    Droonga::HandlerPlugin.repository.register("groonga", self)
+    Droonga::LegacyPlugin.repository.register("groonga", self)
 
     command :table_create
     def table_create(request)

@@ -13,18 +13,19 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler"
+# TODO: Rename to test_plugin
+require "droonga/legacy_plugin"
 
 class HandlerTest < Test::Unit::TestCase
   class HandlableTest < self
-    class SearchHandler < Droonga::Handler
+    class SearchHandler < Droonga::LegacyPlugin
       command :search
       def search(request)
         :search_response
       end
     end
 
-    class StatusHandler < Droonga::Handler
+    class StatusHandler < Droonga::LegacyPlugin
       command :status
       def status(request)
         :status_response

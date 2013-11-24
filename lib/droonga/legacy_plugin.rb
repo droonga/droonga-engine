@@ -21,6 +21,8 @@ require "droonga/logger"
 
 module Droonga
   class LegacyPlugin
+    @@repository = PluginRepository.new
+
     class << self
       def inherited(sub_class)
         super
@@ -37,6 +39,10 @@ module Droonga
 
       def handlable?(command)
         not method_name(command).nil?
+      end
+
+      def repository
+        @@repository
       end
     end
 

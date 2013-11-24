@@ -20,7 +20,7 @@ require "droonga/searcher"
 
 module Droonga
   class SearchHandler < Droonga::LegacyPlugin
-    Droonga::HandlerPlugin.repository.register("search", self)
+    Droonga::LegacyPlugin.repository.register("search", self)
 
     command :search
     def search(request)

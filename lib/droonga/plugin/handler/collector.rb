@@ -20,7 +20,7 @@ require "droonga/searcher"
 
 module Droonga
   class BasicCollectorHandler < Droonga::CollectorHandler
-    Droonga::HandlerPlugin.repository.register("collector", self)
+    Droonga::LegacyPlugin.repository.register("collector", self)
 
     command :collector_gather
     def collector_gather(request)

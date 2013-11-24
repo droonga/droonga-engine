@@ -21,7 +21,7 @@ require "droonga/legacy_plugin"
 
 module Droonga
   class AddHandler < Droonga::LegacyPlugin
-    Droonga::HandlerPlugin.repository.register("add", self)
+    Droonga::LegacyPlugin.repository.register("add", self)
 
     command :add
     def add(request)

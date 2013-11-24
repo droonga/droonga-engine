@@ -248,7 +248,7 @@ module Droonga
   end
 
   class DispatcherMessageHandler < Droonga::LegacyPlugin
-    Droonga::HandlerPlugin.repository.register("dispatcher_message", self)
+    Droonga::LegacyPlugin.repository.register("dispatcher_message", self)
     def initialize(*arguments)
       super
       @dispatcher = Droonga::Dispatcher.new(@worker, @worker.name)

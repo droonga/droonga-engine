@@ -50,7 +50,7 @@ module Droonga
   end
 
   class BasicAdapter < Adapter
-    Droonga::HandlerPlugin.repository.register("adapter", self)
+    Droonga::LegacyPlugin.repository.register("adapter", self)
 
     command :table_create
     def table_create(request)
