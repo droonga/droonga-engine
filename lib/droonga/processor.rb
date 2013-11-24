@@ -45,14 +45,14 @@ module Droonga
       $log.trace("proessor: process: start")
       reply_to = envelope["replyTo"]
       command = envelope["type"]
-      if @handler.handlable?(command)
+      if @handler.processable?(command)
         $log.trace("proessor: process: handlable: #{command}")
         if synchronous.nil?
           synchronous = @handler.prefer_synchronous?(command)
         end
         message = ["", Time.now.to_f, envelope]
         if @n_workers.zero? or synchronous
-          @handler.handle(message)
+          @handler.process(message)
         else
           @job_queue.push_message(message)
         end

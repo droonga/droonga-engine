@@ -15,32 +15,29 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
+require "droonga/plugin_registerable"
 
 module Droonga
-  class HandlerPlugin < Plugin
-    extend PluginRegisterable
-
-    def initialize(handler)
-      super()
-      @handler = handler
-      @context = @handler.context
+  class Plugin
+    def initialize
     end
 
-    def envelope
-      @handler.envelope
+    def start
     end
 
-    def emit(value, name=nil)
-      @handler.emit(value, name)
+    def shutdown
     end
 
-    def post(body, destination=nil)
-      @handler.post(body, destination)
+    def processable?(command)
+      self.class.processable?(command)
     end
 
-    def prefer_synchronous?(command)
-      false
+    def process(command, *arguments)
+      __send__(self.class.method_name(command), *arguments)
+    rescue => exception
+      Logger.error("error while processing #{command}",
+                   arguments: arguments,
+                   exception: exception)
     end
   end
 end

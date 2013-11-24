@@ -15,13 +15,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin_registerable"
+require "droonga/plugin"
 
 module Droonga
-  class DistributorPlugin
+  class DistributorPlugin < Plugin
     extend PluginRegisterable
 
     def initialize(distributor)
+      super()
       @distributor = distributor
     end
 
@@ -30,21 +31,9 @@ module Droonga
       @distributor.post(message)
     end
 
-    def shutdown
-    end
-
-    def processable?(command)
-      self.class.processable?(command)
-    end
-
     def process(envelope, *arguments)
       command = envelope["type"]
-      __send__(self.class.method_name(command), envelope, *arguments)
-    rescue => exception
-      Logger.error("error while processing #{command}",
-                   envelope: envelope,
-                   arguments: arguments,
-                   exception: exception)
+      super(command, envelope, *arguments)
     end
 
     def scatter_all(envelope, key)

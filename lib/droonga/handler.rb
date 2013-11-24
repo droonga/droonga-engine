@@ -72,11 +72,11 @@ module Droonga
         $log.trace("#{log_tag}: execute_one: abort: no message")
         return
       end
-      handle(message)
+      process(message)
       $log.trace("#{log_tag}: execute_one: done")
     end
 
-    def handlable?(command)
+    def processable?(command)
       not find_plugin(command).nil?
     end
 
@@ -84,30 +84,30 @@ module Droonga
       find_plugin(command).prefer_synchronous?(command)
     end
 
-    def handle(message)
-      $log.trace("#{log_tag}: handle: start")
+    def process(message)
+      $log.trace("#{log_tag}: process: start")
       body, command, arguments = parse_message(message)
       plugin = find_plugin(command)
       if plugin.nil?
-        $log.trace("#{log_tag}: handle: done: no plugin: <#{command}>")
+        $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
         return
       end
 
       unless try_handle_as_internal_message(plugin, command, body, arguments)
         @task = {}
         @output_values = {}
-        $log.trace("#{log_tag}: handle: plugin: handle: start",
+        $log.trace("#{log_tag}: process: plugin: process: start",
                    :hander => plugin.class)
-        plugin.handle(command, body, *arguments)
-        $log.trace("#{log_tag}: handle: plugin: handle: done",
+        plugin.process(command, body, *arguments)
+        $log.trace("#{log_tag}: process: plugin: process: done",
                    :hander => plugin.class)
         unless @output_values.empty?
-          $log.trace("#{log_tag}: handle: output: start")
+          $log.trace("#{log_tag}: process: output: start")
           post(@output_values)
-          $log.trace("#{log_tag}: handle: output: done")
+          $log.trace("#{log_tag}: process: output: done")
         end
       end
-      $log.trace("#{log_tag}: handle: done: <#{command}>",
+      $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
     end
 
@@ -161,9 +161,9 @@ module Droonga
             synchronous = plugin.prefer_synchronous?(command)
           end
           if route || @pool_size.zero? || synchronous
-            $log.trace("#{log_tag}: post_or_push: handle: start")
-            plugin.handle(command, body, *arguments)
-            $log.trace("#{log_tag}: post_or_push: handle: done")
+            $log.trace("#{log_tag}: post_or_push: process: start")
+            plugin.process(command, body, *arguments)
+            $log.trace("#{log_tag}: post_or_push: process: done")
           else
             unless message
               envelope["body"] = body
@@ -263,7 +263,7 @@ module Droonga
 
     def find_plugin(command)
       @plugins.find do |plugin|
-        plugin.handlable?(command)
+        plugin.processable?(command)
       end
     end
 
@@ -312,7 +312,7 @@ module Droonga
       @input_name = request["name"]
       @descendants = request["descendants"]
 
-      plugin.handle(command, @body, *arguments)
+      plugin.process(command, @body, *arguments)
       output_xxx if @descendants
       true
     end
