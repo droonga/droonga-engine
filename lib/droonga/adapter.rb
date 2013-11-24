@@ -22,14 +22,14 @@ module Droonga
   class Adapter
     include Pluggable
 
-    def initialize(executor, options={})
-      @executor = executor
+    def initialize(dispatcher, options={})
+      @dispatcher = dispatcher
       load_plugins(options[:adapters] || [])
     end
 
     private
     def instantiate_plugin(name)
-      AdapterPlugin.repository.instantiate(name, @executor)
+      AdapterPlugin.repository.instantiate(name, @dispatcher)
     end
 
     def log_tag

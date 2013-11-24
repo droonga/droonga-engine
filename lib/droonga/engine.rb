@@ -16,27 +16,51 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/logger"
-require "droonga/executor"
+require "droonga/dispatcher"
 
 module Droonga
   class Engine
     def initialize(options={})
       @options = options
+      @dispatcher = Dispatcher.new(@options)
     end
 
     def start
-      @executor = Executor.new(@options)
+      @dispatcher.start
     end
 
     def shutdown
       $log.trace("engine: shutdown: start")
-      @executor.shutdown
+      @dispatcher.shutdown
       $log.trace("engine: shutdown: done")
     end
 
-    def emit(tag, time, record, synchronous=nil)
+    def emit(tag, time, record)
       $log.trace("[#{Process.pid}] tag: <#{tag}> caller: <#{caller.first}>")
-      @executor.dispatch(tag, time, record, synchronous)
+      @dispatcher.handle_envelope(parse_record(tag, record))
+    end
+
+    private
+    def parse_record(tag, record)
+      prefix, type, *arguments = tag.split(/\./)
+      if type.nil? || type.empty? || type == 'message'
+        envelope = record
+      else
+        envelope = {
+          "type" => type,
+          "arguments" => arguments,
+          "body" => record
+        }
+      end
+      envelope["via"] ||= []
+      reply_to = envelope["replyTo"]
+      if reply_to.is_a? String
+        envelope["replyTo"] = {
+          "type" => envelope["type"] + ".result",
+          "to" => reply_to
+        }
+      end
+      envelope
     end
   end
 end

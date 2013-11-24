@@ -17,36 +17,91 @@
 
 require 'tsort'
 require "droonga/adapter"
+require "droonga/distributor"
 require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
 
 module Droonga
   class Dispatcher
-    attr_reader :collectors
-    def initialize(worker, name)
+    attr_reader :name, :envelope, :collectors
+
+    def initialize(options)
+      @options = options
+      @name = @options[:name]
       @farm = Farm.new(name)
-      @farm.start
-      @worker = worker
-      @name = name
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @adapter = Adapter.new(@worker,
+      @adapter = Adapter.new(self,
                              :adapters => Droonga.catalog.option("plugins"))
+      @forwarder = Forwarder.new
+      @distributor = Distributor.new(self, @options)
+    end
+
+    def start
+      @farm.start
     end
 
     def shutdown
+      @forwarder.shutdown
+      @distributor.shutdown
       @adapter.shutdown
       @farm.shutdown
     end
 
-    def processable?(command)
-      @adapter.processable?(command)
+    def add_route(route)
+      envelope["via"].push(route)
     end
 
-    def process(command, body, *arguments)
-      @adapter.process(command, body)
+    def handle_envelope(envelope)
+      @envelope = envelope
+      post(envelope["body"],
+           "type" => envelope["type"],
+           "arguments" => envelope["arguments"],
+           "synchronous" => envelope["synchronous"])
+    end
+
+    def post(body, destination=nil)
+      $log.trace("#{log_tag}: post: start")
+      route = nil
+      unless is_route?(destination)
+        route = envelope["via"].pop
+        destination = route
+      end
+      unless is_route?(destination)
+        destination = envelope["replyTo"]
+      end
+      command = nil
+      receiver = nil
+      arguments = nil
+      synchronous = nil
+      case destination
+      when String
+        command = destination
+      when Hash
+        command = destination["type"]
+        receiver = destination["to"]
+        arguments = destination["arguments"]
+        synchronous = destination["synchronous"]
+      end
+      if receiver
+        @forwarder.forward(envelope, body,
+                           "type" => command,
+                           "to" => receiver,
+                           "arguments" => arguments)
+      else
+        if command == "dispatcher"
+          handle(body, arguments)
+        elsif @adapter.processable?(command)
+          @adapter.process(command, body, *arguments)
+        else
+          @distributor.distribute(envelope.merge("type" => command,
+                                                 "body" => body))
+        end
+      end
+      add_route(route) if route
+      $log.trace("#{log_tag}: post: done")
     end
 
     def handle(message, arguments)
@@ -96,13 +151,9 @@ module Droonga
       if id == route
         post(message, "type" => type, "synchronous"=> synchronous)
       else
-        envelope = @worker.envelope.merge("body" => message, "type" => type)
+        envelope = @envelope.merge("body" => message, "type" => type)
         @farm.process(route, envelope, synchronous)
       end
-    end
-
-    def post(message, destination)
-      @worker.post(message, destination)
     end
 
     def generate_id
@@ -124,6 +175,10 @@ module Droonga
     end
 
     private
+    def is_route?(route)
+      route.is_a?(String) || route.is_a?(Hash)
+    end
+
     def log_tag
       "[#{Process.ppid}][#{Process.pid}] dispatcher"
     end

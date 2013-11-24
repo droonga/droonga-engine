@@ -21,17 +21,17 @@ module Droonga
   class AdapterPlugin < Plugin
     extend PluginRegisterable
 
-    def initialize(executor)
+    def initialize(dispatcher)
       super()
-      @executor = executor
+      @dispatcher = dispatcher
     end
 
     def add_route(route)
-      @executor.add_route(route)
+      @dispatcher.add_route(route)
     end
 
     def post(body, destination=nil)
-      @executor.post(body, destination)
+      @dispatcher.post(body, destination)
     end
 
     def emit(value, name=nil)
