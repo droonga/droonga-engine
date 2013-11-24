@@ -110,65 +110,35 @@ module Droonga
       @output_values[name] = value
     end
 
-    def post(body, destination=nil)
+    def post(body, destination)
       $log.trace("#{log_tag}: post: start")
-      post_or_push(nil, body, destination)
+      command = destination["type"]
+      receiver = destination["to"]
+      arguments = destination["arguments"]
+      synchronous = destination["synchronous"]
+      output(receiver, body, command, arguments)
       $log.trace("#{log_tag}: post: done")
     end
 
-    private
-    def post_or_push(message, body, destination)
-      route = nil
-      unless is_route?(destination)
-        route = envelope["via"].pop
-        destination = route
+    def handle(command, body, synchronous=nil)
+      plugin = find_plugin(command)
+      if synchronous.nil?
+        synchronous = plugin.prefer_synchronous?(command)
       end
-      unless is_route?(destination)
-        destination = envelope["replyTo"]
-      end
-      command = nil
-      receiver = nil
-      arguments = nil
-      synchronous = nil
-      case destination
-      when String
-        command = destination
-      when Hash
-        command = destination["type"]
-        receiver = destination["to"]
-        arguments = destination["arguments"]
-        synchronous = destination["synchronous"]
-      end
-      if receiver
-        output(receiver, body, command, arguments)
+      if synchronous
+        $log.trace("#{log_tag}: post_or_push: process: start")
+        plugin.process(command, body, *arguments)
+        $log.trace("#{log_tag}: post_or_push: process: done")
       else
-        plugin = find_plugin(command)
-        if plugin
-          if synchronous.nil?
-            synchronous = plugin.prefer_synchronous?(command)
-          end
-          if route || @pool_size.zero? || synchronous
-            $log.trace("#{log_tag}: post_or_push: process: start")
-            plugin.process(command, body, *arguments)
-            $log.trace("#{log_tag}: post_or_push: process: done")
-          else
-            unless message
-              envelope["body"] = body
-              envelope["type"] = command
-              envelope["arguments"] = arguments
-              message = ['', Time.now.to_f, envelope]
-            end
-            @job_queue.push_message(message)
-          end
-        end
+        envelope["body"] = body
+        envelope["type"] = command
+        envelope["arguments"] = arguments
+        message = ['', Time.now.to_f, envelope]
+        @job_queue.push_message(message)
       end
-      add_route(route) if route
     end
 
-    def is_route?(route)
-      route.is_a?(String) || route.is_a?(Hash)
-    end
-
+    private
     def output(receiver, body, command, arguments)
       $log.trace("#{log_tag}: output: start")
       unless receiver.is_a?(String) && command.is_a?(String)
@@ -296,7 +266,11 @@ module Droonga
     # TODO: move to dispatcher
     def output_xxx
       result = @task["values"]
-      post(result, @component["post"]) if @component["post"]
+      if @component["post"]
+        destination = @component["post"]
+        destination = envelope["replyTo"] if destination == true
+        post(result, destination)
+      end
       @descendants.each do |name, dests|
         message = {
           "id" => @id,
