@@ -79,21 +79,7 @@ module Droonga
         $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
         return
       end
-
-      unless try_handle_as_internal_message(plugin, command, body, arguments)
-        @task = {}
-        @output_values = {}
-        $log.trace("#{log_tag}: process: plugin: process: start",
-                   :hander => plugin.class)
-        plugin.process(command, body, *arguments)
-        $log.trace("#{log_tag}: process: plugin: process: done",
-                   :hander => plugin.class)
-        unless @output_values.empty?
-          $log.trace("#{log_tag}: process: output: start")
-          post(@output_values)
-          $log.trace("#{log_tag}: process: output: done")
-        end
-      end
+      process_command(plugin, command, body, arguments)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
     end
@@ -240,8 +226,7 @@ module Droonga
       output[:logger]
     end
 
-    # TODO: move to dispatcher
-    def try_handle_as_internal_message(plugin, command, request, arguments)
+    def process_command(plugin, command, request, arguments)
       return false unless request.is_a? Hash
 
       @task = request["task"]
@@ -263,7 +248,6 @@ module Droonga
       true
     end
 
-    # TODO: move to dispatcher
     def output_xxx
       result = @task["values"]
       if @component["post"]
