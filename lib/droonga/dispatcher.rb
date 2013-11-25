@@ -181,20 +181,23 @@ module Droonga
       route.is_a?(String) || route.is_a?(Hash)
     end
 
-    def apply_adapters(envelope)
-      input_message = InputMessage.new(envelope)
+    def apply_input_adapters(envelope)
+      adapted_envelope = envelope
       loop do
+        input_message = InputMessage.new(adapted_envelope)
         command = input_message.command
         break unless @adapter.processable?(command)
         @adapter.process(command, input_message)
         new_command = input_message.command
+        adapted_envelope = input_message.adapted_envelope
         break if command == new_command
       end
+      adapted_envelope
     end
 
     def process_input_message(envelope)
-      apply_adapters(envelope)
-      @distributor.distribute(envelope)
+      adapted_envelope = apply_input_adapters(envelope)
+      @distributor.distribute(adapted_envelope)
     end
 
     def log_tag

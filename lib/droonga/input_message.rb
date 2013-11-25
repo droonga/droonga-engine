@@ -21,6 +21,13 @@ module Droonga
       @envelope = envelope
     end
 
+    def adapted_envelope
+      # TODO: We can create adapted envelope non-destructively.
+      # If it is not performance issue, it is better that we don't
+      # change envelope destructively. Consider about it later.
+      @envelope
+    end
+
     def add_route(route)
       @envelope["via"].push(route)
     end
