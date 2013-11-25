@@ -51,6 +51,10 @@ module Droonga
       @farm.shutdown
     end
 
+    def add_route(route)
+      envelope["via"].push(route)
+    end
+
     def handle_envelope(envelope)
       @envelope = envelope
       if envelope["type"] == "dispatcher"
