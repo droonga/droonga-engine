@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -13,28 +15,30 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/adapter_plugin"
-
 module Droonga
-  class GroongaAdapter < Droonga::AdapterPlugin
-    repository.register("select", self)
-
-    command :select
-    def select(input_message)
-      command = Select.new
-      select_request = input_message.body
-      search_request = command.convert_request(select_request)
-      input_message.add_route("select_response")
-      input_message.command = "search"
-      input_message.body = search_request
+  class InputMessage
+    def initialize(envelope)
+      @envelope = envelope
     end
 
-    command :select_response
-    def select_response(search_response)
-      command = Select.new
-      emit(command.convert_response(search_response))
+    def add_route(route)
+      @envelope["via"].push(route)
+    end
+
+    def body
+      @envelope["body"]
+    end
+
+    def body=(body)
+      @envelope["body"] = body
+    end
+
+    def command
+      @envelope["type"]
+    end
+
+    def command=(command)
+      @envelope["type"] = command
     end
   end
 end
-
-require "droonga/plugin/adapter/groonga/select"

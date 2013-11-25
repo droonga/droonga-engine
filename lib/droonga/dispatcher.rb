@@ -21,6 +21,7 @@ require "droonga/distributor"
 require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
+require "droonga/input_message"
 
 module Droonga
   class Dispatcher
@@ -50,16 +51,13 @@ module Droonga
       @farm.shutdown
     end
 
-    def add_route(route)
-      envelope["via"].push(route)
-    end
-
     def handle_envelope(envelope)
       @envelope = envelope
-      post(envelope["body"],
-           "type" => envelope["type"],
-           "arguments" => envelope["arguments"],
-           "synchronous" => envelope["synchronous"])
+      if envelope["type"] == "dispatcher"
+        handle(envelope["body"], envelope["arguments"])
+      else
+        process_input_message(envelope)
+      end
     end
 
     def post(body, destination=nil)
@@ -177,6 +175,22 @@ module Droonga
     private
     def is_route?(route)
       route.is_a?(String) || route.is_a?(Hash)
+    end
+
+    def apply_adapters(envelope)
+      input_message = InputMessage.new(envelope)
+      loop do
+        command = input_message.command
+        break unless @adapter.processable?(command)
+        @adapter.process(command, input_message)
+        new_command = input_message.command
+        break if command == new_command
+      end
+    end
+
+    def process_input_message(envelope)
+      apply_adapters(envelope)
+      @distributor.distribute(envelope)
     end
 
     def log_tag
