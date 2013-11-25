@@ -40,8 +40,6 @@ if need_bundle_install?(gemfile, gemfile_lock)
   end
 end
 
-ENV["BUNDLE_GEMFILE"] = File.expand_path(gemfile)
-
 drntest_options = ARGV.dup
 drntest_options << File.join(base_dir, "suite")
 
