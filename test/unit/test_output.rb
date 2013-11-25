@@ -17,14 +17,14 @@ require "fluent/plugin/out_droonga"
 
 module OutputStub
   class Engine
-    attr_reader :processed_record
+    attr_reader :processed_envelope
     def initialize(response)
       @response = response
-      @processed_record = nil
+      @processed_envelope = nil
     end
 
-    def emit(tag, time, record)
-      @processed_record = record
+    def process(envelope)
+      @processed_envelope = envelope
       @response
     end
 
@@ -80,7 +80,7 @@ class OutputTest < Test::Unit::TestCase
     driver.run do
       driver.emit(request, time)
     end
-    assert_equal(request, @output.engine.processed_record)
+    assert_equal(request, @output.engine.processed_envelope)
   end
 
   private
