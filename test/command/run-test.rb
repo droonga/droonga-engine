@@ -31,6 +31,8 @@ def need_bundle_install?(gemfile, gemfile_lock)
 end
 
 base_dir = File.dirname(__FILE__)
+lib_dir = File.expand_path(File.join(base_dir, "..", "..", "lib"))
+
 gemfile = File.join(base_dir, "Gemfile")
 gemfile_lock = "#{gemfile}.lock"
 
@@ -40,7 +42,9 @@ if need_bundle_install?(gemfile, gemfile_lock)
   end
 end
 
-drntest_options = ARGV.dup
+drntest_options = []
+drntest_options.concat(["--fluentd-options", "-I#{lib_dir}"])
+drntest_options.concat(ARGV.dup)
 drntest_options << File.join(base_dir, "suite")
 
 run(File.join(base_dir, "bin", "drntest"),
