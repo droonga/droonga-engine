@@ -23,9 +23,6 @@ module Fluent
     Plugin.register_output("droonga", self)
 
     config_param :name, :string, :default => ""
-    config_param :handlers, :default => [] do |value|
-      value.split(/\s*,\s*/)
-    end
 
     def start
       super
