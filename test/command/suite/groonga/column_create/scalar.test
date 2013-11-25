@@ -1,3 +1,4 @@
+#CONFIG ../../../config/cluster/
 {
   "type": "table_create",
   "dataset": "Droonga",
