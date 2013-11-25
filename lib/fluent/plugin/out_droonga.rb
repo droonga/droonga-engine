@@ -38,9 +38,37 @@ module Fluent
 
     def emit(tag, es, chain)
       es.each do |time, record|
-        @engine.emit(tag, time, record)
+        process_event(tag, record)
       end
       chain.next
+    end
+
+    private
+    def process_event(tag, record)
+      $log.trace("out_droonga: tag: <#{tag}> caller: <#{caller.first}>")
+      @engine.process(parse_record(tag, record))
+    end
+
+    def parse_record(tag, record)
+      prefix, type, *arguments = tag.split(/\./)
+      if type.nil? || type.empty? || type == 'message'
+        envelope = record
+      else
+        envelope = {
+          "type" => type,
+          "arguments" => arguments,
+          "body" => record
+        }
+      end
+      envelope["via"] ||= []
+      reply_to = envelope["replyTo"]
+      if reply_to.is_a? String
+        envelope["replyTo"] = {
+          "type" => envelope["type"] + ".result",
+          "to" => reply_to
+        }
+      end
+      envelope
     end
   end
 end

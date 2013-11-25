@@ -35,32 +35,8 @@ module Droonga
       $log.trace("engine: shutdown: done")
     end
 
-    def emit(tag, time, record)
-      $log.trace("[#{Process.pid}] tag: <#{tag}> caller: <#{caller.first}>")
-      @dispatcher.handle_envelope(parse_record(tag, record))
-    end
-
-    private
-    def parse_record(tag, record)
-      prefix, type, *arguments = tag.split(/\./)
-      if type.nil? || type.empty? || type == 'message'
-        envelope = record
-      else
-        envelope = {
-          "type" => type,
-          "arguments" => arguments,
-          "body" => record
-        }
-      end
-      envelope["via"] ||= []
-      reply_to = envelope["replyTo"]
-      if reply_to.is_a? String
-        envelope["replyTo"] = {
-          "type" => envelope["type"] + ".result",
-          "to" => reply_to
-        }
-      end
-      envelope
+    def process(envelope)
+      @dispatcher.handle_envelope(envelope)
     end
   end
 end
