@@ -1,4 +1,4 @@
-#CONFIG ../../../config/cluster/
+#@config ../../../config/cluster/
 {
   "type"    : "select",
   "dataset" : "Droonga",
