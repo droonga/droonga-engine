@@ -67,6 +67,10 @@ module Droonga
       MessagePack.unpack(packed_message)
     end
 
+    def unblock
+      @queue.unblock
+    end
+
     def close
       @queue = nil
       if @database

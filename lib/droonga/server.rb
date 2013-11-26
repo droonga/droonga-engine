@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "groonga"
+require "droonga/job_queue"
 
 module Droonga
   module Server
@@ -95,16 +95,12 @@ module Droonga
 
       def open_queue
         config = @worker.config
-        # TODO: Use JobQueue object
-        context = Groonga::Context.new
-        database = context.open_database(config[:database])
-        queue = context[config[:queue_name]]
+        queue = JobQueue.open(config[:database],
+                              config[:queue_name] || "DroongaQueue")
         begin
           yield(queue)
         ensure
           queue.close
-          database.close
-          context.close
         end
       end
     end
