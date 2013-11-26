@@ -13,7 +13,7 @@
   "body": {
     "table" : "User",
     "name"  : "email",
-    "type"  : "ShortText"
+    "type"  : "ShortText",
     "flags" : "COLUMN_VECTOR"
   }
 }
