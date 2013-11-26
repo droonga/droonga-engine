@@ -53,7 +53,7 @@ module Droonga
             $log.trace("#{log_tag}: stop: start")
 
             $log.trace("#{log_tag}: stop: queue: unblock: start")
-            max_n_retries = 10
+            max_n_retries = 20
             max_n_retries.times do |i|
               $log.trace("#{log_tag}: stop: queue: unblock: #{i}: start")
               super(stop_graceful)
