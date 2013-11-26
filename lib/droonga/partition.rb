@@ -31,14 +31,14 @@ module Droonga
     end
 
     def start
-      start_supervisor if @n_workers > 0
       @processor.start
+      start_supervisor if @n_workers > 0
     end
 
     def shutdown
       $log.trace("partition: shutdown: start")
-      @processor.shutdown
       shutdown_supervisor if @supervisor
+      @processor.shutdown
       $log.trace("partition: shutdown: done")
     end
 
