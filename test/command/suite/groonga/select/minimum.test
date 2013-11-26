@@ -1,4 +1,5 @@
 #@config ../../../config/cluster/
+#@include ../../../fixture/user-table.jsons
 {
   "type"    : "select",
   "dataset" : "Droonga",
