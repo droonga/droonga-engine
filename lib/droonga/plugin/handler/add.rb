@@ -25,12 +25,12 @@ module Droonga
 
     command :add
     def add(request)
-      outputs = process(request)
+      outputs = process_add(request)
       emit(outputs)
     end
 
     private
-    def process(request)
+    def process_add(request)
       table = @context[request["table"]]
       return [false] unless table
       if table.support_key?
