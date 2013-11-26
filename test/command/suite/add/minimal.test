@@ -1,0 +1,12 @@
+#@config ../../config/cluster/
+#@include ../../fixture/user-table.jsons
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "User",
+    "key": "key",
+    "values": {
+    }
+  }
+}
