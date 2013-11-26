@@ -45,6 +45,38 @@ module Droonga
       SUCCESS          = 0
       INVALID_ARGUMENT = -22
     end
+
+    class Command
+      class CommandError < StandardError
+        attr_reader :status, :message, :result
+
+        def initialize(params={})
+          @status = params[:status]
+          @message = params[:message]
+          @result = params[:result]
+        end
+      end
+
+      def initialize(context)
+        @context = context
+      end
+
+      def execute(request)
+        @start_time = Time.now.to_f
+        result = process_request(request)
+        [header(Status::SUCCESS), result]
+      rescue CommandError => error
+        [header(error.status, error.message), error.result]
+      end
+
+      private
+      def header(return_code, error_message="")
+        elapsed_time = Time.now.to_f - @start_time
+        header = [return_code, @start_time, elapsed_time]
+        header.push(error_message) unless error_message.empty?
+        header
+      end
+    end
   end
 end
 

@@ -20,32 +20,23 @@ require "groonga/command/table-create"
 
 module Droonga
   class GroongaHandler
-    class TableCreate
-      def initialize(context)
-        @context = context
-      end
-
-      def header(return_code, error_message="")
-        elapsed_time = Time.now.to_f - @start_time
-        header = [return_code, @start_time, elapsed_time]
-        header.push(error_message) unless error_message.empty?
-        header
-      end
-
-      def execute(request)
-        @start_time = Time.now.to_f
-
+    class TableCreate < Command
+      def process_request(request)
         command_class = Groonga::Command.find("table_create")
         @command = command_class.new("table_create", request)
 
         name = @command["name"]
-        return [header(Status::INVALID_ARGUMENT, "Should not create anonymous table"), false] unless name
+        unless name
+          raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                 :message => "Should not create anonymous table",
+                                 :result => false)
+        end
 
         options = parse_command
         Groonga::Schema.define(:context => @context) do |schema|
           schema.create_table(name, options)
         end
-        [header(Status::SUCCESS), true]
+        true
       end
 
       private

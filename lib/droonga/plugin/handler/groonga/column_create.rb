@@ -20,12 +20,8 @@ require "groonga/command/column-create"
 
 module Droonga
   class GroongaHandler
-    class ColumnCreate
-      def initialize(context)
-        @context = context
-      end
-
-      def execute(request)
+    class ColumnCreate < Command
+      def process_request(request)
         command_class = Groonga::Command.find("column_create")
         @command = command_class.new("column_create", request)
 
@@ -48,7 +44,7 @@ module Droonga
             table.column(column_name, column_type, options)
           end
         end
-        [true]
+        true
       end
 
       def create_column_options
@@ -78,7 +74,7 @@ module Droonga
             table.index("#{target_table}.#{target_column}", options)
           end
         end
-        [true]
+        true
       end
 
       def create_index_options
