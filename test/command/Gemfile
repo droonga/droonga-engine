@@ -16,6 +16,7 @@
 source "https://rubygems.org"
 
 vendor_dir = File.join(File.dirname(__FILE__), "vendor")
+base_dir = File.join(File.dirname(__FILE__), "../../")
 
 drntest_dir = File.join(vendor_dir, "drntest")
 if File.exist?(drntest_dir)
@@ -30,3 +31,6 @@ if File.exist?(droonga_client_dir)
 else
   gem "droonga-client", github: "droonga/droonga-client-ruby"
 end
+
+gem "fluent-plugin-droonga", :path => base_dir
+gem "fluentd"
