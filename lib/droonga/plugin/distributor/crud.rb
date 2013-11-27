@@ -23,14 +23,12 @@ module Droonga
 
     command :add
     def add(envelope)
-      # TODO: update events must be serialized in the primary node of replicas.
       key = envelope["body"]["key"] || rand.to_s
       scatter_all(envelope, key)
     end
 
     command :update
     def update(envelope)
-      # TODO: update events must be serialized in the primary node of replicas.
       key = envelope["body"]["key"] || rand.to_s
       scatter_all(envelope, key)
     end
@@ -38,7 +36,6 @@ module Droonga
     # TODO: What is this?
     command :reset
     def reset(envelope)
-      # TODO: update events must be serialized in the primary node of replicas.
       key = envelope["body"]["key"] || rand.to_s
       scatter_all(envelope, key)
     end
