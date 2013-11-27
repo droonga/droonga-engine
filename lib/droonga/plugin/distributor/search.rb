@@ -45,8 +45,6 @@ module Droonga
           when "count"
             elements[element] = {
               "type" => "sum",
-              "offset" => final_offset,
-              "limit" => final_limit,
             }
           when "records"
             # TODO: must take "sortBy" section into account.
