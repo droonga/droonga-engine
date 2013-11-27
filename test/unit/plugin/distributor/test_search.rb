@@ -158,6 +158,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     message << gatherer
     searcher = {
       "type" => "broadcast",
+      "command" => "search",
       "dataset" => "Droonga",
       "body" => {
         "queries" => {
@@ -191,7 +192,6 @@ class SearchDistributorTest < Test::Unit::TestCase
           },
         },
       },
-      "command" => "search",
       "outputs" => [
         "no_records",
         "no_limit",
