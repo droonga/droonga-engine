@@ -22,11 +22,17 @@ module PluginHelper
     stub(@plugin).emit do |*message|
       @messages << message
     end
+
+    @posted = []
+    stub(@plugin).post do |*message|
+      @posted << message
+    end
   end
 
   def teardown_plugin
     @plugin = nil
     @worker = nil
     @messages = nil
+    @posted = nil
   end
 end
