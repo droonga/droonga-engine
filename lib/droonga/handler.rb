@@ -17,7 +17,6 @@
 
 require "groonga"
 
-require "droonga/job_queue"
 require "droonga/forwarder"
 require "droonga/pluggable"
 require "droonga/handler_plugin"
