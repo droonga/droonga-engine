@@ -296,8 +296,12 @@ module Droonga
         # XXX IMPLEMENT ME!!!
         attributes = nil
         if @query["output"]["format"] == "complex"
+          # should convert columnst to an object like:
+          # {"_id" => {"type" => "UInt32", "vector" => false}}
           attributes = {}
         else
+          # should convert columnst to an object like:
+          # [{"name" => "_id", "type" => "UInt32", "vector" => false}]
           attributes = []
         end
 
