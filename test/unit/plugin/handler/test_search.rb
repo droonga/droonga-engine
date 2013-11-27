@@ -235,6 +235,43 @@ class SearchHandlerTest < Test::Unit::TestCase
         assert_search(expected, request)
       end
 
+      def test_source_only_for_reference_column
+        expected = {
+          "sections-result" => {
+            "records" => [
+              {
+                "_key" => "1.1",
+                "document" => "Groonga",
+              },
+              {
+                "_key" => "1.2",
+                "document" => "Groonga",
+              },
+              {
+                "_key" => "1.3",
+                "document" => "Groonga",
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 3,
+                "attributes" => ["_key", "document"],
+              },
+            },
+          },
+        }
+        assert_search(expected, request)
+      end
+
       def test_label
         expected = {
           "sections-result" => {
