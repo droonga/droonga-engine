@@ -58,6 +58,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         "task" => {
           "values" => {
             output_name => {
+              "numeric_value" => 1,
               "numeric_key_records" => [
                 create_record(1),
                 create_record(2),
@@ -74,6 +75,7 @@ class BasicCollectorTest < Test::Unit::TestCase
             "body" => {
               input_name => {
                 output_name => {
+                  "numeric_value" => { "type" => "sum" },
                   "numeric_key_records" => { "type" => "sum" },
                   "string_key_records" => { "type" => "sum" },
                 },
@@ -84,6 +86,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         "id" => nil,
         "value" => {
+          "numeric_value" => 2,
           "numeric_key_records" => [
             create_record(4),
             create_record(5),
@@ -101,6 +104,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       @plugin.process("collector_reduce", request)
       assert_equal([
                      {
+                       "numeric_value" => 3,
                        "numeric_key_records" => [
                          create_record(1),
                          create_record(2),
@@ -130,6 +134,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         "task" => {
           "values" => {
             output_name => {
+              "numeric_value" => 1,
               "numeric_key_records" => [
                 create_record(1),
                 create_record(2),
@@ -146,6 +151,11 @@ class BasicCollectorTest < Test::Unit::TestCase
             "body" => {
               input_name => {
                 output_name => {
+                  "numeric_value" => {
+                    "type" => "sum",
+                    "offset" => 2,
+                    "limit" => 2,
+                  },
                   "numeric_key_records" => {
                     "type" => "sum",
                     "offset" => 2,
@@ -164,6 +174,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         "id" => nil,
         "value" => {
+          "numeric_value" => 2,
           "numeric_key_records" => [
             create_record(4),
             create_record(5),
@@ -181,6 +192,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       @plugin.process("collector_reduce", request)
       assert_equal([
                      {
+                       "numeric_value" => 3,
                        "numeric_key_records" => [
                          create_record(3),
                          create_record(4),
