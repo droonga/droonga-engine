@@ -40,10 +40,15 @@ module Droonga
         output["elements"].each do |element|
           case element
           when "count"
-            elements[element] = ["sum"]
+            elements[element] = {
+              "type" => "sum",
+            }
           when "records"
             # TODO: must take "sortBy" section into account.
-            elements[element] = ["sort", "<"]
+            elements[element] = {
+              "type" => "sort",
+              "order" => ["<"],
+            }
           end
         end
         reducer = {

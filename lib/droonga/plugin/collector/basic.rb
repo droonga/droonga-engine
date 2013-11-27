@@ -41,12 +41,11 @@ module Droonga
     def reduce(elements, *values)
       result = {}
       elements.each do |key, deal|
-        func, *args = deal
-        case func
+        case deal["type"]
         when "sum"
           result[key] = values[0][key] + values[1][key]
         when "sort"
-          result[key] = merge(values[0][key], values[1][key], args)
+          result[key] = merge(values[0][key], values[1][key], deal["order"])
         end
       end
       return result

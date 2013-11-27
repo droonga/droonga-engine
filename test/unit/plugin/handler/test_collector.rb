@@ -77,8 +77,8 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_key_records" => ["sum"],
-                  "string_key_records" => ["sum"],
+                  "numeric_key_records" => { "type" => "sum" },
+                  "string_key_records" => { "type" => "sum" },
                 },
               },
             },
@@ -149,8 +149,14 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_key_records" => ["sort", "<"],
-                  "string_key_records" => ["sort", "<"],
+                  "numeric_key_records" => {
+                    "type" => "sort",
+                    "order" => ["<"],
+                  },
+                  "string_key_records" => {
+                    "type" => "sort",
+                    "order" => ["<"],
+                  },
                 },
               },
             },
