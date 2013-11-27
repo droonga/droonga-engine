@@ -1,3 +1,4 @@
+#@disable-logging
 {
   "type": "table_create",
   "dataset": "Droonga",
@@ -34,3 +35,4 @@
     "flags" : "COLUMN_VECTOR"
   }
 }
+#@enable-logging
