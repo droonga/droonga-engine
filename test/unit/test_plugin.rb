@@ -17,30 +17,34 @@ require "droonga/plugin"
 
 class PluginTest < Test::Unit::TestCase
   class PluggableTest < self
-    class SearchPlugin < Droonga::Plugin
-      command :search
-      def search(request)
-        :search_response
+    class DummyTypePlugin < Droonga::Plugin
+      extend Droonga::PluginRegisterable
+    end
+
+    class DummyPlugin < DummyTypePlugin
+      command :dummy
+      def dummy(request)
+        :dummy_response
       end
     end
 
-    class Worker
-      def context
-        nil
+    class UnknownPlugin < DummyTypePlugin
+      command :unknown
+      def unknown(request)
+        :unknown_response
       end
     end
 
     def setup
-      context = Worker.new
-      @search_plugin = SearchPlugin.new(context)
+      @dummy_plugin = DummyPlugin.new
     end
 
-    def test_true
-      assert_true(@search_plugin.processable?(:search))
+    def test_processable
+      assert_true(@dummy_plugin.processable?(:dummy))
     end
 
-    def test_false
-      assert_false(@search_plugin.processable?(:status))
+    def test_not_processable
+      assert_false(@dummy_plugin.processable?(:unknown))
     end
   end
 end
