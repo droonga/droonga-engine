@@ -123,6 +123,79 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
                    @messages.last)
     end
 
+    def test_sum_with_offset_and_limit
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => {
+              "numeric_key_records" => [
+                create_record(1),
+                create_record(2),
+                create_record(3),
+              ],
+              "string_key_records" => [
+                create_record("a"),
+                create_record("b"),
+                create_record("c"),
+              ],
+            },
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "numeric_key_records" => {
+                    "type" => "sum",
+                    "offset" => 2,
+                    "limit" => 2,
+                  },
+                  "string_key_records" => {
+                    "type" => "sum",
+                    "offset" => 3,
+                    "limit" => -1,
+                  },
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "numeric_key_records" => [
+            create_record(4),
+            create_record(5),
+            create_record(6),
+          ],
+          "string_key_records" => [
+            create_record("d"),
+            create_record("e"),
+            create_record("f"),
+          ],
+        },
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @handler.process("collector_reduce", request)
+      assert_equal([
+                     {
+                       "numeric_key_records" => [
+                         create_record(3),
+                         create_record(4),
+                       ],
+                       "string_key_records" => [
+                         create_record("d"),
+                         create_record("e"),
+                         create_record("f"),
+                       ],
+                     },
+                     output_name
+                   ],
+                   @messages.last)
+    end
+
     def test_sort
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
@@ -191,6 +264,81 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
                          create_record("a"),
                          create_record("b"),
                          create_record("c"),
+                         create_record("d"),
+                         create_record("e"),
+                         create_record("f"),
+                       ],
+                     },
+                     output_name
+                   ],
+                   @messages.last)
+    end
+
+    def test_sort_with_limit_and_offset
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => {
+              "numeric_key_records" => [
+                create_record(1),
+                create_record(3),
+                create_record(5),
+              ],
+              "string_key_records" => [
+                create_record("a"),
+                create_record("c"),
+                create_record("e"),
+              ],
+            },
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "numeric_key_records" => {
+                    "type" => "sort",
+                    "order" => ["<"],
+                    "offset" => 2,
+                    "limit" => 2,
+                  },
+                  "string_key_records" => {
+                    "type" => "sort",
+                    "order" => ["<"],
+                    "offset" => 3,
+                    "limit" => -1,
+                  },
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "numeric_key_records" => [
+            create_record(2),
+            create_record(4),
+            create_record(6),
+          ],
+          "string_key_records" => [
+            create_record("b"),
+            create_record("d"),
+            create_record("f"),
+          ],
+        },
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @handler.process("collector_reduce", request)
+      assert_equal([
+                     {
+                       "numeric_key_records" => [
+                         create_record(3),
+                         create_record(4),
+                       ],
+                       "string_key_records" => [
                          create_record("d"),
                          create_record("e"),
                          create_record("f"),
