@@ -54,7 +54,7 @@ module Droonga
             input_name=> {
               output_name=> elements,
             },
-          }
+          },
         }
         message << reducer
       end
