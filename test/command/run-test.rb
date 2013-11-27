@@ -44,8 +44,8 @@ end
 
 drntest_options = []
 drntest_options.concat(["--fluentd-options", "-I#{lib_dir}"])
+drntest_options.concat(["--base", base_dir])
 drntest_options.concat(ARGV.dup)
-drntest_options << File.join(base_dir, "suite")
 
 run(File.join(base_dir, "bin", "drntest"),
     *drntest_options)
