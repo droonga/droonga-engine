@@ -52,8 +52,8 @@ module Droonga
           "type"=> "reduce",
           "body"=> {
             input_name=> {
-              output_name=> elements
-            }
+              output_name=> elements,
+            },
           }
         }
         message << reducer
@@ -62,7 +62,7 @@ module Droonga
         "inputs"=> output_names,
         "type"=> "gather",
         "body"=> name_mapper,
-        "post"=> true
+        "post"=> true,
       }
       message << gatherer
       searcher = {
@@ -71,7 +71,7 @@ module Droonga
         "type"=> "broadcast",
         "command"=> "search",
         "replica"=> "random",
-        "body"=> request
+        "body"=> request,
       }
       message.push(searcher)
       post(message)
