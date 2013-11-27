@@ -94,6 +94,13 @@ module Droonga
     def calculate_offset_and_limit!(query)
       rich_sort = query["sortBy"].is_a?(Hash)
 
+      have_records = false
+      if query["output"] &&
+           query["output"]["elements"].is_a?(Array) &&
+           query["output"]["elements"].include?("records")
+        have_records = true
+      end
+
       # offset for workers must be zero.
       sort_offset = 0
       if rich_sort
@@ -102,7 +109,7 @@ module Droonga
       end
 
       output_offset = query["output"]["offset"] || 0
-      query["output"]["offset"] = 0
+      query["output"]["offset"] = 0 if have_records
 
       final_offset = sort_offset + output_offset
 
@@ -119,7 +126,7 @@ module Droonga
         sort_limit = query["sortBy"]["limit"] || UNLIMITED
       end
       output_limit = query["output"]["limit"] || 0
-      query["output"]["limit"] = UNLIMITED
+      query["output"]["limit"] = UNLIMITED if have_records
 
       final_limit = 0
       if sort_limit == UNLIMITED && output_limit == UNLIMITED
