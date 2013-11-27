@@ -366,7 +366,7 @@ module Droonga
           else
             value = record[attribute[:source]]
             if value.is_a?(Groonga::Record)
-              value["_key"]
+              value.record_id
             else
               value
             end
