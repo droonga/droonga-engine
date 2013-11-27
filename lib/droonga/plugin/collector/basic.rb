@@ -41,15 +41,28 @@ module Droonga
     def reduce(elements, *values)
       result = {}
       elements.each do |key, deal|
+        reduced_values = nil
+
         case deal["type"]
         when "sum"
-          result[key] = values[0][key] + values[1][key]
+          reduced_values = values[0][key] + values[1][key]
         when "sort"
-          result[key] = merge(values[0][key], values[1][key], deal["order"])
+          reduced_values = merge(values[0][key], values[1][key], deal["order"])
         end
+
+        if deal["offset"]
+          reduced_values = reduced_values[deal["offset"]..-1]
+        end
+        if deal["limit"] && deal["limit"] != UNLIMITED
+          reduced_values = reduced_values[0..deal["limit"]]
+        end
+
+        result[key] = reduced_values
       end
       return result
     end
+
+    UNLIMITED = -1
 
     def merge(x, y, order)
       index = 0
