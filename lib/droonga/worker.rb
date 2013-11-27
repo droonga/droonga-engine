@@ -19,8 +19,6 @@ require "droonga/handler"
 
 module Droonga
   module Worker
-    attr_reader :context, :envelope, :name
-
     def initialize
       @handler = Handler.new(config)
     end
