@@ -1,5 +1,4 @@
-#@config ../../config/cluster/
-#@include ../../fixture/user-table.jsons
+#@include fixture/user-table.jsons
 {
   "type": "search",
   "dataset": "Droonga",
