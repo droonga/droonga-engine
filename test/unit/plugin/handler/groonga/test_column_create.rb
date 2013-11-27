@@ -17,7 +17,11 @@ class ColumnCreateTest < GroongaHandlerTest
   def test_success
     @handler.table_create({"name" => "Books"})
     @handler.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
-    assert_equal([true], @messages.last.first)
+    response = @messages.last.first
+    assert_equal(
+      [[Droonga::GroongaHandler::Status::SUCCESS, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
+      [normalize_header(response.first), response.last]
+    )
   end
 
   def test_name
