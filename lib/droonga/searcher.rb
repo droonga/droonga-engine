@@ -360,7 +360,12 @@ module Droonga
             variable.value = record
             expression.execute
           else
-            record[attribute[:source]]
+            value = record[attribute[:source]]
+            if value.is_a?(Groonga::Record)
+              value["_key"]
+            else
+              value
+            end
           end
         end
       end
