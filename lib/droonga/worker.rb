@@ -20,18 +20,20 @@ require "droonga/handler"
 module Droonga
   module Worker
     def initialize
-      @handler = Handler.new(config)
+      @database_name = config[:database]
+      @queue_name = config[:queue_name] || "DroongaQueue"
     end
 
     def run
       $log.trace("#{log_tag}: run: start")
+      handler = Handler.new(config)
+      job_queue = JobQueue.open(@database_name, @queue_name)
       @running = true
       while @running
-        $log.trace("#{log_tag}: run: pull_message: start")
-        @handler.execute_one
-        $log.trace("#{log_tag}: run: pull_message: done")
+        process(handler, job_queue)
       end
-      @handler.shutdown
+      handler.shutdown
+      job_queue.close
       $log.trace("#{log_tag}: run: done")
     end
 
@@ -42,6 +44,17 @@ module Droonga
     end
 
     private
+    def process(handler, job_queue)
+      $log.trace("#{log_tag}: process: start")
+      envelope = job_queue.pull_message
+      unless envelope
+        $log.trace("#{log_tag}: process: abort: no message")
+        return
+      end
+      handler.process(envelope)
+      $log.trace("#{log_tag}: process: done")
+    end
+
     def log_tag
       "[#{Process.ppid}][#{Process.pid}] worker"
     end

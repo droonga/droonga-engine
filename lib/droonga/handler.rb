@@ -32,7 +32,6 @@ module Droonga
       @options = options
       @name = options[:name]
       @database_name = options[:database]
-      @queue_name = options[:queue_name] || "DroongaQueue"
       prepare
     end
 
@@ -45,22 +44,7 @@ module Droonga
         @context.close
         @database = @context = nil
       end
-      if @job_queue
-        @job_queue.close
-        @job_queue = nil
-      end
       $log.trace("#{log_tag}: shutdown: done")
-    end
-
-    def execute_one
-      $log.trace("#{log_tag}: execute_one: start")
-      envelope = @job_queue.pull_message
-      unless envelope
-        $log.trace("#{log_tag}: execute_one: abort: no message")
-        return
-      end
-      process(envelope)
-      $log.trace("#{log_tag}: execute_one: done")
     end
 
     def prefer_synchronous?(command)
@@ -107,7 +91,6 @@ module Droonga
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
-        @job_queue = JobQueue.open(@database_name, @queue_name)
       end
       load_plugins(@options[:handlers] || [])
       @forwarder = Forwarder.new
