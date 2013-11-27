@@ -16,15 +16,15 @@
 require "droonga/plugin/handler/groonga"
 
 class GroongaHandlerTest < Test::Unit::TestCase
-  include HandlerHelper
+  include PluginHelper
 
   def setup
     setup_database
-    setup_handler(Droonga::GroongaHandler)
+    setup_plugin(Droonga::GroongaHandler)
   end
 
   def teardown
-    teardown_handler
+    teardown_plugin
     teardown_database
   end
 

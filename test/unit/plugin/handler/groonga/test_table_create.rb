@@ -15,7 +15,7 @@
 
 class TableCreateTest < GroongaHandlerTest
   def test_success
-    @handler.table_create({"name" => "Books"})
+    @plugin.table_create({"name" => "Books"})
     response = @messages.last.first
     assert_equal(
       [[Droonga::GroongaHandler::Status::SUCCESS, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
@@ -24,7 +24,7 @@ class TableCreateTest < GroongaHandlerTest
   end
 
   def test_failure
-    @handler.table_create({})
+    @plugin.table_create({})
     response = @messages.last.first
     assert_equal(
       [[Droonga::GroongaHandler::Status::INVALID_ARGUMENT, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], false],
@@ -33,7 +33,7 @@ class TableCreateTest < GroongaHandlerTest
   end
 
   def test_name
-    @handler.table_create({"name" => "Books"})
+    @plugin.table_create({"name" => "Books"})
     assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
     SCHEMA
@@ -83,7 +83,7 @@ table_create Books TABLE_NO_KEY
         "name" => "Books",
         "flags" => data[:flags],
       }
-      @handler.table_create(request)
+      @plugin.table_create(request)
       assert_equal(data[:schema], dump)
     end
   end
@@ -94,7 +94,7 @@ table_create Books TABLE_NO_KEY
         "name"  => "Books",
         "key_type" => "Int32",
       }
-      @handler.table_create(request)
+      @plugin.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type Int32
       SCHEMA
@@ -107,7 +107,7 @@ table_create Books TABLE_HASH_KEY --key_type Int32
         "name"  => "Books",
         "value_type" => "Int32",
       }
-      @handler.table_create(request)
+      @plugin.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
       SCHEMA
@@ -120,7 +120,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
         "name"  => "Books",
         "default_tokenizer" => "TokenBigram",
       }
-      @handler.table_create(request)
+      @plugin.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer TokenBigram
       SCHEMA
@@ -133,7 +133,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
         "name"  => "Books",
         "normalizer" => "NormalizerAuto",
       }
-      @handler.table_create(request)
+      @plugin.table_create(request)
       assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY|KEY_NORMALIZE --key_type ShortText
       SCHEMA

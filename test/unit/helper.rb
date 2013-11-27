@@ -16,7 +16,7 @@
 require_relative "helper/sandbox"
 require_relative "helper/fixture"
 require_relative "helper/stub_worker"
-require_relative "helper/handler_helper"
+require_relative "helper/plugin_helper"
 require_relative "helper/watch_helper"
 
 class Test::Unit::TestCase

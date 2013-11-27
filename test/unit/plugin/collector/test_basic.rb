@@ -15,16 +15,16 @@
 
 require "droonga/plugin/collector/basic"
 
-class BasicCollectorHandlerTest < Test::Unit::TestCase
-  include HandlerHelper
+class BasicCollectorTest < Test::Unit::TestCase
+  include PluginHelper
 
   def setup
     setup_database
-    setup_handler(Droonga::BasicCollector)
+    setup_plugin(Droonga::BasicCollector)
   end
 
   def teardown
-    teardown_handler
+    teardown_plugin
     teardown_database
   end
 
@@ -45,7 +45,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.process("collector_gather", request)
+      @plugin.process("collector_gather", request)
       assert_equal([input_value, input_name], @messages.last)
     end
   end
@@ -98,7 +98,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.process("collector_reduce", request)
+      @plugin.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [
@@ -178,7 +178,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.process("collector_reduce", request)
+      @plugin.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [
@@ -249,7 +249,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.process("collector_reduce", request)
+      @plugin.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [
@@ -331,7 +331,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.process("collector_reduce", request)
+      @plugin.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [

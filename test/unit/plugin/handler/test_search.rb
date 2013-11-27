@@ -16,22 +16,22 @@
 require "droonga/plugin/handler/search"
 
 class SearchHandlerTest < Test::Unit::TestCase
-  include HandlerHelper
+  include PluginHelper
 
   def setup
     setup_database
     restore(fixture_data("document.grn"))
-    setup_handler(Droonga::SearchHandler)
+    setup_plugin(Droonga::SearchHandler)
   end
 
   def teardown
-    teardown_handler
+    teardown_plugin
     teardown_database
   end
 
   private
   def search(request)
-    @handler.search(request)
+    @plugin.search(request)
     results_to_result_set(@messages)
   end
 

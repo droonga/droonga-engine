@@ -13,19 +13,19 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-module HandlerHelper
-  def setup_handler(handler_class)
+module PluginHelper
+  def setup_plugin(plugin_class)
     @worker = StubWorker.new
-    @handler = handler_class.new(@worker)
+    @plugin = plugin_class.new(@worker)
 
     @messages = []
-    stub(@handler).emit do |*message|
+    stub(@plugin).emit do |*message|
       @messages << message
     end
   end
 
-  def teardown_handler
-    @handler = nil
+  def teardown_plugin
+    @plugin = nil
     @worker = nil
     @messages = nil
   end
