@@ -50,11 +50,13 @@ module Droonga
           reduced_values = merge(values[0][key], values[1][key], deal["order"])
         end
 
-        if deal["offset"]
-          reduced_values = reduced_values[deal["offset"]..-1]
-        end
-        if deal["limit"] && deal["limit"] != UNLIMITED
-          reduced_values = reduced_values[0..deal["limit"]-1]
+        if reduced_values.is_a?(Array)
+          if deal["offset"]
+            reduced_values = reduced_values[deal["offset"]..-1]
+          end
+          if deal["limit"] && deal["limit"] != UNLIMITED
+            reduced_values = reduced_values[0..deal["limit"]-1]
+          end
         end
 
         result[key] = reduced_values
