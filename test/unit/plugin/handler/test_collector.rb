@@ -13,14 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/handler/collector"
+require "droonga/plugin/collector/basic"
 
 class BasicCollectorHandlerTest < Test::Unit::TestCase
   include HandlerHelper
 
   def setup
     setup_database
-    setup_handler(Droonga::BasicCollectorHandler)
+    setup_handler(Droonga::BasicCollector)
   end
 
   def teardown
@@ -28,9 +28,6 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
     teardown_database
   end
 
-  private
-
-  public
   class GatherTest < self
     def test_gather
       input_name = "input_#{Time.now.to_i}"
@@ -48,7 +45,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.handle("collector_gather", request)
+      @handler.process("collector_gather", request)
       assert_equal([input_value, input_name], @messages.last)
     end
   end
@@ -101,7 +98,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.handle("collector_reduce", request)
+      @handler.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [
@@ -179,7 +176,7 @@ class BasicCollectorHandlerTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @handler.handle("collector_reduce", request)
+      @handler.process("collector_reduce", request)
       assert_equal([
                      {
                        "numeric_key_records" => [
