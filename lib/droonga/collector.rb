@@ -46,7 +46,6 @@ module Droonga
         n_of_expects = component["n_of_expects"]
         synchronous = nil
         if command
-          # TODO: should be controllable for each command respectively.
           synchronous = true unless n_of_expects.zero?
           # TODO: check if asynchronous execution is available.
           message = {
