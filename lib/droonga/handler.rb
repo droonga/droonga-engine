@@ -96,23 +96,6 @@ module Droonga
       @forwarder.forward(envelope, message, destination)
     end
 
-    def handle(command, body, synchronous=nil)
-      plugin = find_plugin(command)
-      if synchronous.nil?
-        synchronous = plugin.prefer_synchronous?(command)
-      end
-      if synchronous
-        $log.trace("#{log_tag}: post_or_push: process: start")
-        plugin.process(command, body, *arguments)
-        $log.trace("#{log_tag}: post_or_push: process: done")
-      else
-        envelope["body"] = body
-        envelope["type"] = command
-        envelope["arguments"] = arguments
-        @job_queue.push_message(envelope)
-      end
-    end
-
     private
     def parse_envelope(envelope)
       @envelope = envelope
