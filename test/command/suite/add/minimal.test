@@ -1,4 +1,4 @@
-#@include ../../fixture/user-table.jsons
+#@include fixture/user-table.jsons
 {
   "type": "add",
   "dataset": "Droonga",
