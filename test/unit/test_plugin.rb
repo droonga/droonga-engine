@@ -13,22 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-# TODO: Rename to test_plugin
-require "droonga/legacy_plugin"
+require "droonga/plugin"
 
-class HandlerTest < Test::Unit::TestCase
-  class HandlableTest < self
-    class SearchHandler < Droonga::LegacyPlugin
+class PluginTest < Test::Unit::TestCase
+  class PluggableTest < self
+    class SearchPlugin < Droonga::Plugin
       command :search
       def search(request)
         :search_response
-      end
-    end
-
-    class StatusHandler < Droonga::LegacyPlugin
-      command :status
-      def status(request)
-        :status_response
       end
     end
 
@@ -40,15 +32,15 @@ class HandlerTest < Test::Unit::TestCase
 
     def setup
       context = Worker.new
-      @search_handler = SearchHandler.new(context)
+      @search_plugin = SearchPlugin.new(context)
     end
 
     def test_true
-      assert_true(@search_handler.handlable?(:search))
+      assert_true(@search_plugin.processable?(:search))
     end
 
     def test_false
-      assert_false(@search_handler.handlable?(:status))
+      assert_false(@search_plugin.processable?(:status))
     end
   end
 end
