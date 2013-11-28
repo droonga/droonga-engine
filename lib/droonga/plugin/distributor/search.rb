@@ -153,7 +153,8 @@ module Droonga
       unless sort_keys
         order << "<"
       else
-        sort_keys
+        # XXX NOT IMPLEMENTED YET!
+        # we must change the format of "order" from array to hash (rich object)
       end
 
       {
