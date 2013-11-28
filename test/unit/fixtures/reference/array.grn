@@ -1,0 +1,11 @@
+
+
+table_create SectionsForHash TABLE_HASH_KEY ShortText
+column_create SectionsForHash title COLUMN_SCALAR ShortText
+column_create SectionsForHash document COLUMN_SCALAR DocumentsHash
+load --table SectionsForHash
+[
+{"_key": "1.1", "title": "Groonga overview", "document": "Groonga"},
+{"_key": "1.2", "title": "Full text search and Instant update", "document": "Groonga"},
+{"_key": "1.3", "title": "Column store and aggregate query", "document": "Groonga"}
+]

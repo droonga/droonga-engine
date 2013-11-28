@@ -508,84 +508,94 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   class ReferenceTest < self
-    def setup
-      super
-      restore(fixture_data("reference.grn"))
-      setup_plugin(Droonga::SearchHandler)
-    end
+    class Hash
+      def setup
+        super
+        restore(fixture_data("reference/hash.grn"))
+        setup_plugin(Droonga::SearchHandler)
+      end
 
-    def test_reference_to_hash
-      expected = {
-        "sections-result" => {
-          "records" => [
-            {
-              "_key" => "1.1",
-              "document" => "Groonga",
-            },
-            {
-              "_key" => "1.2",
-              "document" => "Groonga",
-            },
-            {
-              "_key" => "1.3",
-              "document" => "Groonga",
-            },
-          ],
-        },
-      }
-      request = {
-        "queries" => {
+      def test_reference_to_hash
+        expected = {
           "sections-result" => {
-            "source" => "SectionsForHash",
-            "output" => {
-              "elements" => [
-                "records",
-              ],
-              "format" => "complex",
-              "limit" => 3,
-              "attributes" => ["_key", "document"],
+            "records" => [
+              {
+                "_key" => "1.1",
+                "document" => "Groonga",
+              },
+              {
+                "_key" => "1.2",
+                "document" => "Groonga",
+              },
+              {
+                "_key" => "1.3",
+                "document" => "Groonga",
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "SectionsForHash",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 3,
+                "attributes" => ["_key", "document"],
+              },
             },
           },
-        },
-      }
-      assert_search(expected, request)
+        }
+        assert_search(expected, request)
+      end
     end
 
-    def test_reference_to_array
-      expected = {
-        "sections-result" => {
-          "records" => [
-            {
-              "_key" => "1.1",
-              "document" => 1,
-            },
-            {
-              "_key" => "1.2",
-              "document" => 1,
-            },
-            {
-              "_key" => "1.3",
-              "document" => 1,
-            },
-          ],
-        },
-      }
-      request = {
-        "queries" => {
+    class Array
+      def setup
+        super
+        restore(fixture_data("reference/array.grn"))
+        setup_plugin(Droonga::SearchHandler)
+      end
+
+      def test_reference_to_array
+        expected = {
           "sections-result" => {
-            "source" => "SectionsForArray",
-            "output" => {
-              "elements" => [
-                "records",
-              ],
-              "format" => "complex",
-              "limit" => 3,
-              "attributes" => ["_key", "document"],
+            "records" => [
+              {
+                "_key" => "1.1",
+                "document" => 1,
+              },
+              {
+                "_key" => "1.2",
+                "document" => 1,
+              },
+              {
+                "_key" => "1.3",
+                "document" => 1,
+              },
+            ],
+          },
+        }
+        request = {
+          "queries" => {
+            "sections-result" => {
+              "source" => "SectionsForArray",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 3,
+                "attributes" => ["_key", "document"],
+              },
             },
           },
-        },
-      }
-      assert_search(expected, request)
+        }
+        assert_search(expected, request)
+      end
     end
   end
 end
