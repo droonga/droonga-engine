@@ -127,7 +127,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                    @messages.last)
     end
 
-    def test_sum_with_offset_and_limit
+    def test_sum_with_limit
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
@@ -153,17 +153,14 @@ class BasicCollectorTest < Test::Unit::TestCase
                 output_name => {
                   "numeric_value" => {
                     "type" => "sum",
-                    "offset" => 2,
                     "limit" => 2,
                   },
                   "numeric_key_records" => {
                     "type" => "sum",
-                    "offset" => 2,
                     "limit" => 2,
                   },
                   "string_key_records" => {
                     "type" => "sum",
-                    "offset" => 3,
                     "limit" => -1,
                   },
                 },
@@ -194,10 +191,13 @@ class BasicCollectorTest < Test::Unit::TestCase
                      {
                        "numeric_value" => 3,
                        "numeric_key_records" => [
-                         create_record(3),
-                         create_record(4),
+                         create_record(1),
+                         create_record(2),
                        ],
                        "string_key_records" => [
+                         create_record("a"),
+                         create_record("b"),
+                         create_record("c"),
                          create_record("d"),
                          create_record("e"),
                          create_record("f"),
@@ -286,7 +286,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                    @messages.last)
     end
 
-    def test_sort_with_limit_and_offset
+    def test_sort_with_limit
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
@@ -312,13 +312,11 @@ class BasicCollectorTest < Test::Unit::TestCase
                   "numeric_key_records" => {
                     "type" => "sort",
                     "order" => ["<"],
-                    "offset" => 2,
                     "limit" => 2,
                   },
                   "string_key_records" => {
                     "type" => "sort",
                     "order" => ["<"],
-                    "offset" => 3,
                     "limit" => -1,
                   },
                 },
@@ -347,10 +345,13 @@ class BasicCollectorTest < Test::Unit::TestCase
       assert_equal([
                      {
                        "numeric_key_records" => [
-                         create_record(3),
-                         create_record(4),
+                         create_record(1),
+                         create_record(2),
                        ],
                        "string_key_records" => [
+                         create_record("a"),
+                         create_record("b"),
+                         create_record("c"),
                          create_record("d"),
                          create_record("e"),
                          create_record("f"),
