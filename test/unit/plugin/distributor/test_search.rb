@@ -135,7 +135,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "type" => "gather",
         "body" => {
           "query1_reduced" => {
-            "source" => "query1",
+            "output" => "query1",
             "element" => "records",
             "offset" => 0,
             "limit" => 10,
@@ -143,7 +143,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "attributes" => [],
           },
           "query2_reduced" => {
-            "source" => "query2",
+            "output" => "query2",
             "element" => "records",
             "offset" => 0,
             "limit" => 20,
@@ -151,7 +151,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "attributes" => [],
           },
           "query3_reduced" => {
-            "source" => "query3",
+            "output" => "query3",
             "element" => "records",
             "offset" => 0,
             "limit" => 30,
