@@ -28,7 +28,8 @@ class SearchDistributorTest < Test::Unit::TestCase
     teardown_database
   end
 
-  def test_multiple_queries
+  class MultipleQueriesTest < SearchDistributorTest
+  def test_distribute
     envelope = {
       "type" => "search",
       "dataset" => "Droonga",
@@ -192,183 +193,9 @@ class SearchDistributorTest < Test::Unit::TestCase
 
     assert_equal(message, @posted.last.last)
   end
-
-  def test_distribute
-    envelope = {
-      "type" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "no_output" => {
-            "source" => "User",
-          },
-          "no_records" => {
-            "source" => "User",
-            "output" => {
-              "elements" => ["count"],
-            },
-          },
-          "no_limit" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-            },
-          },
-          "have_records" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "attributes" => ["_key", "name", "age"],
-              "offset" => 1,
-              "limit" => 2,
-            },
-          },
-          # XXX we should write cases for...
-          #  - sortBy(simple)
-          #  - sortBy(rich)
-          #  - sortBy(rich) with offset
-          #  - sortBy(rich) with limit
-          #  - sortBy(rich) with offset and limit
-          #  - sortBy(simple) + output(limit, offset)
-          #  - sortBy(rich)
-          #    + output(limit, offset)
-          #  - sortBy(rich) with offset
-          #    + output(limit, offset)
-          #  - sortBy(rich) with limit
-          #    + output(limit, offset)
-          #  - sortBy(rich) with offset and limit
-          #    + output(limit, offset)
-          # and, we have to write cases for both unlimited and limited cases...
-        },
-      },
-    }
-
-    @plugin.process("search", envelope)
-
-    message = []
-    no_records_reducer = {
-      "type" => "reduce",
-      "body" => {
-        "no_records" => {
-          "no_records_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-          },
-        },
-      },
-      "inputs" => ["no_records"],
-      "outputs" => ["no_records_reduced"],
-    }
-    message << no_records_reducer
-    no_limit_reducer = {
-      "type" => "reduce",
-      "body" => {
-        "no_limit" => {
-          "no_limit_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-            "records" => {
-              "type" => "sort",
-              "order" => ["<"],
-              "offset" => 0,
-              "limit" => 0,
-            },
-          },
-        },
-      },
-      "inputs" => ["no_limit"],
-      "outputs" => ["no_limit_reduced"],
-    }
-    message << no_limit_reducer
-    have_records_reducer = {
-      "type" => "reduce",
-      "body" => {
-        "have_records" => {
-          "have_records_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-            "records" => {
-              "type" => "sort",
-              "order" => ["<"],
-              "offset" => 1,
-              "limit" => 2,
-            },
-          },
-        },
-      },
-      "inputs" => ["have_records"],
-      "outputs" => ["have_records_reduced"],
-    }
-    message << have_records_reducer
-
-    gatherer = {
-      "type" => "gather",
-      "body" => {
-        "no_records_reduced" => "no_records",
-        "no_limit_reduced" => "no_limit",
-        "have_records_reduced" => "have_records",
-      },
-      "inputs" => [
-        "no_records_reduced",
-        "no_limit_reduced",
-        "have_records_reduced",
-      ],
-      "post" => true,
-    }
-    message << gatherer
-    searcher = {
-      "type" => "broadcast",
-      "command" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "no_output" => {
-            "source" => "User",
-          },
-          "no_records" => {
-            "source" => "User",
-            "output" => {
-              "elements" => ["count"],
-              "limit" => 0,
-            },
-          },
-          "no_limit" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "offset" => 0,
-              "limit" => 0,
-            },
-          },
-          "have_records" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "attributes" => ["_key", "name", "age"],
-              "offset" => 0,
-              "limit" => 3,
-            },
-          },
-        },
-      },
-      "outputs" => [
-        "no_records",
-        "no_limit",
-        "have_records",
-      ],
-      "replica" => "random",
-    }
-    message << searcher
-    assert_equal(message, @posted.last.last)
   end
 
+  class SingleQueryTest < SearchDistributorTest
   def test_no_output
     envelope = {
       "type" => "search",
@@ -385,13 +212,10 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-    message << gatherer_for_single_search_query(envelope,
-                                                :no_output => true)
-    message << searcher_for_single_search_query(envelope,
-                                                :no_output => true)
+    message << gatherer(envelope, :no_output => true)
+    message << searcher(envelope, :no_output => true)
     assert_equal(message, @posted.last.last)
   end
-
 
   def test_no_records_element
     envelope = {
@@ -412,15 +236,13 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-    message << reducer
-    message << reducer_for_single_search_query(envelope, {
+    message << reducer(envelope, {
       "count" => {
         "type" => "sum",
       },
     })
-    message << gatherer_for_single_search_query(envelope)
-    message << searcher_for_single_search_query(envelope,
-                                                :output_limit => 0)
+    message << gatherer(envelope)
+    message << searcher(envelope, :output_limit => 0)
     assert_equal(message, @posted.last.last)
   end
 
@@ -445,7 +267,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-    message << reducer_for_single_search_query(envelope, {
+    message << reducer(envelope, {
       "count" => {
         "type" => "sum",
       },
@@ -456,10 +278,9 @@ class SearchDistributorTest < Test::Unit::TestCase
         "limit" => 0,
       },
     })
-    message << gatherer_for_single_search_query(envelope)
-    message << searcher_for_single_search_query(envelope,
-                                                :output_offset => 0,
-                                                :output_limit => 0)
+    message << gatherer(envelope)
+    message << searcher(envelope, :output_offset => 0,
+                                  :output_limit => 0)
     assert_equal(message, @posted.last.last)
   end
 
@@ -487,7 +308,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-    message << reducer_for_single_search_query(envelope, {
+    message << reducer(envelope, {
       "count" => {
         "type" => "sum",
       },
@@ -498,10 +319,9 @@ class SearchDistributorTest < Test::Unit::TestCase
         "limit" => 2,
       },
     })
-    message << gatherer_for_single_search_query(envelope)
-    message << searcher_for_single_search_query(envelope,
-                                                :output_offset => 0,
-                                                :output_limit => 3)
+    message << gatherer(envelope)
+    message << searcher(envelope, :output_offset => 0,
+                                  :output_limit => 3)
     assert_equal(message, @posted.last.last)
   end
 
@@ -523,7 +343,7 @@ class SearchDistributorTest < Test::Unit::TestCase
   # and, we have to write cases for both unlimited and limited cases...
 
   private
-  def reducer_for_single_search_query(search_request_envelope, reducer_body)
+  def reducer(search_request_envelope, reducer_body)
     queries = search_request_envelope["body"]["queries"]
     query_name = queries.keys.first
 
@@ -541,7 +361,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     reducer
   end
 
-  def gatherer_for_single_search_query(search_request_envelope, options={})
+  def gatherer(search_request_envelope, options={})
     queries = search_request_envelope["body"]["queries"]
     query_name = queries.keys.first
 
@@ -562,7 +382,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     gatherer
   end
 
-  def searcher_for_single_search_query(search_request_envelope, options={})
+  def searcher(search_request_envelope, options={})
     searcher = search_request_envelope.dup
 
     queries = searcher["body"]["queries"]
@@ -588,5 +408,6 @@ class SearchDistributorTest < Test::Unit::TestCase
     searcher["outputs"] = outputs
     searcher["replica"] = "random"
     searcher
+  end
   end
 end
