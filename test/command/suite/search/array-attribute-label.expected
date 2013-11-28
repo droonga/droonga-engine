@@ -1,0 +1,25 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 200,
+    "type": "search.result",
+    "body": {
+      "result": {
+        "count": 9,
+        "records": [
+          {
+            "section-id": "1.1"
+          },
+          {
+            "section-id": "1.2"
+          },
+          {
+            "section-id": "1.3"
+          }
+        ]
+      }
+    }
+  }
+]
