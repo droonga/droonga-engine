@@ -64,7 +64,7 @@ module Droonga
             # temporarily, for the reducing phase. After all extra columns
             # are removed on the gathering phase.
             final_attributes = collect_output_attributes(output["attributes"])
-            output["attributes"] ||= []
+            output["attributes"] = format_attributes_to_array_style(output["attributes"])
             output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
  
             elements[element] = sort_reducer(output["attributes"], query["sortBy"])
@@ -170,6 +170,27 @@ module Droonga
       end
 
       [final_offset, final_limit]
+    end
+
+    def format_attributes_to_array_style(attributes)
+      attributes ||= []
+      if attributes.is_a?(Hash)
+        attributes.keys.collect do |key|
+          attribute = attributes[key]
+          case attribute
+          when String
+            {
+              "label": key,
+              "source": attribute,
+            }
+          when Hash
+            attribute["label"] = key
+            attribute
+          end
+        end
+      else
+        attributes
+      end
     end
 
     def collect_output_attributes(attributes)
