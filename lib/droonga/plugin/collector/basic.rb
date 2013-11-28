@@ -57,7 +57,7 @@ module Droonga
       attributes = output["attributes"]
       if attributes
         items.collect! do |item|
-          item[0..attributes.size]
+          item[0...attributes.size]
         end
       end
       items
