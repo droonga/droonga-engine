@@ -44,4 +44,4 @@ end
 desc "Run test"
 task :test => ["test:unit", "test:command"]
 
-task :default => "test:unit"
+task :default => :test
