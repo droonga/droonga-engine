@@ -33,7 +33,7 @@ module Droonga
           result[element] = apply_output_attributes(result[element], output)
           result[element] = apply_output_format(result[element], output)
         end
-        output = output["source"]
+        output = output["output"]
       end
       emit(result, output)
     end

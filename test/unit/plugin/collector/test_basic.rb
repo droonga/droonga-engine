@@ -28,10 +28,13 @@ class BasicCollectorTest < Test::Unit::TestCase
     teardown_database
   end
 
+  private
+  def create_record(*columns)
+    columns
+  end
+
   class GatherTest < self
-    def test_gather
-      input_name = "input_#{Time.now.to_i}"
-      input_value = "value_#{Time.now.to_i}"
+    def test_simple_mapper
       request = {
         "task" => {
           "values" => nil,
@@ -41,12 +44,47 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => input_value,
-        "name" => input_name,
+        "value" => "result",
+        "name" => "string_name",
         "descendants" => nil,
       }
       @plugin.process("collector_gather", request)
-      assert_equal([input_value, input_name], @messages.last)
+      assert_equal(["result", "string_name"], @messages.last)
+    end
+
+    def test_complex_mapping
+      request = {
+        "task" => {
+          "values" => nil,
+          "component" => {
+            "body" => nil,
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "count" => 0,
+          "records" => [
+            create_record(0),
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        "name" => {
+          "output" => "search_result",
+        },
+        "descendants" => nil,
+      }
+      @plugin.process("collector_gather", request)
+      gathered = {
+        "count" => 0,
+        "records" => [
+          create_record(0),
+          create_record(1),
+          create_record(2),
+        ],
+      }
+      assert_equal([gathered, "search_result"], @messages.last)
     end
   end
 
@@ -379,11 +417,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                      output_name
                    ],
                    @messages.last)
-    end
-
-    private
-    def create_record(*columns)
-      columns
     end
   end
 end
