@@ -75,9 +75,18 @@ class BasicCollectorTest < Test::Unit::TestCase
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_value" => { "type" => "sum" },
-                  "numeric_key_records" => { "type" => "sum" },
-                  "string_key_records" => { "type" => "sum" },
+                  "numeric_value" => {
+                    "type" => "sum",
+                    "limit" => -1,
+                  },
+                  "numeric_key_records" => {
+                    "type" => "sum",
+                    "limit" => -1,
+                  },
+                  "string_key_records" => {
+                    "type" => "sum",
+                    "limit" => -1,
+                  },
                 },
               },
             },
@@ -234,10 +243,12 @@ class BasicCollectorTest < Test::Unit::TestCase
                   "numeric_key_records" => {
                     "type" => "sort",
                     "order" => ["<"],
+                    "limit" => -1,
                   },
                   "string_key_records" => {
                     "type" => "sort",
                     "order" => ["<"],
+                    "limit" => -1,
                   },
                 },
               },
