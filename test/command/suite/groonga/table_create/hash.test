@@ -3,6 +3,6 @@
   "dataset": "Droonga",
   "body": {
     "name"  : "User",
-    "flags" : "TABLE_PAT_KEY"
+    "flags" : "TABLE_HASH_KEY"
   }
 }
