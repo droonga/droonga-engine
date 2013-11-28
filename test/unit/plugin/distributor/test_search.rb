@@ -301,11 +301,6 @@ class SearchDistributorTest < Test::Unit::TestCase
         "count" => {
           "type" => "sum",
         },
-        "records" => {
-          "type" => "sort",
-          "order" => ["<"],
-          "limit" => 0,
-        },
       })
       message << gatherer(envelope)
       message << searcher(envelope, :output_offset => 0,
