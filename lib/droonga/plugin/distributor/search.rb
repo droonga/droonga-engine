@@ -187,18 +187,17 @@ module Droonga
       end
     end
 
-    def collect_sort_attributes(attributes, sort_keys)
-      sort_keys ||= []
-      sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
-
+    def collect_source_column_names(attributes)
+      attributes ||= []
       if attributes.is_a?(Hash)
         attributes_hash = attributes
         attributes = []
         attributes_hash.each do |key, attribute|
           attributes << attribute["source"] || key
         end
+        attributes
       else
-        attributes.collect! do |attribute|
+        attributes.collect do |attribute|
           if attribute.is_a?(Hash)
             attribute["source"] || attribute["label"]
           else
@@ -206,6 +205,13 @@ module Droonga
           end
         end
       end
+    end
+
+    def collect_sort_attributes(attributes, sort_keys)
+      sort_keys ||= []
+      sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
+
+      attributes = collect_source_column_names(attributes)
 
       sort_attributes = sort_keys.collect do |key|
         key = key[1..-1] if key[0] == "-"
