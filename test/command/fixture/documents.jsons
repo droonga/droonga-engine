@@ -82,17 +82,6 @@
 }
 {
   "dataset": "Droonga",
-  "type": "column_create",
-  "body": {
-    "table": "Bigram",
-    "name": "Documents_title",
-    "flags": "COLUMN_INDEX|WITH_POSITION",
-    "type": "Documents",
-    "source": "title"
-  }
-}
-{
-  "dataset": "Droonga",
   "type": "add",
   "body": {
     "table": "Documents",
