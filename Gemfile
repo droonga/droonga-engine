@@ -43,3 +43,10 @@ if File.exist?(droonga_client_dir)
 else
   gem "droonga-client", github: "droonga/droonga-client-ruby"
 end
+
+drntest_dir = File.join(parent_dir, "drntest")
+if File.exist?(drntest_dir)
+  gem "drntest", :path => drntest_dir
+else
+  gem "drntest", :github => "droonga/drntest"
+end
