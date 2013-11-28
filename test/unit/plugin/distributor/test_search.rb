@@ -808,7 +808,7 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       unless options[:no_output]
         output = {
-          "source" => query_name,
+          "output" => query_name,
         }
         if options[:element]
           output.merge!({

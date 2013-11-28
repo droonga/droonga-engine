@@ -36,7 +36,7 @@ module Droonga
         output_name = input_name + "_reduced"
         output_names << output_name
         output_mapper[output_name] = {
-          "source" => input_name,
+          "output" => input_name,
         }
 
         # override the format, because the collector can/should handle only array type records...
