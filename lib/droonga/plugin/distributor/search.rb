@@ -202,21 +202,29 @@ module Droonga
       sort_attributes      
     end
 
+    ASCENDING_OPERATOR = "<".freeze
+    DESCENDING_OPERATOR = ">".freeze
+
     def sort_reducer(attributes, sort_keys)
+      attributes ||= []
       sort_keys ||= []
       sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
-      order = []
-#      unless sort_keys
-        order << "<"
-#      else
-#        # XXX NOT IMPLEMENTED YET!
-#        # we must change the format of "order" from array to hash (rich object)
-#      end
+      operators = sort_keys.collect do |sort_key|
+        operator = ASCENDING_OPERATOR
+        if sort_key[0] == "-"
+          operator = DESCENDING_OPERATOR
+          sort_key = sort_key[1..-1]
+        end
+        {
+          "operator" => operator,
+          "column" => attributes.index(sort_key),
+        }
+      end
 
       {
         "type" => "sort",
-        "order" => order,
+        "operators" => operators,
       }
     end
   end

@@ -99,7 +99,7 @@ module Droonga
         when "sum"
           reduced_values = values[0][key] + values[1][key]
         when "sort"
-          reduced_values = merge(values[0][key], values[1][key], deal["order"])
+          reduced_values = merge(values[0][key], values[1][key], deal["operators"])
         end
 
         reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
@@ -109,13 +109,21 @@ module Droonga
       return result
     end
 
-    def merge(x, y, order)
+    def merge(x, y, operators)
+      # normalize operators at first!
+      operators = operators.collect do |operator|
+        if operator.is_a?(String)
+          { "operator" => operator }
+        else
+          operators
+        end
+      end
       index = 0
       y.each do |_y|
         loop do
           _x = x[index]
           break unless _x
-          break if compare(_y, _x, order)
+          break if compare(_y, _x, operators)
           index += 1
         end
         x.insert(index, _y)
@@ -125,11 +133,11 @@ module Droonga
     end
 
     def compare(x, y, operators)
-      for index in 0..x.size-1 do
-        _x = x[index]
-        _y = y[index]
-        operator = operators[index]
-        break unless operator
+      operators.each_with_index do |operator, index|
+        column = operator["column"] || index
+        operator = operator["operator"]
+        _x = x[column]
+        _y = y[column]
         return true if _x.__send__(operator, _y)
       end
       return false
