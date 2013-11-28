@@ -69,14 +69,14 @@ module Droonga
         end
 
         reducer = {
-          "inputs" => [input_name],
-          "outputs" => [output_name],
           "type" => "reduce",
           "body" => {
             input_name => {
               output_name => elements,
             },
           },
+          "inputs" => [input_name],
+          "outputs" => [output_name],
         }
         message << reducer
       end
@@ -88,12 +88,12 @@ module Droonga
       }
       message << gatherer
       searcher = {
-        "dataset" => envelope["dataset"] || request["dataset"],
-        "outputs" => input_names,
         "type" => "broadcast",
         "command" => "search",
-        "replica" => "random",
+        "dataset" => envelope["dataset"] || request["dataset"],
         "body" => request,
+        "outputs" => input_names,
+        "replica" => "random",
       }
       message.push(searcher)
       post(message)
