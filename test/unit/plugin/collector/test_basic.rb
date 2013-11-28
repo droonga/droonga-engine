@@ -33,36 +33,21 @@ class BasicCollectorTest < Test::Unit::TestCase
     columns
   end
 
-  class GatherTest < self
-    def test_simple_mapper
-      request = {
-        "task" => {
-          "values" => nil,
-          "component" => {
-            "body" => nil,
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => "result",
-        "name" => "string_name",
-        "descendants" => nil,
-      }
-      @plugin.process("collector_gather", request)
-      assert_equal(["result", "string_name"], @messages.last)
+  class < self
+    def create_record(*columns)
+      columns
     end
+  end
 
-    def test_complex_mapping
-      request = {
-        "task" => {
-          "values" => nil,
-          "component" => {
-            "body" => nil,
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => {
+  class GatherTest < self
+    data(
+      :simple_mapping => {
+        :expected => "result",
+        :source => "result",
+        :mapping => "string_name",
+      },
+      :complex_mapping => {
+        :expected => {
           "count" => 3,
           "records" => [
             create_record(0),
@@ -70,34 +55,26 @@ class BasicCollectorTest < Test::Unit::TestCase
             create_record(2),
           ],
         },
-        "name" => {
+        :source => {
+          "count" => 3,
+          "records" => [
+            create_record(0),
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        :mapping => {
           "output" => "search_result",
         },
-        "descendants" => nil,
-      }
-      @plugin.process("collector_gather", request)
-      gathered = {
-        "count" => 3,
-        "records" => [
-          create_record(0),
-          create_record(1),
-          create_record(2),
-        ],
-      }
-      assert_equal([gathered, "search_result"], @messages.last)
-    end
-
-    def test_offset_and_limit
-      request = {
-        "task" => {
-          "values" => nil,
-          "component" => {
-            "body" => nil,
-            "outputs" => nil,
-          },
+      },
+      :offset_and_limit => {
+        :expected => {
+          "count" => 3,
+          "records" => [
+            create_record(1),
+          ],
         },
-        "id" => nil,
-        "value" => {
+        :source => {
           "count" => 3,
           "records" => [
             create_record(0),
@@ -105,25 +82,38 @@ class BasicCollectorTest < Test::Unit::TestCase
             create_record(2),
           ],
         },
-        "name" => {
+        :mapping => {
           "output" => "search_result",
           "element" => "records",
           "offset" => 1,
           "limit" => 1,
         },
-        "descendants" => nil,
-      }
-      @plugin.process("collector_gather", request)
-      gathered = {
-        "count" => 3,
-        "records" => [
-          create_record(1),
-        ],
-      }
-      assert_equal([gathered, "search_result"], @messages.last)
-    end
-
-    def test_offset_and_unlimited_limit
+      },
+      :offset_and_unlimited_limit => {
+        :expected => {
+          "count" => 3,
+          "records" => [
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        :source => {
+          "count" => 3,
+          "records" => [
+            create_record(0),
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "element" => "records",
+          "offset" => 1,
+          "limit" => -1,
+        },
+      },
+    )
+    def test_gather(data)
       request = {
         "task" => {
           "values" => nil,
@@ -133,31 +123,14 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "count" => 3,
-          "records" => [
-            create_record(0),
-            create_record(1),
-            create_record(2),
-          ],
-        },
-        "name" => {
-          "output" => "search_result",
-          "element" => "records",
-          "offset" => 1,
-          "limit" => -1,
-        },
+        "value" => data[:source],
+        "name" => data[:mapping],
         "descendants" => nil,
       }
       @plugin.process("collector_gather", request)
-      gathered = {
-        "count" => 3,
-        "records" => [
-          create_record(1),
-          create_record(2),
-        ],
-      }
-      assert_equal([gathered, "search_result"], @messages.last)
+      output_name = data[:mapping]
+      output_name = output_name["output"] if output_name.is_a?(Hash)
+      assert_equal([data[:expected], output_name], @messages.last)
     end
   end
 
