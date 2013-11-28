@@ -1,0 +1,43 @@
+#@include fixture/documents.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "Groonga": {
+        "source": "Sections",
+        "condition": {
+          "query": "groonga",
+          "matchTo": ["title"]
+        },
+        "sortBy": ["_key"],
+        "output": {
+          "elements": [
+            "startTime",
+            "elapsedTime",
+            "count",
+            "attributes",
+            "records"
+          ],
+          "limit": -1,
+          "attributes": ["title"]
+        }
+      },
+      "keys": {
+        "source": "Groonga",
+        "sortBy": ["-_key"],
+        "output": {
+          "elements": [
+            "startTime",
+            "elapsedTime",
+            "count",
+            "attributes",
+            "records"
+          ],
+          "limit": -1,
+          "attributes": ["_key"]
+        }
+      }
+    }
+  }
+}
