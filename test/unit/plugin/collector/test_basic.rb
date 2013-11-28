@@ -242,12 +242,16 @@ class BasicCollectorTest < Test::Unit::TestCase
                 output_name => {
                   "numeric_key_records" => {
                     "type" => "sort",
-                    "order" => ["<"],
+                    "operators" => [
+                      { "column" => 0, "operator" => "<" },
+                    ],
                     "limit" => -1,
                   },
                   "string_key_records" => {
                     "type" => "sort",
-                    "order" => ["<"],
+                    "operators" => [
+                      { "column" => 0, "operator" => "<" },
+                    ],
                     "limit" => -1,
                   },
                 },
@@ -322,12 +326,16 @@ class BasicCollectorTest < Test::Unit::TestCase
                 output_name => {
                   "numeric_key_records" => {
                     "type" => "sort",
-                    "order" => ["<"],
+                    "operators" => [
+                      { "column" => 0, "operator" => "<" },
+                    ],
                     "limit" => 2,
                   },
                   "string_key_records" => {
                     "type" => "sort",
-                    "order" => ["<"],
+                    "operators" => [
+                      { "column" => 0, "operator" => "<" },
+                    ],
                     "limit" => -1,
                   },
                 },
