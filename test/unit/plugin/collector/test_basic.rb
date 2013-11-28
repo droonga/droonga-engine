@@ -33,7 +33,7 @@ class BasicCollectorTest < Test::Unit::TestCase
     columns
   end
 
-  class < self
+  class << self
     def create_record(*columns)
       columns
     end
@@ -109,6 +109,50 @@ class BasicCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "element" => "records",
           "offset" => 1,
+          "limit" => -1,
+        },
+      },
+      :attributes => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2, 1.3, 1.4),
+            create_record(2, 2.1, 2.2, 2.3, 2.4),
+          ],
+        },
+        :source => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2, 1.3, 1.4),
+            create_record(2, 2.1, 2.2, 2.3, 2.4),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "element" => "records",
+          "attributes" => ["_key", "chapter", "section", "subsection", "paragraph"],
+          "limit" => -1,
+        },
+      },
+      :attributes_with_sort_attributes => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2),
+            create_record(2, 2.1, 2.2),
+          ],
+        },
+        :source => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2, 1.3, 1.4),
+            create_record(2, 2.1, 2.2, 2.3, 2.4),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "element" => "records",
+          "attributes" => ["_key", "chapter", "section"],
           "limit" => -1,
         },
       },
