@@ -369,7 +369,6 @@ class SearchDistributorTest < Test::Unit::TestCase
     assert_equal(message, @posted.last.last)
   end
 
-
   def test_no_output
     envelope = {
       "type" => "search",
@@ -386,7 +385,6 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-
     message << gatherer_for_single_search_query(envelope,
                                                 :no_output => true)
     message << searcher_for_single_search_query(envelope,
@@ -414,23 +412,12 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-
-    reducer = {
-      "type" => "reduce",
-      "body" => {
-        "no_records" => {
-          "no_records_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-          },
-        },
-      },
-      "inputs" => ["no_records"],
-      "outputs" => ["no_records_reduced"],
-    }
     message << reducer
-
+    message << reducer_for_single_search_query(envelope, {
+      "count" => {
+        "type" => "sum",
+      },
+    })
     message << gatherer_for_single_search_query(envelope)
     message << searcher_for_single_search_query(envelope,
                                                 :output_limit => 0)
@@ -458,29 +445,17 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-
-    reducer = {
-      "type" => "reduce",
-      "body" => {
-        "no_limit" => {
-          "no_limit_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-            "records" => {
-              "type" => "sort",
-              "order" => ["<"],
-              "offset" => 0,
-              "limit" => 0,
-            },
-          },
-        },
+    message << reducer_for_single_search_query(envelope, {
+      "count" => {
+        "type" => "sum",
       },
-      "inputs" => ["no_limit"],
-      "outputs" => ["no_limit_reduced"],
-    }
-    message << reducer
-
+      "records" => {
+        "type" => "sort",
+        "order" => ["<"],
+        "offset" => 0,
+        "limit" => 0,
+      },
+    })
     message << gatherer_for_single_search_query(envelope)
     message << searcher_for_single_search_query(envelope,
                                                 :output_offset => 0,
@@ -512,29 +487,17 @@ class SearchDistributorTest < Test::Unit::TestCase
     @plugin.process("search", envelope)
 
     message = []
-
-    reducer = {
-      "type" => "reduce",
-      "body" => {
-        "have_records" => {
-          "have_records_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-            "records" => {
-              "type" => "sort",
-              "order" => ["<"],
-              "offset" => 1,
-              "limit" => 2,
-            },
-          },
-        },
+    message << reducer_for_single_search_query(envelope, {
+      "count" => {
+        "type" => "sum",
       },
-      "inputs" => ["have_records"],
-      "outputs" => ["have_records_reduced"],
-    }
-    message << reducer
-
+      "records" => {
+        "type" => "sort",
+        "order" => ["<"],
+        "offset" => 1,
+        "limit" => 2,
+      },
+    })
     message << gatherer_for_single_search_query(envelope)
     message << searcher_for_single_search_query(envelope,
                                                 :output_offset => 0,
@@ -560,6 +523,24 @@ class SearchDistributorTest < Test::Unit::TestCase
   # and, we have to write cases for both unlimited and limited cases...
 
   private
+  def reducer_for_single_search_query(search_request_envelope, reducer_body)
+    queries = search_request_envelope["body"]["queries"]
+    query_name = queries.keys.first
+
+    reducer = {
+      "type" => "reduce",
+      "body" => {
+        query_name => {
+          "#{query_name}_reduced" => reducer_body,
+        },
+      },
+      "inputs" => [query_name],
+      "outputs" => ["#{query_name}_reduced"],
+    }
+
+    reducer
+  end
+
   def gatherer_for_single_search_query(search_request_envelope, options={})
     queries = search_request_envelope["body"]["queries"]
     query_name = queries.keys.first
