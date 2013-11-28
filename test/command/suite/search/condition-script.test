@@ -6,7 +6,10 @@
     "queries": {
       "result": {
         "source": "Sections",
-        "condition": "title @ 'groonga'",
+        "condition": {
+          "query": "groonga",
+          "matchTo": ["title"]
+        },
         "sortBy": ["_key"],
         "output": {
           "elements": [

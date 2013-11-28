@@ -6,7 +6,11 @@
     "queries": {
       "result": {
         "source": "Sections",
-        "condition": "title @ 'groonga'",
+        "condition": [
+          "&&",
+          "title @ 'groonga'",
+          "title @ 'engine'"
+        ],
         "sortBy": ["_key"],
         "output": {
           "elements": [
