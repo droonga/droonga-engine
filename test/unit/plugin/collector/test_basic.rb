@@ -156,6 +156,52 @@ class BasicCollectorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       },
+      :format_simple => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2),
+            create_record(2, 2.1, 2.2),
+          ],
+        },
+        :source => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2),
+            create_record(2, 2.1, 2.2),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "element" => "records",
+          "format" => "simple",
+          "attributes" => ["_key", "chapter", "section"],
+          "limit" => -1,
+        },
+      },
+      :format_complex => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+            { "_key" => 1, "chapter" => 1.1, "section" => 1.2 },
+            { "_key" => 2, "chapter" => 2.1, "section" => 2.2 },
+          ],
+        },
+        :source => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2),
+            create_record(2, 2.1, 2.2),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "element" => "records",
+          "format" => "complex",
+          "attributes" => ["_key", "chapter", "section"],
+          "limit" => -1,
+        },
+      },
     )
     def test_gather(data)
       request = {
