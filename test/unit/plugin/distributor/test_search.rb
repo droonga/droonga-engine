@@ -387,31 +387,10 @@ class SearchDistributorTest < Test::Unit::TestCase
 
     message = []
 
-    gatherer = {
-      "type" => "gather",
-      "body" => {
-      },
-      "inputs" => [
-      ],
-      "post" => true,
-    }
-    message << gatherer
-    searcher = {
-      "type" => "broadcast",
-      "command" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "no_output" => {
-            "source" => "User",
-          },
-        },
-      },
-      "outputs" => [
-      ],
-      "replica" => "random",
-    }
-    message << searcher
+    message << gatherer_for_single_search_query(envelope,
+                                                :no_output => true)
+    message << searcher_for_single_search_query(envelope,
+                                                :no_output => true)
     assert_equal(message, @posted.last.last)
   end
 
@@ -452,38 +431,9 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
     message << reducer
 
-    gatherer = {
-      "type" => "gather",
-      "body" => {
-        "no_records_reduced" => "no_records",
-      },
-      "inputs" => [
-        "no_records_reduced",
-      ],
-      "post" => true,
-    }
-    message << gatherer
-    searcher = {
-      "type" => "broadcast",
-      "command" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "no_records" => {
-            "source" => "User",
-            "output" => {
-              "elements" => ["count"],
-              "limit" => 0,
-            },
-          },
-        },
-      },
-      "outputs" => [
-        "no_records",
-      ],
-      "replica" => "random",
-    }
-    message << searcher
+    message << gatherer_for_single_search_query(envelope)
+    message << searcher_for_single_search_query(envelope,
+                                                :output_limit => 0)
     assert_equal(message, @posted.last.last)
   end
 
@@ -531,40 +481,10 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
     message << reducer
 
-    gatherer = {
-      "type" => "gather",
-      "body" => {
-        "no_limit_reduced" => "no_limit",
-      },
-      "inputs" => [
-        "no_limit_reduced",
-      ],
-      "post" => true,
-    }
-    message << gatherer
-    searcher = {
-      "type" => "broadcast",
-      "command" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "no_limit" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "offset" => 0,
-              "limit" => 0,
-            },
-          },
-        },
-      },
-      "outputs" => [
-        "no_limit",
-      ],
-      "replica" => "random",
-    }
-    message << searcher
+    message << gatherer_for_single_search_query(envelope)
+    message << searcher_for_single_search_query(envelope,
+                                                :output_offset => 0,
+                                                :output_limit => 0)
     assert_equal(message, @posted.last.last)
   end
 
@@ -615,41 +535,10 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
     message << reducer
 
-    gatherer = {
-      "type" => "gather",
-      "body" => {
-        "have_records_reduced" => "have_records",
-      },
-      "inputs" => [
-        "have_records_reduced",
-      ],
-      "post" => true,
-    }
-    message << gatherer
-    searcher = {
-      "type" => "broadcast",
-      "command" => "search",
-      "dataset" => "Droonga",
-      "body" => {
-        "queries" => {
-          "have_records" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "attributes" => ["_key", "name", "age"],
-              "offset" => 0,
-              "limit" => 3,
-            },
-          },
-        },
-      },
-      "outputs" => [
-        "have_records",
-      ],
-      "replica" => "random",
-    }
-    message << searcher
+    message << gatherer_for_single_search_query(envelope)
+    message << searcher_for_single_search_query(envelope,
+                                                :output_offset => 0,
+                                                :output_limit => 3)
     assert_equal(message, @posted.last.last)
   end
 
@@ -669,4 +558,54 @@ class SearchDistributorTest < Test::Unit::TestCase
   #  - sortBy(rich) with offset and limit
   #    + output(limit, offset)
   # and, we have to write cases for both unlimited and limited cases...
+
+  private
+  def gatherer_for_single_search_query(search_request_envelope, options={})
+    queries = search_request_envelope["body"]["queries"]
+    query_name = queries.keys.first
+
+    gatherer = {
+      "type" => "gather",
+      "body" => {
+      },
+      "inputs" => [
+      ],
+      "post" => true,
+    }
+
+    unless options[:no_output]
+      gatherer["body"]["#{query_name}_reduced"] = query_name
+      gatherer["inputs"] << "#{query_name}_reduced"
+    end
+
+    gatherer
+  end
+
+  def searcher_for_single_search_query(search_request_envelope, options={})
+    searcher = search_request_envelope.dup
+
+    queries = searcher["body"]["queries"]
+    query_name = queries.keys.first
+    if options[:sort_offset]
+      queries[query_name]["sortBy"]["offset"] = options[:sort_offset]
+    end
+    if options[:sort_limit]
+      queries[query_name]["sortBy"]["limit"] = options[:sort_limit]
+    end
+    if options[:output_offset]
+      queries[query_name]["output"]["offset"] = options[:output_offset]
+    end
+    if options[:output_limit]
+      queries[query_name]["output"]["limit"] = options[:output_limit]
+    end
+
+    outputs = []
+    outputs << query_name unless options[:no_output]
+
+    searcher["type"] = "broadcast"
+    searcher["command"] = "search"    
+    searcher["outputs"] = outputs
+    searcher["replica"] = "random"
+    searcher
+  end
 end
