@@ -42,7 +42,6 @@ namespace :test do
 end
 
 desc "Run test"
-#task :test => ["test:unit", "test:command"]
-task :test => "test:unit"
+task :test => ["test:unit", "test:command"]
 
 task :default => :test
