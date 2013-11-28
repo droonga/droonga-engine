@@ -6,6 +6,7 @@
     "queries": {
       "result": {
         "source": "Sections",
+        "sortBy": ["_key"],
         "output": {
           "elements": [
             "startTime",

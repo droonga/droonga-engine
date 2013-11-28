@@ -7,11 +7,43 @@
     "type": "search.result",
     "body": {
       "result": {
-        "count": 1,
+        "count": 9,
         "records": [
           [
-            "Groonga",
-            "Groonga"
+            "1.1",
+            "Groonga overview"
+          ],
+          [
+            "1.2",
+            "Full text search and Instant update"
+          ],
+          [
+            "1.3",
+            "Column store and aggregate query"
+          ],
+          [
+            "1.4",
+            "Inverted index and tokenizer"
+          ],
+          [
+            "1.5",
+            "Sharable storage and read lock-free"
+          ],
+          [
+            "1.6",
+            "Geo-location (latitude and longitude) search"
+          ],
+          [
+            "1.7",
+            "Groonga library"
+          ],
+          [
+            "1.8",
+            "Groonga server"
+          ],
+          [
+            "1.9",
+            "Groonga storage engine"
           ]
         ]
       }
