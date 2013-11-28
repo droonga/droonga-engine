@@ -21,16 +21,6 @@
 }
 {
   "dataset": "Droonga",
-  "type": "column_create",
-  "body": {
-    "table": "Documents",
-    "name": "title",
-    "flags": "COLUMN_SCALAR",
-    "type": "ShortText"
-  }
-}
-{
-  "dataset": "Droonga",
   "type": "table_create",
   "body": {
     "name": "Sections",
@@ -106,10 +96,7 @@
   "type": "add",
   "body": {
     "table": "Documents",
-    "key": "Groonga",
-    "values": {
-      "title": "Groonga"
-    }
+    "key": "Groonga"
   }
 }
 {
