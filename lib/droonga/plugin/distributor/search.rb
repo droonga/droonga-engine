@@ -27,9 +27,11 @@ module Droonga
       input_names = []
       output_names = []
       output_mapper = {}
+
       request = envelope["body"]
       request["queries"].each do |input_name, query|
         output = query["output"]
+        # Skip reducing phase for a result with no output.
         next unless output
 
         input_names << input_name
@@ -39,7 +41,9 @@ module Droonga
           "output" => input_name,
         }
 
-        # override the format, because the collector can/should handle only array type records...
+        # The collector module supports only "simple" format search results.
+        # So we have to override the format and restore it on the gathering
+        # phase.
         final_format = output["format"] || "simple"
         output["format"] = "simple"
 
@@ -53,13 +57,23 @@ module Droonga
               "type" => "sum",
             }
           when "records"
+            # Skip reducing phase for a result with no record output.
             next if final_limit.zero?
-            # TODO: must take "sortBy" section into account.
+
+            # Append sort key attributes to the list of output attributes
+            # temporarily, for the reducing phase. After all extra columns
+            # are removed on the gathering phase.
             final_attributes = collect_output_attributes(output["attributes"])
             output["attributes"] ||= []
             output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
+ 
             elements[element] = sort_reducer(output["attributes"], query["sortBy"])
+            # On the reducing phase, we apply only "limit". We cannot apply
+            # "offset" on this phase because the collecter merges a pair of
+            # results step by step even if there are three or more results.
+            # Instead, we apply "offset" on the gethering phase.
             elements[element]["limit"] = output["limit"]
+
             output_mapper[output_name]["element"] = element
             output_mapper[output_name]["offset"] = final_offset
             output_mapper[output_name]["limit"] = final_limit
@@ -75,25 +89,25 @@ module Droonga
               output_name => elements,
             },
           },
-          "inputs" => [input_name],
-          "outputs" => [output_name],
+          "inputs" => [input_name], # XXX should be placed in the "body"?
+          "outputs" => [output_name], # XXX should be placed in the "body"?
         }
         message << reducer
       end
       gatherer = {
         "type" => "gather",
         "body" => output_mapper,
-        "inputs" => output_names,
-        "post" => true,
+        "inputs" => output_names, # XXX should be placed in the "body"?
+        "post" => true, # XXX should be placed in the "body"?
       }
       message << gatherer
       searcher = {
         "type" => "broadcast",
-        "command" => "search",
+        "command" => "search", # XXX should be placed in the "body"?
         "dataset" => envelope["dataset"] || request["dataset"],
         "body" => request,
-        "outputs" => input_names,
-        "replica" => "random",
+        "outputs" => input_names, # XXX should be placed in the "body"?
+        "replica" => "random", # XXX should be placed in the "body"?
       }
       message.push(searcher)
       post(message)
@@ -112,7 +126,8 @@ module Droonga
         have_records = true
       end
 
-      # offset for workers must be zero.
+      # Offset for workers must be zero, because we have to apply "limit" and
+      # "offset" on the last gapthering phase instaed of each reducing phase.
       sort_offset = 0
       if rich_sort
         sort_offset = query["sortBy"]["offset"] || 0
@@ -124,14 +139,14 @@ module Droonga
 
       final_offset = sort_offset + output_offset
 
-      # we have to calculate limit based on offset.
+      # We have to calculate limit based on offset.
       # <A, B = limited integer (0...MAXINT)>
-      # | sort      | output    | => | worker's sort limit      | worker's output limit   | final limit |
-      # =========================    ====================================================================
-      # | UNLIMITED | UNLIMITED | => | UNLIMITED                | UNLIMITED               | UNLIMITED   |
-      # | UNLIMITED | B         | => | final_offset + B         | final_offset + B        | B           |
-      # | A         | UNLIMITED | => | final_offset + A         | final_offset + A        | A           |
-      # | A         | B         | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
+      # | sort limit | output limit | => | worker's sort limit      | worker's output limit   | final limit |
+      # =============================    ====================================================================
+      # | UNLIMITED  | UNLIMITED    | => | UNLIMITED                | UNLIMITED               | UNLIMITED   |
+      # | UNLIMITED  | B            | => | final_offset + B         | final_offset + B        | B           |
+      # | A          | UNLIMITED    | => | final_offset + A         | final_offset + A        | A           |
+      # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
       sort_limit = UNLIMITED
       if rich_sort
         sort_limit = query["sortBy"]["limit"] || UNLIMITED
