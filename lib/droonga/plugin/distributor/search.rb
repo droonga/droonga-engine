@@ -177,7 +177,7 @@ module Droonga
       if attributes.is_a?(Hash)
         attributes_hash = attributes
         attributes = []
-        attributes_hash.each |key, attribute|
+        attributes_hash.each do |key, attribute|
           attributes << attribute["source"] || key
         end
       else
