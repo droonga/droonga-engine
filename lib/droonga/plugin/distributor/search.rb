@@ -26,7 +26,7 @@ module Droonga
       message = []
       input_names = []
       output_names = []
-      name_mapper = {}
+      output_mapper = {}
       request = envelope["body"]
       request["queries"].each do |input_name, query|
         output = query["output"]
@@ -35,7 +35,9 @@ module Droonga
         input_names << input_name
         output_name = input_name + "_reduced"
         output_names << output_name
-        name_mapper[output_name] = input_name
+        output_mapper[output_name] = {
+          "source" => input_name,
+        }
 
         final_offset, final_limit = calculate_offset_and_limit!(query)
 
@@ -50,8 +52,8 @@ module Droonga
             # TODO: must take "sortBy" section into account.
             elements[element] = sort_reducer(:attributes => query["attributes"],
                                              :sort_keys => query["sortBy"])
-            elements[element]["offset"] = final_offset
-            elements[element]["limit"] = final_limit
+            output_mapper[output_name]["offset"] = final_offset
+            output_mapper[output_name]["limit"] = final_limit
           end
         end
 
@@ -60,17 +62,17 @@ module Droonga
           "outputs" => [output_name],
           "type" => "reduce",
           "body" => {
-            input_name=> {
-              output_name=> elements,
+            input_name => {
+              output_name => elements,
             },
           },
         }
         message << reducer
       end
       gatherer = {
-        "inputs" => output_names,
         "type" => "gather",
-        "body" => name_mapper,
+        "body" => output_mapper,
+        "inputs" => output_names,
         "post" => true,
       }
       message << gatherer
