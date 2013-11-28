@@ -111,13 +111,15 @@ module Droonga
 
     def merge(x, y, operators)
       # normalize operators at first!
+      operators ||= []
       operators = operators.collect do |operator|
         if operator.is_a?(String)
           { "operator" => operator }
         else
-          operators
+          operator
         end
       end
+
       index = 0
       y.each do |_y|
         loop do
