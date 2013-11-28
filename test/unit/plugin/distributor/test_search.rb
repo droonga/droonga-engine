@@ -307,10 +307,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 0,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => 0,
-                                    :element => "records",
-                                    :format => "complex")
+      message << gatherer(envelope)
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 0)
       assert_equal(message, @posted.last.last)
