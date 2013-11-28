@@ -305,6 +305,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 0,
         },
       })
       message << gatherer(envelope, :offset => 0,
@@ -345,6 +346,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 1,
         },
       })
       message << gatherer(envelope, :offset => 0,
@@ -386,6 +388,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 1,
         },
       })
       message << gatherer(envelope, :offset => 1,
@@ -428,6 +431,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 1,
         },
       })
       message << gatherer(envelope, :offset => 0,
@@ -472,6 +476,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 1,
         },
       })
       message << gatherer(envelope, :offset => 0,
@@ -520,6 +525,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 7,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -568,6 +574,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 7,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -616,6 +623,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => 8,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -664,6 +672,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
+          "limit" => -1,
         },
       })
       message << gatherer(envelope, :offset => 5,

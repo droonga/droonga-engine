@@ -40,7 +40,9 @@ module Droonga
     def apply_output_range(items, output)
       if items && items.is_a?(Array)
         offset = output["offset"] || 0
-        items = items[offset..-1]
+        unless offset.zero?
+          items = items[offset..-1]
+        end
 
         limit = output["limit"] || 0
         unless limit == UNLIMITED
@@ -81,12 +83,16 @@ module Droonga
       result = {}
       elements.each do |key, deal|
         reduced_values = nil
+
         case deal["type"]
         when "sum"
           reduced_values = values[0][key] + values[1][key]
         when "sort"
           reduced_values = merge(values[0][key], values[1][key], deal["order"])
         end
+
+        reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
+
         result[key] = reduced_values
       end
       return result
