@@ -28,6 +28,170 @@ class SearchDistributorTest < Test::Unit::TestCase
     teardown_database
   end
 
+  def test_multiple_queries
+    envelope = {
+      "type" => "search",
+      "dataset" => "Droonga",
+      "body" => {
+        "queries" => {
+          "query1" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+          "query2" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 20,
+            },
+          },
+          "query3" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 30,
+            },
+          },
+        },
+      },
+    }
+
+    @plugin.process("search", envelope)
+
+    message = []
+
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query1" => {
+          "query1_reduced" => {
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "order" => ["<"],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+        },
+      },
+      "inputs" => ["query1"],
+      "outputs" => ["query1_reduced"],
+    }
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query2" => {
+          "query2_reduced" => {
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "order" => ["<"],
+              "offset" => 0,
+              "limit" => 20,
+            },
+          },
+        },
+      },
+      "inputs" => ["query2"],
+      "outputs" => ["query2_reduced"],
+    }
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query3" => {
+          "query3_reduced" => {
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "order" => ["<"],
+              "offset" => 0,
+              "limit" => 30,
+            },
+          },
+        },
+      },
+      "inputs" => ["query3"],
+      "outputs" => ["query3_reduced"],
+    }
+
+    gatherer = {
+      "type" => "gather",
+      "body" => {
+        "query1_reduced" => "query1",
+        "query2_reduced" => "query2",
+        "query3_reduced" => "query3",
+      },
+      "inputs" => [
+        "query1_reduced",
+        "query2_reduced",
+        "query3_reduced",
+      ],
+      "post" => true,
+    }
+    message << gatherer
+
+    searcher = {
+      "type" => "broadcast",
+      "command" => "search",
+      "dataset" => "Droonga",
+      "body" => {
+        "queries" => {
+          "query1" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+          "query2" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 20,
+            },
+          },
+          "query3" => {
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "offset" => 0,
+              "limit" => 30,
+            },
+          },
+        },
+      },
+      "outputs" => [
+        "query1",
+        "query2",
+        "query3",
+      ],
+      "replica" => "random",
+    }
+    message << searcher
+    assert_equal(message, @posted.last.last)
+  end
+
   def test_distribute
     envelope = {
       "type" => "search",

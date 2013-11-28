@@ -115,22 +115,22 @@ module Droonga
 
       # we have to calculate limit based on offset.
       # <A, B = limited integer (0...MAXINT)>
-      # | sort      | output    | => | worker's sort limit      | worker's output limit | final limit |
-      # =========================    ==================================================================
-      # | UNLIMITED | UNLIMITED | => | UNLIMITED                | UNLIMITED             | UNLIMITED   |
-      # | UNLIMITED | B         | => | final_offset + B         | UNLIMITED             | B           |
-      # | A         | UNLIMITED | => | final_offset + A         | UNLIMITED             | A           |
-      # | A         | B         | => | final_offset + min(A, B) | UNLIMITED             | min(A, B)   |
+      # | sort      | output    | => | worker's sort limit      | worker's output limit   | final limit |
+      # =========================    ====================================================================
+      # | UNLIMITED | UNLIMITED | => | UNLIMITED                | UNLIMITED               | UNLIMITED   |
+      # | UNLIMITED | B         | => | final_offset + B         | final_offset + B        | B           |
+      # | A         | UNLIMITED | => | final_offset + A         | final_offset + A        | A           |
+      # | A         | B         | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
       sort_limit = UNLIMITED
       if rich_sort
         sort_limit = query["sortBy"]["limit"] || UNLIMITED
       end
       output_limit = query["output"]["limit"] || 0
-      query["output"]["limit"] = UNLIMITED if have_records
 
       final_limit = 0
       if sort_limit == UNLIMITED && output_limit == UNLIMITED
         final_limit = UNLIMITED
+        query["output"]["limit"] = UNLIMITED
       else
         if sort_limit == UNLIMITED
           final_limit = output_limit
@@ -140,6 +140,7 @@ module Droonga
           final_limit = [sort_limit, output_limit].min
         end
         query["sortBy"]["limit"] = final_offset + final_limit if rich_sort
+        query["output"]["limit"] = final_offset + final_limit
       end
 
       [final_offset, final_limit]
