@@ -354,12 +354,53 @@ class SearchDistributorTest < Test::Unit::TestCase
           "type" => "sort",
           "order" => ["<"],
           "offset" => 1,
-          "limit" => 2,
+          "limit" => 1,
         },
       })
       message << gatherer(envelope)
       message << searcher(envelope, :output_offset => 0,
-                                    :output_limit => 3)
+                                    :output_limit => 2)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_have_simple_sortBy
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => ["name"],
+              "output" => {
+                "format" => "complex",
+                "elements" => ["count", "records"],
+                "attributes" => ["_key", "name", "age"],
+                "offset" => 0,
+                "limit" => 1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "order" => ["<"],
+          "offset" => 0,
+          "limit" => 1,
+        },
+      })
+      message << gatherer(envelope)
+      message << searcher(envelope, :output_offset => 0,
+                                    :output_limit => 1)
       assert_equal(message, @posted.last.last)
     end
 
