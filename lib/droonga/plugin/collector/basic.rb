@@ -110,7 +110,7 @@ module Droonga
     end
 
     def merge(x, y, operators)
-      # normalize operators at first!
+      # Normalize operators at first for optimization.
       operators ||= []
       operators = operators.collect do |operator|
         if operator.is_a?(String)
