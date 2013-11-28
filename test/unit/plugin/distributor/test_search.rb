@@ -246,7 +246,6 @@ class SearchDistributorTest < Test::Unit::TestCase
       assert_equal(message, @posted.last.last)
     end
 
-
     def test_no_output_limit
       envelope = {
         "type" => "search",
@@ -283,7 +282,6 @@ class SearchDistributorTest < Test::Unit::TestCase
                                     :output_limit => 0)
       assert_equal(message, @posted.last.last)
     end
-
 
     def test_have_records
       envelope = {
