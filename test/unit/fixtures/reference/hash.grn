@@ -1,0 +1,7 @@
+table_create DocumentsHash TABLE_HASH_KEY ShortText
+column_create DocumentsHash title COLUMN_SCALAR ShortText
+
+load --table DocumentsHash
+[
+{"_key": "Groonga", "title": "Groonga"}
+]
