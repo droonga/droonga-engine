@@ -333,6 +333,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "source" => "User",
             "output" => {
               "elements" => ["count"],
+              "limit" => 0,
             },
           },
           "no_limit" => {
@@ -341,7 +342,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "format" => "complex",
               "elements" => ["count", "records"],
               "offset" => 0,
-              "limit" => -1,
+              "limit" => 0,
             },
           },
           "have_records" => {
@@ -351,7 +352,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "elements" => ["count", "records"],
               "attributes" => ["_key", "name", "age"],
               "offset" => 0,
-              "limit" => -1,
+              "limit" => 3,
             },
           },
         },
