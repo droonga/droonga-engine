@@ -150,12 +150,12 @@ module Droonga
       sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
 
       order = []
-      unless sort_keys
+#      unless sort_keys
         order << "<"
-      else
-        # XXX NOT IMPLEMENTED YET!
-        # we must change the format of "order" from array to hash (rich object)
-      end
+#      else
+#        # XXX NOT IMPLEMENTED YET!
+#        # we must change the format of "order" from array to hash (rich object)
+#      end
 
       {
         "type" => "sort",
