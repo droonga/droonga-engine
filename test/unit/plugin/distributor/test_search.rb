@@ -272,8 +272,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "type" => "sum",
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => 1)
+      message << gatherer(envelope)
       message << searcher(envelope, :output_limit => 0)
       assert_equal(message, @posted.last.last)
     end
@@ -310,6 +309,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 0,
                                     :limit => 0,
+                                    :element => "records",
                                     :format => "complex")
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 0)
@@ -351,6 +351,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 0,
                                     :limit => 1,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
@@ -393,6 +394,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 1,
                                     :limit => 1,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
@@ -436,6 +438,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 0,
                                     :limit => 1,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
@@ -481,6 +484,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 0,
                                     :limit => 1,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
@@ -530,6 +534,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 5,
                                     :limit => 2,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
@@ -579,6 +584,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 5,
                                     :limit => 2,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
@@ -628,6 +634,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 5,
                                     :limit => 8,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
@@ -677,6 +684,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       })
       message << gatherer(envelope, :offset => 5,
                                     :limit => -1,
+                                    :element => "records",
                                     :format => "complex",
                                     :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
@@ -719,14 +727,19 @@ class SearchDistributorTest < Test::Unit::TestCase
       }
 
       unless options[:no_output]
-        gatherer["body"]["#{query_name}_reduced"] = {
+        output = {
           "source" => query_name,
-          "element" => "records",
-          "offset" => options[:offset] || 0,
-          "limit" => options[:limit] || 0,
-          "format" => options[:format] || "simple",
-          "attributes" => options[:attributes] || [],
-        },
+        }
+        if options[:element]
+          output.merge({
+            "element" => options[:element],
+            "offset" => options[:offset] || 0,
+            "limit" => options[:limit] || 0,
+            "format" => options[:format] || "simple",
+            "attributes" => options[:attributes] || [],
+          })
+        end
+        gatherer["body"]["#{query_name}_reduced"] = output
         gatherer["inputs"] << "#{query_name}_reduced"
       end
 
