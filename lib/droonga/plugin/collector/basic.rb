@@ -55,7 +55,7 @@ module Droonga
             reduced_values = reduced_values[deal["offset"]..-1]
           end
           if deal["limit"] && deal["limit"] != UNLIMITED
-            reduced_values = reduced_values[0..deal["limit"]-1]
+            reduced_values = reduced_values[0...deal["limit"]]
           end
         end
 
