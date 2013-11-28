@@ -47,5 +47,6 @@ drntest_options.concat(["--fluentd-options", "-I#{lib_dir}"])
 drntest_options.concat(["--base", base_dir])
 drntest_options.concat(ARGV.dup)
 
-run(File.join(base_dir, "bin", "drntest"),
-    *drntest_options)
+Dir.chdir(base_dir) do
+  run("bundle", "exec", "drntest", *drntest_options)
+end
