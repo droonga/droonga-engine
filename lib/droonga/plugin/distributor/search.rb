@@ -55,20 +55,10 @@ module Droonga
           when "records"
             next if final_limit.zero?
             # TODO: must take "sortBy" section into account.
-            final_attributes = output["attributes"] || []
-            if final_attributes.is_a?(Hash)
-              final_attributes = final_attributes.keys
-            else
-              final_attributes.collect! do |attribute|
-                if attribute.is_a?(Hash)
-                  attribute["label"] || attribute["source"]
-                else
-                  attribute
-                end
-              end
-            end
-            elements[element] = sort_reducer(:attributes => output["attributes"],
-                                             :sort_keys => query["sortBy"])
+            final_attributes = collect_output_attributes(output["attributes"])
+            output["attributes"] ||= []
+            output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
+            elements[element] = sort_reducer(output["attributes"], query["sortBy"])
             elements[element]["limit"] = output["limit"]
             output_mapper[output_name]["element"] = element
             output_mapper[output_name]["offset"] = final_offset
@@ -167,9 +157,50 @@ module Droonga
       [final_offset, final_limit]
     end
 
-    def sort_reducer(params)
-      attributes = params[:attributes]
-      sort_keys = params[:sort_keys]
+    def collect_output_attributes(attributes=[])
+      if attributes.is_a?(Hash)
+        attributes.keys
+      else
+        attributes.collect do |attribute|
+          if attribute.is_a?(Hash)
+            attribute["label"] || attribute["source"]
+          else
+            attribute
+          end
+        end
+      end
+    end
+
+    def collect_sort_attributes(attributes, sort_keys)
+      sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
+
+      if attributes.is_a?(Hash)
+        attributes_hash = attributes
+        attributes = []
+        attributes_hash.each |key, attribute|
+          attributes << attribute["source"] || key
+        end
+      else
+        attributes.collect! do |attribute|
+          if attribute.is_a?(Hash)
+            attribute["source"] || attribute["label"]
+          else
+            attribute
+          end
+        end
+      end
+
+      sort_attributes = sort_keys.collect do |key|
+        key = key[1..-1] if key[0] == "-"
+        key
+      end
+      sort_attributes.reject! do |attribute|
+        attributes.include?(attribute)
+      end
+      sort_attributes      
+    end
+
+    def sort_reducer(attributes, sort_keys)
       sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
 
       order = []

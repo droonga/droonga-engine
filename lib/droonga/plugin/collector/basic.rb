@@ -30,6 +30,7 @@ module Droonga
         element = output["element"]
         if element
           result[element] = apply_output_range(result[element], output)
+          result[element] = apply_output_attributes(result[element], output)
           result[element] = apply_output_format(result[element], output)
         end
         output = output["source"]
@@ -47,6 +48,16 @@ module Droonga
         limit = output["limit"] || 0
         unless limit == UNLIMITED
           items = items[0...limit]
+        end
+      end
+      items
+    end
+
+    def apply_output_attributes(items, output)
+      attributes = output["attributes"]
+      if attributes
+        items.collect! do |item|
+          item[0..attributes.size]
         end
       end
       items
