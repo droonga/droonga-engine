@@ -63,7 +63,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         "id" => nil,
         "value" => {
-          "count" => 0,
+          "count" => 3,
           "records" => [
             create_record(0),
             create_record(1),
@@ -77,9 +77,82 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_gather", request)
       gathered = {
-        "count" => 0,
+        "count" => 3,
         "records" => [
           create_record(0),
+          create_record(1),
+          create_record(2),
+        ],
+      }
+      assert_equal([gathered, "search_result"], @messages.last)
+    end
+
+    def test_offset_and_limit
+      request = {
+        "task" => {
+          "values" => nil,
+          "component" => {
+            "body" => nil,
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "count" => 3,
+          "records" => [
+            create_record(0),
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        "name" => {
+          "output" => "search_result",
+          "element" => "records",
+          "offset" => 1,
+          "limit" => 1,
+        },
+        "descendants" => nil,
+      }
+      @plugin.process("collector_gather", request)
+      gathered = {
+        "count" => 3,
+        "records" => [
+          create_record(1),
+        ],
+      }
+      assert_equal([gathered, "search_result"], @messages.last)
+    end
+
+    def test_offset_and_unlimited_limit
+      request = {
+        "task" => {
+          "values" => nil,
+          "component" => {
+            "body" => nil,
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "count" => 3,
+          "records" => [
+            create_record(0),
+            create_record(1),
+            create_record(2),
+          ],
+        },
+        "name" => {
+          "output" => "search_result",
+          "element" => "records",
+          "offset" => 1,
+          "limit" => -1,
+        },
+        "descendants" => nil,
+      }
+      @plugin.process("collector_gather", request)
+      gathered = {
+        "count" => 3,
+        "records" => [
           create_record(1),
           create_record(2),
         ],
