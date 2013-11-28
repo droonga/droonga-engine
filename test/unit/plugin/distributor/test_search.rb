@@ -134,9 +134,30 @@ class SearchDistributorTest < Test::Unit::TestCase
       gatherer = {
         "type" => "gather",
         "body" => {
-          "query1_reduced" => "query1",
-          "query2_reduced" => "query2",
-          "query3_reduced" => "query3",
+          "query1_reduced" => {
+            "source" => "query1",
+            "element" => "records",
+            "offset" => 0,
+            "limit" => 10,
+            "format" => "simple",
+            "attributes" => [],
+          },
+          "query2_reduced" => {
+            "source" => "query2",
+            "element" => "records",
+            "offset" => 0,
+            "limit" => 20,
+            "format" => "simple",
+            "attributes" => [],
+          },
+          "query3_reduced" => {
+            "source" => "query3",
+            "element" => "records",
+            "offset" => 0,
+            "limit" => 30,
+            "format" => "simple",
+            "attributes" => [],
+          },
         },
         "inputs" => [
           "query1_reduced",
@@ -251,7 +272,8 @@ class SearchDistributorTest < Test::Unit::TestCase
           "type" => "sum",
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => 1)
       message << searcher(envelope, :output_limit => 0)
       assert_equal(message, @posted.last.last)
     end
@@ -283,11 +305,11 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 0,
-          "limit" => 0,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => 0,
+                                    :format => "complex")
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 0)
       assert_equal(message, @posted.last.last)
@@ -323,11 +345,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 0,
-          "limit" => 1,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => 1,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 1)
       assert_equal(message, @posted.last.last)
@@ -363,11 +386,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 1,
-          "limit" => 1,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 1,
+                                    :limit => 1,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 2)
       assert_equal(message, @posted.last.last)
@@ -404,11 +428,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 0,
-          "limit" => 1,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => 1,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 1)
       assert_equal(message, @posted.last.last)
@@ -447,11 +472,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 0,
-          "limit" => 1,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => 1,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 1,
                                     :output_offset => 0,
@@ -494,11 +520,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 5,
-          "limit" => 2,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 5,
+                                    :limit => 2,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 7,
                                     :output_offset => 0,
@@ -541,11 +568,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 5,
-          "limit" => 2,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 5,
+                                    :limit => 2,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 7,
                                     :output_offset => 0,
@@ -588,11 +616,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 5,
-          "limit" => 8,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 5,
+                                    :limit => 8,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 8,
                                     :output_offset => 0,
@@ -635,11 +664,12 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "offset" => 5,
-          "limit" => -1,
         },
       })
-      message << gatherer(envelope)
+      message << gatherer(envelope, :offset => 5,
+                                    :limit => -1,
+                                    :format => "complex",
+                                    :attributes => ["_key", "name", "age"])
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
@@ -680,7 +710,14 @@ class SearchDistributorTest < Test::Unit::TestCase
       }
 
       unless options[:no_output]
-        gatherer["body"]["#{query_name}_reduced"] = query_name
+        gatherer["body"]["#{query_name}_reduced"] = {
+          "source" => query_name,
+          "element" => "records",
+          "offset" => options[:offset] || 0,
+          "limit" => options[:limit] || 0,
+          "format" => options[:format] || "simple",
+          "attributes" => options[:attributes] || [],
+        },
         gatherer["inputs"] << "#{query_name}_reduced"
       end
 

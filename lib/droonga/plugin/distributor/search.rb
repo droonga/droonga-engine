@@ -54,7 +54,7 @@ module Droonga
             }
           when "records"
             # TODO: must take "sortBy" section into account.
-            final_attributes = output["attributes"]
+            final_attributes = output["attributes"] || []
             if final_attributes.is_a?(Hash)
               final_attributes = final_attributes.keys
             else
