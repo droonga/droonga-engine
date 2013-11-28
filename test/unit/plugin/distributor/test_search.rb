@@ -774,6 +774,59 @@ class SearchDistributorTest < Test::Unit::TestCase
       assert_equal(message, @posted.last.last)
     end
 
+    def test_hash_attributes
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => {
+                "keys" => ["-public_age", "public_name"],
+                "limit" => -1,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["records"],
+                "attributes" => {
+                  "id" => "_key",
+                  "name" => { "source" => "name" },
+                  "age" => { "source" => "age" },
+                },
+                "limit" => -1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "records" => {
+          "type" => "sort",
+          "operators" => [
+            { "column" => 3, "operator" => ">" },
+            { "column" => 4, "operator" => "<" },
+          ],
+          "limit" => -1,
+        },
+      })
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => -1,
+                                    :element => "records",
+                                    :format => "complex",
+                                    :attributes => ["id", "name", "age"])
+      message << searcher(envelope, :sort_offset => 0,
+                                    :sort_limit => -1,
+                                    :output_offset => 0,
+                                    :output_limit => -1,
+                                    :extra_attributes => ["public_age", "public_name"])
+      assert_equal(message, @posted.last.last)
+    end
+
     private
     def reducer(search_request_envelope, reducer_body)
       queries = search_request_envelope["body"]["queries"]
