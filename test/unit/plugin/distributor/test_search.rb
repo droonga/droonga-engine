@@ -81,7 +81,6 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "order" => ["<"],
-                "offset" => 0,
                 "limit" => 10,
               },
             },
@@ -101,7 +100,6 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "order" => ["<"],
-                "offset" => 0,
                 "limit" => 20,
               },
             },
@@ -121,7 +119,6 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "order" => ["<"],
-                "offset" => 0,
                 "limit" => 30,
               },
             },
@@ -139,7 +136,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "element" => "records",
             "offset" => 0,
             "limit" => 10,
-            "format" => "simple",
+            "format" => "complex",
             "attributes" => [],
           },
           "query2_reduced" => {
@@ -147,7 +144,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "element" => "records",
             "offset" => 0,
             "limit" => 20,
-            "format" => "simple",
+            "format" => "complex",
             "attributes" => [],
           },
           "query3_reduced" => {
@@ -155,7 +152,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "element" => "records",
             "offset" => 0,
             "limit" => 30,
-            "format" => "simple",
+            "format" => "complex",
             "attributes" => [],
           },
         },
@@ -177,7 +174,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "query1" => {
               "source" => "User",
               "output" => {
-                "format" => "complex",
+                "format" => "simple",
                 "elements" => ["count", "records"],
                 "offset" => 0,
                 "limit" => 10,
@@ -186,7 +183,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "query2" => {
               "source" => "User",
               "output" => {
-                "format" => "complex",
+                "format" => "simple",
                 "elements" => ["count", "records"],
                 "offset" => 0,
                 "limit" => 20,
@@ -195,7 +192,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             "query3" => {
               "source" => "User",
               "output" => {
-                "format" => "complex",
+                "format" => "simple",
                 "elements" => ["count", "records"],
                 "offset" => 0,
                 "limit" => 30,
@@ -381,7 +378,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "limit" => 1,
+          "limit" => 2,
         },
       })
       message << gatherer(envelope, :offset => 1,
@@ -521,7 +518,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "limit" => 7,
+          "limit" => 1 + 4 + [2, 8].min,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -571,7 +568,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "limit" => 7,
+          "limit" => 1 + 4 + 2,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -621,7 +618,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "order" => ["<"],
-          "limit" => 8,
+          "limit" => 1 + 4 + 8,
         },
       })
       message << gatherer(envelope, :offset => 5,
@@ -723,7 +720,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "source" => query_name,
         }
         if options[:element]
-          output.merge({
+          output.merge!({
             "element" => options[:element],
             "offset" => options[:offset] || 0,
             "limit" => options[:limit] || 0,
