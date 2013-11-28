@@ -48,20 +48,18 @@ module Droonga
             }
           when "records"
             # TODO: must take "sortBy" section into account.
-            elements[element] = {
-              "type" => "sort",
-              "order" => ["<"],
-              "offset" => final_offset,
-              "limit" => final_limit,
-            }
+            elements[element] = sort_reducer(:attributes => query["attributes"],
+                                             :sort_keys => query["sortBy"])
+            elements[element]["offset"] = final_offset
+            elements[element]["limit"] = final_limit
           end
         end
 
         reducer = {
-          "inputs"=> [input_name],
-          "outputs"=> [output_name],
-          "type"=> "reduce",
-          "body"=> {
+          "inputs" => [input_name],
+          "outputs" => [output_name],
+          "type" => "reduce",
+          "body" => {
             input_name=> {
               output_name=> elements,
             },
@@ -70,19 +68,19 @@ module Droonga
         message << reducer
       end
       gatherer = {
-        "inputs"=> output_names,
-        "type"=> "gather",
-        "body"=> name_mapper,
-        "post"=> true,
+        "inputs" => output_names,
+        "type" => "gather",
+        "body" => name_mapper,
+        "post" => true,
       }
       message << gatherer
       searcher = {
-        "dataset"=> envelope["dataset"] || request["dataset"],
-        "outputs"=> input_names,
-        "type"=> "broadcast",
-        "command"=> "search",
-        "replica"=> "random",
-        "body"=> request,
+        "dataset" => envelope["dataset"] || request["dataset"],
+        "outputs" => input_names,
+        "type" => "broadcast",
+        "command" => "search",
+        "replica" => "random",
+        "body" => request,
       }
       message.push(searcher)
       post(message)
@@ -144,6 +142,24 @@ module Droonga
       end
 
       [final_offset, final_limit]
+    end
+
+    def sort_reducer(params)
+      attributes = params[:attributes]
+      sort_keys = params[:sort_keys]
+      sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
+
+      order = []
+      unless sort_keys
+        order << "<"
+      else
+        sort_keys
+      end
+
+      {
+        "type" => "sort",
+        "order" => order,
+      }
     end
   end
 end
