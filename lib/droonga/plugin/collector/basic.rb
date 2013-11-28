@@ -21,10 +21,25 @@ module Droonga
   class BasicCollector < Droonga::CollectorPlugin
     repository.register("basic", self)
 
+    UNLIMITED = -1
+
     command :collector_gather
-    def collector_gather(request)
+    def collector_gather(result)
       output = body ? body[input_name] : input_name
-      emit(request, output)
+      if output.is_a?(Hash)
+        element = output["element"]
+        if element && result[element] && result[element].is_a?(Array)
+          offset = output["offset"] || 0
+          result[element] = result[element][offset..-1]
+
+          limit = output["limit"] || 0
+          unless limit == UNLIMITED
+            result[element] = result[element][0...limit]
+          end
+        end
+        output = output["source"]
+      end
+      emit(result, output)
     end
 
     command :collector_reduce
@@ -42,29 +57,16 @@ module Droonga
       result = {}
       elements.each do |key, deal|
         reduced_values = nil
-
         case deal["type"]
         when "sum"
           reduced_values = values[0][key] + values[1][key]
         when "sort"
           reduced_values = merge(values[0][key], values[1][key], deal["order"])
         end
-
-        if reduced_values.is_a?(Array)
-          if deal["offset"]
-            reduced_values = reduced_values[deal["offset"]..-1]
-          end
-          if deal["limit"] && deal["limit"] != UNLIMITED
-            reduced_values = reduced_values[0...deal["limit"]]
-          end
-        end
-
         result[key] = reduced_values
       end
       return result
     end
-
-    UNLIMITED = -1
 
     def merge(x, y, order)
       index = 0

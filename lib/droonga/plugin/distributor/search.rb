@@ -52,6 +52,7 @@ module Droonga
             # TODO: must take "sortBy" section into account.
             elements[element] = sort_reducer(:attributes => query["attributes"],
                                              :sort_keys => query["sortBy"])
+            output_mapper[output_name]["element"] = element
             output_mapper[output_name]["offset"] = final_offset
             output_mapper[output_name]["limit"] = final_limit
           end
