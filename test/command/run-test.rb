@@ -38,7 +38,7 @@ gemfile_lock = "#{gemfile}.lock"
 
 if need_bundle_install?(gemfile, gemfile_lock)
   Dir.chdir(base_dir) do
-    run("bundle", "install")
+    run("bundle", "install", "--binstubs")
   end
 end
 
