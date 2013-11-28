@@ -30,7 +30,7 @@ module Droonga
         element = output["element"]
         if element
           result[element] = apply_output_range(result[element], output)
-          result[element] = apply_output_format(result[element], output["format"])
+          result[element] = apply_output_format(result[element], output)
         end
         output = output["source"]
       end
@@ -50,7 +50,8 @@ module Droonga
       items
     end
 
-    def apply_output_format(items, format)
+    def apply_output_format(items, output)
+      format = output["format"]
       attributes = output["attributes"]
       if format == "complex" && attributes
         items.collect! do |item|
