@@ -647,23 +647,6 @@ class SearchDistributorTest < Test::Unit::TestCase
       assert_equal(message, @posted.last.last)
     end
 
-    # XXX we should write cases for...
-    #  - sortBy(simple)
-    #  - sortBy(rich)
-    #  - sortBy(rich) with offset
-    #  - sortBy(rich) with limit
-    #  - sortBy(rich) with offset and limit
-    #  - sortBy(simple) + output(limit, offset)
-    #  - sortBy(rich)
-    #    + output(limit, offset)
-    #  - sortBy(rich) with offset
-    #    + output(limit, offset)
-    #  - sortBy(rich) with limit
-    #    + output(limit, offset)
-    #  - sortBy(rich) with offset and limit
-    #    + output(limit, offset)
-    # and, we have to write cases for both unlimited and limited cases...
-
     private
     def reducer(search_request_envelope, reducer_body)
       queries = search_request_envelope["body"]["queries"]
