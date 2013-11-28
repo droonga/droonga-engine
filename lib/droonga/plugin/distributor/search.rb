@@ -180,8 +180,8 @@ module Droonga
           case attribute
           when String
             {
-              "label": key,
-              "source": attribute,
+              "label" => key,
+              "source" => attribute,
             }
           when Hash
             attribute["label"] = key
