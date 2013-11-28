@@ -321,7 +321,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "source" => "User",
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 0,
                 "limit" => 1,
@@ -335,9 +335,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [],
@@ -364,7 +361,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "source" => "User",
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 1,
                 "limit" => 1,
@@ -378,9 +375,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [],
@@ -408,7 +402,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "sortBy" => ["name"],
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 0,
                 "limit" => 1,
@@ -422,9 +416,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -456,7 +447,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               },
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 0,
                 "limit" => 1,
@@ -470,9 +461,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -508,7 +496,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               },
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 4,
                 "limit" => 8,
@@ -522,9 +510,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -560,7 +545,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               },
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 4,
                 "limit" => -1,
@@ -574,9 +559,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -612,7 +594,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               },
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 4,
                 "limit" => 8,
@@ -626,9 +608,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -664,7 +643,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               },
               "output" => {
                 "format" => "complex",
-                "elements" => ["count", "records"],
+                "elements" => ["records"],
                 "attributes" => ["_key", "name", "age"],
                 "offset" => 4,
                 "limit" => -1,
@@ -678,9 +657,6 @@ class SearchDistributorTest < Test::Unit::TestCase
 
       message = []
       message << reducer(envelope, {
-        "count" => {
-          "type" => "sum",
-        },
         "records" => {
           "type" => "sort",
           "operators" => [
