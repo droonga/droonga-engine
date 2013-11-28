@@ -24,28 +24,12 @@ def run(*command_line)
   exit(false)
 end
 
-def need_bundle_install?(gemfile, gemfile_lock)
-  return true unless File.exist?(gemfile_lock)
-  return true if File.mtime(gemfile) > File.mtime(gemfile_lock)
-  false
-end
-
 base_dir = File.dirname(__FILE__)
 lib_dir = File.expand_path(File.join(base_dir, "..", "..", "lib"))
-
-gemfile = File.join(base_dir, "Gemfile")
-gemfile_lock = "#{gemfile}.lock"
-
-if need_bundle_install?(gemfile, gemfile_lock)
-  Dir.chdir(base_dir) do
-    run("bundle", "install", "--binstubs")
-  end
-end
 
 drntest_options = []
 drntest_options.concat(["--fluentd-options", "-I#{lib_dir}"])
 drntest_options.concat(["--base", base_dir])
 drntest_options.concat(ARGV.dup)
 
-run(File.join(base_dir, "bin", "drntest"),
-    *drntest_options)
+run("bundle", "exec", "drntest", *drntest_options)
