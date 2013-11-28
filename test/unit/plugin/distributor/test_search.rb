@@ -449,6 +449,194 @@ class SearchDistributorTest < Test::Unit::TestCase
       assert_equal(message, @posted.last.last)
     end
 
+    def test_have_sortBy_offset_limit
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 1,
+                "limit" => 2,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["count", "records"],
+                "attributes" => ["_key", "name", "age"],
+                "offset" => 4,
+                "limit" => 8,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "order" => ["<"],
+          "offset" => 5,
+          "limit" => 2,
+        },
+      })
+      message << gatherer(envelope)
+      message << searcher(envelope, :sort_offset => 0,
+                                    :sort_limit => 7,
+                                    :output_offset => 0,
+                                    :output_limit => 7)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_have_sortBy_with_infinity_output_limit
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 1,
+                "limit" => 2,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["count", "records"],
+                "attributes" => ["_key", "name", "age"],
+                "offset" => 4,
+                "limit" => -1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "order" => ["<"],
+          "offset" => 5,
+          "limit" => 2,
+        },
+      })
+      message << gatherer(envelope)
+      message << searcher(envelope, :sort_offset => 0,
+                                    :sort_limit => 7,
+                                    :output_offset => 0,
+                                    :output_limit => 7)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_have_sortBy_with_infinity_sort_limit
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 1,
+                "limit" => -1,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["count", "records"],
+                "attributes" => ["_key", "name", "age"],
+                "offset" => 4,
+                "limit" => 8,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "order" => ["<"],
+          "offset" => 5,
+          "limit" => 8,
+        },
+      })
+      message << gatherer(envelope)
+      message << searcher(envelope, :sort_offset => 0,
+                                    :sort_limit => 8,
+                                    :output_offset => 0,
+                                    :output_limit => 8)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_have_sortBy_with_infinity_limit
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "have_records" => {
+              "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 1,
+                "limit" => -1,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["count", "records"],
+                "attributes" => ["_key", "name", "age"],
+                "offset" => 4,
+                "limit" => -1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "order" => ["<"],
+          "offset" => 5,
+          "limit" => -1,
+        },
+      })
+      message << gatherer(envelope)
+      message << searcher(envelope, :sort_offset => 0,
+                                    :sort_limit => -1,
+                                    :output_offset => 0,
+                                    :output_limit => -1)
+      assert_equal(message, @posted.last.last)
+    end
+
     # XXX we should write cases for...
     #  - sortBy(simple)
     #  - sortBy(rich)
