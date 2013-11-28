@@ -20,8 +20,6 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def setup
     setup_database
-    restore(fixture_data("document.grn"))
-    setup_plugin(Droonga::SearchHandler)
   end
 
   def teardown
@@ -62,479 +60,532 @@ class SearchHandlerTest < Test::Unit::TestCase
     assert_equal(expected, search(request))
   end
 
-  class NoParameterTest < self
-    def test_empty
-      assert_search({}, {})
+  class GeneralTest < self
+    def setup
+      super
+      restore(fixture_data("document.grn"))
+      setup_plugin(Droonga::SearchHandler)
+    end
+
+    class NoParameterTest < self
+      def test_empty
+        assert_search({}, {})
+      end
+    end
+
+    class QueriesTest < self
+      def test_empty
+        assert_search({}, {"queries" => {}})
+      end
+    end
+
+    class HashQueryTest < self
+      def test_string_matchTo
+        request = base_request
+        request["queries"]["sections-result"]["condition"] = {
+          "query" => "Groonga",
+          "matchTo" => "title"
+        }
+        assert_search({
+                        "sections-result" => {
+                          "records" => [
+                            { "title" => "Groonga overview" },
+                          ],
+                        },
+                      },
+                      request)
+      end
+
+      def test_array_matchTo
+        request = base_request
+        request["queries"]["sections-result"]["condition"] = {
+          "query" => "Groonga",
+          "matchTo" => ["title"]
+        }
+        assert_search({
+                        "sections-result" => {
+                          "records" => [
+                            { "title" => "Groonga overview" },
+                          ],
+                        },
+                      },
+                      request)
+      end
+
+      def base_request
+        {
+          "queries" => {
+            "sections-result" => {
+              "source" => "Sections",
+              "output" => {
+                "elements" => [
+                  "records",
+                ],
+                "format" => "complex",
+                "limit" => 1,
+                "attributes" => ["title"],
+              },
+            },
+          },
+        }
+      end
+    end
+
+    class SourceTest < self
+      def test_non_existent
+        assert_raise(Droonga::Searcher::UndefinedSourceError) do
+          search({
+                   "queries" => {
+                     "non-existent-result" => {
+                       "source" => "non-existent",
+                     },
+                   },
+                 })
+        end
+      end
+
+      def test_existent
+        assert_search({
+                        "sections-result" => {},
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {},
+                          },
+                        },
+                      })
+      end
+    end
+
+    class OutputTest < self
+      def test_count
+        assert_search({
+                        "sections-result" => {
+                          "count" => 9,
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "elements" => [
+                                "count",
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      def test_elapsed_time
+        assert_search({
+                        "sections-result" => {
+                          "startTime" => start_time,
+                          "elapsedTime" => elapsed_time,
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "elements" => [
+                                "startTime",
+                                "elapsedTime",
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      class AttributesTest < self
+        def test_source_only
+          expected = {
+            "sections-result" => {
+              "records" => [
+                {
+                  "_key" => "1.1",
+                  "title" => "Groonga overview",
+                },
+                {
+                  "_key" => "1.2",
+                  "title" => "Full text search and Instant update",
+                },
+                {
+                  "_key" => "1.3",
+                  "title" => "Column store and aggregate query",
+                },
+              ],
+            },
+          }
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 3,
+                  "attributes" => ["_key", "title"],
+                },
+              },
+            },
+          }
+          assert_search(expected, request)
+        end
+
+        def test_label
+          expected = {
+            "sections-result" => {
+              "records" => [
+                {
+                  "key" => "1.1",
+                  "title" => "Groonga overview",
+                },
+                {
+                  "key" => "1.2",
+                  "title" => "Full text search and Instant update",
+                },
+                {
+                  "key" => "1.3",
+                  "title" => "Column store and aggregate query",
+                },
+              ],
+            },
+          }
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 3,
+                  "attributes" => [
+                    {
+                      "label" => "key",
+                      "source" => "_key",
+                    },
+                    "title",
+                  ],
+                },
+              },
+            },
+          }
+          assert_search(expected, request)
+        end
+
+        def test_static_value
+          expected = {
+            "sections-result" => {
+              "records" => [
+                {
+                  "single_quote_string" => "string value",
+                  "double_quote_string" => "string value",
+                  "integer" => 29,
+                  "complex_negative_number" => -29.29,
+                },
+                {
+                  "single_quote_string" => "string value",
+                  "double_quote_string" => "string value",
+                  "integer" => 29,
+                  "complex_negative_number" => -29.29,
+                },
+              ],
+            },
+          }
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 2,
+                  "attributes" => [
+                    {
+                      "label" => "single_quote_string",
+                      "source" => "'string value'",
+                    },
+                    {
+                      "label" => "double_quote_string",
+                      "source" => '"string value"',
+                    },
+                    {
+                      "label" => "integer",
+                      "source" => "29",
+                    },
+                    {
+                      "label" => "complex_negative_number",
+                      "source" => "-29.29",
+                    },
+                  ],
+                },
+              },
+            },
+          }
+          assert_search(expected, request)
+        end
+
+        def test_expression
+          expected = {
+            "sections-result" => {
+              "records" => [
+                {
+                  "formatted title" => "<Groonga overview>",
+                  "title" => "Groonga overview",
+                },
+              ],
+            },
+          }
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 1,
+                  "attributes" => [
+                    "title",
+                    {
+                      "label" => "formatted title",
+                      "source" => "'<' + title + '>'",
+                    },
+                  ],
+                },
+              },
+            },
+          }
+          assert_search(expected, request)
+        end
+
+        def test_snippet_html
+          expected = {
+            "sections-result" => {
+              "records" => [
+                {
+                  "title" => "Groonga overview",
+                  "snippet" => [
+                    "<span class=\"keyword\">Groonga</span> overview",
+                  ],
+                },
+              ],
+            },
+          }
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "condition" => {
+                  "query" => "Groonga",
+                  "matchTo" => ["title"],
+                },
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 1,
+                  "attributes" => [
+                    "title",
+                    {
+                      "label" => "snippet",
+                      "source" => "snippet_html(title)",
+                    },
+                  ],
+                },
+              },
+            },
+          }
+          assert_search(expected, request)
+        end
+      end
+
+      class FormatTest < self
+        def test_complex
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "complex",
+                  "limit" => 3,
+                  "attributes" => ["_key", "title"],
+                },
+              },
+            },
+          }
+          assert_search(complex_result, request)
+        end
+
+        def test_simple
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "format" => "simple",
+                  "limit" => 3,
+                  "attributes" => ["_key", "title"],
+                },
+              },
+            },
+          }
+          assert_search(simple_result, request)
+        end
+
+        def test_default
+          request = {
+            "queries" => {
+              "sections-result" => {
+                "source" => "Sections",
+                "output" => {
+                  "elements" => [
+                    "records",
+                  ],
+                  "limit" => 3,
+                  "attributes" => ["_key", "title"],
+                },
+              },
+            },
+          }
+          assert_search(simple_result, request)
+        end
+
+        def complex_result
+          {
+            "sections-result" => {
+              "records" => [
+                {
+                  "_key" => "1.1",
+                  "title" => "Groonga overview",
+                },
+                {
+                  "_key" => "1.2",
+                  "title" => "Full text search and Instant update",
+                },
+                {
+                  "_key" => "1.3",
+                  "title" => "Column store and aggregate query",
+                },
+              ],
+            },
+          }
+        end
+
+        def simple_result
+          {
+            "sections-result" => {
+              "records" => [
+                ["1.1", "Groonga overview"],
+                ["1.2", "Full text search and Instant update"],
+                ["1.3", "Column store and aggregate query"],
+              ],
+            },
+          }
+        end
+      end
     end
   end
 
-  class QueriesTest < self
-    def test_empty
-      assert_search({}, {"queries" => {}})
+  class ReferenceTest < self
+    def setup
+      super
+      restore(fixture_data("reference.grn"))
+      setup_plugin(Droonga::SearchHandler)
     end
-  end
 
-  class HashQueryTest < self
-    def test_string_matchTo
-      request = base_request
-      request["queries"]["sections-result"]["condition"] = {
-        "query" => "Groonga",
-        "matchTo" => "title"
+    def test_reference_to_hash
+      expected = {
+        "sections-result" => {
+          "records" => [
+            {
+              "_key" => "1.1",
+              "document" => "Groonga",
+            },
+            {
+              "_key" => "1.2",
+              "document" => "Groonga",
+            },
+            {
+              "_key" => "1.3",
+              "document" => "Groonga",
+            },
+          ],
+        },
       }
-      assert_search({
-                      "sections-result" => {
-                        "records" => [
-                          { "title" => "Groonga overview" },
-                        ],
-                      },
-                    },
-                    request)
-    end
-
-    def test_array_matchTo
-      request = base_request
-      request["queries"]["sections-result"]["condition"] = {
-        "query" => "Groonga",
-        "matchTo" => ["title"]
-      }
-      assert_search({
-                      "sections-result" => {
-                        "records" => [
-                          { "title" => "Groonga overview" },
-                        ],
-                      },
-                    },
-                    request)
-    end
-
-    def base_request
-      {
+      request = {
         "queries" => {
           "sections-result" => {
-            "source" => "Sections",
+            "source" => "SectionsForHash",
             "output" => {
               "elements" => [
                 "records",
               ],
               "format" => "complex",
-              "limit" => 1,
-              "attributes" => ["title"],
+              "limit" => 3,
+              "attributes" => ["_key", "document"],
             },
           },
         },
       }
-    end
-  end
-
-  class SourceTest < self
-    def test_non_existent
-      assert_raise(Droonga::Searcher::UndefinedSourceError) do
-        search({
-                 "queries" => {
-                   "non-existent-result" => {
-                     "source" => "non-existent",
-                   },
-                 },
-               })
-      end
+      assert_search(expected, request)
     end
 
-    def test_existent
-      assert_search({
-                      "sections-result" => {},
-                    },
-                    {
-                      "queries" => {
-                        "sections-result" => {
-                          "source" => "Sections",
-                          "output" => {},
-                        },
-                      },
-                    })
-    end
-  end
-
-  class OutputTest < self
-    def test_count
-      assert_search({
-                      "sections-result" => {
-                        "count" => 9,
-                      },
-                    },
-                    {
-                      "queries" => {
-                        "sections-result" => {
-                          "source" => "Sections",
-                          "output" => {
-                            "elements" => [
-                              "count",
-                            ],
-                          },
-                        },
-                      },
-                    })
-    end
-
-    def test_elapsed_time
-      assert_search({
-                      "sections-result" => {
-                        "startTime" => start_time,
-                        "elapsedTime" => elapsed_time,
-                      },
-                    },
-                    {
-                      "queries" => {
-                        "sections-result" => {
-                          "source" => "Sections",
-                          "output" => {
-                            "elements" => [
-                              "startTime",
-                              "elapsedTime",
-                            ],
-                          },
-                        },
-                      },
-                    })
-    end
-
-    class AttributesTest < self
-      def test_source_only
-        expected = {
+    def test_reference_to_array
+      expected = {
+        "sections-result" => {
+          "records" => [
+            {
+              "_key" => "1.1",
+              "document" => 1,
+            },
+            {
+              "_key" => "1.2",
+              "document" => 1,
+            },
+            {
+              "_key" => "1.3",
+              "document" => 1,
+            },
+          ],
+        },
+      }
+      request = {
+        "queries" => {
           "sections-result" => {
-            "records" => [
-              {
-                "_key" => "1.1",
-                "title" => "Groonga overview",
-              },
-              {
-                "_key" => "1.2",
-                "title" => "Full text search and Instant update",
-              },
-              {
-                "_key" => "1.3",
-                "title" => "Column store and aggregate query",
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 3,
-                "attributes" => ["_key", "title"],
-              },
+            "source" => "SectionsForArray",
+            "output" => {
+              "elements" => [
+                "records",
+              ],
+              "format" => "complex",
+              "limit" => 3,
+              "attributes" => ["_key", "document"],
             },
           },
-        }
-        assert_search(expected, request)
-      end
-
-      def test_source_only_for_reference_column
-        expected = {
-          "sections-result" => {
-            "records" => [
-              {
-                "_key" => "1.1",
-                "document" => "Groonga",
-              },
-              {
-                "_key" => "1.2",
-                "document" => "Groonga",
-              },
-              {
-                "_key" => "1.3",
-                "document" => "Groonga",
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 3,
-                "attributes" => ["_key", "document"],
-              },
-            },
-          },
-        }
-        assert_search(expected, request)
-      end
-
-      def test_label
-        expected = {
-          "sections-result" => {
-            "records" => [
-              {
-                "key" => "1.1",
-                "title" => "Groonga overview",
-              },
-              {
-                "key" => "1.2",
-                "title" => "Full text search and Instant update",
-              },
-              {
-                "key" => "1.3",
-                "title" => "Column store and aggregate query",
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 3,
-                "attributes" => [
-                  {
-                    "label" => "key",
-                    "source" => "_key",
-                  },
-                  "title",
-                ],
-              },
-            },
-          },
-        }
-        assert_search(expected, request)
-      end
-
-      def test_static_value
-        expected = {
-          "sections-result" => {
-            "records" => [
-              {
-                "single_quote_string" => "string value",
-                "double_quote_string" => "string value",
-                "integer" => 29,
-                "complex_negative_number" => -29.29,
-              },
-              {
-                "single_quote_string" => "string value",
-                "double_quote_string" => "string value",
-                "integer" => 29,
-                "complex_negative_number" => -29.29,
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 2,
-                "attributes" => [
-                  {
-                    "label" => "single_quote_string",
-                    "source" => "'string value'",
-                  },
-                  {
-                    "label" => "double_quote_string",
-                    "source" => '"string value"',
-                  },
-                  {
-                    "label" => "integer",
-                    "source" => "29",
-                  },
-                  {
-                    "label" => "complex_negative_number",
-                    "source" => "-29.29",
-                  },
-                ],
-              },
-            },
-          },
-        }
-        assert_search(expected, request)
-      end
-
-      def test_expression
-        expected = {
-          "sections-result" => {
-            "records" => [
-              {
-                "formatted title" => "<Groonga overview>",
-                "title" => "Groonga overview",
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 1,
-                "attributes" => [
-                  "title",
-                  {
-                    "label" => "formatted title",
-                    "source" => "'<' + title + '>'",
-                  },
-                ],
-              },
-            },
-          },
-        }
-        assert_search(expected, request)
-      end
-
-      def test_snippet_html
-        expected = {
-          "sections-result" => {
-            "records" => [
-              {
-                "title" => "Groonga overview",
-                "snippet" => [
-                  "<span class=\"keyword\">Groonga</span> overview",
-                ],
-              },
-            ],
-          },
-        }
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "condition" => {
-                "query" => "Groonga",
-                "matchTo" => ["title"],
-              },
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 1,
-                "attributes" => [
-                  "title",
-                  {
-                    "label" => "snippet",
-                    "source" => "snippet_html(title)",
-                  },
-                ],
-              },
-            },
-          },
-        }
-        assert_search(expected, request)
-      end
-    end
-
-    class FormatTest < self
-      def test_complex
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "complex",
-                "limit" => 3,
-                "attributes" => ["_key", "title"],
-              },
-            },
-          },
-        }
-        assert_search(complex_result, request)
-      end
-
-      def test_simple
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "format" => "simple",
-                "limit" => 3,
-                "attributes" => ["_key", "title"],
-              },
-            },
-          },
-        }
-        assert_search(simple_result, request)
-      end
-
-      def test_default
-        request = {
-          "queries" => {
-            "sections-result" => {
-              "source" => "Sections",
-              "output" => {
-                "elements" => [
-                  "records",
-                ],
-                "limit" => 3,
-                "attributes" => ["_key", "title"],
-              },
-            },
-          },
-        }
-        assert_search(simple_result, request)
-      end
-
-      def complex_result
-        {
-          "sections-result" => {
-            "records" => [
-              {
-                "_key" => "1.1",
-                "title" => "Groonga overview",
-              },
-              {
-                "_key" => "1.2",
-                "title" => "Full text search and Instant update",
-              },
-              {
-                "_key" => "1.3",
-                "title" => "Column store and aggregate query",
-              },
-            ],
-          },
-        }
-      end
-
-      def simple_result
-        {
-          "sections-result" => {
-            "records" => [
-              ["1.1", "Groonga overview"],
-              ["1.2", "Full text search and Instant update"],
-              ["1.3", "Column store and aggregate query"],
-            ],
-          },
-        }
-      end
+        },
+      }
+      assert_search(expected, request)
     end
   end
 end
