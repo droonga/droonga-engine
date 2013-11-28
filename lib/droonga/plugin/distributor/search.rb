@@ -157,7 +157,8 @@ module Droonga
       [final_offset, final_limit]
     end
 
-    def collect_output_attributes(attributes=[])
+    def collect_output_attributes(attributes)
+      attributes ||= []
       if attributes.is_a?(Hash)
         attributes.keys
       else
@@ -172,7 +173,8 @@ module Droonga
     end
 
     def collect_sort_attributes(attributes, sort_keys)
-      sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
+      sort_keys ||= []
+      sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
       if attributes.is_a?(Hash)
         attributes_hash = attributes
@@ -201,7 +203,8 @@ module Droonga
     end
 
     def sort_reducer(attributes, sort_keys)
-      sort_keys = sort_keys["keys"] if sort_keys.is_a?(Hash)
+      sort_keys ||= []
+      sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
       order = []
 #      unless sort_keys
