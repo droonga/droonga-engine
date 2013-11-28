@@ -1,0 +1,16 @@
+#@include fixture/user-table-array.jsons
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "User",
+    "values": {
+      "name": "Alice",
+      "age": 20,
+      "email": [
+        "alice@example.com",
+        "alice@example.jp"
+      ]
+    }
+  }
+}
