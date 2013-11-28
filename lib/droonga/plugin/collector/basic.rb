@@ -28,18 +28,41 @@ module Droonga
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
         element = output["element"]
-        if element && result[element] && result[element].is_a?(Array)
-          offset = output["offset"] || 0
-          result[element] = result[element][offset..-1]
-
-          limit = output["limit"] || 0
-          unless limit == UNLIMITED
-            result[element] = result[element][0...limit]
-          end
+        if element
+          result[element] = apply_output_range(result[element], output)
+          result[element] = apply_output_format(result[element], output["format"])
         end
         output = output["source"]
       end
       emit(result, output)
+    end
+
+    def apply_output_range(items, output)
+      if items && items.is_a?(Array)
+        offset = output["offset"] || 0
+        items = items[offset..-1]
+
+        limit = output["limit"] || 0
+        unless limit == UNLIMITED
+          items = items[0...limit]
+        end
+      end
+      items
+    end
+
+    def apply_output_format(items, format)
+      attributes = output["attributes"]
+      if format == "complex" && attributes
+        items.collect! do |item|
+          complex_item = {}
+          item.each_with_index do |value, index|
+            label = attributes[index]
+            complex_item[label] = value if label
+          end
+          complex_item
+        end
+      end
+      items
     end
 
     command :collector_reduce

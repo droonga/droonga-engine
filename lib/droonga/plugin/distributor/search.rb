@@ -39,6 +39,10 @@ module Droonga
           "source" => input_name,
         }
 
+        # override the format, because the collector can/should handle only array type records...
+        final_format = output["format"] || "simple"
+        output["format"] = "simple"
+
         final_offset, final_limit = calculate_offset_and_limit!(query)
 
         elements = {}
@@ -50,11 +54,25 @@ module Droonga
             }
           when "records"
             # TODO: must take "sortBy" section into account.
-            elements[element] = sort_reducer(:attributes => query["attributes"],
+            final_attributes = output["attributes"]
+            if final_attributes.is_a?(Hash)
+              final_attributes = final_attributes.keys
+            else
+              final_attributes.collect! do |attribute|
+                if attribute.is_a?(Hash)
+                  attribute["label"] || attribute["source"]
+                else
+                  attribute
+                end
+              end
+            end
+            elements[element] = sort_reducer(:attributes => output["attributes"],
                                              :sort_keys => query["sortBy"])
             output_mapper[output_name]["element"] = element
             output_mapper[output_name]["offset"] = final_offset
             output_mapper[output_name]["limit"] = final_limit
+            output_mapper[output_name]["format"] = final_format
+            output_mapper[output_name]["attributes"] = final_attributes
           end
         end
 
