@@ -22,7 +22,7 @@
             "fixed-string": "Groonga"
           },
           {
-            "section-id: "1.3",
+            "section-id": "1.3",
             "label": "Column store and aggregate query",
             "fixed-number": 29,
             "fixed-string": "Groonga"
