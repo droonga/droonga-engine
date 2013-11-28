@@ -204,6 +204,11 @@ class SearchDistributorTest < Test::Unit::TestCase
           "queries" => {
             "no_output" => {
               "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 0,
+                "limit" => 1,
+              },
             },
           },
         },
@@ -225,6 +230,11 @@ class SearchDistributorTest < Test::Unit::TestCase
           "queries" => {
             "no_records" => {
               "source" => "User",
+              "sortBy" => {
+                "keys" => ["name"],
+                "offset" => 0,
+                "limit" => 1,
+              },
               "output" => {
                 "elements" => ["count"],
               },
