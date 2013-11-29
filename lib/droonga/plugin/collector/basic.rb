@@ -52,7 +52,7 @@ module Droonga
       items
     end
 
-    def apply_output_attribute_and_format(items, output)
+    def apply_output_attributes_and_format(items, output)
       attributes = output["attributes"]
       if attributes
         format = output["format"]
