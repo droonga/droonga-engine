@@ -29,7 +29,7 @@ lib_dir = File.expand_path(File.join(base_dir, "..", "..", "lib"))
 
 drntest_options = []
 drntest_options.concat(["--fluentd-options", "-I#{lib_dir}"])
-drntest_options.concat(["--base", base_dir])
+drntest_options.concat(["--base-path", base_dir])
 drntest_options.concat(ARGV)
 
 run("bundle", "exec", "drntest", *drntest_options)
