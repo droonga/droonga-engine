@@ -66,6 +66,7 @@ module Droonga
             final_attributes = collect_output_attributes(output["attributes"])
             output["attributes"] = format_attributes_to_array_style(output["attributes"])
             output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
+            output["attributes"] << "_key" unless output["attributes"].include?("_key")
  
             elements[element] = sort_reducer(output["attributes"], query["sortBy"])
             # On the reducing phase, we apply only "limit". We cannot apply
@@ -246,11 +247,20 @@ module Droonga
 
     ASCENDING_OPERATOR = "<".freeze
     DESCENDING_OPERATOR = ">".freeze
+    MERGE_ATTRIBUTES = ["_nsubrecs", "_subrecs"]
 
     def sort_reducer(attributes, sort_keys)
       attributes ||= []
       sort_keys ||= []
       sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
+
+      key_column_index = attributes.index("_key")
+      merge_columns = []
+      attributes.each_with_index do |attribute, index|
+        source = attribute
+        source = attribute["source"] if attribute.is_a?(Hash)
+        merge_colums << index if MERGE_ATTRIBUTES.include?(source)
+      end
 
       operators = sort_keys.collect do |sort_key|
         operator = ASCENDING_OPERATOR
@@ -267,6 +277,8 @@ module Droonga
       {
         "type" => "sort",
         "operators" => operators,
+        "key_column" => key_column_index,
+        "merge_columns" => merge_columns,
       }
     end
   end
