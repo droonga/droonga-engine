@@ -8,7 +8,11 @@
     "body": {
       "documents": {
         "count": 9,
-        "records": []
+        "records": [
+          [],
+          [],
+          []
+        ]
       }
     }
   }

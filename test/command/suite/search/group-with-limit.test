@@ -6,11 +6,13 @@
     "queries": {
       "documents": {
         "source": "Sections",
-        "groupBy": "document",
+        "groupBy": "title",
         "output": {
           "elements": [
-            "count"
-          ]
+            "count",
+            "records"
+          ],
+          "limit": 3
         }
       }
     }
