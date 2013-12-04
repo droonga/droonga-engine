@@ -31,8 +31,8 @@ module Droonga
       request = envelope["body"]
       queries = request["queries"]
 
-      queries.each do |input_name, query|
-        if query["groupBy"] && query["output"]
+      queries.each do |name, query|
+        if can_be_unified?(name, queries) && query["output"]
           query["output"]["canUnify"] = true
         end
       end
@@ -129,6 +129,14 @@ module Droonga
 
     private
     UNLIMITED = -1
+
+    def can_be_unified?(name, queries)
+      query = queries[name]
+      return true if query["groupBy"]
+      name = query["source"]
+      return false unless queries.keys.include?(name)
+      can_be_unified?(name, queries)
+    end
 
     def calculate_offset_and_limit!(query)
       rich_sort = query["sortBy"].is_a?(Hash)
