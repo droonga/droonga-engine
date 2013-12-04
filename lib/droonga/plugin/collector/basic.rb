@@ -96,8 +96,7 @@ module Droonga
           reduced_values = merge(values[0][key],
                                  values[1][key],
                                  :operators => deal["operators"],
-                                 :key_column => deal["key_column"],
-                                 :unified_columns => deal["unified_columns"])
+                                 :key_column => deal["key_column"])
         end
 
         reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
@@ -165,11 +164,8 @@ module Droonga
         rest_unified_items.any? do |unified_item|
           if unified_item[key_column_index] == key
             base_item.each_with_index do |value, column|
-              if options[:unified_columns].include?(column)
-                unified_item[column] += value
-              else
-                unified_item[column] ||= value
-              end
+              next if column == key_column_index
+              unified_item[column] += value
             end
             rest_unified_items -= [unified_item]
             true

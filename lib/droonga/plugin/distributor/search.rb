@@ -260,7 +260,6 @@ module Droonga
 
     ASCENDING_OPERATOR = "<".freeze
     DESCENDING_OPERATOR = ">".freeze
-    MERGE_ATTRIBUTES = ["_nsubrecs", "_subrecs"]
 
     def sort_reducer(params={})
       attributes = params[:attributes] || []
@@ -268,12 +267,6 @@ module Droonga
       sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
       key_column_index = attributes.index("_key")
-      unified_columns = []
-      attributes.each_with_index do |attribute, index|
-        source = attribute
-        source = attribute["source"] if attribute.is_a?(Hash)
-        unified_columns << index if MERGE_ATTRIBUTES.include?(source)
-      end
 
       operators = sort_keys.collect do |sort_key|
         operator = ASCENDING_OPERATOR
@@ -293,7 +286,6 @@ module Droonga
       }
       if params[:unify_by_key] && !key_column_index.nil?
         reducer["key_column"] = key_column_index
-        reducer["unified_columns"] = unified_columns unless unified_columns.empty?
       end
       reducer
     end
