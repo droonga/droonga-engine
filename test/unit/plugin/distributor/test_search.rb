@@ -136,27 +136,39 @@ class SearchDistributorTest < Test::Unit::TestCase
         "body" => {
           "query1_reduced" => {
             "output" => "query1",
-            "element" => "records",
-            "offset" => 0,
-            "limit" => 10,
-            "format" => "complex",
-            "attributes" => [],
+            "elements" => {
+              "records" => {
+                "type" => "sort",
+                "offset" => 0,
+                "limit" => 10,
+                "format" => "complex",
+                "attributes" => [],
+              },
+            },
           },
           "query2_reduced" => {
             "output" => "query2",
-            "element" => "records",
-            "offset" => 0,
-            "limit" => 20,
-            "format" => "complex",
-            "attributes" => [],
+            "elements" => {
+              "records" => {
+                "type" => "sort",
+                "offset" => 0,
+                "limit" => 20,
+                "format" => "complex",
+                "attributes" => [],
+              },
+            },
           },
           "query3_reduced" => {
             "output" => "query3",
-            "element" => "records",
-            "offset" => 0,
-            "limit" => 30,
-            "format" => "complex",
-            "attributes" => [],
+            "elements" => {
+              "records" => {
+                "type" => "sort",
+                "offset" => 0,
+                "limit" => 30,
+                "format" => "complex",
+                "attributes" => [],
+              },
+            },
           },
         },
         "inputs" => [
@@ -341,11 +353,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => 1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => 1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 1)
       assert_equal(message, @posted.last.last)
@@ -381,11 +396,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 2,
         },
       })
-      message << gatherer(envelope, :offset => 1,
-                                    :limit => 1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 1,
+                                        :limit => 1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 2)
       assert_equal(message, @posted.last.last)
@@ -424,11 +442,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => 1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => 1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => 1)
       assert_equal(message, @posted.last.last)
@@ -469,11 +490,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => 1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => 1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 1,
                                     :output_offset => 0,
@@ -518,11 +542,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1 + 4 + [2, 8].min,
         },
       })
-      message << gatherer(envelope, :offset => 5,
-                                    :limit => 2,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 5,
+                                        :limit => 2,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 7,
                                     :output_offset => 0,
@@ -567,11 +594,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1 + 4 + 2,
         },
       })
-      message << gatherer(envelope, :offset => 5,
-                                    :limit => 2,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 5,
+                                        :limit => 2,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 7,
                                     :output_offset => 0,
@@ -616,11 +646,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => 1 + 4 + 8,
         },
       })
-      message << gatherer(envelope, :offset => 5,
-                                    :limit => 8,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 5,
+                                        :limit => 8,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => 8,
                                     :output_offset => 0,
@@ -665,11 +698,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 5,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 5,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
@@ -713,11 +749,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
@@ -761,11 +800,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
@@ -814,11 +856,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["id", "name", "age"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["id", "name", "age"],
+                                      ),
+                                    })
       message << searcher(envelope, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
@@ -858,11 +903,59 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["_key", "_nsubrecs"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["_key", "_nsubrecs"],
+                                      ),
+                                    })
+      message << searcher(envelope, :output_offset => 0,
+                                    :output_limit => -1)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_groupBy_count
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "grouped_records" => {
+              "source" => "User",
+              "groupBy" => "family_name",
+              "output" => {
+                "elements" => ["count"],
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "count" => {
+          "type" => "sum",
+        },
+        "records" => {
+          "type" => "sort",
+          "operators" => [],
+          "key_column" => 0,
+          "limit" => -1,
+        },
+      })
+      message << gatherer(envelope, :elements => {
+                                      "count" => count_mapper(
+                                        :drop_elements => ["records"],
+                                      ),
+                                      "records" => records_mapper(
+                                        :limit => -1,
+                                        :attributes => ["_key"],
+                                      ),
+                                    })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => -1)
       assert_equal(message, @posted.last.last)
@@ -908,11 +1001,14 @@ class SearchDistributorTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :offset => 0,
-                                    :limit => -1,
-                                    :element => "records",
-                                    :format => "complex",
-                                    :attributes => ["family_name", "count", "users"])
+      message << gatherer(envelope, :elements => {
+                                      "records" => records_mapper(
+                                        :offset => 0,
+                                        :limit => -1,
+                                        :format => "complex",
+                                        :attributes => ["family_name", "count", "users"],
+                                      ),
+                                    })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => -1,
                                     :extra_attributes => ["_key"])
@@ -938,6 +1034,27 @@ class SearchDistributorTest < Test::Unit::TestCase
       reducer
     end
 
+    def count_mapper(options={})
+      mapper = {
+        "type" => "count",
+        "target" => "records",
+      }
+      if options[:drop_elements]
+        mapper["drop_elements"] = options[:drop_elements]
+      end
+      mapper
+    end
+
+    def records_mapper(options={})
+      {
+        "type" => "sort",
+        "offset" => options[:offset] || 0,
+        "limit" => options[:limit] || 0,
+        "format" => options[:format] || "simple",
+        "attributes" => options[:attributes] || [],
+      }
+    end
+
     def gatherer(search_request_envelope, options={})
       queries = search_request_envelope["body"]["queries"]
       query_name = queries.keys.first
@@ -954,16 +1071,8 @@ class SearchDistributorTest < Test::Unit::TestCase
       unless options[:no_output]
         output = {
           "output" => query_name,
+          "elements" => options[:elements] || {},
         }
-        if options[:element]
-          output.merge!({
-            "element" => options[:element],
-            "offset" => options[:offset] || 0,
-            "limit" => options[:limit] || 0,
-            "format" => options[:format] || "simple",
-            "attributes" => options[:attributes] || [],
-          })
-        end
         gatherer["body"]["#{query_name}_reduced"] = output
         gatherer["inputs"] << "#{query_name}_reduced"
       end
