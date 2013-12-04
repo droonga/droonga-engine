@@ -74,6 +74,7 @@ module Droonga
               "target" => "records",
             }
             unless output["elements"].include?("records")
+              final_limit = -1
               output["elements"] << "records"
               output["attributes"] ||= ["_key"]
               mapper["drop_elements"] = ["records"]
