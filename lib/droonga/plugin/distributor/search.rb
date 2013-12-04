@@ -291,7 +291,7 @@ module Droonga
         "type" => "sort",
         "operators" => operators,
       }
-      if options[:unify_by_key] && !key_column_index.nil?
+      if params[:unify_by_key] && !key_column_index.nil?
         reducer["key_column"] = key_column_index
         reducer["unified_columns"] = unified_columns unless unified_columns.empty?
       end
