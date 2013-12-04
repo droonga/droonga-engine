@@ -40,7 +40,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => ["_key"],
+                "attributes" => [],
                 "offset" => 0,
                 "limit" => 10,
               },
@@ -50,7 +50,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => ["_key"],
+                "attributes" => [],
                 "offset" => 0,
                 "limit" => 20,
               },
@@ -60,7 +60,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => ["_key"],
+                "attributes" => [],
                 "offset" => 0,
                 "limit" => 30,
               },
