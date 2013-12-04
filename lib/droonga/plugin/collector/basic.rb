@@ -108,15 +108,7 @@ module Droonga
     end
 
     def merge(x, y, options={})
-      # Normalize operators at first for optimization.
-      operators = options[:operators] || []
-      operators = operators.collect do |operator|
-        if operator.is_a?(String)
-          { "operator" => operator }
-        else
-          operator
-        end
-      end
+      operators = options[:operators] = normalize_operators(options[:operators])
 
       unify_by_key!(x, y, options)
 
@@ -132,6 +124,17 @@ module Droonga
         index += 1
       end
       return x
+    end
+
+    def normalize_operators(operators)
+      operators ||= []
+      operators.collect do |operator|
+        if operator.is_a?(String)
+          { "operator" => operator }
+        else
+          operator
+        end
+      end
     end
 
     def compare(x, y, operators)
@@ -173,6 +176,14 @@ module Droonga
           else
             false
           end
+        end
+      end
+
+      unified_items.sort! do |a, b|
+        if compare(a, b, options[:operators])
+          -1
+        else
+          1
         end
       end
     end
