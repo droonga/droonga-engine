@@ -855,7 +855,6 @@ class SearchDistributorTest < Test::Unit::TestCase
           "type" => "sort",
           "operators" => [],
           "key_column" => 0,
-          "unified_columns" => [1],
           "limit" => -1,
         },
       })
@@ -906,7 +905,6 @@ class SearchDistributorTest < Test::Unit::TestCase
           "type" => "sort",
           "operators" => [],
           "key_column" => 3, # 0=family_name, 1=_nsubrecs, 2=_subrecs, 3=_keys
-          "unified_columns" => [1, 2],
           "limit" => -1,
         },
       })
