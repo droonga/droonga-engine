@@ -66,9 +66,14 @@ module Droonga
             final_attributes = collect_output_attributes(output["attributes"])
             output["attributes"] = format_attributes_to_array_style(output["attributes"])
             output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
-            output["attributes"] << "_key" unless output["attributes"].include?("_key")
+            unify_by_key = true
+            if unify_by_key && !output["attributes"].include?("_key")
+              output["attributes"] << "_key"
+            end
  
-            elements[element] = sort_reducer(output["attributes"], query["sortBy"])
+            elements[element] = sort_reducer(:attributes => output["attributes"],
+                                             :sort_keys => query["sortBy"],
+                                             :unify_by_key => unify_by_key)
             # On the reducing phase, we apply only "limit". We cannot apply
             # "offset" on this phase because the collecter merges a pair of
             # results step by step even if there are three or more results.
@@ -249,9 +254,9 @@ module Droonga
     DESCENDING_OPERATOR = ">".freeze
     MERGE_ATTRIBUTES = ["_nsubrecs", "_subrecs"]
 
-    def sort_reducer(attributes, sort_keys)
-      attributes ||= []
-      sort_keys ||= []
+    def sort_reducer(params={})
+      attributes = params[:attributes] || []
+      sort_keys = params[:sort_keys] || []
       sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
       key_column_index = attributes.index("_key")
@@ -278,8 +283,10 @@ module Droonga
         "type" => "sort",
         "operators" => operators,
       }
-      reducer["key_column"] = key_column_index unless key_column_index.nil?
-      reducer["unified_columns"] = unified_columns unless unified_columns.empty?
+      if options[:unify_by_key] && !key_column_index.nil?
+        reducer["key_column"] = key_column_index
+        reducer["unified_columns"] = unified_columns unless unified_columns.empty?
+      end
       reducer
     end
   end
