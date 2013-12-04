@@ -179,12 +179,14 @@ module Droonga
         end
       end
 
+      unless rest_unified_items.size == unified_items.size
       unified_items.sort! do |a, b|
         if compare(a, b, options[:operators])
           -1
         else
           1
         end
+      end
       end
     end
   end
