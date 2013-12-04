@@ -1,0 +1,18 @@
+#@include fixture/documents.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "documents": {
+        "source": "Sections",
+        "groupBy": "document",
+        "output": {
+          "elements": [
+            "count"
+          ]
+        }
+      }
+    }
+  }
+}

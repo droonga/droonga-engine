@@ -1,0 +1,14 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 200,
+    "type": "search.result",
+    "body": {
+      "documents": {
+        "count": 1
+      }
+    }
+  }
+]
