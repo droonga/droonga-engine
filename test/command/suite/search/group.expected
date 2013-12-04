@@ -1,0 +1,36 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 200,
+    "type": "search.result",
+    "body": {
+      "Groonga": {
+        "count": 4,
+        "records": [
+          [
+            "Groonga overview"
+          ],
+          [
+            "Groonga library"
+          ],
+          [
+            "Groonga server"
+          ],
+          [
+            "Groonga storage engine"
+          ]
+        ]
+      },
+      "documents": {
+        "count": 1,
+        "records": [
+          [
+            "Groonga"
+          ]
+        ]
+      }
+    }
+  }
+]
