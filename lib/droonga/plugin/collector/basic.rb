@@ -93,7 +93,11 @@ module Droonga
         when "sum"
           reduced_values = values[0][key] + values[1][key]
         when "sort"
-          reduced_values = merge(values[0][key], values[1][key], deal["operators"])
+          reduced_values = merge(values[0][key],
+                                 values[1][key],
+                                 :operators => deal["operators"],
+                                 :key_column => deal["key_column"],
+                                 :merge_columns => deal["merge_columns"])
         end
 
         reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
@@ -103,9 +107,9 @@ module Droonga
       return result
     end
 
-    def merge(x, y, operators)
+    def merge(x, y, options={})
       # Normalize operators at first for optimization.
-      operators ||= []
+      operators = options[:operators] || []
       operators = operators.collect do |operator|
         if operator.is_a?(String)
           { "operator" => operator }
@@ -113,6 +117,8 @@ module Droonga
           operator
         end
       end
+
+      unify_by_key!(x, y, options)
 
       index = 0
       y.each do |_y|
@@ -137,6 +143,38 @@ module Droonga
         return true if _x.__send__(operator, _y)
       end
       return false
+    end
+
+    def unify_by_key!(base_items, unified_items, options={})
+      key_column_index = options[:key_column]
+      return unless key_column_index
+
+      # The unified records must be smaller than the base, because
+      # I sort unified records at last. I want to sort only smaller array.
+      if base_items.size < unified_items.size
+        base_items, unified_items = unified_items, base_items
+      end
+
+      rest_unified_items = unified_items.dup
+
+      base_items.reject! do |base_item|
+        key = base_item[key_column_index]
+        rest_unified_items.any? do |unified_item|
+          if unified_item[key_column_index] == key
+            base_item.each_with_index do |value, column|
+              if options[:merge_columns].include?(column)
+                unified_item[column] += value
+              else
+                unified_item[column] ||= value
+              end
+            end
+            rest_unified_items -= [unified_item]
+            true
+          else
+            false
+          end
+        end
+      end
     end
   end
 end
