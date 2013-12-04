@@ -583,6 +583,15 @@ class BasicCollectorTest < Test::Unit::TestCase
                     create_record("e"),
                   ],
                 ],
+                [
+                  "group3",
+                  30,
+                  [
+                    create_record("A"),
+                    create_record("B"),
+                    create_record("C"),
+                  ],
+                ],
               ],
             },
           },
@@ -626,6 +635,15 @@ class BasicCollectorTest < Test::Unit::TestCase
                 create_record("f"),
               ],
             ],
+            [
+              "group4",
+              50,
+              [
+                create_record("D"),
+                create_record("E"),
+                create_record("F"),
+              ],
+            ],
           ],
         },
         "name" => input_name,
@@ -636,27 +654,45 @@ class BasicCollectorTest < Test::Unit::TestCase
                      {
                        "records" => [
                          [
+                           "group3",
+                           30,
+                           [
+                             create_record("A"),
+                             create_record("B"),
+                             create_record("C"),
+                           ],
+                         ],
+                         [
                            "group1",
                            40,
                            [
-                             create_record(1),
-                             create_record(3),
-                             create_record(5),
                              create_record(2),
                              create_record(4),
                              create_record(6),
+                             create_record(1),
+                             create_record(3),
+                             create_record(5),
+                           ],
+                         ],
+                         [
+                           "group4",
+                           50,
+                           [
+                             create_record("D"),
+                             create_record("E"),
+                             create_record("F"),
                            ],
                          ],
                          [
                            "group2",
                            60,
                            [
-                             create_record("a"),
-                             create_record("c"),
-                             create_record("e"),
                              create_record("b"),
                              create_record("d"),
                              create_record("f"),
+                             create_record("a"),
+                             create_record("c"),
+                             create_record("e"),
                            ],
                          ],
                        ],
