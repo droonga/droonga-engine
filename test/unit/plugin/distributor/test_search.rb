@@ -84,6 +84,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "operators" => [],
+                "key_column" => 0,
                 "limit" => 10,
               },
             },
@@ -103,6 +104,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "operators" => [],
+                "key_column" => 0,
                 "limit" => 20,
               },
             },
@@ -122,6 +124,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "records" => {
                 "type" => "sort",
                 "operators" => [],
+                "key_column" => 0,
                 "limit" => 30,
               },
             },
@@ -338,6 +341,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "operators" => [],
+          "key_column" => 0,
           "limit" => 1,
         },
       })
@@ -378,6 +382,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         "records" => {
           "type" => "sort",
           "operators" => [],
+          "key_column" => 0,
           "limit" => 2,
         },
       })
@@ -421,6 +426,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => 1,
         },
       })
@@ -466,6 +472,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => 1,
         },
       })
@@ -515,6 +522,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => 1 + 4 + [2, 8].min,
         },
       })
@@ -564,6 +572,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => 1 + 4 + 2,
         },
       })
@@ -613,6 +622,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => 1 + 4 + 8,
         },
       })
@@ -662,6 +672,7 @@ class SearchDistributorTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => -1,
         },
       })
@@ -710,6 +721,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             { "column" => 2, "operator" => ">" },
             { "column" => 1, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => -1,
         },
       })
@@ -758,6 +770,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             { "column" => 3, "operator" => ">" },
             { "column" => 4, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => -1,
         },
       })
@@ -811,6 +824,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             { "column" => 3, "operator" => ">" },
             { "column" => 4, "operator" => "<" },
           ],
+          "key_column" => 0,
           "limit" => -1,
         },
       })
