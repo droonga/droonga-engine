@@ -605,7 +605,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                       { "column" => 1, "operator" => "<" },
                     ],
                     "key_column" => 0,
-                    "merge_columns" => [1, 2],
+                    "unified_columns" => [1, 2],
                     "limit" => -1,
                   },
                 },

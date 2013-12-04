@@ -255,11 +255,11 @@ module Droonga
       sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
       key_column_index = attributes.index("_key")
-      merge_columns = []
+      unified_columns = []
       attributes.each_with_index do |attribute, index|
         source = attribute
         source = attribute["source"] if attribute.is_a?(Hash)
-        merge_colums << index if MERGE_ATTRIBUTES.include?(source)
+        unified_columns << index if MERGE_ATTRIBUTES.include?(source)
       end
 
       operators = sort_keys.collect do |sort_key|
@@ -279,7 +279,7 @@ module Droonga
         "operators" => operators,
       }
       reducer["key_column"] = key_column_index unless key_column_index.nil?
-      reducer["merge_columns"] = merge_columns unless merge_columns.empty?
+      reducer["unified_columns"] = unified_columns unless unified_columns.empty?
       reducer
     end
   end
