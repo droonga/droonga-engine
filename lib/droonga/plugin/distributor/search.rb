@@ -32,7 +32,7 @@ module Droonga
       queries = request["queries"]
 
       queries.each do |name, query|
-        if can_be_unified?(name, queries) && query["output"]
+        if unifiable?(name, queries) && query["output"]
           query["output"]["canUnify"] = true
         end
       end
@@ -130,12 +130,12 @@ module Droonga
     private
     UNLIMITED = -1
 
-    def can_be_unified?(name, queries)
+    def unifiable?(name, queries)
       query = queries[name]
       return true if query["groupBy"]
       name = query["source"]
       return false unless queries.keys.include?(name)
-      can_be_unified?(name, queries)
+      unifiable?(name, queries)
     end
 
     def calculate_offset_and_limit!(query)
