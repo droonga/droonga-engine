@@ -827,6 +827,100 @@ class SearchDistributorTest < Test::Unit::TestCase
       assert_equal(message, @posted.last.last)
     end
 
+    def test_groupBy
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "grouped_records" => {
+              "source" => "User",
+              "groupBy" => "family_name",
+              "output" => {
+                "format" => "complex",
+                "elements" => ["records"],
+                "attributes" => ["_key", "_nsubrecs"],
+                "limit" => -1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "records" => {
+          "type" => "sort",
+          "operators" => [],
+          "key_column" => 0,
+          "unified_columns" => [1],
+          "limit" => -1,
+        },
+      })
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => -1,
+                                    :element => "records",
+                                    :format => "complex",
+                                    :attributes => ["_key", "_nsubrecs"])
+      message << searcher(envelope, :output_offset => 0,
+                                    :output_limit => -1)
+      assert_equal(message, @posted.last.last)
+    end
+
+    def test_groupBy_hash
+      envelope = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "grouped_records" => {
+              "source" => "User",
+              "groupBy" => {
+                "key" => "family_name",
+                "maxNSubRecords" => 3,
+              },
+              "output" => {
+                "format" => "complex",
+                "elements" => ["records"],
+                "attributes" => [
+                  { "label" => "family_name", "source" => "_key" },
+                  { "label" => "count", "source" => "_nsubrecs" },
+                  { "label" => "users",
+                    "source" => "_subrecs",
+                    "attributes" => ["name", "age"] },
+                ],
+                "limit" => -1,
+              },
+            },
+          },
+        },
+      }
+
+      @plugin.process("search", envelope)
+
+      message = []
+      message << reducer(envelope, {
+        "records" => {
+          "type" => "sort",
+          "operators" => [],
+          "key_column" => 3, # 0=family_name, 1=_nsubrecs, 2=_subrecs, 3=_keys
+          "unified_columns" => [1, 2],
+          "limit" => -1,
+        },
+      })
+      message << gatherer(envelope, :offset => 0,
+                                    :limit => -1,
+                                    :element => "records",
+                                    :format => "complex",
+                                    :attributes => ["family_name", "count", "users"])
+      message << searcher(envelope, :output_offset => 0,
+                                    :output_limit => -1,
+                                    :extra_attributes => ["_key"])
+      assert_equal(message, @posted.last.last)
+    end
+
     private
     def reducer(search_request_envelope, reducer_body)
       queries = search_request_envelope["body"]["queries"]
