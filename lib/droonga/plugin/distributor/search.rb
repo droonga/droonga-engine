@@ -29,7 +29,18 @@ module Droonga
       output_mapper = {}
 
       request = envelope["body"]
-      request["queries"].each do |input_name, query|
+      queries = request["queries"]
+
+      queries.each do |input_name, query|
+        source = query["source"]
+        if queries.keys.include?(source) &&
+             queries[source]["groupBy"] &&
+             query["output"]
+          query["output"]["canUnify"] = true
+        end
+      end
+
+      queries.each do |input_name, query|
         output = query["output"]
         # Skip reducing phase for a result with no output.
         next unless output
@@ -66,7 +77,7 @@ module Droonga
             final_attributes = collect_output_attributes(output["attributes"])
             output["attributes"] = format_attributes_to_array_style(output["attributes"])
             output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
-            unify_by_key = true
+            unify_by_key = output["canUnify"]
             if unify_by_key && !output["attributes"].include?("_key")
               output["attributes"] << "_key"
             end
