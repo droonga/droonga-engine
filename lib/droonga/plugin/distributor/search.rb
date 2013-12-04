@@ -32,10 +32,7 @@ module Droonga
       queries = request["queries"]
 
       queries.each do |input_name, query|
-        source = query["source"]
-        if queries.keys.include?(source) &&
-             queries[source]["groupBy"] &&
-             query["output"]
+        if query["groupBy"] && query["output"]
           query["output"]["canUnify"] = true
         end
       end
