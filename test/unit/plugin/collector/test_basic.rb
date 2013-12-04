@@ -555,4 +555,115 @@ class BasicCollectorTest < Test::Unit::TestCase
                    @messages.last)
     end
   end
+
+  class MergeTest < self
+    def test_grouped
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => {
+              "records" => [
+                [
+                  "group1",
+                  10,
+                  [
+                    create_record(1),
+                    create_record(3),
+                    create_record(5),
+                  ],
+                ],
+                [
+                  "group2",
+                  20,
+                  [
+                    create_record("a"),
+                    create_record("c"),
+                    create_record("e"),
+                  ],
+                ],
+              ],
+            },
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "records" => {
+                    "type" => "sort",
+                    "operators" => [
+                      { "column" => 1, "operator" => "<" },
+                    ],
+                    "key_column" => 0,
+                    "merge_columns" => [1, 2],
+                    "limit" => -1,
+                  },
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => {
+          "records" => [
+            [
+              "group1",
+              30,
+              [
+                create_record(2),
+                create_record(4),
+                create_record(6),
+              ],
+            ],
+            [
+              "group2",
+              40,
+              [
+                create_record("b"),
+                create_record("d"),
+                create_record("f"),
+              ],
+            ],
+          ],
+        },
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @plugin.process("collector_reduce", request)
+      assert_equal([
+                     {
+                       "records" => [
+                         [
+                           "group1",
+                           40,
+                           [
+                             create_record(1),
+                             create_record(3),
+                             create_record(5),
+                             create_record(2),
+                             create_record(4),
+                             create_record(6),
+                           ],
+                         ],
+                         [
+                           "group2",
+                           60,
+                           [
+                             create_record("a"),
+                             create_record("c"),
+                             create_record("e"),
+                             create_record("b"),
+                             create_record("d"),
+                             create_record("f"),
+                           ],
+                         ],
+                       ],
+                     },
+                     output_name
+                   ],
+                   @messages.last)
+    end
+  end
 end
