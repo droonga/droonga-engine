@@ -59,16 +59,31 @@ module Droonga
         final_offset, final_limit = calculate_offset_and_limit!(query)
 
         elements = {}
-        output["elements"].each do |element|
-          case element
-          when "count"
-            elements[element] = {
+
+        if output["elements"].include?("count")
+            elements["count"] = {
               "type" => "sum",
             }
-          when "records"
-            # Skip reducing phase for a result with no record output.
-            next if final_limit.zero?
+            if output["unifiable"]
+              if query["sortBy"] && query["sortBy"].is_a?(Hash)
+                query["sortBy"]["limit"] = -1
+              end
+              output["limit"] = -1
+              mapper = {
+                "type" => "count",
+                "target" => "records",
+              }
+              unless output["elements"].include?("records")
+                output["elements"] << "records"
+                output["attributes"] ||= ["_key"]
+                mapper["drop_elements"] = ["records"]
+              end
+              output_mapper[output_name]["elements"]["count"] = mapper
+            end
+        end
 
+        # Skip reducing phase for a result with no record output.
+        if output["elements"].include?("records") && !final_limit.zero?
             # Append sort key attributes to the list of output attributes
             # temporarily, for the reducing phase. After all extra columns
             # are removed on the gathering phase.
@@ -80,23 +95,22 @@ module Droonga
               output["attributes"] << "_key"
             end
  
-            elements[element] = sort_reducer(:attributes => output["attributes"],
-                                             :sort_keys => query["sortBy"],
-                                             :unifiable => unifiable)
+            elements["records"] = sort_reducer(:attributes => output["attributes"],
+                                               :sort_keys => query["sortBy"],
+                                               :unifiable => unifiable)
             # On the reducing phase, we apply only "limit". We cannot apply
             # "offset" on this phase because the collecter merges a pair of
             # results step by step even if there are three or more results.
             # Instead, we apply "offset" on the gethering phase.
-            elements[element]["limit"] = output["limit"]
+            elements["records"]["limit"] = output["limit"]
 
-            output_mapper[output_name]["elements"][element] = {
+            output_mapper[output_name]["elements"]["records"] = {
               "type" => "sort",
               "offset" => final_offset,
               "limit" => final_limit,
               "format" => final_format,
               "attributes" => final_attributes,
             }
-          end
         end
 
         reducer = {

@@ -29,11 +29,28 @@ module Droonga
       if output.is_a?(Hash)
         elements = output["elements"]
         if elements && elements.is_a?(Hash)
+          # phase 1: pre-process
           elements.each do |element, mapper|
             case mapper["type"]
+            when "count"
+              result[element] = result[mapper["target"]].size
+              mapper["drop_elements"].each do |drop_element|
+                result.delete(drop_element)
+              end
             when "sort"
-              result[element] = apply_output_range(result[element], mapper)
-              result[element] = apply_output_attributes_and_format(result[element], mapper)
+            end
+          end
+          # phase 2: post-process
+          elements.each do |element, mapper|
+            case mapper["type"]
+            when "count"
+            when "sort"
+              # because "count" type mapper requres all items of the array,
+              # I have to apply "sort" type mapper later.
+              if result[element]
+                result[element] = apply_output_range(result[element], mapper)
+                result[element] = apply_output_attributes_and_format(result[element], mapper)
+              end
             end
           end
         end
