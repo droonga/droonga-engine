@@ -84,9 +84,13 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "offset" => 1,
-          "limit" => 1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "offset" => 1,
+              "limit" => 1,
+            },
+          },
         },
       },
       :offset_and_unlimited_limit => {
@@ -107,9 +111,13 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "offset" => 1,
-          "limit" => -1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "offset" => 1,
+              "limit" => -1,
+            },
+          },
         },
       },
       :attributes => {
@@ -129,9 +137,13 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "attributes" => ["_key", "chapter", "section", "subsection", "paragraph"],
-          "limit" => -1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "attributes" => ["_key", "chapter", "section", "subsection", "paragraph"],
+              "limit" => -1,
+            },
+          },
         },
       },
       :attributes_with_sort_attributes => {
@@ -151,9 +163,13 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "attributes" => ["_key", "chapter", "section"],
-          "limit" => -1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "attributes" => ["_key", "chapter", "section"],
+              "limit" => -1,
+            },
+          },
         },
       },
       :format_simple => {
@@ -173,10 +189,14 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "format" => "simple",
-          "attributes" => ["_key", "chapter", "section"],
-          "limit" => -1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "format" => "simple",
+              "attributes" => ["_key", "chapter", "section"],
+              "limit" => -1,
+            },
+          },
         },
       },
       :format_complex => {
@@ -196,10 +216,14 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-          "element" => "records",
-          "format" => "complex",
-          "attributes" => ["_key", "chapter", "section"],
-          "limit" => -1,
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "format" => "complex",
+              "attributes" => ["_key", "chapter", "section"],
+              "limit" => -1,
+            },
+          },
         },
       },
     )
