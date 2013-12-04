@@ -27,10 +27,15 @@ module Droonga
     def collector_gather(result)
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
-        element = output["element"]
-        if element
-          result[element] = apply_output_range(result[element], output)
-          result[element] = apply_output_attributes_and_format(result[element], output)
+        elements = output["elements"]
+        if elements && elements.is_a?(Hash)
+          elements.each do |element, mapper|
+            case mapper["type"]
+            when "sort"
+              result[element] = apply_output_range(result[element], mapper)
+              result[element] = apply_output_attributes_and_format(result[element], mapper)
+            end
+          end
         end
         output = output["output"]
       end

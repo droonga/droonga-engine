@@ -47,6 +47,7 @@ module Droonga
         output_names << output_name
         output_mapper[output_name] = {
           "output" => input_name,
+          "elements" => {},
         }
 
         # The collector module supports only "simple" format search results.
@@ -88,11 +89,13 @@ module Droonga
             # Instead, we apply "offset" on the gethering phase.
             elements[element]["limit"] = output["limit"]
 
-            output_mapper[output_name]["element"] = element
-            output_mapper[output_name]["offset"] = final_offset
-            output_mapper[output_name]["limit"] = final_limit
-            output_mapper[output_name]["format"] = final_format
-            output_mapper[output_name]["attributes"] = final_attributes
+            output_mapper[output_name]["elements"][element] = {
+              "type" => "sort",
+              "offset" => final_offset,
+              "limit" => final_limit,
+              "format" => final_format,
+              "attributes" => final_attributes,
+            }
           end
         end
 
