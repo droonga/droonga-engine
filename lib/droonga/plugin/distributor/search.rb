@@ -274,12 +274,13 @@ module Droonga
         }
       end
 
-      {
+      reducer = {
         "type" => "sort",
         "operators" => operators,
-        "key_column" => key_column_index,
-        "merge_columns" => merge_columns,
       }
+      reducer["key_column"] = key_column_index unless key_column_index.nil?
+      reducer["merge_columns"] = merge_columns unless merge_columns.empty?
+      reducer
     end
   end
 end
