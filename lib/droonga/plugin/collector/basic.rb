@@ -35,6 +35,7 @@ module Droonga
             when "count"
               result[element] = result[mapper["target"]].size
             when "sort"
+              # do nothing on this phase!
             end
           end
           # phase 2: post-process
@@ -46,6 +47,7 @@ module Droonga
 
             case mapper["type"]
             when "count"
+              # do nothing on this phase!
             when "sort"
               # because "count" type mapper requres all items of the array,
               # I have to apply "sort" type mapper later.
