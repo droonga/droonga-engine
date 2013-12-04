@@ -274,13 +274,13 @@ class BasicCollectorTest < Test::Unit::TestCase
             "count" => {
               "type" => "count",
               "target" => "records",
-              "drop_elements" => ["records"],
             },
             "records" => {
               "type" => "sort",
               "format" => "simple",
               "attributes" => [],
               "limit" => -1,
+              "no_output" => true,
             },
           },
         },

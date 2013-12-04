@@ -59,6 +59,7 @@ module Droonga
         final_offset, final_limit = calculate_offset_and_limit!(query)
 
         elements = {}
+        no_output_records = false
 
         if output["elements"].include?("count")
           elements["count"] = {
@@ -77,7 +78,7 @@ module Droonga
               final_limit = -1
               output["elements"] << "records"
               output["attributes"] ||= ["_key"]
-              mapper["drop_elements"] = ["records"]
+              no_output_records = true
             end
             output_mapper[output_name]["elements"]["count"] = mapper
           end
@@ -105,13 +106,15 @@ module Droonga
           # Instead, we apply "offset" on the gethering phase.
           elements["records"]["limit"] = output["limit"]
 
-          output_mapper[output_name]["elements"]["records"] = {
+          mapper = {
             "type" => "sort",
             "offset" => final_offset,
             "limit" => final_limit,
             "format" => final_format,
             "attributes" => final_attributes,
           }
+          mapper["no_output"] = true if no_output_records
+          output_mapper[output_name]["elements"]["records"] = mapper
         end
 
         reducer = {

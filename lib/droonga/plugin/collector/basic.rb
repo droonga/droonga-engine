@@ -34,16 +34,16 @@ module Droonga
             case mapper["type"]
             when "count"
               result[element] = result[mapper["target"]].size
-              if mapper["drop_elements"]
-                mapper["drop_elements"].each do |drop_element|
-                  result.delete(drop_element)
-                end
-              end
             when "sort"
             end
           end
           # phase 2: post-process
           elements.each do |element, mapper|
+            if mapper["no_output"]
+              result.delete(element)
+              next
+            end
+
             case mapper["type"]
             when "count"
             when "sort"

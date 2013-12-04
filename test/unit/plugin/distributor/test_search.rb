@@ -948,12 +948,11 @@ class SearchDistributorTest < Test::Unit::TestCase
         },
       })
       message << gatherer(envelope, :elements => {
-                                      "count" => count_mapper(
-                                        :drop_elements => ["records"],
-                                      ),
+                                      "count" => count_mapper,
                                       "records" => records_mapper(
                                         :limit => -1,
                                         :attributes => ["_key"],
+                                        :no_output => true,
                                       ),
                                     })
       message << searcher(envelope, :output_offset => 0,
@@ -1039,20 +1038,21 @@ class SearchDistributorTest < Test::Unit::TestCase
         "type" => "count",
         "target" => "records",
       }
-      if options[:drop_elements]
-        mapper["drop_elements"] = options[:drop_elements]
-      end
       mapper
     end
 
     def records_mapper(options={})
-      {
+      mapper = {
         "type" => "sort",
         "offset" => options[:offset] || 0,
         "limit" => options[:limit] || 0,
         "format" => options[:format] || "simple",
         "attributes" => options[:attributes] || [],
       }
+      unless options[:no_output].nil?
+        mapper["no_output"] = options[:no_output]
+      end
+      mapper
     end
 
     def gatherer(search_request_envelope, options={})
