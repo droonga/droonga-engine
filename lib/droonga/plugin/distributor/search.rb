@@ -61,56 +61,56 @@ module Droonga
         elements = {}
 
         if output["elements"].include?("count")
-            elements["count"] = {
-              "type" => "sum",
-            }
-            if output["unifiable"]
-              if query["sortBy"] && query["sortBy"].is_a?(Hash)
-                query["sortBy"]["limit"] = -1
-              end
-              output["limit"] = -1
-              mapper = {
-                "type" => "count",
-                "target" => "records",
-              }
-              unless output["elements"].include?("records")
-                output["elements"] << "records"
-                output["attributes"] ||= ["_key"]
-                mapper["drop_elements"] = ["records"]
-              end
-              output_mapper[output_name]["elements"]["count"] = mapper
+          elements["count"] = {
+            "type" => "sum",
+          }
+          if output["unifiable"]
+            if query["sortBy"] && query["sortBy"].is_a?(Hash)
+              query["sortBy"]["limit"] = -1
             end
+            output["limit"] = -1
+            mapper = {
+              "type" => "count",
+              "target" => "records",
+            }
+            unless output["elements"].include?("records")
+              output["elements"] << "records"
+              output["attributes"] ||= ["_key"]
+              mapper["drop_elements"] = ["records"]
+            end
+            output_mapper[output_name]["elements"]["count"] = mapper
+          end
         end
 
         # Skip reducing phase for a result with no record output.
         if output["elements"].include?("records") && !final_limit.zero?
-            # Append sort key attributes to the list of output attributes
-            # temporarily, for the reducing phase. After all extra columns
-            # are removed on the gathering phase.
-            final_attributes = collect_output_attributes(output["attributes"])
-            output["attributes"] = format_attributes_to_array_style(output["attributes"])
-            output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
-            unifiable = output["unifiable"]
-            if unifiable && !output["attributes"].include?("_key")
-              output["attributes"] << "_key"
-            end
+          # Append sort key attributes to the list of output attributes
+          # temporarily, for the reducing phase. After all extra columns
+          # are removed on the gathering phase.
+          final_attributes = collect_output_attributes(output["attributes"])
+          output["attributes"] = format_attributes_to_array_style(output["attributes"])
+          output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
+          unifiable = output["unifiable"]
+          if unifiable && !output["attributes"].include?("_key")
+            output["attributes"] << "_key"
+          end
  
-            elements["records"] = sort_reducer(:attributes => output["attributes"],
-                                               :sort_keys => query["sortBy"],
-                                               :unifiable => unifiable)
-            # On the reducing phase, we apply only "limit". We cannot apply
-            # "offset" on this phase because the collecter merges a pair of
-            # results step by step even if there are three or more results.
-            # Instead, we apply "offset" on the gethering phase.
-            elements["records"]["limit"] = output["limit"]
+          elements["records"] = sort_reducer(:attributes => output["attributes"],
+                                             :sort_keys => query["sortBy"],
+                                             :unifiable => unifiable)
+          # On the reducing phase, we apply only "limit". We cannot apply
+          # "offset" on this phase because the collecter merges a pair of
+          # results step by step even if there are three or more results.
+          # Instead, we apply "offset" on the gethering phase.
+          elements["records"]["limit"] = output["limit"]
 
-            output_mapper[output_name]["elements"]["records"] = {
-              "type" => "sort",
-              "offset" => final_offset,
-              "limit" => final_limit,
-              "format" => final_format,
-              "attributes" => final_attributes,
-            }
+          output_mapper[output_name]["elements"]["records"] = {
+            "type" => "sort",
+            "offset" => final_offset,
+            "limit" => final_limit,
+            "format" => final_format,
+            "attributes" => final_attributes,
+          }
         end
 
         reducer = {
