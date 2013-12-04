@@ -226,6 +226,65 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
       },
+      :count_with_records => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+            [],
+            [],
+          ],
+        },
+        :source => {
+          "count" => 5,
+          "records" => [
+            [],
+            [],
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "elements" => {
+            "count" => {
+              "type" => "count",
+              "target" => "records",
+            },
+            "records" => {
+              "type" => "sort",
+              "format" => "simple",
+              "attributes" => [],
+              "limit" => -1,
+            },
+          },
+        },
+      },
+      :count_only => {
+        :expected => {
+          "count" => 2,
+        },
+        :source => {
+          "count" => 5,
+          "records" => [
+            [],
+            [],
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "elements" => {
+            "count" => {
+              "type" => "count",
+              "target" => "records",
+              "drop_elements" => ["records"],
+            },
+            "records" => {
+              "type" => "sort",
+              "format" => "simple",
+              "attributes" => [],
+              "limit" => -1,
+            },
+          },
+        },
+      },
     )
     def test_gather(data)
       request = {
