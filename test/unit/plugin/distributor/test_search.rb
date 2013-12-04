@@ -40,7 +40,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 10,
               },
@@ -50,7 +50,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 20,
               },
@@ -60,7 +60,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "complex",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 30,
               },
@@ -182,7 +182,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "simple",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 10,
               },
@@ -192,7 +192,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "simple",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 20,
               },
@@ -202,7 +202,7 @@ class SearchDistributorTest < Test::Unit::TestCase
               "output" => {
                 "format" => "simple",
                 "elements" => ["count", "records"],
-                "attributes" => [],
+                "attributes" => ["_key"],
                 "offset" => 0,
                 "limit" => 30,
               },
@@ -824,7 +824,7 @@ class SearchDistributorTest < Test::Unit::TestCase
             { "column" => 3, "operator" => ">" },
             { "column" => 4, "operator" => "<" },
           ],
-          "key_column" => 0,
+          "key_column" => 5, # 0-2 => hash type, 3-4 => sort keys
           "limit" => -1,
         },
       })
