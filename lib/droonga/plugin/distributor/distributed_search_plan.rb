@@ -193,62 +193,62 @@ module Droonga
       def build_count_mapper_and_reducer!
         return unless @output["elements"].include?("count")
 
-          @reducers["count"] = {
-            "type" => "sum",
-          }
-          if @output["unifiable"]
-            if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
-              @query["sortBy"]["limit"] = -1
-            end
-            @output["limit"] = -1
-            mapper = {
-              "type" => "count",
-              "target" => "records",
-            }
-            unless @output["elements"].include?("records")
-              @records_limit = -1
-              @output["elements"] << "records"
-              @output["attributes"] ||= ["_key"]
-              @output_records = false
-            end
-            @mappers["count"] = mapper
+        @reducers["count"] = {
+          "type" => "sum",
+        }
+        if @output["unifiable"]
+          if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
+            @query["sortBy"]["limit"] = -1
           end
+          @output["limit"] = -1
+          mapper = {
+            "type" => "count",
+            "target" => "records",
+          }
+          unless @output["elements"].include?("records")
+            @records_limit = -1
+            @output["elements"] << "records"
+            @output["attributes"] ||= ["_key"]
+            @output_records = false
+          end
+          @mappers["count"] = mapper
+        end
       end
 
       def build_records_mapper_and_reducer!
         # Skip reducing phase for a result with no record output.
         return if !@output["elements"].include?("records") || @records_limit.zero?
 
-          # Append sort key attributes to the list of output attributes
-          # temporarily, for the reducing phase. After all extra columns
-          # are removed on the gathering phase.
-          final_attributes = collect_output_attributes(@output["attributes"])
-          @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
-          @output["attributes"] += collect_sort_attributes(@output["attributes"], @query["sortBy"])
-          unifiable = @output["unifiable"]
-          if unifiable && !@output["attributes"].include?("_key")
-            @output["attributes"] << "_key"
-          end
+        # Append sort key attributes to the list of output attributes
+        # temporarily, for the reducing phase. After all extra columns
+        # are removed on the gathering phase.
+        final_attributes = collect_output_attributes(@output["attributes"])
+        @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
+        @output["attributes"] += collect_sort_attributes(@output["attributes"], @query["sortBy"])
+        unifiable = @output["unifiable"]
+        if unifiable && !@output["attributes"].include?("_key")
+          @output["attributes"] << "_key"
+        end
 
-          reducer = sort_reducer(:attributes => @output["attributes"],
-                                 :sort_keys => @query["sortBy"],
-                                 :unifiable => unifiable)
-          # On the reducing phase, we apply only "limit". We cannot apply
-          # "offset" on this phase because the collecter merges a pair of
-          # results step by step even if there are three or more results.
-          # Instead, we apply "offset" on the gethering phase.
-          reducer["limit"] = @output["limit"]
-          @reducers["records"] = reducer
+        reducer = sort_reducer(:attributes => @output["attributes"],
+                               :sort_keys => @query["sortBy"],
+                               :unifiable => unifiable)
+        # On the reducing phase, we apply only "limit". We cannot apply
+        # "offset" on this phase because the collecter merges a pair of
+        # results step by step even if there are three or more results.
+        # Instead, we apply "offset" on the gethering phase.
+        reducer["limit"] = @output["limit"]
+        @reducers["records"] = reducer
 
-          mapper = {
-            "type" => "sort",
-            "offset" => @records_offset,
-            "limit" => @records_limit,
-            "format" => @records_format,
-            "attributes" => final_attributes,
-          }
-          mapper["no_output"] = true unless @output_records
-          @mappers["records"] = mapper
+        mapper = {
+          "type" => "sort",
+          "offset" => @records_offset,
+          "limit" => @records_limit,
+          "format" => @records_format,
+          "attributes" => final_attributes,
+        }
+        mapper["no_output"] = true unless @output_records
+        @mappers["records"] = mapper
       end
 
       def format_attributes_to_array_style(attributes)
