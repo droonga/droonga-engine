@@ -37,8 +37,7 @@ module Droonga
 
       @queries.each do |input_name, query|
         # Skip reducing phase for a result with no output.
-        next unless query["output"]
-        @messages << build_reducer(input_name, query)
+        @messages << build_reducer(input_name, query) if query["output"]
       end
 
       gatherer = {
