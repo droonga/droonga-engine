@@ -153,10 +153,6 @@ module Droonga
         # | UNLIMITED  | B            | => | final_offset + B         | final_offset + B        | B           |
         # | A          | UNLIMITED    | => | final_offset + A         | final_offset + A        | A           |
         # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
-        sort_limit = UNLIMITED
-        if rich_sort?
-          sort_limit = @query["sortBy"]["limit"] || UNLIMITED
-        end
         output_limit = @output["limit"] || 0
 
         final_limit = 0
@@ -197,6 +193,14 @@ module Droonga
 
       def output_offset
         @output["offset"] || 0
+      end
+
+      def sort_limit
+        if rich_sort?
+          @query["sortBy"]["limit"] || UNLIMITED
+        else
+          UNLIMITED
+        end
       end
 
       def calculate_output_offset!
