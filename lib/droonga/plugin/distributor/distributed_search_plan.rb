@@ -37,9 +37,51 @@ module Droonga
       ensure_unifiable!
 
       @queries.each do |input_name, query|
-        output = query["output"]
         # Skip reducing phase for a result with no output.
-        next unless output
+        next unless query["output"]
+        @messages << build_reducer(input_name, query)
+      end
+
+      gatherer = {
+        "type" => "gather",
+        "body" => @output_mappers,
+        "inputs" => @output_names, # XXX should be placed in the "body"?
+        "post" => true, # XXX should be placed in the "body"?
+      }
+      @messages << gatherer
+      searcher = {
+        "type" => "broadcast",
+        "command" => "search", # XXX should be placed in the "body"?
+        "dataset" => @source_envelope["dataset"] || @request["dataset"],
+        "body" => @request,
+        "outputs" => @input_names, # XXX should be placed in the "body"?
+        "replica" => "random", # XXX should be placed in the "body"?
+      }
+      @messages.push(searcher)
+    end
+
+    private
+    UNLIMITED = -1
+
+    def ensure_unifiable!(queries=nil)
+      queries ||= @queries
+      queries.each do |name, query|
+        if unifiable?(name, queries) && query["output"]
+          query["output"]["unifiable"] = true
+        end
+      end
+    end
+
+    def unifiable?(name)
+      query = @queries[name]
+      return true if query["groupBy"]
+      name = query["source"]
+      return false unless @queries.keys.include?(name)
+      unifiable?(name)
+    end
+
+    def build_reducer(input_name, query)
+        output = query["output"]
 
         @input_names << input_name
         output_name = input_name + "_reduced"
@@ -116,7 +158,7 @@ module Droonga
           @output_mappers[output_name]["elements"]["records"] = mapper
         end
 
-        reducer = {
+        {
           "type" => "reduce",
           "body" => {
             input_name => {
@@ -126,45 +168,6 @@ module Droonga
           "inputs" => [input_name], # XXX should be placed in the "body"?
           "outputs" => [output_name], # XXX should be placed in the "body"?
         }
-        @messages << reducer
-      end
-
-      gatherer = {
-        "type" => "gather",
-        "body" => @output_mappers,
-        "inputs" => @output_names, # XXX should be placed in the "body"?
-        "post" => true, # XXX should be placed in the "body"?
-      }
-      @messages << gatherer
-      searcher = {
-        "type" => "broadcast",
-        "command" => "search", # XXX should be placed in the "body"?
-        "dataset" => @source_envelope["dataset"] || @request["dataset"],
-        "body" => @request,
-        "outputs" => @input_names, # XXX should be placed in the "body"?
-        "replica" => "random", # XXX should be placed in the "body"?
-      }
-      @messages.push(searcher)
-    end
-
-    private
-    UNLIMITED = -1
-
-    def ensure_unifiable!(queries=nil)
-      queries ||= @queries
-      queries.each do |name, query|
-        if unifiable?(name, queries) && query["output"]
-          query["output"]["unifiable"] = true
-        end
-      end
-    end
-
-    def unifiable?(name)
-      query = @queries[name]
-      return true if query["groupBy"]
-      name = query["source"]
-      return false unless @queries.keys.include?(name)
-      unifiable?(name)
     end
 
     def calculate_offset_and_limit!(query)
