@@ -49,7 +49,7 @@ module Droonga
             when "count"
               # do nothing on this phase!
             when "sort"
-              # because "count" type mapper requres all items of the array,
+              # because "count" type mapper requires all items of the array,
               # I have to apply "sort" type mapper later.
               if result[element]
                 result[element] = apply_output_range(result[element], mapper)
