@@ -148,7 +148,7 @@ module Droonga
         end
 
         output_offset = @output["offset"] || 0
-        @output["offset"] = 0 if have_records?
+        @output["offset"] = 0 if has_records?
 
         final_offset = sort_offset + output_offset
 
@@ -186,7 +186,7 @@ module Droonga
         @records_limit = final_limit
       end
 
-      def have_records?
+      def has_records?
         @output["elements"].include?("records")
       end
 
