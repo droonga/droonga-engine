@@ -32,6 +32,9 @@ module Droonga
       build_messages
     end
 
+    private
+    UNLIMITED = -1
+
     def build_messages
       ensure_unifiable!
 
@@ -56,9 +59,6 @@ module Droonga
       }
       @messages.push(searcher)
     end
-
-    private
-    UNLIMITED = -1
 
     def ensure_unifiable!
       @queries.each do |name, query|
