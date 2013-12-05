@@ -141,6 +141,8 @@ module Droonga
       def calculate_offset_and_limit!
         @original_sort_offset = sort_offset
         @original_output_offset = output_offset
+        @original_sort_limit = sort_limit
+        @original_output_limit = output_limit
 
         calculate_sort_offset!
         calculate_output_offset!
@@ -153,18 +155,12 @@ module Droonga
         # | UNLIMITED  | B            | => | final_offset + B         | final_offset + B        | B           |
         # | A          | UNLIMITED    | => | final_offset + A         | final_offset + A        | A           |
         # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
-        final_limit = 0
-        if sort_limit == UNLIMITED && output_limit == UNLIMITED
-          final_limit = UNLIMITED
+
+        # XXX final_limit and final_offset calculated in many times
+
+        if final_limit == UNLIMITED
           @output["limit"] = UNLIMITED
         else
-          if sort_limit == UNLIMITED
-            final_limit = output_limit
-          elsif output_limit == UNLIMITED
-            final_limit = sort_limit
-          else
-            final_limit = [sort_limit, output_limit].min
-          end
           @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort?
           @output["limit"] = final_offset + final_limit
         end
@@ -211,6 +207,20 @@ module Droonga
 
       def final_offset
         @original_sort_offset + @original_output_offset
+      end
+
+      def final_limit
+        if @original_sort_limit == UNLIMITED && @original_output_limit == UNLIMITED
+          UNLIMITED
+        else
+          if @original_sort_limit == UNLIMITED
+            @original_output_limit
+          elsif @original_output_limit == UNLIMITED
+            @original_sort_limit
+          else
+            [@original_sort_limit, @original_output_limit].min
+          end
+        end
       end
 
       def has_records?
