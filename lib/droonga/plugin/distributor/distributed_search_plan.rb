@@ -78,8 +78,13 @@ module Droonga
 
     def transform_query(input_name, query)
       output = query["output"]
+
       # Skip reducing phase for a result with no output.
-      return unless output
+      if output.nil? or
+           output["elements"].nil? or
+           (output["elements"] - ["count", "recors"]).empty?
+        return
+      end
 
       @input_names << input_name
       output_name = input_name + "_reduced"
