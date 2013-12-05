@@ -140,6 +140,7 @@ module Droonga
 
       def calculate_offset_and_limit!
         @original_sort_offset = sort_offset
+        @original_output_offset = output_offset
 
         calculate_sort_offset!
         calculate_output_offset!
@@ -194,13 +195,16 @@ module Droonga
         end
       end
 
+      def output_offset
+        @output["offset"] || 0
+      end
+
       def calculate_output_offset!
-        @output_offset = @output["offset"] || 0
         @output["offset"] = 0 if has_records?
       end
 
       def final_offset
-        @original_sort_offset + @output_offset
+        @original_sort_offset + @original_output_offset
       end
 
       def has_records?
