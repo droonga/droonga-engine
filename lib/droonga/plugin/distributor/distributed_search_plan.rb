@@ -139,6 +139,8 @@ module Droonga
       end
 
       def calculate_offset_and_limit!
+        @original_sort_offset = sort_offset
+
         calculate_sort_offset!
         calculate_output_offset!
 
@@ -179,10 +181,16 @@ module Droonga
       def calculate_sort_offset!
         # Offset for workers must be zero, because we have to apply "limit" and
         # "offset" on the last gathering phase instead of each reducing phase.
-        @sort_offset = 0
         if rich_sort?
-          @sort_offset = @query["sortBy"]["offset"] || 0
           @query["sortBy"]["offset"] = 0
+        end
+      end
+
+      def sort_offset
+        if rich_sort?
+          @query["sortBy"]["offset"] || 0
+        else
+          0
         end
       end
 
@@ -192,7 +200,7 @@ module Droonga
       end
 
       def final_offset
-        @sort_offset + @output_offset
+        @original_sort_offset + @output_offset
       end
 
       def has_records?
