@@ -84,7 +84,7 @@ module Droonga
       @input_names << input_name
       output_name = input_name + "_reduced"
       @output_names << output_name
-      @output_mappers[output_name] = {
+      mapper = {
         "output" => input_name,
         "elements" => {},
       }
@@ -109,7 +109,7 @@ module Droonga
             query["sortBy"]["limit"] = -1
           end
           output["limit"] = -1
-          mapper = {
+          count_mapper = {
             "type" => "count",
             "target" => "records",
           }
@@ -119,7 +119,7 @@ module Droonga
             output["attributes"] ||= ["_key"]
             no_output_records = true
           end
-          @output_mappers[output_name]["elements"]["count"] = mapper
+          mapper["elements"]["count"] = count_mapper
         end
       end
 
@@ -145,15 +145,15 @@ module Droonga
         # Instead, we apply "offset" on the gethering phase.
         elements["records"]["limit"] = output["limit"]
 
-        mapper = {
+        records_mapper = {
           "type" => "sort",
           "offset" => final_offset,
           "limit" => final_limit,
           "format" => final_format,
           "attributes" => final_attributes,
         }
-        mapper["no_output"] = true if no_output_records
-        @output_mappers[output_name]["elements"]["records"] = mapper
+        records_mapper["no_output"] = true if no_output_records
+        mapper["elements"]["records"] = records_mapper
       end
 
       reducer = {
@@ -167,6 +167,8 @@ module Droonga
         "outputs" => [output_name], # XXX should be placed in the "body"?
       }
       @messages << reducer
+
+      @output_mappers[output_name] = mapper
     end
 
     def calculate_offset_and_limit!(query)
