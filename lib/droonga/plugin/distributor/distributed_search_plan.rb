@@ -229,12 +229,8 @@ module Droonga
         # Append sort key attributes to the list of output attributes
         # temporarily, for the reducing phase. After all extra columns
         # are removed on the gathering phase.
-        final_attributes = collect_output_attributes
-        @output["attributes"] = format_attributes_to_array_style
-        @output["attributes"] += collect_sort_attributes
-        if unifiable? && !@output["attributes"].include?("_key")
-          @output["attributes"] << "_key"
-        end
+        final_attributes = output_attribute_names
+        update_output_attributes!
 
         @reducers["records"] = build_records_reducer
 
@@ -249,7 +245,30 @@ module Droonga
         @mappers["records"] = mapper
       end
 
-      def format_attributes_to_array_style
+      def output_attribute_names
+        attributes = @output["attributes"] || []
+        if attributes.is_a?(Hash)
+          attributes.keys
+        else
+          attributes.collect do |attribute|
+            if attribute.is_a?(Hash)
+              attribute["label"] || attribute["source"]
+            else
+              attribute
+            end
+          end
+        end
+      end
+
+      def update_output_attributes!
+        @output["attributes"] = array_style_attributes
+        @output["attributes"] += sort_attribute_names
+        if unifiable? && !@output["attributes"].include?("_key")
+          @output["attributes"] << "_key"
+        end
+      end
+
+      def array_style_attributes
         attributes = @output["attributes"] || []
         if attributes.is_a?(Hash)
           attributes.keys.collect do |key|
@@ -270,22 +289,7 @@ module Droonga
         end
       end
 
-      def collect_output_attributes
-        attributes = @output["attributes"] || []
-        if attributes.is_a?(Hash)
-          attributes.keys
-        else
-          attributes.collect do |attribute|
-            if attribute.is_a?(Hash)
-              attribute["label"] || attribute["source"]
-            else
-              attribute
-            end
-          end
-        end
-      end
-
-      def collect_source_column_names
+      def source_column_names
         attributes = @output["attributes"] || []
         if attributes.is_a?(Hash)
           attributes_hash = attributes
@@ -305,13 +309,12 @@ module Droonga
         end
       end
 
-      def collect_sort_attributes
-        attributes = collect_source_column_names
-
+      def sort_attribute_names
         sort_attributes = @sort_keys.collect do |key|
           key = key[1..-1] if key[0] == "-"
           key
         end
+        attributes = source_column_names
         sort_attributes.reject! do |attribute|
           attributes.include?(attribute)
         end
