@@ -60,9 +60,8 @@ module Droonga
     private
     UNLIMITED = -1
 
-    def ensure_unifiable!(queries=nil)
-      queries ||= @queries
-      queries.each do |name, query|
+    def ensure_unifiable!
+      @queries.each do |name, query|
         if unifiable?(name) && query["output"]
           query["output"]["unifiable"] = true
         end
