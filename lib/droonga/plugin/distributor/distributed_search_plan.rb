@@ -118,6 +118,7 @@ module Droonga
         @query = query
         @reducers = {}
         @mappers = {}
+        @output_records = true
         transform!
       end
 
@@ -130,9 +131,7 @@ module Droonga
         final_format = output["format"] || "simple"
         output["format"] = "simple"
 
-        final_offset, final_limit = calculate_offset_and_limit!
-
-        no_output_records = false
+        calculate_offset_and_limit!
 
         if output["elements"].include?("count")
           @reducers["count"] = {
@@ -148,17 +147,17 @@ module Droonga
               "target" => "records",
             }
             unless output["elements"].include?("records")
-              final_limit = -1
+              @records_limit = -1
               output["elements"] << "records"
               output["attributes"] ||= ["_key"]
-              no_output_records = true
+              @output_records = false
             end
             @mappers["count"] = count_mapper
           end
         end
 
         # Skip reducing phase for a result with no record output.
-        if output["elements"].include?("records") && !final_limit.zero?
+        if output["elements"].include?("records") && !@records_limit.zero?
           # Append sort key attributes to the list of output attributes
           # temporarily, for the reducing phase. After all extra columns
           # are removed on the gathering phase.
@@ -182,12 +181,12 @@ module Droonga
 
           records_mapper = {
             "type" => "sort",
-            "offset" => final_offset,
-            "limit" => final_limit,
+            "offset" => @records_offset,
+            "limit" => @records_limit,
             "format" => final_format,
             "attributes" => final_attributes,
           }
-          records_mapper["no_output"] = true if no_output_records
+          records_mapper["no_output"] = true unless @output_records
           @mappers["records"] = records_mapper
         end
       end
@@ -245,7 +244,8 @@ module Droonga
           @query["output"]["limit"] = final_offset + final_limit
         end
 
-        [final_offset, final_limit]
+        @records_offset = final_offset
+        @records_limit = final_limit
       end
 
       def format_attributes_to_array_style(attributes)
