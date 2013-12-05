@@ -229,20 +229,14 @@ module Droonga
         # Append sort key attributes to the list of output attributes
         # temporarily, for the reducing phase. After all extra columns
         # are removed on the gathering phase.
-        final_attributes = collect_output_attributes(@output["attributes"])
-        @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
-        @output["attributes"] += collect_sort_attributes(@output["attributes"])
+        final_attributes = collect_output_attributes
+        @output["attributes"] = format_attributes_to_array_style
+        @output["attributes"] += collect_sort_attributes
         if unifiable? && !@output["attributes"].include?("_key")
           @output["attributes"] << "_key"
         end
 
-        reducer = sort_reducer(:attributes => @output["attributes"])
-        # On the reducing phase, we apply only "limit". We cannot apply
-        # "offset" on this phase because the collector merges a pair of
-        # results step by step even if there are three or more results.
-        # Instead, we apply "offset" on the gathering phase.
-        reducer["limit"] = @output["limit"]
-        @reducers["records"] = reducer
+        @reducers["records"] = build_records_reducer
 
         mapper = {
           "type" => "sort",
@@ -255,8 +249,8 @@ module Droonga
         @mappers["records"] = mapper
       end
 
-      def format_attributes_to_array_style(attributes)
-        attributes ||= []
+      def format_attributes_to_array_style
+        attributes = @output["attributes"] || []
         if attributes.is_a?(Hash)
           attributes.keys.collect do |key|
             attribute = attributes[key]
@@ -276,8 +270,8 @@ module Droonga
         end
       end
 
-      def collect_output_attributes(attributes)
-        attributes ||= []
+      def collect_output_attributes
+        attributes = @output["attributes"] || []
         if attributes.is_a?(Hash)
           attributes.keys
         else
@@ -291,8 +285,8 @@ module Droonga
         end
       end
 
-      def collect_source_column_names(attributes)
-        attributes ||= []
+      def collect_source_column_names
+        attributes = @output["attributes"] || []
         if attributes.is_a?(Hash)
           attributes_hash = attributes
           attributes = []
@@ -327,9 +321,8 @@ module Droonga
       ASCENDING_OPERATOR = "<".freeze
       DESCENDING_OPERATOR = ">".freeze
 
-      def sort_reducer(params={})
-        attributes = params[:attributes] || []
-
+      def build_records_reducer
+        attributes = @output["attributes"]
         key_column_index = attributes.index("_key")
 
         operators = @sort_keys.collect do |sort_key|
@@ -351,6 +344,13 @@ module Droonga
         if unifiable? && !key_column_index.nil?
           reducer["key_column"] = key_column_index
         end
+
+        # On the reducing phase, we apply only "limit". We cannot apply
+        # "offset" on this phase because the collector merges a pair of
+        # results step by step even if there are three or more results.
+        # Instead, we apply "offset" on the gathering phase.
+        reducer["limit"] = @output["limit"]
+
         reducer
       end
     end
