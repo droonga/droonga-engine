@@ -77,7 +77,7 @@ module Droonga
       unifiable?(name)
     end
 
-    def build_reducer(input_name, query)
+    def transform_query(input_name, query)
       output = query["output"]
       # Skip reducing phase for a result with no output.
       return unless output
