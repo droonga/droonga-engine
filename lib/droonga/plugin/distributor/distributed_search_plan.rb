@@ -90,10 +90,39 @@ module Droonga
       @input_names << input_name
       output_name = input_name + "_reduced"
       @output_names << output_name
-      mapper = {
-        "output" => input_name,
-        "elements" => {},
+
+      transformer = QueryTransformer.new(query)
+
+      reducer = {
+        "type" => "reduce",
+        "body" => {
+          input_name => {
+            output_name => transformer.reducers,
+          },
+        },
+        "inputs" => [input_name], # XXX should be placed in the "body"?
+        "outputs" => [output_name], # XXX should be placed in the "body"?
       }
+      @messages << reducer
+
+      @output_mappers[output_name] = {
+        "output" => input_name,
+        "elements" => transformer.mappers,
+      }
+    end
+
+    class QueryTransformer
+      attr_reader :reducers, :mappers
+
+      def initialize(query)
+        @query = query
+        @reducers = {}
+        @mappers = {}
+        transform!
+      end
+
+    def transform!
+      output = @query["output"]
 
       # The collector module supports only "simple" format search results.
       # So we have to override the format and restore it on the gathering
@@ -101,18 +130,17 @@ module Droonga
       final_format = output["format"] || "simple"
       output["format"] = "simple"
 
-      final_offset, final_limit = calculate_offset_and_limit!(query)
+      final_offset, final_limit = calculate_offset_and_limit!
 
-      reducers = {}
       no_output_records = false
 
       if output["elements"].include?("count")
-        reducers["count"] = {
+        @reducers["count"] = {
           "type" => "sum",
         }
         if output["unifiable"]
-          if query["sortBy"] && query["sortBy"].is_a?(Hash)
-            query["sortBy"]["limit"] = -1
+          if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
+            @query["sortBy"]["limit"] = -1
           end
           output["limit"] = -1
           count_mapper = {
@@ -125,7 +153,7 @@ module Droonga
             output["attributes"] ||= ["_key"]
             no_output_records = true
           end
-          mapper["elements"]["count"] = count_mapper
+          @mappers["count"] = count_mapper
         end
       end
 
@@ -136,21 +164,21 @@ module Droonga
         # are removed on the gathering phase.
         final_attributes = collect_output_attributes(output["attributes"])
         output["attributes"] = format_attributes_to_array_style(output["attributes"])
-        output["attributes"] += collect_sort_attributes(output["attributes"], query["sortBy"])
+        output["attributes"] += collect_sort_attributes(output["attributes"], @query["sortBy"])
         unifiable = output["unifiable"]
         if unifiable && !output["attributes"].include?("_key")
           output["attributes"] << "_key"
         end
 
         records_reducer = sort_reducer(:attributes => output["attributes"],
-                                       :sort_keys => query["sortBy"],
+                                       :sort_keys => @query["sortBy"],
                                        :unifiable => unifiable)
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collecter merges a pair of
         # results step by step even if there are three or more results.
         # Instead, we apply "offset" on the gethering phase.
-        records_output["limit"] = output["limit"]
-        reducers["records"] = records_reducer
+        records_reducer["limit"] = output["limit"]
+        @reducers["records"] = records_reducer
 
         records_mapper = {
           "type" => "sort",
@@ -160,31 +188,17 @@ module Droonga
           "attributes" => final_attributes,
         }
         records_mapper["no_output"] = true if no_output_records
-        mapper["elements"]["records"] = records_mapper
+        @mappers["records"] = records_mapper
       end
-
-      reducer = {
-        "type" => "reduce",
-        "body" => {
-          input_name => {
-            output_name => reducers,
-          },
-        },
-        "inputs" => [input_name], # XXX should be placed in the "body"?
-        "outputs" => [output_name], # XXX should be placed in the "body"?
-      }
-      @messages << reducer
-
-      @output_mappers[output_name] = mapper
     end
 
-    def calculate_offset_and_limit!(query)
-      rich_sort = query["sortBy"].is_a?(Hash)
+    def calculate_offset_and_limit!
+      rich_sort = @query["sortBy"].is_a?(Hash)
 
       have_records = false
-      if query["output"] &&
-           query["output"]["elements"].is_a?(Array) &&
-           query["output"]["elements"].include?("records")
+      if @query["output"] &&
+           @query["output"]["elements"].is_a?(Array) &&
+           @query["output"]["elements"].include?("records")
         have_records = true
       end
 
@@ -192,12 +206,12 @@ module Droonga
       # "offset" on the last gapthering phase instaed of each reducing phase.
       sort_offset = 0
       if rich_sort
-        sort_offset = query["sortBy"]["offset"] || 0
-        query["sortBy"]["offset"] = 0
+        sort_offset = @query["sortBy"]["offset"] || 0
+        @query["sortBy"]["offset"] = 0
       end
 
-      output_offset = query["output"]["offset"] || 0
-      query["output"]["offset"] = 0 if have_records
+      output_offset = @query["output"]["offset"] || 0
+      @query["output"]["offset"] = 0 if have_records
 
       final_offset = sort_offset + output_offset
 
@@ -211,14 +225,14 @@ module Droonga
       # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
       sort_limit = UNLIMITED
       if rich_sort
-        sort_limit = query["sortBy"]["limit"] || UNLIMITED
+        sort_limit = @query["sortBy"]["limit"] || UNLIMITED
       end
-      output_limit = query["output"]["limit"] || 0
+      output_limit = @query["output"]["limit"] || 0
 
       final_limit = 0
       if sort_limit == UNLIMITED && output_limit == UNLIMITED
         final_limit = UNLIMITED
-        query["output"]["limit"] = UNLIMITED
+        @query["output"]["limit"] = UNLIMITED
       else
         if sort_limit == UNLIMITED
           final_limit = output_limit
@@ -227,8 +241,8 @@ module Droonga
         else
           final_limit = [sort_limit, output_limit].min
         end
-        query["sortBy"]["limit"] = final_offset + final_limit if rich_sort
-        query["output"]["limit"] = final_offset + final_limit
+        @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort
+        @query["output"]["limit"] = final_offset + final_limit
       end
 
       [final_offset, final_limit]
@@ -336,6 +350,7 @@ module Droonga
         reducer["key_column"] = key_column_index
       end
       reducer
+    end
     end
   end
 end
