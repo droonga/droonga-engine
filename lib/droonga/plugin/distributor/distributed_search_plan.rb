@@ -82,7 +82,8 @@ module Droonga
       # Skip reducing phase for a result with no output.
       if output.nil? or
            output["elements"].nil? or
-           (output["elements"] - ["count", "recors"]).empty?
+           (!output["elements"].include?("count") &&
+            !output["elements"].include?("records"))
         return
       end
 
@@ -102,11 +103,11 @@ module Droonga
 
       final_offset, final_limit = calculate_offset_and_limit!(query)
 
-      elements = {}
+      output_elements = {}
       no_output_records = false
 
       if output["elements"].include?("count")
-        elements["count"] = {
+        output_elements["count"] = {
           "type" => "sum",
         }
         if output["unifiable"]
@@ -141,14 +142,14 @@ module Droonga
           output["attributes"] << "_key"
         end
  
-        elements["records"] = sort_reducer(:attributes => output["attributes"],
-                                           :sort_keys => query["sortBy"],
-                                           :unifiable => unifiable)
+        output_elements["records"] = sort_reducer(:attributes => output["attributes"],
+                                                  :sort_keys => query["sortBy"],
+                                                  :unifiable => unifiable)
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collecter merges a pair of
         # results step by step even if there are three or more results.
         # Instead, we apply "offset" on the gethering phase.
-        elements["records"]["limit"] = output["limit"]
+        output_elements["records"]["limit"] = output["limit"]
 
         records_mapper = {
           "type" => "sort",
@@ -165,7 +166,7 @@ module Droonga
         "type" => "reduce",
         "body" => {
           input_name => {
-            output_name => elements,
+            output_name => output_elements,
           },
         },
         "inputs" => [input_name], # XXX should be placed in the "body"?
