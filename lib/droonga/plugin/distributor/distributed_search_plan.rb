@@ -130,6 +130,9 @@ module Droonga
         @records_format = @output["format"] || "simple"
         @output["format"] = "simple"
 
+        @sort_keys = @query["sortBy"] || []
+        @sort_keys = @sort_keys["keys"] || [] if @sort_keys.is_a?(Hash)
+
         calculate_offset_and_limit!
         build_count_mapper_and_reducer!
         build_records_mapper_and_reducer!
@@ -228,13 +231,12 @@ module Droonga
         # are removed on the gathering phase.
         final_attributes = collect_output_attributes(@output["attributes"])
         @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
-        @output["attributes"] += collect_sort_attributes(@output["attributes"], @query["sortBy"])
+        @output["attributes"] += collect_sort_attributes(@output["attributes"])
         if unifiable? && !@output["attributes"].include?("_key")
           @output["attributes"] << "_key"
         end
 
-        reducer = sort_reducer(:attributes => @output["attributes"],
-                               :sort_keys => @query["sortBy"])
+        reducer = sort_reducer(:attributes => @output["attributes"])
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collector merges a pair of
         # results step by step even if there are three or more results.
@@ -309,13 +311,10 @@ module Droonga
         end
       end
 
-      def collect_sort_attributes(attributes, sort_keys)
-        sort_keys ||= []
-        sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
-
+      def collect_sort_attributes(attributes)
         attributes = collect_source_column_names(attributes)
 
-        sort_attributes = sort_keys.collect do |key|
+        sort_attributes = @sort_keys.collect do |key|
           key = key[1..-1] if key[0] == "-"
           key
         end
@@ -330,12 +329,10 @@ module Droonga
 
       def sort_reducer(params={})
         attributes = params[:attributes] || []
-        sort_keys = params[:sort_keys] || []
-        sort_keys = sort_keys["keys"] || [] if sort_keys.is_a?(Hash)
 
         key_column_index = attributes.index("_key")
 
-        operators = sort_keys.collect do |sort_key|
+        operators = @sort_keys.collect do |sort_key|
           operator = ASCENDING_OPERATOR
           if sort_key[0] == "-"
             operator = DESCENDING_OPERATOR
