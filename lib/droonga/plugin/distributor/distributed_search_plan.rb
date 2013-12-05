@@ -146,9 +146,9 @@ module Droonga
                                                   :sort_keys => query["sortBy"],
                                                   :unifiable => unifiable)
         # On the reducing phase, we apply only "limit". We cannot apply
-        # "offset" on this phase because the collecter merges a pair of
+        # "offset" on this phase because the collector merges a pair of
         # results step by step even if there are three or more results.
-        # Instead, we apply "offset" on the gethering phase.
+        # Instead, we apply "offset" on the gathering phase.
         output_elements["records"]["limit"] = output["limit"]
 
         records_mapper = {
@@ -188,7 +188,7 @@ module Droonga
       end
 
       # Offset for workers must be zero, because we have to apply "limit" and
-      # "offset" on the last gapthering phase instaed of each reducing phase.
+      # "offset" on the last gathering phase instead of each reducing phase.
       sort_offset = 0
       if rich_sort
         sort_offset = query["sortBy"]["offset"] || 0
