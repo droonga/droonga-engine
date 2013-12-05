@@ -158,15 +158,15 @@ module Droonga
 
         # XXX final_limit and final_offset calculated in many times
 
+        @records_offset = final_offset
+        @records_limit = final_limit
+
         if final_limit == UNLIMITED
           @output["limit"] = UNLIMITED
         else
           @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort?
           @output["limit"] = final_offset + final_limit
         end
-
-        @records_offset = final_offset
-        @records_limit = final_limit
       end
 
       def calculate_sort_offset!
