@@ -31,11 +31,7 @@ module Droonga
       request = envelope["body"]
       queries = request["queries"]
 
-      queries.each do |name, query|
-        if unifiable?(name, queries) && query["output"]
-          query["output"]["unifiable"] = true
-        end
-      end
+      ensure_unifiable!(queries)
 
       queries.each do |input_name, query|
         output = query["output"]
@@ -129,6 +125,7 @@ module Droonga
         }
         message << reducer
       end
+
       gatherer = {
         "type" => "gather",
         "body" => output_mapper,
@@ -150,6 +147,14 @@ module Droonga
 
     private
     UNLIMITED = -1
+
+    def ensure_unifiable!(queries)
+      queries.each do |name, query|
+        if unifiable?(name, queries) && query["output"]
+          query["output"]["unifiable"] = true
+        end
+      end
+    end
 
     def unifiable?(name, queries)
       query = queries[name]
