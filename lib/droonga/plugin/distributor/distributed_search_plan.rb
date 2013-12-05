@@ -141,7 +141,7 @@ module Droonga
         if unifiable && !output["attributes"].include?("_key")
           output["attributes"] << "_key"
         end
- 
+
         output_elements["records"] = sort_reducer(:attributes => output["attributes"],
                                                   :sort_keys => query["sortBy"],
                                                   :unifiable => unifiable)
@@ -302,7 +302,7 @@ module Droonga
       sort_attributes.reject! do |attribute|
         attributes.include?(attribute)
       end
-      sort_attributes      
+      sort_attributes
     end
 
     ASCENDING_OPERATOR = "<".freeze
