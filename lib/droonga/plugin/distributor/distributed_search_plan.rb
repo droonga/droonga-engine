@@ -65,7 +65,7 @@ module Droonga
     def ensure_unifiable!(queries=nil)
       queries ||= @queries
       queries.each do |name, query|
-        if unifiable?(name, queries) && query["output"]
+        if unifiable?(name) && query["output"]
           query["output"]["unifiable"] = true
         end
       end
