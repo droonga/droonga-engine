@@ -103,11 +103,11 @@ module Droonga
 
       final_offset, final_limit = calculate_offset_and_limit!(query)
 
-      output_elements = {}
+      reducers = {}
       no_output_records = false
 
       if output["elements"].include?("count")
-        output_elements["count"] = {
+        reducers["count"] = {
           "type" => "sum",
         }
         if output["unifiable"]
@@ -141,15 +141,16 @@ module Droonga
         if unifiable && !output["attributes"].include?("_key")
           output["attributes"] << "_key"
         end
- 
-        output_elements["records"] = sort_reducer(:attributes => output["attributes"],
-                                                  :sort_keys => query["sortBy"],
-                                                  :unifiable => unifiable)
+
+        records_reducer = sort_reducer(:attributes => output["attributes"],
+                                       :sort_keys => query["sortBy"],
+                                       :unifiable => unifiable)
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collecter merges a pair of
         # results step by step even if there are three or more results.
         # Instead, we apply "offset" on the gethering phase.
-        output_elements["records"]["limit"] = output["limit"]
+        records_output["limit"] = output["limit"]
+        reducers["records"] = records_reducer
 
         records_mapper = {
           "type" => "sort",
@@ -166,7 +167,7 @@ module Droonga
         "type" => "reduce",
         "body" => {
           input_name => {
-            output_name => output_elements,
+            output_name => reducers,
           },
         },
         "inputs" => [input_name], # XXX should be placed in the "body"?
