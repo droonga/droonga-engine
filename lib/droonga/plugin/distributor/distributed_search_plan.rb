@@ -140,11 +140,9 @@ module Droonga
 
       def calculate_offset_and_limit!
         calculate_sort_offset!
+        calculate_output_offset!
 
-        output_offset = @output["offset"] || 0
-        @output["offset"] = 0 if has_records?
-
-        final_offset = @sort_offset + output_offset
+        final_offset = @sort_offset + @output_offset
 
         # We have to calculate limit based on offset.
         # <A, B = limited integer (0...MAXINT)>
@@ -188,6 +186,11 @@ module Droonga
           @sort_offset = @query["sortBy"]["offset"] || 0
           @query["sortBy"]["offset"] = 0
         end
+      end
+
+      def calculate_output_offset!
+        @output_offset = @output["offset"] || 0
+        @output["offset"] = 0 if has_records?
       end
 
       def has_records?
