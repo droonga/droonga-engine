@@ -36,8 +36,7 @@ module Droonga
       ensure_unifiable!
 
       @queries.each do |input_name, query|
-        # Skip reducing phase for a result with no output.
-        @messages << build_reducer(input_name, query) if query["output"]
+        transform_query(input_name, query)
       end
 
       gatherer = {
@@ -80,6 +79,8 @@ module Droonga
 
     def build_reducer(input_name, query)
       output = query["output"]
+      # Skip reducing phase for a result with no output.
+      return unless output
 
       @input_names << input_name
       output_name = input_name + "_reduced"
@@ -156,7 +157,7 @@ module Droonga
         @output_mappers[output_name]["elements"]["records"] = mapper
       end
 
-      {
+      reducer = {
         "type" => "reduce",
         "body" => {
           input_name => {
@@ -166,6 +167,7 @@ module Droonga
         "inputs" => [input_name], # XXX should be placed in the "body"?
         "outputs" => [output_name], # XXX should be placed in the "body"?
       }
+      @messages << reducer
     end
 
     def calculate_offset_and_limit!(query)
