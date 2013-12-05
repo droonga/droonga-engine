@@ -234,7 +234,7 @@ module Droonga
                                :sort_keys => @query["sortBy"],
                                :unifiable => unifiable)
         # On the reducing phase, we apply only "limit". We cannot apply
-        # "offset" on this phase because the collecter merges a pair of
+        # "offset" on this phase because the collector merges a pair of
         # results step by step even if there are three or more results.
         # Instead, we apply "offset" on the gethering phase.
         reducer["limit"] = @output["limit"]
