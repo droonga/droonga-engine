@@ -139,8 +139,6 @@ module Droonga
       end
 
       def calculate_offset_and_limit!
-        rich_sort = @query["sortBy"].is_a?(Hash)
-
         have_records = false
         if @output["elements"].include?("records")
           have_records = true
@@ -149,7 +147,7 @@ module Droonga
         # Offset for workers must be zero, because we have to apply "limit" and
         # "offset" on the last gathering phase instead of each reducing phase.
         sort_offset = 0
-        if rich_sort
+        if rich_sort?
           sort_offset = @query["sortBy"]["offset"] || 0
           @query["sortBy"]["offset"] = 0
         end
@@ -168,7 +166,7 @@ module Droonga
         # | A          | UNLIMITED    | => | final_offset + A         | final_offset + A        | A           |
         # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
         sort_limit = UNLIMITED
-        if rich_sort
+        if rich_sort?
           sort_limit = @query["sortBy"]["limit"] || UNLIMITED
         end
         output_limit = @output["limit"] || 0
@@ -185,12 +183,16 @@ module Droonga
           else
             final_limit = [sort_limit, output_limit].min
           end
-          @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort
+          @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort?
           @output["limit"] = final_offset + final_limit
         end
 
         @records_offset = final_offset
         @records_limit = final_limit
+      end
+
+      def rich_sort?
+        @query["sortBy"].is_a?(Hash)
       end
 
       def unifiable?
