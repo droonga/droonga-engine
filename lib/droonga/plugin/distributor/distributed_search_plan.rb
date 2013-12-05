@@ -116,6 +116,7 @@ module Droonga
 
       def initialize(query)
         @query = query
+        @output = @query["output"]
         @reducers = {}
         @mappers = {}
         @output_records = true
@@ -123,81 +124,22 @@ module Droonga
       end
 
       def transform!
-        output = @query["output"]
-
         # The collector module supports only "simple" format search results.
         # So we have to override the format and restore it on the gathering
         # phase.
-        final_format = output["format"] || "simple"
-        output["format"] = "simple"
+        @records_format = @output["format"] || "simple"
+        @output["format"] = "simple"
 
         calculate_offset_and_limit!
-
-        if output["elements"].include?("count")
-          @reducers["count"] = {
-            "type" => "sum",
-          }
-          if output["unifiable"]
-            if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
-              @query["sortBy"]["limit"] = -1
-            end
-            output["limit"] = -1
-            count_mapper = {
-              "type" => "count",
-              "target" => "records",
-            }
-            unless output["elements"].include?("records")
-              @records_limit = -1
-              output["elements"] << "records"
-              output["attributes"] ||= ["_key"]
-              @output_records = false
-            end
-            @mappers["count"] = count_mapper
-          end
-        end
-
-        # Skip reducing phase for a result with no record output.
-        if output["elements"].include?("records") && !@records_limit.zero?
-          # Append sort key attributes to the list of output attributes
-          # temporarily, for the reducing phase. After all extra columns
-          # are removed on the gathering phase.
-          final_attributes = collect_output_attributes(output["attributes"])
-          output["attributes"] = format_attributes_to_array_style(output["attributes"])
-          output["attributes"] += collect_sort_attributes(output["attributes"], @query["sortBy"])
-          unifiable = output["unifiable"]
-          if unifiable && !output["attributes"].include?("_key")
-            output["attributes"] << "_key"
-          end
-
-          records_reducer = sort_reducer(:attributes => output["attributes"],
-                                         :sort_keys => @query["sortBy"],
-                                         :unifiable => unifiable)
-          # On the reducing phase, we apply only "limit". We cannot apply
-          # "offset" on this phase because the collecter merges a pair of
-          # results step by step even if there are three or more results.
-          # Instead, we apply "offset" on the gethering phase.
-          records_reducer["limit"] = output["limit"]
-          @reducers["records"] = records_reducer
-
-          records_mapper = {
-            "type" => "sort",
-            "offset" => @records_offset,
-            "limit" => @records_limit,
-            "format" => final_format,
-            "attributes" => final_attributes,
-          }
-          records_mapper["no_output"] = true unless @output_records
-          @mappers["records"] = records_mapper
-        end
+        build_count_mapper_and_reducer!
+        build_records_mapper_and_reducer!
       end
 
       def calculate_offset_and_limit!
         rich_sort = @query["sortBy"].is_a?(Hash)
 
         have_records = false
-        if @query["output"] &&
-             @query["output"]["elements"].is_a?(Array) &&
-             @query["output"]["elements"].include?("records")
+        if @output["elements"].include?("records")
           have_records = true
         end
 
@@ -209,8 +151,8 @@ module Droonga
           @query["sortBy"]["offset"] = 0
         end
 
-        output_offset = @query["output"]["offset"] || 0
-        @query["output"]["offset"] = 0 if have_records
+        output_offset = @output["offset"] || 0
+        @output["offset"] = 0 if have_records
 
         final_offset = sort_offset + output_offset
 
@@ -226,12 +168,12 @@ module Droonga
         if rich_sort
           sort_limit = @query["sortBy"]["limit"] || UNLIMITED
         end
-        output_limit = @query["output"]["limit"] || 0
+        output_limit = @output["limit"] || 0
 
         final_limit = 0
         if sort_limit == UNLIMITED && output_limit == UNLIMITED
           final_limit = UNLIMITED
-          @query["output"]["limit"] = UNLIMITED
+          @output["limit"] = UNLIMITED
         else
           if sort_limit == UNLIMITED
             final_limit = output_limit
@@ -241,11 +183,72 @@ module Droonga
             final_limit = [sort_limit, output_limit].min
           end
           @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort
-          @query["output"]["limit"] = final_offset + final_limit
+          @output["limit"] = final_offset + final_limit
         end
 
         @records_offset = final_offset
         @records_limit = final_limit
+      end
+
+      def build_count_mapper_and_reducer!
+        return unless @output["elements"].include?("count")
+
+          @reducers["count"] = {
+            "type" => "sum",
+          }
+          if @output["unifiable"]
+            if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
+              @query["sortBy"]["limit"] = -1
+            end
+            @output["limit"] = -1
+            mapper = {
+              "type" => "count",
+              "target" => "records",
+            }
+            unless @output["elements"].include?("records")
+              @records_limit = -1
+              @output["elements"] << "records"
+              @output["attributes"] ||= ["_key"]
+              @output_records = false
+            end
+            @mappers["count"] = mapper
+          end
+      end
+
+      def build_records_mapper_and_reducer!
+        # Skip reducing phase for a result with no record output.
+        return if !@output["elements"].include?("records") || @records_limit.zero?
+
+          # Append sort key attributes to the list of output attributes
+          # temporarily, for the reducing phase. After all extra columns
+          # are removed on the gathering phase.
+          final_attributes = collect_output_attributes(@output["attributes"])
+          @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
+          @output["attributes"] += collect_sort_attributes(@output["attributes"], @query["sortBy"])
+          unifiable = @output["unifiable"]
+          if unifiable && !@output["attributes"].include?("_key")
+            @output["attributes"] << "_key"
+          end
+
+          reducer = sort_reducer(:attributes => @output["attributes"],
+                                 :sort_keys => @query["sortBy"],
+                                 :unifiable => unifiable)
+          # On the reducing phase, we apply only "limit". We cannot apply
+          # "offset" on this phase because the collecter merges a pair of
+          # results step by step even if there are three or more results.
+          # Instead, we apply "offset" on the gethering phase.
+          reducer["limit"] = @output["limit"]
+          @reducers["records"] = reducer
+
+          mapper = {
+            "type" => "sort",
+            "offset" => @records_offset,
+            "limit" => @records_limit,
+            "format" => @records_format,
+            "attributes" => final_attributes,
+          }
+          mapper["no_output"] = true unless @output_records
+          @mappers["records"] = mapper
       end
 
       def format_attributes_to_array_style(attributes)
