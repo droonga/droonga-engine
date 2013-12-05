@@ -144,7 +144,7 @@ module Droonga
         end
 
         # Offset for workers must be zero, because we have to apply "limit" and
-        # "offset" on the last gapthering phase instaed of each reducing phase.
+        # "offset" on the last gathering phase instead of each reducing phase.
         sort_offset = 0
         if rich_sort
           sort_offset = @query["sortBy"]["offset"] || 0
@@ -236,7 +236,7 @@ module Droonga
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collector merges a pair of
         # results step by step even if there are three or more results.
-        # Instead, we apply "offset" on the gethering phase.
+        # Instead, we apply "offset" on the gathering phase.
         reducer["limit"] = @output["limit"]
         @reducers["records"] = reducer
 
@@ -320,7 +320,7 @@ module Droonga
         sort_attributes.reject! do |attribute|
           attributes.include?(attribute)
         end
-        sort_attributes      
+        sort_attributes
       end
 
       ASCENDING_OPERATOR = "<".freeze
