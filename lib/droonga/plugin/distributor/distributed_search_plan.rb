@@ -19,26 +19,32 @@ module Droonga
   class DistributedSearchPlan
     attr_reader :messages
 
-    def initialize(envelope)
-      message = []
-      input_names = []
-      output_names = []
-      output_mapper = {}
+    def initialize(search_request_envelope)
+      @source_envelope = search_request_envelope
+      @request = @source_envelope["body"]
+      @queries = @request["queries"]
 
-      request = envelope["body"]
-      queries = request["queries"]
+      @input_names = []
+      @output_names = []
+      @output_mappers = {}
+      @messages = []
 
-      ensure_unifiable!(queries)
+      build_messages
+    end
 
-      queries.each do |input_name, query|
+    def build_messages
+
+      ensure_unifiable!
+
+      @queries.each do |input_name, query|
         output = query["output"]
         # Skip reducing phase for a result with no output.
         next unless output
 
-        input_names << input_name
+        @input_names << input_name
         output_name = input_name + "_reduced"
-        output_names << output_name
-        output_mapper[output_name] = {
+        @output_names << output_name
+        @output_mappers[output_name] = {
           "output" => input_name,
           "elements" => {},
         }
@@ -73,7 +79,7 @@ module Droonga
               output["attributes"] ||= ["_key"]
               no_output_records = true
             end
-            output_mapper[output_name]["elements"]["count"] = mapper
+            @output_mappers[output_name]["elements"]["count"] = mapper
           end
         end
 
@@ -107,7 +113,7 @@ module Droonga
             "attributes" => final_attributes,
           }
           mapper["no_output"] = true if no_output_records
-          output_mapper[output_name]["elements"]["records"] = mapper
+          @output_mappers[output_name]["elements"]["records"] = mapper
         end
 
         reducer = {
@@ -120,33 +126,32 @@ module Droonga
           "inputs" => [input_name], # XXX should be placed in the "body"?
           "outputs" => [output_name], # XXX should be placed in the "body"?
         }
-        message << reducer
+        @messages << reducer
       end
 
       gatherer = {
         "type" => "gather",
-        "body" => output_mapper,
-        "inputs" => output_names, # XXX should be placed in the "body"?
+        "body" => @output_mappers,
+        "inputs" => @output_names, # XXX should be placed in the "body"?
         "post" => true, # XXX should be placed in the "body"?
       }
-      message << gatherer
+      @messages << gatherer
       searcher = {
         "type" => "broadcast",
         "command" => "search", # XXX should be placed in the "body"?
-        "dataset" => envelope["dataset"] || request["dataset"],
-        "body" => request,
-        "outputs" => input_names, # XXX should be placed in the "body"?
+        "dataset" => @source_envelope["dataset"] || @request["dataset"],
+        "body" => @request,
+        "outputs" => @input_names, # XXX should be placed in the "body"?
         "replica" => "random", # XXX should be placed in the "body"?
       }
-      message.push(searcher)
-
-      @messages = message
+      @messages.push(searcher)
     end
 
     private
     UNLIMITED = -1
 
-    def ensure_unifiable!(queries)
+    def ensure_unifiable!(queries=nil)
+      queries ||= @queries
       queries.each do |name, query|
         if unifiable?(name, queries) && query["output"]
           query["output"]["unifiable"] = true
@@ -154,12 +159,12 @@ module Droonga
       end
     end
 
-    def unifiable?(name, queries)
-      query = queries[name]
+    def unifiable?(name)
+      query = @queries[name]
       return true if query["groupBy"]
       name = query["source"]
-      return false unless queries.keys.include?(name)
-      unifiable?(name, queries)
+      return false unless @queries.keys.include?(name)
+      unifiable?(name)
     end
 
     def calculate_offset_and_limit!(query)
