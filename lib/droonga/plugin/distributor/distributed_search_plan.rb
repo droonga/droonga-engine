@@ -305,8 +305,8 @@ module Droonga
         end
       end
 
-      def collect_sort_attributes(attributes)
-        attributes = collect_source_column_names(attributes)
+      def collect_sort_attributes
+        attributes = collect_source_column_names
 
         sort_attributes = @sort_keys.collect do |key|
           key = key[1..-1] if key[0] == "-"
