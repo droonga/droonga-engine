@@ -142,8 +142,6 @@ module Droonga
         calculate_sort_offset!
         calculate_output_offset!
 
-        final_offset = @sort_offset + @output_offset
-
         # We have to calculate limit based on offset.
         # <A, B = limited integer (0...MAXINT)>
         # | sort limit | output limit | => | worker's sort limit      | worker's output limit   | final limit |
@@ -191,6 +189,10 @@ module Droonga
       def calculate_output_offset!
         @output_offset = @output["offset"] || 0
         @output["offset"] = 0 if has_records?
+      end
+
+      def final_offset
+        @sort_offset + @output_offset
       end
 
       def has_records?
