@@ -190,13 +190,17 @@ module Droonga
         @records_limit = final_limit
       end
 
+      def unifiable?
+        @output["unifiable"]
+      end
+
       def build_count_mapper_and_reducer!
         return unless @output["elements"].include?("count")
 
         @reducers["count"] = {
           "type" => "sum",
         }
-        if @output["unifiable"]
+        if unifiable?
           if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
             @query["sortBy"]["limit"] = -1
           end
@@ -225,14 +229,12 @@ module Droonga
         final_attributes = collect_output_attributes(@output["attributes"])
         @output["attributes"] = format_attributes_to_array_style(@output["attributes"])
         @output["attributes"] += collect_sort_attributes(@output["attributes"], @query["sortBy"])
-        unifiable = @output["unifiable"]
-        if unifiable && !@output["attributes"].include?("_key")
+        if unifiable? && !@output["attributes"].include?("_key")
           @output["attributes"] << "_key"
         end
 
         reducer = sort_reducer(:attributes => @output["attributes"],
-                               :sort_keys => @query["sortBy"],
-                               :unifiable => unifiable)
+                               :sort_keys => @query["sortBy"])
         # On the reducing phase, we apply only "limit". We cannot apply
         # "offset" on this phase because the collector merges a pair of
         # results step by step even if there are three or more results.
@@ -349,7 +351,7 @@ module Droonga
           "type" => "sort",
           "operators" => operators,
         }
-        if params[:unifiable] && !key_column_index.nil?
+        if unifiable? && !key_column_index.nil?
           reducer["key_column"] = key_column_index
         end
         reducer
