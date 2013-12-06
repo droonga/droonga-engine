@@ -202,7 +202,7 @@ module Droonga
       end
 
       def calculate_output_offset!
-        @output["offset"] = 0 if has_records?
+        @output["offset"] = 0 if have_records?
       end
 
       def final_offset
@@ -223,7 +223,7 @@ module Droonga
         end
       end
 
-      def has_records?
+      def have_records?
         @output["elements"].include?("records")
       end
 
