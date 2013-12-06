@@ -17,7 +17,7 @@ require "droonga/plugin/distributor/search"
 
 class DistributedSearchPlanTest < Test::Unit::TestCase
   def assert_planned(expected, search_request_envelope)
-    plan = DistributedSearchPlan.new(search_request_envelope)
+    plan = Droonga::DistributedSearchPlan.new(search_request_envelope)
     actual = plan.messages
     assert_equal(expected, actual)
   end
