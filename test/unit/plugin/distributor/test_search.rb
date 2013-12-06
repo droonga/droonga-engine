@@ -28,204 +28,204 @@ class SearchDistributorTest < Test::Unit::TestCase
     teardown_database
   end
 
-    def test_distribute
-      envelope = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "query1" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 10,
-              },
-            },
-            "query2" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 20,
-              },
-            },
-            "query3" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 30,
-              },
-            },
-          },
-        },
-      }
-
-      @plugin.process("search", envelope)
-
-      message = []
-
-      message << {
-        "type" => "reduce",
-        "body" => {
+  def test_distribute
+    envelope = {
+      "type" => "search",
+      "dataset" => "Droonga",
+      "body" => {
+        "queries" => {
           "query1" => {
-            "query1_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 10,
-              },
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 10,
             },
           },
-        },
-        "inputs" => ["query1"],
-        "outputs" => ["query1_reduced"],
-      }
-      message << {
-        "type" => "reduce",
-        "body" => {
           "query2" => {
-            "query2_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 20,
-              },
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 20,
             },
           },
-        },
-        "inputs" => ["query2"],
-        "outputs" => ["query2_reduced"],
-      }
-      message << {
-        "type" => "reduce",
-        "body" => {
           "query3" => {
-            "query3_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 30,
-              },
+            "source" => "User",
+            "output" => {
+              "format" => "complex",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 30,
             },
           },
         },
-        "inputs" => ["query3"],
-        "outputs" => ["query3_reduced"],
-      }
+      },
+    }
 
-      gatherer = {
-        "type" => "gather",
-        "body" => {
+    @plugin.process("search", envelope)
+
+    message = []
+
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query1" => {
           "query1_reduced" => {
-            "output" => "query1",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 10,
-                "format" => "complex",
-                "attributes" => [],
-              },
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "operators" => [],
+              "limit" => 10,
             },
           },
+        },
+      },
+      "inputs" => ["query1"],
+      "outputs" => ["query1_reduced"],
+    }
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query2" => {
           "query2_reduced" => {
-            "output" => "query2",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 20,
-                "format" => "complex",
-                "attributes" => [],
-              },
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "operators" => [],
+              "limit" => 20,
             },
           },
+        },
+      },
+      "inputs" => ["query2"],
+      "outputs" => ["query2_reduced"],
+    }
+    message << {
+      "type" => "reduce",
+      "body" => {
+        "query3" => {
           "query3_reduced" => {
-            "output" => "query3",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 30,
-                "format" => "complex",
-                "attributes" => [],
-              },
+            "count" => {
+              "type" => "sum",
+            },
+            "records" => {
+              "type" => "sort",
+              "operators" => [],
+              "limit" => 30,
             },
           },
         },
-        "inputs" => [
-          "query1_reduced",
-          "query2_reduced",
-          "query3_reduced",
-        ],
-        "post" => true,
-      }
-      message << gatherer
+      },
+      "inputs" => ["query3"],
+      "outputs" => ["query3_reduced"],
+    }
 
-      searcher = {
-        "type" => "broadcast",
-        "command" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "query1" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 10,
-              },
-            },
-            "query2" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 20,
-              },
-            },
-            "query3" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 30,
-              },
+    gatherer = {
+      "type" => "gather",
+      "body" => {
+        "query1_reduced" => {
+          "output" => "query1",
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "offset" => 0,
+              "limit" => 10,
+              "format" => "complex",
+              "attributes" => [],
             },
           },
         },
-        "outputs" => [
-          "query1",
-          "query2",
-          "query3",
-        ],
-        "replica" => "random",
-      }
-      message << searcher
+        "query2_reduced" => {
+          "output" => "query2",
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "offset" => 0,
+              "limit" => 20,
+              "format" => "complex",
+              "attributes" => [],
+            },
+          },
+        },
+        "query3_reduced" => {
+          "output" => "query3",
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "offset" => 0,
+              "limit" => 30,
+              "format" => "complex",
+              "attributes" => [],
+            },
+          },
+        },
+      },
+      "inputs" => [
+        "query1_reduced",
+        "query2_reduced",
+        "query3_reduced",
+      ],
+      "post" => true,
+    }
+    message << gatherer
 
-      assert_equal(message, @posted.last.last)
-    end
+    searcher = {
+      "type" => "broadcast",
+      "command" => "search",
+      "dataset" => "Droonga",
+      "body" => {
+        "queries" => {
+          "query1" => {
+            "source" => "User",
+            "output" => {
+              "format" => "simple",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+          "query2" => {
+            "source" => "User",
+            "output" => {
+              "format" => "simple",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 20,
+            },
+          },
+          "query3" => {
+            "source" => "User",
+            "output" => {
+              "format" => "simple",
+              "elements" => ["count", "records"],
+              "attributes" => [],
+              "offset" => 0,
+              "limit" => 30,
+            },
+          },
+        },
+      },
+      "outputs" => [
+        "query1",
+        "query2",
+        "query3",
+      ],
+      "replica" => "random",
+    }
+    message << searcher
+
+    assert_equal(message, @posted.last.last)
+  end
 end
