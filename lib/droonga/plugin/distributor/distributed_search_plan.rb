@@ -242,9 +242,7 @@ module Droonga
           "type" => "sum",
         }
         if unifiable?
-          if @query["sortBy"] && @query["sortBy"].is_a?(Hash)
-            @query["sortBy"]["limit"] = -1
-          end
+          @query["sortBy"]["limit"] = -1 if @query["sortBy"].is_a?(Hash)
           @output["limit"] = -1
           mapper = {
             "type" => "count",
