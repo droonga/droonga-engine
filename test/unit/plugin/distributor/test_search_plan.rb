@@ -1039,7 +1039,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
     end
 
     def searcher(search_request_envelope, options={})
-      searcher = search_request_envelope.dup
+      searcher = search_request_envelope.clone
 
       queries = searcher["body"]["queries"]
       query_name = queries.keys.first
