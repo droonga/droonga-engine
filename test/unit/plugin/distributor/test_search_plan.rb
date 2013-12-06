@@ -276,7 +276,8 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       })
       message << gatherer(envelope)
-      message << searcher(envelope, :output_limit => 0)
+      message << searcher(envelope, :sort_limit => 0,
+                                    :output_limit => 0)
       assert_planned(message, envelope)
     end
 
@@ -508,6 +509,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       }
 
+      limit = 1 + 4 + [2, 8].min
       message = []
       message << reducer(envelope, {
         "records" => {
@@ -515,7 +517,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
-          "limit" => 1 + 4 + [2, 8].min,
+          "limit" => limit,
         },
       })
       message << gatherer(envelope, :elements => {
@@ -527,9 +529,9 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                       ),
                                     })
       message << searcher(envelope, :sort_offset => 0,
-                                    :sort_limit => 7,
+                                    :sort_limit => limit,
                                     :output_offset => 0,
-                                    :output_limit => 7)
+                                    :output_limit => limit)
       assert_planned(message, envelope)
     end
 
@@ -558,6 +560,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       }
 
+      limit = 1 + 4 + 2
       message = []
       message << reducer(envelope, {
         "records" => {
@@ -565,7 +568,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
-          "limit" => 1 + 4 + 2,
+          "limit" => limit,
         },
       })
       message << gatherer(envelope, :elements => {
@@ -577,9 +580,9 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                       ),
                                     })
       message << searcher(envelope, :sort_offset => 0,
-                                    :sort_limit => 7,
+                                    :sort_limit => limit,
                                     :output_offset => 0,
-                                    :output_limit => 7)
+                                    :output_limit => limit)
       assert_planned(message, envelope)
     end
 
@@ -608,6 +611,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       }
 
+      limit = 1 + 4 + 8
       message = []
       message << reducer(envelope, {
         "records" => {
@@ -615,7 +619,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
-          "limit" => 1 + 4 + 8,
+          "limit" => limit,
         },
       })
       message << gatherer(envelope, :elements => {
@@ -627,9 +631,9 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                       ),
                                     })
       message << searcher(envelope, :sort_offset => 0,
-                                    :sort_limit => 8,
+                                    :sort_limit => limit,
                                     :output_offset => 0,
-                                    :output_limit => 8)
+                                    :output_limit => limit)
       assert_planned(message, envelope)
     end
 
@@ -874,7 +878,8 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                       ),
                                     })
       message << searcher(envelope, :output_offset => 0,
-                                    :output_limit => -1)
+                                    :output_limit => -1,
+                                    :unifiable => true)
       assert_planned(message, envelope)
     end
 
@@ -915,8 +920,10 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                         :no_output => true,
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
-                                    :output_limit => -1)
+      message << searcher(envelope, :output_limit => -1,
+                                    :extra_attributes => ["_key"],
+                                    :extra_elements => ["records"],
+                                    :unifiable => true)
       assert_planned(message, envelope)
     end
 
@@ -968,7 +975,8 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                     })
       message << searcher(envelope, :output_offset => 0,
                                     :output_limit => -1,
-                                    :extra_attributes => ["_key"])
+                                    :extra_attributes => ["_key"],
+                                    :unifiable => true)
       assert_planned(message, envelope)
     end
 
@@ -1046,7 +1054,23 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
       query_name = queries.keys.first
       query = queries.values.first
       if options[:extra_attributes]
-        query["output"]["attributes"] += options[:extra_attributes]
+        attributes = query["output"]["attributes"] || []
+        if attributes.is_a?(Hash)
+          array_attributes = attributes.collect do |label, attribute|
+            case attribute
+            when Hash
+              attribute["label"] = label
+            when String
+              attribute = { "label" => label, "source" => attribute }
+            end
+            attribute
+          end
+          attributes = array_attributes
+        end
+        query["output"]["attributes"] = attributes + options[:extra_attributes]
+      end
+      if options[:extra_elements]
+        query["output"]["elements"] += options[:extra_elements]
       end
       if options[:sort_offset]
         query["sortBy"]["offset"] = options[:sort_offset]
@@ -1060,6 +1084,9 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
       if options[:output_limit]
         query["output"]["limit"] = options[:output_limit]
       end
+
+      query["output"]["format"] = "simple" if query["output"]
+      query["output"]["unifiable"] = true if options[:unifiable]
 
       outputs = []
       outputs << query_name unless options[:no_output]
