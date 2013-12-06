@@ -1039,7 +1039,8 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
     end
 
     def searcher(search_request_envelope, options={})
-      searcher = search_request_envelope.clone
+      # dup and clone don't copy it deeply...
+      searcher = Marshal.load(Marshal.dump(search_request_envelope))
 
       queries = searcher["body"]["queries"]
       query_name = queries.keys.first
