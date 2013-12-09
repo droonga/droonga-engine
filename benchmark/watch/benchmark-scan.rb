@@ -19,11 +19,14 @@ require "benchmark"
 require "fileutils"
 require "optparse"
 require "csv"
+require "fluent/log"
 
 require "groonga"
 
 require "droonga/watcher"
 require File.expand_path(File.join(__FILE__, "..", "..", "utils.rb"))
+
+$log = Fluent::Log.new
 
 class ScanBenchmark
   attr_reader :n_keywords
