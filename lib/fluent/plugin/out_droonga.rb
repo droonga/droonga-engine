@@ -45,7 +45,7 @@ module Fluent
 
     private
     def process_event(tag, record)
-      $log.trace("out_droonga: tag: <#{tag}> caller: <#{caller.first}>")
+      $log.trace("out_droonga: tag: <#{tag}>")
       @engine.process(parse_record(tag, record))
     end
 
