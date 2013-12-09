@@ -66,7 +66,7 @@ class NotifyBenchmark
       message = DroongaBenchmark::MessageCreator.envelope_to_subscribe(WATCHING_KEYWORD)
       message["body"]["subscriber"] += " #{@n_subscribers + index}"
       message["body"]["route"] = @route
-      @client.connection.send_receive(message)
+      @client.connection.send(message, :response => :one)
     end
     @n_subscribers += n_subscribers
   end
