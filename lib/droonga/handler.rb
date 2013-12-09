@@ -126,7 +126,9 @@ module Droonga
       if @component["post"]
         destination = @component["post"]
         destination = envelope["replyTo"] if destination == true
-        post(result, destination)
+        if destination
+          post(result, destination)
+        end
       end
       @descendants.each do |name, dests|
         message = {
