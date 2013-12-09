@@ -35,26 +35,26 @@
           }
         }
       }
-    }
-  },
-  "Watch": {
-    "workers": 2,
-    "plugins": ["search", "groonga", "add", "watch"],
-    "number_of_replicas": 1,
-    "number_of_partitions": 1,
-    "partition_key": "_key",
-    "date_range": "infinity",
-    "ring": {
-      "localhost:23041": {
-        "weight": 50,
-        "partitions": {
-          "2013-09-01": [
-            "localhost:23003/droonga.watch"
-          ]
+    },
+    "Watch": {
+      "workers": 2,
+      "plugins": ["search", "groonga", "add", "watch"],
+      "number_of_replicas": 1,
+      "number_of_partitions": 1,
+      "partition_key": "_key",
+      "date_range": "infinity",
+      "ring": {
+        "localhost:23041": {
+          "weight": 50,
+          "partitions": {
+            "2013-09-01": [
+              "localhost:23003/droonga.watch"
+            ]
+          }
         }
       }
     }
-  }
+  },
   "options": {
     "plugins": ["select"]
   }
