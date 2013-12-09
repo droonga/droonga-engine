@@ -154,7 +154,7 @@ module Droonga
         # | UNLIMITED  | UNLIMITED    | => | UNLIMITED                | UNLIMITED               | UNLIMITED   |
         # | UNLIMITED  | B            | => | final_offset + B         | final_offset + B        | B           |
         # | A          | UNLIMITED    | => | final_offset + A         | final_offset + A        | A           |
-        # | A          | B            | => | final_offset + min(A, B) | final_offset + min(A, B)| min(A, B)   |
+        # | A          | B            | => | final_offset + max(A, B) | final_offset + min(A, B)| min(A, B)   |
 
         # XXX final_limit and final_offset calculated in many times
 
@@ -164,7 +164,9 @@ module Droonga
         if final_limit == UNLIMITED
           @output["limit"] = UNLIMITED
         else
-          @query["sortBy"]["limit"] = final_offset + final_limit if rich_sort?
+          if rich_sort?
+            @query["sortBy"]["limit"] = final_offset + [sort_limit, output_limit].max
+          end
           @output["limit"] = final_offset + final_limit
         end
       end
