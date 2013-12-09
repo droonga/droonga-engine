@@ -45,7 +45,7 @@ module Droonga
     end
 
     def broadcast_all(envelope)
-      distirubte_message = [{
+      distribute_message = [{
         "command"=> envelope["type"],
         "dataset"=> envelope["dataset"],
         "body"=> envelope["body"],
@@ -53,7 +53,7 @@ module Droonga
         "replica"=> "all",
         "post"=> true
       }]
-      post(distirubte_message)
+      post(distribute_message)
     end
   end
 end
