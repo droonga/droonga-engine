@@ -276,7 +276,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       })
       message << gatherer(envelope)
-      message << searcher(envelope, :sort_limit => 0,
+      message << searcher(envelope, :sort_limit => 1,
                                     :output_limit => 0)
       assert_planned(message, envelope)
     end
@@ -509,7 +509,8 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
         },
       }
 
-      limit = 1 + 4 + [2, 8].min
+      sort_limit = 1 + 4 + [2, 8].max
+      output_limit = 1 + 4 + [2, 8].min
       message = []
       message << reducer(envelope, {
         "records" => {
@@ -517,7 +518,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
           "operators" => [
             { "column" => 1, "operator" => "<" },
           ],
-          "limit" => limit,
+          "limit" => output_limit,
         },
       })
       message << gatherer(envelope, :elements => {
@@ -529,9 +530,9 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
                                       ),
                                     })
       message << searcher(envelope, :sort_offset => 0,
-                                    :sort_limit => limit,
+                                    :sort_limit => sort_limit,
                                     :output_offset => 0,
-                                    :output_limit => limit)
+                                    :output_limit => output_limit)
       assert_planned(message, envelope)
     end
 
