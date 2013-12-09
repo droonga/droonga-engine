@@ -1,0 +1,26 @@
+#@include fixture/documents.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "result": {
+        "source": "Sections",
+        "sortBy": {
+          "keys": ["-_key"]
+        },
+        "output": {
+          "elements": [
+            "startTime",
+            "elapsedTime",
+            "count",
+            "attributes",
+            "records"
+          ],
+          "limit": -1,
+          "attributes": ["_key"]
+        }
+      }
+    }
+  }
+}
