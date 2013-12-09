@@ -52,4 +52,6 @@ $LOAD_PATH.unshift(test_dir)
 
 require "helper"
 
+ARGV.unshift("--max-diff-target-string-size=10000")
+
 exit Test::Unit::AutoRunner.run(true, test_dir)
