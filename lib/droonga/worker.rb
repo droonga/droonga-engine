@@ -15,44 +15,35 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/job_queue"
 require "droonga/handler"
+require "droonga/message_receiver"
 
 module Droonga
   module Worker
     def initialize
-      @database_name = config[:database]
-      @queue_name = config[:queue_name] || "DroongaQueue"
+      @handler = Handler.new(config)
+      receiver_socket = config[:message_receiver]
+      @message_receiver = MessageReceiver.new(receiver_socket) do |message|
+        process(message)
+      end
     end
 
     def run
       $log.trace("#{log_tag}: run: start")
-      handler = Handler.new(config)
-      job_queue = JobQueue.open(@database_name, @queue_name)
-      @running = true
-      while @running
-        process(handler, job_queue)
-      end
-      handler.shutdown
-      job_queue.close
+      @message_receiver.run
       $log.trace("#{log_tag}: run: done")
     end
 
     def stop
       $log.trace("#{log_tag}: stop: start")
-      @running = false
+      @message_receiver.stop
       $log.trace("#{log_tag}: stop: done")
     end
 
     private
-    def process(handler, job_queue)
+    def process(envelope)
       $log.trace("#{log_tag}: process: start")
-      envelope = job_queue.pull_message
-      unless envelope
-        $log.trace("#{log_tag}: process: abort: no message")
-        return
-      end
-      handler.process(envelope)
+      @handler.process(envelope)
       $log.trace("#{log_tag}: process: done")
     end
 

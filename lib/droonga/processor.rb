@@ -15,29 +15,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/job_queue"
 require "droonga/handler"
 
 module Droonga
   class Processor
-    def initialize(options={})
+    def initialize(message_pusher, options={})
+      @message_pusher = message_pusher
       @options = options
-      @database_name = @options[:database]
-      @queue_name = @options[:options] || "DroongaQueue"
       @n_workers = @options[:n_workers] || 0
     end
 
     def start
-      Droonga::JobQueue.ensure_schema(@database_name,
-                                      @queue_name)
-      @job_queue = JobQueue.open(@database_name, @queue_name)
       @handler = Handler.new(@options)
     end
 
     def shutdown
       $log.trace("processor: shutdown: start")
       @handler.shutdown
-      @job_queue.close
       $log.trace("processor: shutdown: done")
     end
 
@@ -53,7 +47,7 @@ module Droonga
         if @n_workers.zero? or synchronous
           @handler.process(envelope)
         else
-          @job_queue.push_message(envelope)
+          @message_pusher.push(envelope)
         end
       else
         $log.trace("proessor: process: ignore #{command}")

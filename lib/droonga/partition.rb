@@ -19,6 +19,7 @@ require "serverengine"
 
 require "droonga/server"
 require "droonga/worker"
+require "droonga/message_pusher"
 require "droonga/processor"
 
 module Droonga
@@ -26,18 +27,22 @@ module Droonga
     def initialize(options={})
       @options = options
       @n_workers = @options[:n_workers] || 0
-      @processor = Processor.new(@options)
+      @message_pusher = MessagePusher.new
+      @processor = Processor.new(@message_pusher, @options)
       @supervisor = nil
     end
 
     def start
+      ensure_database
       @processor.start
+      @message_pusher.start
       start_supervisor if @n_workers > 0
     end
 
     def shutdown
       $log.trace("partition: shutdown: start")
       shutdown_supervisor if @supervisor
+      @message_pusher.shutdown
       @processor.shutdown
       $log.trace("partition: shutdown: done")
     end
@@ -49,6 +54,19 @@ module Droonga
     end
 
     private
+    def ensure_database
+      database_path = @options[:database]
+      return if File.exist?(database_path)
+      FileUtils.mkdir_p(File.dirname(database_path))
+      context = Groonga::Context.new
+      begin
+        context.create_database(database_path) do
+        end
+      ensure
+        context.close
+      end
+    end
+
     def start_supervisor
       @supervisor = ServerEngine::Supervisor.new(Server, Worker) do
         force_options = {
@@ -56,7 +74,8 @@ module Droonga
           :workers       => @options[:n_workers],
           :log_level     => $log.level,
           :server_process_name => "Server[#{@options[:database]}] #$0",
-          :worker_process_name => "Worker[#{@options[:database]}] #$0"
+          :worker_process_name => "Worker[#{@options[:database]}] #$0",
+          :message_receiver => @message_pusher.raw_receiver,
         }
         @options.merge(force_options)
       end

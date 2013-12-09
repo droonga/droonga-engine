@@ -15,27 +15,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "coolio"
+
 module Droonga
-  module Server
-    def before_run
-      $log.trace("#{log_tag}: before_run: start")
-      $log.trace("#{log_tag}: before_run: done")
+  class EventLoop
+    def initialize
+      @loop = Coolio::Loop.new
+      @loop_breaker = Coolio::AsyncWatcher.new
+      @loop_breaker.attach(@loop)
     end
 
-    def after_run
-      $log.trace("#{log_tag}: after_run: start")
-      $log.trace("#{log_tag}: after_run: done")
+    def run
+      @loop.run
     end
 
-    def stop(stop_graceful)
-      $log.trace("#{log_tag}: stop: start")
-      super(stop_graceful)
-      $log.trace("#{log_tag}: stop: done")
+    def stop
+      @loop.stop
+      @loop_breaker.signal
     end
 
-    private
-    def log_tag
-      "[#{Process.ppid}][#{Process.pid}] server"
+    def attach(watcher)
+      @loop.attach(watcher)
+      @loop_breaker.signal
     end
   end
 end
