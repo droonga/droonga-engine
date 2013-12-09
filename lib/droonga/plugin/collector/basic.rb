@@ -67,7 +67,7 @@ module Droonga
       if items && items.is_a?(Array)
         offset = output["offset"] || 0
         unless offset.zero?
-          items = items[offset..-1]
+          items = items[offset..-1] || []
         end
 
         limit = output["limit"] || 0
