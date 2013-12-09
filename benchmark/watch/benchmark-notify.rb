@@ -73,7 +73,7 @@ class NotifyBenchmark
 
   def do_feed(target)
     message = DroongaBenchmark::MessageCreator.envelope_to_feed(target)
-    @client.connection.send(message)
+    @client.connection.send(message, :response => :none)
   end
 end
 
