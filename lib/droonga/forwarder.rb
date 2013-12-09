@@ -33,12 +33,12 @@ module Droonga
     end
 
     def forward(envelope, body, destination)
-      $log.trace("#{log_tag}: post: start")
+      $log.trace("#{log_tag}: forward: start")
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
       output(receiver, envelope, body, command, arguments)
-      $log.trace("#{log_tag}: post: done")
+      $log.trace("#{log_tag}: forward: done")
     end
 
     private
