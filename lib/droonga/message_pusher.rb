@@ -38,8 +38,9 @@ module Droonga
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
+      socket_path = @raw_receiver.path
       @raw_receiver.close
-      FileUtils.rm_f(@raw_receiver.path)
+      FileUtils.rm_f(socket_path)
       @loop.stop
       @loop_thread.join
       $log.trace("#{log_tag}: shutdown: done")
