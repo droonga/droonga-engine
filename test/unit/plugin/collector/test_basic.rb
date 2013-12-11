@@ -120,6 +120,32 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
       },
+      :too_large_offset => {
+        :expected => {
+          "count" => 2,
+          "records" => [
+          ],
+        },
+        :source => {
+          "count" => 2,
+          "records" => [
+            create_record(1, 1.1, 1.2),
+            create_record(2, 2.1, 2.2),
+          ],
+        },
+        :mapping => {
+          "output" => "search_result",
+          "elements" => {
+            "records" => {
+              "type" => "sort",
+              "format" => "simple",
+              "attributes" => [],
+              "offset" => 10000,
+              "limit" => -1,
+            },
+          },
+        },
+      },
       :attributes => {
         :expected => {
           "count" => 2,
