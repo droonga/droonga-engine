@@ -35,7 +35,8 @@ module Droonga
     def start
       ensure_database
       @processor.start
-      @message_pusher.start
+      base_path = @options[:database]
+      @message_pusher.start(base_path)
       start_supervisor if @n_workers > 0
     end
 

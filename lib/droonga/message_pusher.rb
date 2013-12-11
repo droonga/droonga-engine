@@ -26,8 +26,11 @@ module Droonga
       @loop = EventLoop.new
     end
 
-    def start
-      @raw_receiver = TCPServer.new("127.0.0.1", 0)
+    def start(base_path)
+      socket_path = "#{base_path}.sock"
+      FileUtils.rm_f(socket_path)
+      @raw_receiver = UNIXServer.new(socket_path)
+      FileUtils.chmod(0600, socket_path)
       @loop_thread = Thread.new do
         @loop.run
       end
@@ -36,6 +39,7 @@ module Droonga
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       @raw_receiver.close
+      FileUtils.rm_f(@raw_receiver.path)
       @loop.stop
       @loop_thread.join
       $log.trace("#{log_tag}: shutdown: done")
@@ -44,8 +48,8 @@ module Droonga
     def push(message)
       $log.trace("#{log_tag}: push: start")
       packed_message = message.to_msgpack
-      _, port, _, ip_address = @raw_receiver.addr
-      sender = Coolio::TCPSocket.connect(ip_address, port)
+      path = @raw_receiver.path
+      sender = Coolio::UNIXSocket.connect(path)
       sender.write(message.to_msgpack)
       sender.on_write_complete do
         close
