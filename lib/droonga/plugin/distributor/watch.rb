@@ -35,5 +35,10 @@ module Droonga
     def unsubscribe(envelope)
       broadcast_all(envelope)
     end
+
+    command "watch.sweep" => :sweep
+    def sweep(envelope)
+      broadcast_all(envelope)
+    end
   end
 end
