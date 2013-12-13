@@ -36,13 +36,17 @@ module Droonga
       @local = Regexp.new("^#{@name}")
       @adapter = Adapter.new(self,
                              :adapters => Droonga.catalog.option("plugins"))
-      @forwarder = Forwarder.new
+      @loop = EventLoop.new
+      @forwarder = Forwarder.new(@loop)
       @distributor = Distributor.new(self, @options)
     end
 
     def start
       @forwarder.start
       @farm.start
+      @loop_thread = Thread.new do
+        @loop.run
+      end
     end
 
     def shutdown
@@ -50,6 +54,8 @@ module Droonga
       @distributor.shutdown
       @adapter.shutdown
       @farm.shutdown
+      @loop.stop
+      @loop_thread.join
     end
 
     def add_route(route)

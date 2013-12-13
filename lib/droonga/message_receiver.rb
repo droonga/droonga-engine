@@ -17,27 +17,25 @@
 
 require "msgpack"
 
-require "droonga/event_loop"
-
 module Droonga
   class MessageReceiver
-    def initialize(receiver, &callback)
-      @loop = EventLoop.new
+    def initialize(loop, receiver, &callback)
+      @loop = loop
       @receiver = Coolio::Server.new(receiver, Coolio::Socket) do |connection|
         setup_receive_handler(connection)
       end
-      @loop.attach(@receiver)
       @callback = callback
     end
 
-    def run
-      @loop.run
+    def start
+      $log.trace("#{log_tag}: start: start")
+      @loop.attach(@receiver)
+      $log.trace("#{log_tag}: start: done")
     end
 
-    def stop
+    def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       @receiver.close
-      @loop.stop
       $log.trace("#{log_tag}: shutdown: done")
     end
 

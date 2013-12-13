@@ -15,13 +15,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "fluent-logger"
-require "fluent/logger/fluent_logger"
+require "droonga/event_loop"
+require "droonga/fluent_message_sender"
 
 module Droonga
   class Forwarder
-    def initialize
-      @outputs = {}
+    def initialize(loop)
+      @loop = loop
+      @senders = {}
     end
 
     def start
@@ -31,8 +32,8 @@ module Droonga
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      @outputs.each do |dest, output|
-        output[:logger].close if output[:logger]
+      @senders.each_value do |sender|
+        sender.shutdown
       end
       $log.trace("#{log_tag}: shutdown: done")
     end
@@ -62,9 +63,9 @@ module Droonga
       port = $2
       tag  = $3
       params = $4
-      output = get_output(host, port, params)
-      unless output
-        $log.trace("#{log_tag}: output: abort: no output",
+      sender = find_sender(host, port, params)
+      unless sender
+        $log.trace("#{log_tag}: output: abort: no sender",
                    :host   => host,
                    :port   => port,
                    :params => params)
@@ -87,40 +88,33 @@ module Droonga
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       $log.trace("#{log_tag}: output: post: start: #{log_info}")
-      output.post(output_tag, message)
+      sender.send(output_tag, message)
       $log.trace("#{log_tag}: output: post: done: #{log_info}")
       $log.trace("#{log_tag}: output: done")
     end
 
-    def get_output(host, port, params)
-      host_port = "#{host}:#{port}"
-      @outputs[host_port] ||= {}
-      output = @outputs[host_port]
+    def find_sender(host, port, params)
+      connection_id = extract_connection_id(params)
+      destination = "#{host}:#{port}"
+      destination << "?#{connection_id}" if connection_id
 
-      has_connection_id = (not params.nil? \
-                           and params =~ /[\?&;]connection_id=([^&;]+)/)
-      if output[:logger].nil? or has_connection_id
-        connection_id = $1
-        if not has_connection_id or output[:connection_id] != connection_id
-          output[:connection_id] = connection_id
-          logger = create_logger(:host => host, :port => port.to_i)
-          # output[:logger] should be closed if it exists beforehand?
-          output[:logger] = logger
-        end
-      end
-
-      has_client_session_id = (not params.nil? \
-                               and params =~ /[\?&;]client_session_id=([^&;]+)/)
-      if has_client_session_id
-        client_session_id = $1
-        # some generic way to handle client_session_id is expected
-      end
-
-      output[:logger]
+      @senders[destination] ||= create_sender(host, port)
     end
 
-    def create_logger(options)
-      Fluent::Logger::FluentLogger.new(nil, options)
+    def extract_connection_id(params)
+      return nil unless params
+
+      if /[\?&;]connection_id=([^&;]+)/ =~ params
+        $1
+      else
+        nil
+      end
+    end
+
+    def create_sender(host, port)
+      sender = FluentMessageSender.new(@loop, host, port)
+      sender.start
+      sender
     end
 
     def log_tag

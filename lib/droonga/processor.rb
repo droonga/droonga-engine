@@ -19,14 +19,15 @@ require "droonga/handler"
 
 module Droonga
   class Processor
-    def initialize(message_pusher, options={})
+    def initialize(loop, message_pusher, options={})
+      @loop = loop
       @message_pusher = message_pusher
       @options = options
       @n_workers = @options[:n_workers] || 0
     end
 
     def start
-      @handler = Handler.new(@options)
+      @handler = Handler.new(@loop, @options)
       @handler.start
     end
 

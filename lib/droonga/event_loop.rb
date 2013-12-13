@@ -31,11 +31,15 @@ module Droonga
 
     def stop
       @loop.stop
-      @loop_breaker.signal
+      break_current_loop
     end
 
     def attach(watcher)
       @loop.attach(watcher)
+      break_current_loop
+    end
+
+    def break_current_loop
       @loop_breaker.signal
     end
   end

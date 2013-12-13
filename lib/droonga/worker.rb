@@ -15,15 +15,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/event_loop"
 require "droonga/handler"
 require "droonga/message_receiver"
 
 module Droonga
   module Worker
     def initialize
-      @handler = Handler.new(config)
+      @loop = EventLoop.new
+      @handler = Handler.new(@loop, config)
       receiver_socket = config[:message_receiver]
-      @message_receiver = MessageReceiver.new(receiver_socket) do |message|
+      @message_receiver = MessageReceiver.new(@loop, receiver_socket) do |message|
         process(message)
       end
     end
@@ -31,14 +33,16 @@ module Droonga
     def run
       $log.trace("#{log_tag}: run: start")
       @handler.start
-      @message_receiver.run
+      @message_receiver.start
+      @loop.run
       @handler.shutdown
       $log.trace("#{log_tag}: run: done")
     end
 
     def stop
       $log.trace("#{log_tag}: stop: start")
-      @message_receiver.stop
+      @message_receiver.shutdown
+      @loop.stop
       $log.trace("#{log_tag}: stop: done")
     end
 

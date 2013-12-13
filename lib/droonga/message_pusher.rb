@@ -17,13 +17,11 @@
 
 require "msgpack"
 
-require "droonga/event_loop"
-
 module Droonga
   class MessagePusher
     attr_reader :raw_receiver
-    def initialize
-      @loop = EventLoop.new
+    def initialize(loop)
+      @loop = loop
     end
 
     def start(base_path)
@@ -31,9 +29,6 @@ module Droonga
       FileUtils.rm_f(socket_path)
       @raw_receiver = UNIXServer.new(socket_path)
       FileUtils.chmod(0600, socket_path)
-      @loop_thread = Thread.new do
-        @loop.run
-      end
     end
 
     def shutdown
@@ -41,8 +36,6 @@ module Droonga
       socket_path = @raw_receiver.path
       @raw_receiver.close
       FileUtils.rm_f(socket_path)
-      @loop.stop
-      @loop_thread.join
       $log.trace("#{log_tag}: shutdown: done")
     end
 

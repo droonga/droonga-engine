@@ -27,7 +27,8 @@ module Droonga
 
     attr_reader :context, :envelope, :name
 
-    def initialize(options={})
+    def initialize(loop, options={})
+      @loop = loop
       @options = options
       @name = options[:name]
       @database_name = options[:database]
@@ -98,7 +99,7 @@ module Droonga
         @database = @context.open_database(@database_name)
       end
       load_plugins(@options[:handlers] || [])
-      @forwarder = Forwarder.new
+      @forwarder = Forwarder.new(@loop)
     end
 
     def instantiate_plugin(name)
