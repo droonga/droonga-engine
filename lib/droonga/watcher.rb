@@ -99,6 +99,7 @@ module Droonga
       targets.each do |key, target|
         scan_body(hits, target)
       end
+      hits.uniq! # hits may be duplicated if multiple targets are matched
 
       publish(hits, request, &block)
     end
