@@ -1,0 +1,9 @@
+{
+  "type": "watch.unsubscribe",
+  "dataset": "Watch",
+  "body": {
+    "condition": "condition",
+    "subscriber": "subscriber",
+    "route": "localhost:23003/output"
+  }
+}
