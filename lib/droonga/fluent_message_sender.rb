@@ -23,7 +23,6 @@ module Droonga
       @loop = loop
       @host = host
       @port = port
-      @shutdown = false
     end
 
     def start
@@ -34,7 +33,6 @@ module Droonga
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      @shutdown = true
       @socket.close unless @socket.closed?
       $log.trace("#{log_tag}: shutdown: done")
     end
