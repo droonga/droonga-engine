@@ -30,7 +30,9 @@ module Droonga
 
     def run
       $log.trace("#{log_tag}: run: start")
+      @handler.start
       @message_receiver.run
+      @handler.shutdown
       $log.trace("#{log_tag}: run: done")
     end
 

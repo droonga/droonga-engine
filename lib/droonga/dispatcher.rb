@@ -41,6 +41,7 @@ module Droonga
     end
 
     def start
+      @forwarder.start
       @farm.start
     end
 

@@ -27,6 +27,7 @@ module Droonga
 
     def start
       @handler = Handler.new(@options)
+      @handler.start
     end
 
     def shutdown

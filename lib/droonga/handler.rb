@@ -34,6 +34,12 @@ module Droonga
       prepare
     end
 
+    def start
+      $log.trace("#{log_tag}: start: start")
+      @forwarder.start
+      $log.trace("#{log_tag}: start: done")
+    end
+
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       super

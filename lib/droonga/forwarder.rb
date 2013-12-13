@@ -24,6 +24,11 @@ module Droonga
       @outputs = {}
     end
 
+    def start
+      $log.trace("#{log_tag}: start: start")
+      $log.trace("#{log_tag}: start: done")
+    end
+
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
       @outputs.each do |dest, output|
