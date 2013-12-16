@@ -42,7 +42,7 @@ class MessagePackPackerTest < Test::Unit::TestCase
 
   private
   def pack(object)
-    Droonga::MessagePackPacker.to_msgpack(object)
+    Droonga::MessagePackPacker.pack(object)
   end
 
   def unpack(msgpack)

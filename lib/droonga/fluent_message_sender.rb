@@ -41,7 +41,7 @@ module Droonga
     def send(tag, data)
       $log.trace("#{log_tag}: send: start")
       connect if @socket.closed?
-      fluent_message = MessagePackPacker.to_msgpack(
+      fluent_message = MessagePackPacker.pack(
         [tag, Time.now.to_i, data]
       )
       @socket.write(fluent_message)
