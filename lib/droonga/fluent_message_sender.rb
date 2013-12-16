@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "cool.io"
+require "droonga/message_pack_packer"
 
 module Droonga
   class FluentMessageSender
@@ -40,7 +41,9 @@ module Droonga
     def send(tag, data)
       $log.trace("#{log_tag}: send: start")
       connect if @socket.closed?
-      fluent_message = [tag, Time.now.to_i, data].to_msgpack
+      fluent_message = MessagePackPacker.to_msgpack(
+        [tag, Time.now.to_i, data]
+      )
       @socket.write(fluent_message)
       @loop.break_current_loop
       $log.trace("#{log_tag}: send: done")

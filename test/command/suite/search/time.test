@@ -1,0 +1,24 @@
+#@include fixture/event.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "result": {
+        "source": "Event",
+        "sortBy": ["_key"],
+        "output": {
+          "elements": [
+            "startTime",
+            "elapsedTime",
+            "count",
+            "attributes",
+            "records"
+          ],
+          "limit": -1,
+          "attributes": ["_key", "start"]
+        }
+      }
+    }
+  }
+}

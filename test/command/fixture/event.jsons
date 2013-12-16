@@ -1,0 +1,41 @@
+#@disable-logging
+{
+  "type": "table_create",
+  "dataset": "Droonga",
+  "body": {
+    "name"  : "Event",
+    "flags" : "TABLE_HASH_KEY"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "Event",
+    "name"  : "start",
+    "type"  : "Time"
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Event",
+    "key": "Groonga Night 3",
+    "values": {
+      "start": 1354183200
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Event",
+    "key": "Groonga Night 4",
+    "values": {
+      "start": "2013-11-29T08:00:00Z"
+    }
+  }
+}
+#@enable-logging
