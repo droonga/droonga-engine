@@ -16,17 +16,36 @@
 require "droonga/message_pack_packer"
 
 class MessagePackPackerTest < Test::Unit::TestCase
-  def test_to_msgpack
-    src = [
-      11,
-      29,
-      Time.parse("2013-11-29T08:00:00Z"),
-      "Groonga",
-      {"key" => "value"}
-    ]
-    actual = Droonga::MessagePackPacker.to_msgpack(src)
-    expected = "\x95\v\x1D\xB42013-11-29T08:00:00Z\xA7Groonga\x81\xA3key\xA5value".force_encoding("ASCII-8BIT")
+  def test_integer
+    assert_equal(29, unpack(pack(29)))
+  end
 
-    assert_equal(expected, actual)
+  def test_string
+    assert_equal("Droonga", unpack(pack("Droonga")))
+  end
+
+  def test_time
+    w3c_dtf_time = "2013-11-29T08:00:00Z"
+    time = Time.parse(w3c_dtf_time)
+    assert_equal(w3c_dtf_time, unpack(pack(time)))
+  end
+
+  def test_hash
+    hash = {"key" => "value"}
+    assert_equal(hash, unpack(pack(hash)))
+  end
+
+  def test_array
+    array = ["Groonga", "Rroonga", "Droonga"]
+    assert_equal(array, unpack(pack(array)))
+  end
+
+  private
+  def pack(object)
+    Droonga::MessagePackPacker.to_msgpack(object)
+  end
+
+  def unpack(msgpack)
+    MessagePack.unpack(msgpack)
   end
 end
