@@ -1093,7 +1093,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
       outputs << query_name unless options[:no_output]
 
       searcher["type"] = "broadcast"
-      searcher["command"] = "search"    
+      searcher["command"] = "search"
       searcher["outputs"] = outputs
       searcher["replica"] = "random"
       searcher
