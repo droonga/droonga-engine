@@ -22,7 +22,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
     assert_equal(expected, actual)
   end
 
-  class MultipleQueriesTest < DistributedSearchPlanTest
+  class MultipleQueriesTest < self
     def test_distribute
       envelope = {
         "type" => "search",
@@ -223,7 +223,7 @@ class DistributedSearchPlanTest < Test::Unit::TestCase
     end
   end
 
-  class SingleQueryTest < DistributedSearchPlanTest
+  class SingleQueryTest < self
     def test_no_output
       envelope = {
         "type" => "search",
