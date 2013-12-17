@@ -17,6 +17,7 @@
 
 require "droonga/pluggable"
 require "droonga/distributor_plugin"
+require "droonga/distribution_planner"
 
 module Droonga
   class Distributor
@@ -31,7 +32,14 @@ module Droonga
     end
 
     def distribute(message)
-      @dispatcher.handle_incoming_message(message)
+      id = @dispatcher.generate_id
+      planner = DistributionPlanner.new(@dispatcher, message)
+      destinations = planner.resolve(id)
+      components = planner.components
+      dispatch_message = { "id" => id, "components" => components }
+      destinations.each do |destination, frequency|
+        @dispatcher.dispatch(dispatch_message, destination)
+      end
     end
 
     private

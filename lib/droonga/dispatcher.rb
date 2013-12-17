@@ -116,21 +116,8 @@ module Droonga
 
     def handle(message, arguments)
       case message
-      when Array
-        handle_incoming_message(message)
       when Hash
         handle_internal_message(message)
-      end
-    end
-
-    def handle_incoming_message(message)
-      id = generate_id
-      planner = Planner.new(self, message)
-      destinations = planner.resolve(id)
-      components = planner.components
-      message = { "id" => id, "components" => components }
-      destinations.each do |destination, frequency|
-        dispatch(message, destination)
       end
     end
 
@@ -214,62 +201,10 @@ module Droonga
 
     class Planner
       attr_reader :components
-      class UndefinedInputError < StandardError
-        attr_reader :input
-        def initialize(input)
-          @input = input
-          super("undefined input assigned: <#{input}>")
-        end
-      end
 
-      class CyclicComponentsError < StandardError
-        attr_reader :components
-        def initialize(components)
-          @components = components
-          super("cyclic components found: <#{components}>")
-        end
-      end
-
-      include TSort
       def initialize(dispatcher, components)
         @dispatcher = dispatcher
         @components = components
-      end
-
-      def resolve(id)
-        @dependency = {}
-        @components.each do |component|
-          @dependency[component] = component["inputs"]
-          next unless component["outputs"]
-          component["outputs"].each do |output|
-            @dependency[output] = [component]
-          end
-        end
-        @components = []
-        each_strongly_connected_component do |cs|
-          raise CyclicComponentsError.new(cs) if cs.size > 1
-          @components.concat(cs) unless cs.first.is_a? String
-        end
-        resolve_routes(id)
-      end
-
-      def resolve_routes(id)
-        local = [id]
-        destinations = Hash.new(0)
-        @components.each do |component|
-          dataset = component["dataset"]
-          routes =
-            if dataset
-              Droonga.catalog.get_routes(dataset, component)
-            else
-              local
-            end
-          routes.each do |route|
-            destinations[@dispatcher.farm_path(route)] += 1
-          end
-          component["routes"] = routes
-        end
-        return destinations
       end
 
       def get_collector(id)
@@ -325,19 +260,6 @@ module Droonga
           descendants[output] = @descendants[output]
         end
         descendants
-      end
-
-      def tsort_each_node(&block)
-        @dependency.each_key(&block)
-      end
-
-      def tsort_each_child(node, &block)
-        if node.is_a? String and @dependency[node].nil?
-          raise UndefinedInputError.new(node)
-        end
-        if @dependency[node]
-          @dependency[node].each(&block)
-        end
       end
     end
   end
