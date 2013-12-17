@@ -30,13 +30,8 @@ module Droonga
       load_plugins(options[:distributors] || ["search", "crud", "groonga", "watch"])
     end
 
-    def distribute(envelope)
-      command = envelope["type"]
-      process(command, envelope)
-    end
-
-    def post(message)
-      @dispatcher.handle(message, [])
+    def distribute(message)
+      @dispatcher.handle_incoming_message(message)
     end
 
     private

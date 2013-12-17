@@ -16,15 +16,13 @@
 require "droonga/plugin/distributor/search"
 
 class SearchDistributorTest < Test::Unit::TestCase
-  include PluginHelper
-
   def setup
     setup_database
-    setup_plugin(Droonga::SearchDistributor)
+    @distributor = Droonga::Test::StubDistributor.new
+    @plugin = Droonga::SearchDistributor.new(@distributor)
   end
 
   def teardown
-    teardown_plugin
     teardown_database
   end
 
@@ -226,6 +224,6 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
     message << searcher
 
-    assert_equal(message, @posted.last.last)
+    assert_equal([message], @distributor.messages)
   end
 end

@@ -26,9 +26,8 @@ module Droonga
       @distributor = distributor
     end
 
-    # TODO: consider better name
-    def post(message)
-      @distributor.post(message)
+    def distribute(message)
+      @distributor.distribute(message)
     end
 
     def scatter_all(envelope, key)
@@ -41,7 +40,7 @@ module Droonga
         "replica"=> "all",
         "post"=> true
       }]
-      post(message)
+      distribute(message)
     end
 
     def broadcast_all(envelope)
@@ -53,7 +52,7 @@ module Droonga
         "replica"=> "all",
         "post"=> true
       }]
-      post(distribute_message)
+      distribute(distribute_message)
     end
   end
 end

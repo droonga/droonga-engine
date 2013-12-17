@@ -105,8 +105,9 @@ module Droonga
         elsif @adapter.processable?(command)
           @adapter.process(command, body, *arguments)
         else
-          @distributor.distribute(envelope.merge("type" => command,
-                                                 "body" => body))
+          @distributor.process(command,
+                               envelope.merge("type" => command,
+                                              "body" => body))
         end
       end
       add_route(route) if route
@@ -204,7 +205,7 @@ module Droonga
 
     def process_input_message(envelope)
       adapted_envelope = apply_input_adapters(envelope)
-      @distributor.distribute(adapted_envelope)
+      @distributor.process(adapted_envelope["type"], adapted_envelope)
     end
 
     def log_tag
