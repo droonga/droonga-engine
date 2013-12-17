@@ -3,5 +3,6 @@
 /test/command/Gemfile.lock
 /test/command/bin/
 /test/command/vendor/
+/test/command/tmp
 /doc/
 /.yardoc/
