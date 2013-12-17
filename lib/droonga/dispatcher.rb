@@ -140,7 +140,9 @@ module Droonga
       if local?(destination)
         handle_internal_message(message)
       else
-        post(message, "to"=>farm_path(destination), "type"=>"dispatcher")
+        @forwarder.forward(envelope, message,
+                           "type" => "dispatcher",
+                           "to"   => farm_path(destination))
       end
     end
 
