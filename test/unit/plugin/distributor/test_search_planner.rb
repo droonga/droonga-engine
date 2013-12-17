@@ -13,11 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/distributor/distributed_search_plan"
+require "droonga/plugin/distributor/distributed_search_planner"
 
-class DistributedSearchPlanTest < Test::Unit::TestCase
+class DistributedSearchPlannerTest < Test::Unit::TestCase
   def assert_planned(expected, search_request_envelope)
-    plan = Droonga::DistributedSearchPlan.new(search_request_envelope)
+    plan = Droonga::DistributedSearchPlanner.new(search_request_envelope)
     actual = plan.messages
     assert_equal(expected, actual)
   end

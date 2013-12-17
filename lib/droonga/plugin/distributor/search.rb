@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/distributor_plugin"
-require "droonga/plugin/distributor/distributed_search_plan"
+require "droonga/plugin/distributor/distributed_search_planner"
 
 module Droonga
   class SearchDistributor < Droonga::DistributorPlugin
@@ -24,8 +24,8 @@ module Droonga
 
     command :search
     def search(envelope)
-      plan = DistributedSearchPlan.new(envelope)
-      post(plan.messages)
+      planner = DistributedSearchPlanner.new(envelope)
+      post(planner.messages)
     end
   end
 end

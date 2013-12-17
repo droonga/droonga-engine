@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class DistributedSearchPlan
+  class DistributedSearchPlanner
     attr_reader :messages
 
     def initialize(search_request_envelope)
