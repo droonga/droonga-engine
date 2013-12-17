@@ -104,10 +104,6 @@ module Droonga
           handle(body, arguments)
         elsif @adapter.processable?(command)
           @adapter.process(command, body, *arguments)
-        else
-          @distributor.process(command,
-                               envelope.merge("type" => command,
-                                              "body" => body))
         end
       end
       add_route(route) if route
