@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -13,15 +15,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/test"
+module Droonga
+  module Test
+    class StubDistributor
+      attr_reader :messages
+      def initialize
+        @messages = []
+      end
 
-require_relative "helper/sandbox"
-require_relative "helper/fixture"
-require_relative "helper/stub_worker"
-require_relative "helper/plugin_helper"
-require_relative "helper/watch_helper"
-
-class Test::Unit::TestCase
-  include Sandbox
-  include Fixture
+      def distribute(message)
+        @messages << message
+      end
+    end
+  end
 end
