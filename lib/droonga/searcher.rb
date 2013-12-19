@@ -125,6 +125,10 @@ module Droonga
       def need_output?
         @query.has_key?("output")
       end
+
+      def complex_output?
+        @query["output"]["format"] == "complex"
+      end
     end
 
     class SearchResult
@@ -357,7 +361,7 @@ module Droonga
 
         # XXX IMPLEMENT ME!!!
         attributes = nil
-        if @request.query["output"]["format"] == "complex"
+        if @request.complex_output?
           # should convert columns to an object like:
           # {"_id" => {"type" => "UInt32", "vector" => false}}
           attributes = {}
@@ -380,7 +384,7 @@ module Droonga
         offset = params["offset"] || 0
         limit = params["limit"] || 10
         @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
-          if params["format"] == "complex"
+          if @request.complex_output?
             formatted_result["records"] = cursor.collect do |record|
               complex_record(target_attributes, record)
             end
