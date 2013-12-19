@@ -118,7 +118,7 @@ module Droonga
         @request = search_request
         @context = @request.context
         @query = @request.query
-        @result = result
+        @records = result
         @start_time = start_time
         @count = count
         @condition = condition
@@ -180,7 +180,7 @@ module Droonga
         target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
-        @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+        @records.open_cursor(:offset => offset, :limit => limit) do |cursor|
           if params["format"] == "complex"
             formatted_result["records"] = cursor.collect do |record|
               complex_record(target_attributes, record)
@@ -245,7 +245,7 @@ module Droonga
         return attribute[:target_attributes]
       end
 
-      def normalize_target_attributes(attributes, domain = @result)
+      def normalize_target_attributes(attributes, domain = @records)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
             attribute = {
@@ -294,7 +294,7 @@ module Droonga
         @request = search_request
         @context = @request.context
         @query = @request.query
-        @result = nil
+        @records = nil
         @condition = nil
         @start_time = nil
       end
@@ -304,12 +304,12 @@ module Droonga
       end
 
       def need_output?
-        @result and @query.has_key?("output")
+        @records and @query.has_key?("output")
       end
 
       def format
         # XXX too many arguments are passed to ResultFormatter
-        formatter = ResultFormatter.new(@request, @result, @condition, @count, @start_time)
+        formatter = ResultFormatter.new(@request, @records, @condition, @count, @start_time)
         formatter.format
       end
 
@@ -395,7 +395,7 @@ module Droonga
         $log.trace("#{log_tag}: search_query: start")
 
         @start_time = Time.now
-        @result = results[@query["source"]]
+        @records = results[@query["source"]]
 
         condition = @query["condition"]
         apply_condition!(condition) if condition
@@ -403,22 +403,22 @@ module Droonga
         group_by = @query["groupBy"]
         apply_group_by!(group_by) if group_by
 
-        @count = @result.size
+        @count = @records.size
 
         sort_by = @query["sortBy"]
         apply_sort_by!(sort_by) if sort_by
 
         $log.trace("#{log_tag}: search_query: done")
-        @result
+        @records
       end
 
       def apply_condition!(condition)
         expression = Groonga::Expression.new(context: @context)
-        expression.define_variable(:domain => @result)
-        parseCondition(@result, expression, condition)
+        expression.define_variable(:domain => @records)
+        parseCondition(@records, expression, condition)
         $log.trace("#{log_tag}: search_query: select: start",
                    :condition => condition)
-        @result = @result.select(expression)
+        @records = @records.select(expression)
         $log.trace("#{log_tag}: search_query: select: done")
         @condition = expression
       end
@@ -428,11 +428,11 @@ module Droonga
                    :by => group_by)
         case group_by
         when String
-          @result = @result.group(group_by)
+          @records = @records.group(group_by)
         when Hash
           key = group_by["key"]
           max_n_sub_records = group_by["maxNSubRecords"]
-          @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
+          @records = @records.group(key, :max_n_sub_records => max_n_sub_records)
         else
           raise '"groupBy" parameter must be a Hash or a String'
         end
@@ -455,7 +455,7 @@ module Droonga
         else
           raise '"sortBy" parameter must be a Hash or an Array'
         end
-        @result = @result.sort(keys, :offset => offset, :limit => limit)
+        @records = @records.sort(keys, :offset => offset, :limit => limit)
         $log.trace("#{log_tag}: search_query: sort: done",
                    :by => sort_by)
       end
