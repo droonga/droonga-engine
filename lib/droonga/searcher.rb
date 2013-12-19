@@ -152,7 +152,7 @@ module Droonga
       end
 
       def search
-        search_query
+        search_query!
         @result
       end
 
@@ -234,7 +234,7 @@ module Droonga
         end
       end
 
-      def search_query
+      def search_query!
         $log.trace("#{log_tag}: search_query: start")
 
         @result.start_time = Time.now
