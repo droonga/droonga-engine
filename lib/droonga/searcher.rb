@@ -158,9 +158,10 @@ module Droonga
 
       private
       def parse_condition(source, expression, condition)
-        if condition.is_a? String
+        case condition
+        when String
           expression.parse(condition, :syntax => :script)
-        elsif condition.is_a? Hash
+        when Hash
           options = {}
           if condition["matchTo"]
             matchTo = Groonga::Expression.new(context: @request.context)
@@ -201,7 +202,7 @@ module Droonga
           else
             raise "neither 'query' nor 'script' assigned in #{condition.inspect}"
           end
-        elsif condition.is_a? Array
+        when Array
           case condition[0]
           when "||"
             operator = Groonga::Operator::OR
