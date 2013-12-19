@@ -115,165 +115,15 @@ module Droonga
       end
     end
 
-    class ResultFormatter
-      def initialize(search_request, search_result)
-        @request = search_request
-        @result = search_result
-      end
+    class SearchResult
+      attr_accessor :start_time, :end_time, :condition, :records, :count
 
-      def format
-        formatted_result = {}
-        format_count(formatted_result)
-        format_attributes(formatted_result)
-        format_records(formatted_result)
-        if need_element_output?("startTime")
-          formatted_result["startTime"] = @result.start_time.iso8601
-        end
-        if need_element_output?("elapsedTime")
-          formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
-        end
-        formatted_result
-      end
-
-      private
-      def need_element_output?(element)
-        params = @request.query["output"]
-
-        elements = params["elements"]
-        return false if elements.nil?
-
-        elements.include?(element)
-      end
-
-      def format_count(formatted_result)
-        return unless need_element_output?("count")
-        formatted_result["count"] = @result.count
-      end
-
-      def format_attributes(formatted_result)
-        return unless need_element_output?("attributes")
-
-        # XXX IMPLEMENT ME!!!
-        attributes = nil
-        if @request.query["output"]["format"] == "complex"
-          # should convert columns to an object like:
-          # {"_id" => {"type" => "UInt32", "vector" => false}}
-          attributes = {}
-        else
-          # should convert columns to an object like:
-          # [{"name" => "_id", "type" => "UInt32", "vector" => false}]
-          attributes = []
-        end
-
-        formatted_result["attributes"] = attributes
-      end
-
-      def format_records(formatted_result)
-        return unless need_element_output?("records")
-
-        params = @request.query["output"]
-
-        attributes = params["attributes"]
-        target_attributes = normalize_target_attributes(attributes)
-        offset = params["offset"] || 0
-        limit = params["limit"] || 10
-        @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
-          if params["format"] == "complex"
-            formatted_result["records"] = cursor.collect do |record|
-              complex_record(target_attributes, record)
-            end
-          else
-            formatted_result["records"] = cursor.collect do |record|
-              simple_record(target_attributes, record)
-            end
-          end
-        end
-      end
-
-      def complex_record(attributes, record)
-        values = {}
-        attributes.collect do |attribute|
-          values[attribute[:label]] = record_value(record, attribute)
-        end
-        values
-      end
-
-      def simple_record(attributes, record)
-        attributes.collect do |attribute|
-          record_value(record, attribute)
-        end
-      end
-
-      def record_value(record, attribute)
-        if attribute[:source] == "_subrecs"
-          if @request.query["output"]["format"] == "complex"
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              complex_record(target_attributes, sub_record)
-            end
-          else
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              simple_record(target_attributes, sub_record)
-            end
-          end
-        else
-          expression = attribute[:expression]
-          if expression
-            variable = attribute[:variable]
-            variable.value = record
-            expression.execute
-          else
-            value = record[attribute[:source]]
-            if value.is_a?(Groonga::Record)
-              value.record_id
-            else
-              value
-            end
-          end
-        end
-      end
-
-      def resolve_attributes(attribute, record)
-        unless attribute[:target_attributes]
-          attribute[:target_attributes] =
-            normalize_target_attributes(attribute[:attributes], record.table)
-        end
-        return attribute[:target_attributes]
-      end
-
-      def normalize_target_attributes(attributes, domain = @result.records)
-        attributes.collect do |attribute|
-          if attribute.is_a?(String)
-            attribute = {
-              "source" => attribute,
-            }
-          end
-          source = attribute["source"]
-          if accessor_name?(source)
-            expression = nil
-            variable = nil
-          else
-            expression = Groonga::Expression.new(context: @request.context)
-            variable = expression.define_variable(domain: domain)
-            expression.parse(source, syntax: :script)
-            condition = expression.define_variable(name: "$condition",
-                                                   reference: true)
-            condition.value = @result.condition
-            source = nil
-          end
-          {
-            label: attribute["label"] || attribute["source"],
-            source: source,
-            expression: expression,
-            variable: variable,
-            attributes: attribute["attributes"]
-          }
-        end
-      end
-
-      def accessor_name?(source)
-        /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
+      def initialize
+        @start_time = nil
+        @end_time = nil
+        @condition = nil
+        @records = nil
+        @count = nil
       end
     end
 
@@ -284,18 +134,6 @@ module Droonga
         @context = context
         @query = query
         @resolved_results = resolved_results
-      end
-    end
-
-    class SearchResult
-      attr_accessor :start_time, :end_time, :condition, :records, :count
-
-      def initialize
-        @start_time = nil
-        @end_time = nil
-        @condition = nil
-        @records = nil
-        @count = nil
       end
     end
 
@@ -465,6 +303,168 @@ module Droonga
 
       def log_tag
         "[#{Process.ppid}][#{Process.pid}] query_searcher"
+      end
+    end
+
+    class ResultFormatter
+      def initialize(search_request, search_result)
+        @request = search_request
+        @result = search_result
+      end
+
+      def format
+        formatted_result = {}
+        format_count(formatted_result)
+        format_attributes(formatted_result)
+        format_records(formatted_result)
+        if need_element_output?("startTime")
+          formatted_result["startTime"] = @result.start_time.iso8601
+        end
+        if need_element_output?("elapsedTime")
+          formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
+        end
+        formatted_result
+      end
+
+      private
+      def need_element_output?(element)
+        params = @request.query["output"]
+
+        elements = params["elements"]
+        return false if elements.nil?
+
+        elements.include?(element)
+      end
+
+      def format_count(formatted_result)
+        return unless need_element_output?("count")
+        formatted_result["count"] = @result.count
+      end
+
+      def format_attributes(formatted_result)
+        return unless need_element_output?("attributes")
+
+        # XXX IMPLEMENT ME!!!
+        attributes = nil
+        if @request.query["output"]["format"] == "complex"
+          # should convert columns to an object like:
+          # {"_id" => {"type" => "UInt32", "vector" => false}}
+          attributes = {}
+        else
+          # should convert columns to an object like:
+          # [{"name" => "_id", "type" => "UInt32", "vector" => false}]
+          attributes = []
+        end
+
+        formatted_result["attributes"] = attributes
+      end
+
+      def format_records(formatted_result)
+        return unless need_element_output?("records")
+
+        params = @request.query["output"]
+
+        attributes = params["attributes"]
+        target_attributes = normalize_target_attributes(attributes)
+        offset = params["offset"] || 0
+        limit = params["limit"] || 10
+        @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
+          if params["format"] == "complex"
+            formatted_result["records"] = cursor.collect do |record|
+              complex_record(target_attributes, record)
+            end
+          else
+            formatted_result["records"] = cursor.collect do |record|
+              simple_record(target_attributes, record)
+            end
+          end
+        end
+      end
+
+      def complex_record(attributes, record)
+        values = {}
+        attributes.collect do |attribute|
+          values[attribute[:label]] = record_value(record, attribute)
+        end
+        values
+      end
+
+      def simple_record(attributes, record)
+        attributes.collect do |attribute|
+          record_value(record, attribute)
+        end
+      end
+
+      def record_value(record, attribute)
+        if attribute[:source] == "_subrecs"
+          if @request.query["output"]["format"] == "complex"
+            record.sub_records.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              complex_record(target_attributes, sub_record)
+            end
+          else
+            record.sub_records.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              simple_record(target_attributes, sub_record)
+            end
+          end
+        else
+          expression = attribute[:expression]
+          if expression
+            variable = attribute[:variable]
+            variable.value = record
+            expression.execute
+          else
+            value = record[attribute[:source]]
+            if value.is_a?(Groonga::Record)
+              value.record_id
+            else
+              value
+            end
+          end
+        end
+      end
+
+      def resolve_attributes(attribute, record)
+        unless attribute[:target_attributes]
+          attribute[:target_attributes] =
+            normalize_target_attributes(attribute[:attributes], record.table)
+        end
+        return attribute[:target_attributes]
+      end
+
+      def normalize_target_attributes(attributes, domain = @result.records)
+        attributes.collect do |attribute|
+          if attribute.is_a?(String)
+            attribute = {
+              "source" => attribute,
+            }
+          end
+          source = attribute["source"]
+          if accessor_name?(source)
+            expression = nil
+            variable = nil
+          else
+            expression = Groonga::Expression.new(context: @request.context)
+            variable = expression.define_variable(domain: domain)
+            expression.parse(source, syntax: :script)
+            condition = expression.define_variable(name: "$condition",
+                                                   reference: true)
+            condition.value = @result.condition
+            source = nil
+          end
+          {
+            label: attribute["label"] || attribute["source"],
+            source: source,
+            expression: expression,
+            variable: variable,
+            attributes: attribute["attributes"]
+          }
+        end
+      end
+
+      def accessor_name?(source)
+        /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
       end
     end
   end
