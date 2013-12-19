@@ -73,16 +73,16 @@ module Droonga
       end
       if command =~ /\.result$/
         message = {
-          inReplyTo: envelope["id"],
-          statusCode: 200,
-          type: command,
-          body: body
+          "inReplyTo" => envelope["id"],
+          "statusCode" => 200,
+          "type" => command,
+          "body" => body
         }
       else
         message = envelope.merge(
-          body: body,
-          type: command,
-          arguments: arguments
+          "body" => body,
+          "type" => command,
+          "arguments" => arguments
         )
       end
       output_tag = "#{tag}.message"
