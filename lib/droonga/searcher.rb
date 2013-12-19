@@ -133,6 +133,11 @@ module Droonga
       def complex_output?
         output["format"] == "complex"
       end
+
+      def source
+        source_name = @query["source"]
+        @resolved_results[source_name]
+      end
     end
 
     class SearchResult
@@ -243,17 +248,12 @@ module Droonga
         end
       end
 
-      def source
-        source_name = @request.query["source"]
-        @request.resolved_results[source_name]
-      end
-
       def search_query!
         $log.trace("#{log_tag}: search_query: start")
 
         @result.start_time = Time.now
 
-        @records = source
+        @records = @request.source
 
         condition = @request.query["condition"]
         apply_condition!(condition) if condition
