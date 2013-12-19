@@ -16,7 +16,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require 'tsort'
-require "droonga/adapter"
+require "droonga/input_adapter"
+require "droonga/output_adapter"
 require "droonga/distributor"
 require "droonga/catalog"
 require "droonga/collector"
@@ -34,8 +35,10 @@ module Droonga
       @collectors = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @adapter = Adapter.new(self,
-                             :adapters => Droonga.catalog.option("plugins"))
+      @input_adapter =
+        InputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
+      @output_adapter =
+        OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
       @loop = EventLoop.new
       @forwarder = Forwarder.new(@loop)
       @distributor = Distributor.new(self, @options)
@@ -52,7 +55,8 @@ module Droonga
     def shutdown
       @forwarder.shutdown
       @distributor.shutdown
-      @adapter.shutdown
+      @input_adapter.shutdown
+      @output_adapter.shutdown
       @farm.shutdown
       @loop.stop
       @loop_thread.join
@@ -102,8 +106,8 @@ module Droonga
       else
         if command == "dispatcher"
           handle(body, arguments)
-        elsif @adapter.processable?(command)
-          @adapter.process(command, body, *arguments)
+        elsif @output_adapter.processable?(command)
+          @output_adapter.process(command, body, *arguments)
         end
       end
       add_route(route) if route
@@ -179,8 +183,8 @@ module Droonga
       loop do
         input_message = InputMessage.new(adapted_envelope)
         command = input_message.command
-        break unless @adapter.processable?(command)
-        @adapter.process(command, input_message)
+        break unless @input_adapter.processable?(command)
+        @input_adapter.process(command, input_message)
         new_command = input_message.command
         adapted_envelope = input_message.adapted_envelope
         break if command == new_command

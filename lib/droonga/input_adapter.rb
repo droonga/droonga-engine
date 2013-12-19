@@ -15,37 +15,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
+require "droonga/pluggable"
+require "droonga/input_adapter_plugin"
 
 module Droonga
-  class AdapterPlugin < Plugin
-    extend PluginRegisterable
+  class InputAdapter
+    include Pluggable
 
-    def initialize(dispatcher)
-      super()
+    def initialize(dispatcher, options={})
       @dispatcher = dispatcher
+      load_plugins(options[:plugins] || [])
     end
 
-    def add_route(route)
-      @dispatcher.add_route(route)
+    private
+    def instantiate_plugin(name)
+      InputAdapterPlugin.repository.instantiate(name, @dispatcher)
     end
 
-    def post(body, destination=nil)
-      @dispatcher.post(body, destination)
-    end
-
-    def emit(value, name=nil)
-      if name
-        @output_values[name] = value
-      else
-        @output_values = value
-      end
-    end
-
-    def process(command, message)
-      @output_values = {}
-      super(command, message)
-      post(@output_values) unless @output_values.empty?
+    def log_tag
+      "input-adapter"
     end
   end
 end

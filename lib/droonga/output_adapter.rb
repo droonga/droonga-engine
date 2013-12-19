@@ -16,24 +16,24 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/pluggable"
-require "droonga/adapter_plugin"
+require "droonga/output_adapter_plugin"
 
 module Droonga
-  class Adapter
+  class OutputAdapter
     include Pluggable
 
     def initialize(dispatcher, options={})
       @dispatcher = dispatcher
-      load_plugins(options[:adapters] || [])
+      load_plugins(options[:plugins] || [])
     end
 
     private
     def instantiate_plugin(name)
-      AdapterPlugin.repository.instantiate(name, @dispatcher)
+      OutputAdapterPlugin.repository.instantiate(name, @dispatcher)
     end
 
     def log_tag
-      "adapter"
+      "output-adapter"
     end
   end
 end
