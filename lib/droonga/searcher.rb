@@ -416,7 +416,7 @@ module Droonga
 
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
-          if @request.query["output"]["format"] == "complex"
+          if @request.complex_output?
             record.sub_records.collect do |sub_record|
               target_attributes = resolve_attributes(attribute, sub_record)
               complex_record(target_attributes, sub_record)
