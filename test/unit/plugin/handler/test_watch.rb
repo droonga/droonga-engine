@@ -149,7 +149,6 @@ class WatchHandlerTest < Test::Unit::TestCase
                      ],
                    ],
                    @handler.messages)
-      assert_equal({ "to" => ["localhost"] }, @handler.envelope)
     end
 
     def test_feed_not_match

@@ -75,7 +75,6 @@ module Droonga
     def feed(request)
       @watcher.feed(:targets => request["targets"]) do |route, subscribers|
         message = request # return request itself
-        envelope["to"] = subscribers
         forward(message, "to" => route, "type" => "watch.notification")
       end
     end
