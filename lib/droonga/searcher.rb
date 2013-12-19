@@ -231,7 +231,7 @@ module Droonga
         apply_condition!(condition) if condition
 
         group_by = @query["groupBy"]
-        apply_group_by!(sort_by) if group_by
+        apply_group_by!(group_by) if group_by
 
         @count = @result.size
 
