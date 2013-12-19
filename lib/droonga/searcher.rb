@@ -114,14 +114,16 @@ module Droonga
     end
 
     class ResultFormatter
-      def initialize(search_request, result, condition, count, start_time)
+      def initialize(search_request, search_result)
         @request = search_request
         @context = @request.context
         @query = @request.query
-        @records = result
-        @start_time = start_time
-        @count = count
-        @condition = condition
+
+        @result = search_result
+        @records = @result.records
+        @start_time = @result.start_time
+        @count = @result.count
+        @condition = @result.condition
       end
 
       def format
@@ -289,27 +291,36 @@ module Droonga
       end
     end
 
+    class SearchResult
+      attr_accessor :start_time, :condition, :records, :count
+
+      def initialize
+        @start_time = nil
+        @condition = nil
+        @records = nil
+        @count = nil
+      end
+    end
+
     class QuerySearcher
       def initialize(search_request)
         @request = search_request
         @context = @request.context
         @query = @request.query
-        @records = nil
-        @condition = nil
-        @start_time = nil
       end
 
       def search(results)
+        @result = SearchResult.new
         search_query(results)
+        @result.records # FIXME later, this should be just result
       end
 
       def need_output?
-        @records and @query.has_key?("output")
+        @result.records and @query.has_key?("output")
       end
 
       def format
-        # XXX too many arguments are passed to ResultFormatter
-        formatter = ResultFormatter.new(@request, @records, @condition, @count, @start_time)
+        formatter = ResultFormatter.new(@request, @result)
         formatter.format
       end
 
@@ -394,7 +405,7 @@ module Droonga
       def search_query(results)
         $log.trace("#{log_tag}: search_query: start")
 
-        @start_time = Time.now
+        @result.start_time = Time.now
         @records = results[@query["source"]]
 
         condition = @query["condition"]
@@ -403,13 +414,13 @@ module Droonga
         group_by = @query["groupBy"]
         apply_group_by!(group_by) if group_by
 
-        @count = @records.size
+        @result.count = @records.size
 
         sort_by = @query["sortBy"]
         apply_sort_by!(sort_by) if sort_by
 
         $log.trace("#{log_tag}: search_query: done")
-        @records
+        @result.records = @records
       end
 
       def apply_condition!(condition)
@@ -420,7 +431,7 @@ module Droonga
                    :condition => condition)
         @records = @records.select(expression)
         $log.trace("#{log_tag}: search_query: select: done")
-        @condition = expression
+        @result.condition = expression
       end
 
       def apply_group_by!(group_by)
