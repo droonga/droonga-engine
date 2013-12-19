@@ -75,8 +75,7 @@ module Droonga
           if searcher.need_output?
             $log.trace("#{log_tag}: process_queries: format: start",
                        :name => name)
-            formatter = ResultFormatter.new(search_request, search_result)
-            outputs[name] = formatter.format
+            outputs[name] = ResultFormatter.format(search_request, search_result)
             $log.trace("#{log_tag}: process_queries: format: done",
                        :name => name)
           end
@@ -307,6 +306,12 @@ module Droonga
     end
 
     class ResultFormatter
+      class << self
+        def format(search_request, search_result)
+          new(search_request, search_result).format
+        end
+      end
+
       def initialize(search_request, search_result)
         @request = search_request
         @result = search_result
