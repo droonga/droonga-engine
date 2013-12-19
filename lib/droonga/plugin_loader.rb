@@ -25,8 +25,8 @@ module Droonga
             type = File.basename(type_path)
             Dir.glob("#{type_path}/*.rb") do |path|
               name = File.basename(path, ".rb")
-              plugin = new(type, name)
-              plugin.load
+              loader = new(type, name)
+              loader.load
             end
           end
         end
