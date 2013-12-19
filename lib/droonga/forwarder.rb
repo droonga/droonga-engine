@@ -38,17 +38,17 @@ module Droonga
       $log.trace("#{log_tag}: shutdown: done")
     end
 
-    def forward(envelope, body, destination)
+    def forward(message, destination)
       $log.trace("#{log_tag}: forward: start")
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      output(receiver, envelope, body, command, arguments)
+      output(receiver, message, command, arguments)
       $log.trace("#{log_tag}: forward: done")
     end
 
     private
-    def output(receiver, envelope, body, command, arguments)
+    def output(receiver, message, command, arguments)
       $log.trace("#{log_tag}: output: start")
       unless receiver.is_a?(String) && command.is_a?(String)
         $log.trace("#{log_tag}: output: abort: invalid argument",
@@ -73,17 +73,13 @@ module Droonga
       end
       if command =~ /\.result$/
         message = {
-          "inReplyTo" => envelope["id"],
+          "inReplyTo" => message["id"],
           "statusCode" => 200,
           "type" => command,
-          "body" => body
+          "body" => message["body"],
         }
       else
-        message = envelope.merge(
-          "body" => body,
-          "type" => command,
-          "arguments" => arguments
-        )
+        message = message.merge("type" => command, "arguments" => arguments)
       end
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"

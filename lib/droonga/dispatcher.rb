@@ -95,7 +95,7 @@ module Droonga
         synchronous = destination["synchronous"]
       end
       if receiver
-        @forwarder.forward(envelope, body,
+        @forwarder.forward(envelope.merge("body" => body),
                            "type" => command,
                            "to" => receiver,
                            "arguments" => arguments)
@@ -136,7 +136,7 @@ module Droonga
       if local?(destination)
         handle_internal_message(message)
       else
-        @forwarder.forward(envelope, message,
+        @forwarder.forward(envelope.merge("body" => message),
                            "type" => "dispatcher",
                            "to"   => farm_path(destination))
       end

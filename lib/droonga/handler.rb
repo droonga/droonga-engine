@@ -90,7 +90,7 @@ module Droonga
     end
 
     def forward(message, destination)
-      @forwarder.forward(envelope, message, destination)
+      @forwarder.forward(envelope.merge("body" => message), destination)
     end
 
     private
