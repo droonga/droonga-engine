@@ -121,11 +121,6 @@ module Droonga
         @query = @request.query
 
         @result = search_result
-        @records = @result.records
-        @start_time = @result.start_time
-        @end_time = @result.end_time
-        @count = @result.count
-        @condition = @result.condition
       end
 
       def format
@@ -134,10 +129,10 @@ module Droonga
         format_attributes(formatted_result)
         format_records(formatted_result)
         if need_element_output?("startTime")
-          formatted_result["startTime"] = @start_time.iso8601
+          formatted_result["startTime"] = @result.start_time.iso8601
         end
         if need_element_output?("elapsedTime")
-          formatted_result["elapsedTime"] = @end_time.to_f - @start_time.to_f
+          formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
         end
         formatted_result
       end
@@ -154,7 +149,7 @@ module Droonga
 
       def format_count(formatted_result)
         return unless need_element_output?("count")
-        formatted_result["count"] = @count
+        formatted_result["count"] = @result.count
       end
 
       def format_attributes(formatted_result)
@@ -184,7 +179,7 @@ module Droonga
         target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
-        @records.open_cursor(:offset => offset, :limit => limit) do |cursor|
+        @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
           if params["format"] == "complex"
             formatted_result["records"] = cursor.collect do |record|
               complex_record(target_attributes, record)
@@ -249,7 +244,7 @@ module Droonga
         return attribute[:target_attributes]
       end
 
-      def normalize_target_attributes(attributes, domain = @records)
+      def normalize_target_attributes(attributes, domain = @result.records)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
             attribute = {
@@ -266,7 +261,7 @@ module Droonga
             expression.parse(source, syntax: :script)
             condition = expression.define_variable(name: "$condition",
                                                    reference: true)
-            condition.value = @condition
+            condition.value = @result.condition
             source = nil
           end
           {
