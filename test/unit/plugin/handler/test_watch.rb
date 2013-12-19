@@ -23,22 +23,22 @@ class WatchHandlerTest < Test::Unit::TestCase
   def setup
     setup_database
     setup_schema
-    setup_handler
+    setup_plugin
   end
 
   def teardown
-    teardown_handler
+    teardown_plugin
     teardown_database
   end
 
   private
-  def setup_handler
-    @worker = StubWorker.new
-    @handler = Droonga::WatchHandler.new(@worker)
+  def setup_plugin
+    @handler = Droonga::Test::StubHandler.new
+    @plugin = Droonga::WatchHandler.new(@handler)
   end
 
-  def teardown_handler
-    @handler = nil
+  def teardown_plugin
+    @plugin = nil
   end
 
   public
@@ -49,8 +49,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      mock(@handler).emit([true])
-      @handler.subscribe(request)
+      mock(@plugin).emit([true])
+      @plugin.subscribe(request)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -63,9 +63,9 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      @worker.envelope["from"] = "localhost:23004/output"
-      mock(@handler).emit([true])
-      @handler.subscribe(request)
+      @handler.envelope["from"] = "localhost:23004/output"
+      mock(@plugin).emit([true])
+      @plugin.subscribe(request)
 
       assert_equal(
         ["localhost:23004/output"],
@@ -79,9 +79,9 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost",
         "route" => "localhost:23003/output"
       }
-      @worker.envelope["from"] = "localhost:23004/output"
-      mock(@handler).emit([true])
-      @handler.subscribe(request)
+      @handler.envelope["from"] = "localhost:23004/output"
+      mock(@plugin).emit([true])
+      @plugin.subscribe(request)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -91,7 +91,7 @@ class WatchHandlerTest < Test::Unit::TestCase
 
     private
     def actual_routes_for_query(query)
-      @worker.context["Subscriber"].select {|record|
+      @handler.context["Subscriber"].select {|record|
         record[:subscriptions] =~ query.to_json
       }.map {|subscriber|
         subscriber.route.key
@@ -111,8 +111,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      mock(@handler).emit([true])
-      @handler.unsubscribe(request)
+      mock(@plugin).emit([true])
+      @plugin.unsubscribe(request)
     end
 
     private
@@ -122,8 +122,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      stub(@handler).emit([true])
-      @handler.subscribe(request)
+      stub(@plugin).emit([true])
+      @plugin.subscribe(request)
     end
   end
 
@@ -139,9 +139,17 @@ class WatchHandlerTest < Test::Unit::TestCase
           "text" => "たいやきおいしいです"
         }
       }
-      @handler.feed(request)
-      assert_equal(request, @worker.body)
-      assert_equal({"to" => ["localhost"]}, @worker.envelope)
+      @plugin.feed(request)
+      assert_equal([
+                     [request,
+                       {
+                         "to"   => "localhost:23003/output",
+                         "type" => "watch.notification",
+                       },
+                     ],
+                   ],
+                   @handler.messages)
+      assert_equal({ "to" => ["localhost"] }, @handler.envelope)
     end
 
     def test_feed_not_match
@@ -150,8 +158,8 @@ class WatchHandlerTest < Test::Unit::TestCase
           "text" => "たこやきおいしいです"
         }
       }
-      @handler.feed(request)
-      assert_nil(@worker.body)
+      @plugin.feed(request)
+      assert_equal([], @handler.messages)
     end
 
     private
@@ -161,8 +169,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      stub(@handler).emit([true])
-      @handler.subscribe(request)
+      stub(@plugin).emit([true])
+      @plugin.subscribe(request)
     end
   end
 end

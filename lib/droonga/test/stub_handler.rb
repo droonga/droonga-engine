@@ -15,5 +15,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/test/stub_distributor"
-require "droonga/test/stub_handler"
+module Droonga
+  module Test
+    class StubHandler
+      attr_reader :context, :envelope, :messages
+      def initialize
+        @context = Groonga::Context.default
+        @envelope = {}
+        @messages = []
+      end
+
+      def emit(message)
+        @messages << message
+      end
+
+      def forward(message, destination)
+        @messages << [message, destination]
+      end
+    end
+  end
+end
