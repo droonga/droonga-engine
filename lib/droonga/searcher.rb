@@ -256,9 +256,10 @@ module Droonga
       def apply_group_by!(group_by)
         $log.trace("#{log_tag}: search_query: group: start",
                    :by => group_by)
-        if group_by.is_a? String
+        case group_by
+        when String
           @result = @result.group(group_by)
-        elsif group_by.is_a? Hash
+        when Hash
           key = group_by["key"]
           max_n_sub_records = group_by["maxNSubRecords"]
           @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
@@ -272,11 +273,12 @@ module Droonga
       def apply_sort_by!(sort_by)
         $log.trace("#{log_tag}: search_query: sort: start",
                    :by => sort_by)
-        if sort_by.is_a? Array
+        case sort_by
+        when Array
           keys = parse_order_keys(sort_by)
           offset = 0
           limit = -1
-        elsif sort_by.is_a? Hash
+        when Hash
           keys = parse_order_keys(sort_by["keys"])
           offset = sort_by["offset"]
           limit = sort_by["limit"]
