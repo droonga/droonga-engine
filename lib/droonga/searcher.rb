@@ -118,9 +118,6 @@ module Droonga
     class ResultFormatter
       def initialize(search_request, search_result)
         @request = search_request
-        @context = @request.context
-        @query = @request.query
-
         @result = search_result
       end
 
@@ -140,7 +137,7 @@ module Droonga
 
       private
       def need_element_output?(element)
-        params = @query["output"]
+        params = @request.query["output"]
 
         elements = params["elements"]
         return false if elements.nil?
@@ -158,7 +155,7 @@ module Droonga
 
         # XXX IMPLEMENT ME!!!
         attributes = nil
-        if @query["output"]["format"] == "complex"
+        if @request.query["output"]["format"] == "complex"
           # should convert columns to an object like:
           # {"_id" => {"type" => "UInt32", "vector" => false}}
           attributes = {}
@@ -174,7 +171,7 @@ module Droonga
       def format_records(formatted_result)
         return unless need_element_output?("records")
 
-        params = @query["output"]
+        params = @request.query["output"]
 
         attributes = params["attributes"]
         target_attributes = normalize_target_attributes(attributes)
@@ -209,7 +206,7 @@ module Droonga
 
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
-          if @query["output"]["format"] == "complex"
+          if @request.query["output"]["format"] == "complex"
             record.sub_records.collect do |sub_record|
               target_attributes = resolve_attributes(attribute, sub_record)
               complex_record(target_attributes, sub_record)
@@ -257,7 +254,7 @@ module Droonga
             expression = nil
             variable = nil
           else
-            expression = Groonga::Expression.new(context: @context)
+            expression = Groonga::Expression.new(context: @request.context)
             variable = expression.define_variable(domain: domain)
             expression.parse(source, syntax: :script)
             condition = expression.define_variable(name: "$condition",
