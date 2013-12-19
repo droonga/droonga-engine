@@ -338,15 +338,27 @@ module Droonga
 
       def format
         formatted_result = {}
-        format_count(formatted_result)
-        format_attributes(formatted_result)
-        format_records(formatted_result)
+
+        if need_element_output?("count")
+          format_count(formatted_result)
+        end
+
+        if need_element_output?("attributes")
+          format_attributes(formatted_result)
+        end
+
+        if need_element_output?("records")
+          format_records(formatted_result)
+        end
+
         if need_element_output?("startTime")
           formatted_result["startTime"] = @result.start_time.iso8601
         end
+
         if need_element_output?("elapsedTime")
           formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
         end
+
         formatted_result
       end
 
@@ -361,13 +373,10 @@ module Droonga
       end
 
       def format_count(formatted_result)
-        return unless need_element_output?("count")
         formatted_result["count"] = @result.count
       end
 
       def format_attributes(formatted_result)
-        return unless need_element_output?("attributes")
-
         # XXX IMPLEMENT ME!!!
         attributes = nil
         if @request.complex_output?
@@ -384,8 +393,6 @@ module Droonga
       end
 
       def format_records(formatted_result)
-        return unless need_element_output?("records")
-
         params = @request.output
 
         attributes = params["attributes"]
