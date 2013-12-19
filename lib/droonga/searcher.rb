@@ -123,6 +123,7 @@ module Droonga
         @result = search_result
         @records = @result.records
         @start_time = @result.start_time
+        @end_time = @result.end_time
         @count = @result.count
         @condition = @result.condition
       end
@@ -136,7 +137,7 @@ module Droonga
           formatted_result["startTime"] = @start_time.iso8601
         end
         if need_element_output?("elapsedTime")
-          formatted_result["elapsedTime"] = Time.now.to_f - @start_time.to_f
+          formatted_result["elapsedTime"] = @end_time.to_f - @start_time.to_f
         end
         formatted_result
       end
@@ -293,10 +294,11 @@ module Droonga
     end
 
     class SearchResult
-      attr_accessor :start_time, :condition, :records, :count
+      attr_accessor :start_time, :end_time, :condition, :records, :count
 
       def initialize
         @start_time = nil
+        @end_time = nil
         @condition = nil
         @records = nil
         @count = nil
@@ -422,6 +424,7 @@ module Droonga
 
         $log.trace("#{log_tag}: search_query: done")
         @result.records = @records
+        @result.end_time = Time.now
       end
 
       def apply_condition!(condition)
