@@ -349,7 +349,8 @@ module Droonga
 
         SUB_FORMATTERS.each do |name, sub_formatter_method_name|
           if need_element_output?(name)
-            method(sub_formatter_method_name).call(formatted_result)
+            formatted_result[name] =
+              method(sub_formatter_method_name).call
           end
         end
 
@@ -366,11 +367,11 @@ module Droonga
         elements.include?(element)
       end
 
-      def format_count(formatted_result)
-        formatted_result["count"] = @result.count
+      def format_count
+        @result.count
       end
 
-      def format_attributes(formatted_result)
+      def format_attributes
         # XXX IMPLEMENT ME!!!
         attributes = nil
         if @request.complex_output?
@@ -383,27 +384,30 @@ module Droonga
           attributes = []
         end
 
-        formatted_result["attributes"] = attributes
+        attributes
       end
 
-      def format_records(formatted_result)
+      def format_records
         params = @request.output
 
         attributes = params["attributes"]
         target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
+        formatted_records = nil
         @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
           if @request.complex_output?
-            formatted_result["records"] = cursor.collect do |record|
+            formatted_records = cursor.collect do |record|
               complex_record(target_attributes, record)
             end
           else
-            formatted_result["records"] = cursor.collect do |record|
+            formatted_records = cursor.collect do |record|
               simple_record(target_attributes, record)
             end
           end
         end
+
+        formatted_records
       end
 
       def complex_record(attributes, record)
@@ -492,12 +496,12 @@ module Droonga
         /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
       end
 
-      def format_start_time(formatted_result)
-        formatted_result["startTime"] = @result.start_time.iso8601
+      def format_start_time
+        @result.start_time.iso8601
       end
 
-      def format_elapsed_time(formatted_result)
-        formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
+      def format_elapsed_time
+        @result.end_time.to_f - @result.start_time.to_f
       end
     end
   end
