@@ -153,7 +153,7 @@ module Droonga
       end
 
       private
-      def parseCondition(source, expression, condition)
+      def parse_condition(source, expression, condition)
         if condition.is_a? String
           expression.parse(condition, :syntax => :script)
         elsif condition.is_a? Hash
@@ -209,10 +209,10 @@ module Droonga
             raise "undefined operator assigned #{condition[0]}"
           end
           if condition[1]
-            parseCondition(source, expression, condition[1])
+            parse_condition(source, expression, condition[1])
           end
           condition[2..-1].each do |element|
-            parseCondition(source, expression, element)
+            parse_condition(source, expression, element)
             expression.append_operation(operator, 2)
           end
         else
@@ -256,7 +256,7 @@ module Droonga
       def apply_condition!(condition)
         expression = Groonga::Expression.new(context: @request.context)
         expression.define_variable(:domain => @records)
-        parseCondition(@records, expression, condition)
+        parse_condition(@records, expression, condition)
         $log.trace("#{log_tag}: search_query: select: start",
                    :condition => condition)
         @records = @records.select(expression)
