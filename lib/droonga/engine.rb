@@ -35,8 +35,8 @@ module Droonga
       $log.trace("engine: shutdown: done")
     end
 
-    def process(envelope)
-      @dispatcher.handle_envelope(envelope)
+    def process(message)
+      @dispatcher.handle_envelope(message)
     end
   end
 end
