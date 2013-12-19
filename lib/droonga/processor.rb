@@ -39,7 +39,6 @@ module Droonga
 
     def process(envelope, synchronous=nil)
       $log.trace("proessor: process: start")
-      reply_to = envelope["replyTo"]
       command = envelope["type"]
       if @handler.processable?(command)
         $log.trace("proessor: process: handlable: #{command}")
