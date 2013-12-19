@@ -68,7 +68,8 @@ module Droonga
                      :name => name)
           search_request = SearchRequest.new(@context, queries[name])
           searcher = QuerySearcher.new(search_request)
-          results[name] = searcher.search(results)
+          search_result = searcher.search(results)
+          results[name] = search_result.records
           $log.trace("#{log_tag}: process_queries: search: done",
                      :name => name)
           if searcher.need_output?
@@ -312,7 +313,7 @@ module Droonga
       def search(results)
         @result = SearchResult.new
         search_query(results)
-        @result.records # FIXME later, this should be just result
+        @result
       end
 
       def need_output?
