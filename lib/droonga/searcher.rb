@@ -126,8 +126,12 @@ module Droonga
         @query.has_key?("output")
       end
 
+      def output
+        @query["output"]
+      end
+
       def complex_output?
-        @query["output"]["format"] == "complex"
+        output["format"] == "complex"
       end
     end
 
