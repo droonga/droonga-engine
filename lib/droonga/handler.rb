@@ -70,19 +70,26 @@ module Droonga
                  :plugin => plugin.class)
     end
 
-    def emit(value, name = nil)
-      unless name
-        if @output_names
-          name = @output_names.first
-        else
-          @output_values = @task["values"] = value
-          return
+    def emit(value)
+      if @descendants.empty?
+        forward(value, envelope["replyTo"])
+      else
+        @descendants.each do |name, dests|
+          message = {
+            "id" => @id,
+            "input" => name,
+            "value" => value[name],
+          }
+          dests.each do |routes|
+            routes.each do |route|
+              forward(message, "to" => route, "type" => "dispatcher")
+            end
+          end
         end
       end
-      @output_values[name] = value
     end
 
-    def post(message, destination)
+    def forward(message, destination)
       @forwarder.forward(envelope, message, destination)
     end
 
@@ -117,38 +124,10 @@ module Droonga
 
       @output_values = @task["values"]
       @body = @component["body"]
-      @output_names = @component["outputs"]
       @id = request["id"]
-      @value = request["value"]
-      @input_name = request["name"]
       @descendants = request["descendants"]
 
       plugin.process(command, @body, *arguments)
-      output if @descendants
-      true
-    end
-
-    def output
-      result = @task["values"]
-      if @component["post"]
-        destination = @component["post"]
-        destination = envelope["replyTo"] if destination == true
-        if destination
-          post(result, destination)
-        end
-      end
-      @descendants.each do |name, dests|
-        message = {
-          "id" => @id,
-          "input" => name,
-          "value" => result[name]
-        }
-        dests.each do |routes|
-          routes.each do |route|
-            post(message, "to"=>route, "type"=>"dispatcher")
-          end
-        end
-      end
     end
 
     def log_tag

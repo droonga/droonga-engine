@@ -31,12 +31,12 @@ module Droonga
       @handler.envelope
     end
 
-    def emit(value, name=nil)
-      @handler.emit(value, name)
+    def emit(value)
+      @handler.emit(value)
     end
 
-    def post(body, destination=nil)
-      @handler.post(body, destination)
+    def forward(body, destination)
+      @handler.forward(body, destination)
     end
 
     def prefer_synchronous?(command)
