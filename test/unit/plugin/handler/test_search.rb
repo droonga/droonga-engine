@@ -16,10 +16,10 @@
 require "droonga/plugin/handler/search"
 
 class SearchHandlerTest < Test::Unit::TestCase
-  include PluginHelper
-
   def setup
     setup_database
+    setup_data
+    setup_plugin
   end
 
   def teardown
@@ -27,16 +27,25 @@ class SearchHandlerTest < Test::Unit::TestCase
     teardown_database
   end
 
+  def setup_plugin
+    @handler = Droonga::Test::StubHandler.new
+    @plugin = Droonga::SearchHandler.new(@handler)
+  end
+
+  def teardown_plugin
+    @handler = nil
+    @plugin = nil
+  end
+
   private
   def search(request)
     @plugin.search(request)
-    results_to_result_set(@messages)
+    results_to_result_set(@handler.messages.first)
   end
 
   def results_to_result_set(results)
     result_set = {}
-    results.each do |result_and_name|
-      result, name = result_and_name
+    results.each do |name, result|
       result_set[name] = normalize_result(result)
     end
     result_set
@@ -61,10 +70,8 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   class GeneralTest < self
-    def setup
-      super
+    def setup_data
       restore(fixture_data("document.grn"))
-      setup_plugin(Droonga::SearchHandler)
     end
 
     class NoParameterTest < self
@@ -509,10 +516,8 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   class ReferenceTest < self
     class Hash
-      def setup
-        super
+      def setup_data
         restore(fixture_data("reference/hash.grn"))
-        setup_plugin(Droonga::SearchHandler)
       end
 
       def test_reference_to_hash
@@ -554,10 +559,8 @@ class SearchHandlerTest < Test::Unit::TestCase
     end
 
     class Array
-      def setup
-        super
+      def setup_data
         restore(fixture_data("reference/array.grn"))
-        setup_plugin(Droonga::SearchHandler)
       end
 
       def test_reference_to_array
