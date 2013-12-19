@@ -52,23 +52,23 @@ module Fluent
     def parse_record(tag, record)
       prefix, type, *arguments = tag.split(/\./)
       if type.nil? || type.empty? || type == 'message'
-        envelope = record
+        message = record
       else
-        envelope = {
+        message = {
           "type" => type,
           "arguments" => arguments,
           "body" => record
         }
       end
-      envelope["via"] ||= []
-      reply_to = envelope["replyTo"]
+      message["via"] ||= []
+      reply_to = message["replyTo"]
       if reply_to.is_a? String
-        envelope["replyTo"] = {
-          "type" => envelope["type"] + ".result",
+        message["replyTo"] = {
+          "type" => message["type"] + ".result",
           "to" => reply_to
         }
       end
-      envelope
+      message
     end
   end
 end
