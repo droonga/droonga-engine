@@ -325,6 +325,14 @@ module Droonga
     end
 
     class ResultFormatter
+      SUB_FORMATTERS = {
+        "count"       => :format_count,
+        "attribtues"  => :format_attributes,
+        "records"     => :format_records,
+        "startTime"   => :format_start_time,
+        "elapsedTime" => :format_elapsed_time
+      }
+
       class << self
         def format(search_request, search_result)
           new(search_request, search_result).format
@@ -339,24 +347,10 @@ module Droonga
       def format
         formatted_result = {}
 
-        if need_element_output?("count")
-          format_count(formatted_result)
-        end
-
-        if need_element_output?("attributes")
-          format_attributes(formatted_result)
-        end
-
-        if need_element_output?("records")
-          format_records(formatted_result)
-        end
-
-        if need_element_output?("startTime")
-          format_start_time(formatted_result)
-        end
-
-        if need_element_output?("elapsedTime")
-          format_elapsed_time(formatted_result)
+        SUB_FORMATTERS.each do |name, sub_formatter_method_name|
+          if need_element_output?(name)
+            method(sub_formatter_method_name).call(formatted_result)
+          end
         end
 
         formatted_result
