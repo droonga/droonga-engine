@@ -303,8 +303,6 @@ module Droonga
     class QuerySearcher
       def initialize(search_request)
         @request = search_request
-        @context = @request.context
-        @query = @request.query
       end
 
       def search(results)
@@ -314,7 +312,7 @@ module Droonga
       end
 
       def need_output?
-        @result.records and @query.has_key?("output")
+        @result.records and @request.query.has_key?("output")
       end
 
       def format
@@ -329,7 +327,7 @@ module Droonga
         elsif condition.is_a? Hash
           options = {}
           if condition["matchTo"]
-            matchTo = Groonga::Expression.new(context: @context)
+            matchTo = Groonga::Expression.new(context: @request.context)
             matchTo.define_variable(:domain => source)
             match_columns = condition["matchTo"]
             match_columns = match_columns.join(",") if match_columns.is_a?(Array)
@@ -404,17 +402,17 @@ module Droonga
         $log.trace("#{log_tag}: search_query: start")
 
         @result.start_time = Time.now
-        @records = results[@query["source"]]
+        @records = results[@request.query["source"]]
 
-        condition = @query["condition"]
+        condition = @request.query["condition"]
         apply_condition!(condition) if condition
 
-        group_by = @query["groupBy"]
+        group_by = @request.query["groupBy"]
         apply_group_by!(group_by) if group_by
 
         @result.count = @records.size
 
-        sort_by = @query["sortBy"]
+        sort_by = @request.query["sortBy"]
         apply_sort_by!(sort_by) if sort_by
 
         $log.trace("#{log_tag}: search_query: done")
@@ -423,7 +421,7 @@ module Droonga
       end
 
       def apply_condition!(condition)
-        expression = Groonga::Expression.new(context: @context)
+        expression = Groonga::Expression.new(context: @request.context)
         expression.define_variable(:domain => @records)
         parseCondition(@records, expression, condition)
         $log.trace("#{log_tag}: search_query: select: start",
