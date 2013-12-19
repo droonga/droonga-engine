@@ -114,9 +114,10 @@ module Droonga
     end
 
     class ResultFormatter
-      def initialize(context, query, result, condition, count, start_time)
-        @context = context
-        @query = query
+      def initialize(search_request, result, condition, count, start_time)
+        @request = search_request
+        @context = @request.context
+        @query = @request.query
         @result = result
         @start_time = start_time
         @count = count
@@ -308,7 +309,7 @@ module Droonga
 
       def format
         # XXX too many arguments are passed to ResultFormatter
-        formatter = ResultFormatter.new(@context, @query, @result, @condition, @count, @start_time)
+        formatter = ResultFormatter.new(@request, @result, @condition, @count, @start_time)
         formatter.format
       end
 
