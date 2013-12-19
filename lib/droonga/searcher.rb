@@ -114,18 +114,6 @@ module Droonga
       end
     end
 
-    class SearchResult
-      attr_accessor :start_time, :end_time, :condition, :records, :count
-
-      def initialize
-        @start_time = nil
-        @end_time = nil
-        @condition = nil
-        @records = nil
-        @count = nil
-      end
-    end
-
     class SearchRequest
       attr_reader :context, :query, :resolved_results
 
@@ -137,6 +125,18 @@ module Droonga
 
       def need_output?
         @query.has_key?("output")
+      end
+    end
+
+    class SearchResult
+      attr_accessor :start_time, :end_time, :condition, :records, :count
+
+      def initialize
+        @start_time = nil
+        @end_time = nil
+        @condition = nil
+        @records = nil
+        @count = nil
       end
     end
 
