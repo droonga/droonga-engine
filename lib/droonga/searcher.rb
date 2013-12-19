@@ -66,14 +66,16 @@ module Droonga
         if queries[name]
           $log.trace("#{log_tag}: process_queries: search: start",
                      :name => name)
-          searcher = QuerySearcher.new(@context, queries[name])
-          results[name] = searcher.search(results)
+          search_request = SearchRequest.new(@context, queries[name], results)
+          searcher = QuerySearcher.new(search_request)
+          search_result = searcher.search
+          results[name] = search_result.records
           $log.trace("#{log_tag}: process_queries: search: done",
                      :name => name)
           if searcher.need_output?
             $log.trace("#{log_tag}: process_queries: format: start",
                        :name => name)
-            outputs[name] = searcher.format
+            outputs[name] = ResultFormatter.format(search_request, search_result)
             $log.trace("#{log_tag}: process_queries: format: done",
                        :name => name)
           end
@@ -112,45 +114,51 @@ module Droonga
       end
     end
 
-    class QuerySearcher
-      def initialize(context, query)
+    class SearchResult
+      attr_accessor :start_time, :end_time, :condition, :records, :count
+
+      def initialize
+        @start_time = nil
+        @end_time = nil
+        @condition = nil
+        @records = nil
+        @count = nil
+      end
+    end
+
+    class SearchRequest
+      attr_reader :context, :query, :resolved_results
+
+      def initialize(context, query, resolved_results)
         @context = context
         @query = query
-        @result = nil
-        @condition = nil
-        @start_time = nil
+        @resolved_results = resolved_results
+      end
+    end
+
+    class QuerySearcher
+      def initialize(search_request)
+        @request = search_request
       end
 
-      def search(results)
-        search_query(results)
+      def search
+        @result = SearchResult.new
+        search_query
+        @result
       end
 
       def need_output?
-        @result and @query.has_key?("output")
-      end
-
-      def format
-        formatted_result = {}
-        format_count(formatted_result)
-        format_attributes(formatted_result)
-        format_records(formatted_result)
-        if need_element_output?("startTime")
-          formatted_result["startTime"] = @start_time.iso8601
-        end
-        if need_element_output?("elapsedTime")
-          formatted_result["elapsedTime"] = Time.now.to_f - @start_time.to_f
-        end
-        formatted_result
+        @result.records and @request.query.has_key?("output")
       end
 
       private
-      def parseCondition(source, expression, condition)
+      def parse_condition(source, expression, condition)
         if condition.is_a? String
           expression.parse(condition, :syntax => :script)
         elsif condition.is_a? Hash
           options = {}
           if condition["matchTo"]
-            matchTo = Groonga::Expression.new(context: @context)
+            matchTo = Groonga::Expression.new(context: @request.context)
             matchTo.define_variable(:domain => source)
             match_columns = condition["matchTo"]
             match_columns = match_columns.join(",") if match_columns.is_a?(Array)
@@ -200,10 +208,10 @@ module Droonga
             raise "undefined operator assigned #{condition[0]}"
           end
           if condition[1]
-            parseCondition(source, expression, condition[1])
+            parse_condition(source, expression, condition[1])
           end
           condition[2..-1].each do |element|
-            parseCondition(source, expression, element)
+            parse_condition(source, expression, element)
             expression.append_operation(operator, 2)
           end
         else
@@ -221,36 +229,38 @@ module Droonga
         end
       end
 
-      def search_query(results)
+      def search_query
         $log.trace("#{log_tag}: search_query: start")
 
-        @start_time = Time.now
-        @result = results[@query["source"]]
+        @result.start_time = Time.now
+        results = @request.resolved_results
+        @records = results[@request.query["source"]]
 
-        condition = @query["condition"]
+        condition = @request.query["condition"]
         apply_condition!(condition) if condition
 
-        group_by = @query["groupBy"]
+        group_by = @request.query["groupBy"]
         apply_group_by!(group_by) if group_by
 
-        @count = @result.size
+        @result.count = @records.size
 
-        sort_by = @query["sortBy"]
+        sort_by = @request.query["sortBy"]
         apply_sort_by!(sort_by) if sort_by
 
         $log.trace("#{log_tag}: search_query: done")
-        @result
+        @result.records = @records
+        @result.end_time = Time.now
       end
 
       def apply_condition!(condition)
-        expression = Groonga::Expression.new(context: @context)
-        expression.define_variable(:domain => @result)
-        parseCondition(@result, expression, condition)
+        expression = Groonga::Expression.new(context: @request.context)
+        expression.define_variable(:domain => @records)
+        parse_condition(@records, expression, condition)
         $log.trace("#{log_tag}: search_query: select: start",
                    :condition => condition)
-        @result = @result.select(expression)
+        @records = @records.select(expression)
         $log.trace("#{log_tag}: search_query: select: done")
-        @condition = expression
+        @result.condition = expression
       end
 
       def apply_group_by!(group_by)
@@ -258,11 +268,11 @@ module Droonga
                    :by => group_by)
         case group_by
         when String
-          @result = @result.group(group_by)
+          @records = @records.group(group_by)
         when Hash
           key = group_by["key"]
           max_n_sub_records = group_by["maxNSubRecords"]
-          @result = @result.group(key, :max_n_sub_records => max_n_sub_records)
+          @records = @records.group(key, :max_n_sub_records => max_n_sub_records)
         else
           raise '"groupBy" parameter must be a Hash or a String'
         end
@@ -285,13 +295,45 @@ module Droonga
         else
           raise '"sortBy" parameter must be a Hash or an Array'
         end
-        @result = @result.sort(keys, :offset => offset, :limit => limit)
+        @records = @records.sort(keys, :offset => offset, :limit => limit)
         $log.trace("#{log_tag}: search_query: sort: done",
                    :by => sort_by)
       end
 
+      def log_tag
+        "[#{Process.ppid}][#{Process.pid}] query_searcher"
+      end
+    end
+
+    class ResultFormatter
+      class << self
+        def format(search_request, search_result)
+          new(search_request, search_result).format
+        end
+      end
+
+      def initialize(search_request, search_result)
+        @request = search_request
+        @result = search_result
+      end
+
+      def format
+        formatted_result = {}
+        format_count(formatted_result)
+        format_attributes(formatted_result)
+        format_records(formatted_result)
+        if need_element_output?("startTime")
+          formatted_result["startTime"] = @result.start_time.iso8601
+        end
+        if need_element_output?("elapsedTime")
+          formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
+        end
+        formatted_result
+      end
+
+      private
       def need_element_output?(element)
-        params = @query["output"]
+        params = @request.query["output"]
 
         elements = params["elements"]
         return false if elements.nil?
@@ -301,7 +343,7 @@ module Droonga
 
       def format_count(formatted_result)
         return unless need_element_output?("count")
-        formatted_result["count"] = @count
+        formatted_result["count"] = @result.count
       end
 
       def format_attributes(formatted_result)
@@ -309,7 +351,7 @@ module Droonga
 
         # XXX IMPLEMENT ME!!!
         attributes = nil
-        if @query["output"]["format"] == "complex"
+        if @request.query["output"]["format"] == "complex"
           # should convert columns to an object like:
           # {"_id" => {"type" => "UInt32", "vector" => false}}
           attributes = {}
@@ -325,13 +367,13 @@ module Droonga
       def format_records(formatted_result)
         return unless need_element_output?("records")
 
-        params = @query["output"]
+        params = @request.query["output"]
 
         attributes = params["attributes"]
         target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
-        @result.open_cursor(:offset => offset, :limit => limit) do |cursor|
+        @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
           if params["format"] == "complex"
             formatted_result["records"] = cursor.collect do |record|
               complex_record(target_attributes, record)
@@ -360,7 +402,7 @@ module Droonga
 
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
-          if @query["output"]["format"] == "complex"
+          if @request.query["output"]["format"] == "complex"
             record.sub_records.collect do |sub_record|
               target_attributes = resolve_attributes(attribute, sub_record)
               complex_record(target_attributes, sub_record)
@@ -396,11 +438,7 @@ module Droonga
         return attribute[:target_attributes]
       end
 
-      def accessor_name?(source)
-        /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
-      end
-
-      def normalize_target_attributes(attributes, domain = @result)
+      def normalize_target_attributes(attributes, domain = @result.records)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
             attribute = {
@@ -412,12 +450,12 @@ module Droonga
             expression = nil
             variable = nil
           else
-            expression = Groonga::Expression.new(context: @context)
+            expression = Groonga::Expression.new(context: @request.context)
             variable = expression.define_variable(domain: domain)
             expression.parse(source, syntax: :script)
             condition = expression.define_variable(name: "$condition",
                                                    reference: true)
-            condition.value = @condition
+            condition.value = @result.condition
             source = nil
           end
           {
@@ -430,8 +468,8 @@ module Droonga
         end
       end
 
-      def log_tag
-        "[#{Process.ppid}][#{Process.pid}] query_searcher"
+      def accessor_name?(source)
+        /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
       end
     end
   end
