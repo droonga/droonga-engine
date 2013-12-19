@@ -347,7 +347,7 @@ module Droonga
 
       private
       def need_element_output?(element)
-        params = @request.query["output"]
+        params = @request.output
 
         elements = params["elements"]
         return false if elements.nil?
@@ -381,7 +381,7 @@ module Droonga
       def format_records(formatted_result)
         return unless need_element_output?("records")
 
-        params = @request.query["output"]
+        params = @request.output
 
         attributes = params["attributes"]
         target_attributes = normalize_target_attributes(attributes)
