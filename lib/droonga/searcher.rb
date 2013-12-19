@@ -66,7 +66,8 @@ module Droonga
         if queries[name]
           $log.trace("#{log_tag}: process_queries: search: start",
                      :name => name)
-          searcher = QuerySearcher.new(@context, queries[name])
+          search_request = SearchRequest.new(@context, queries[name])
+          searcher = QuerySearcher.new(search_request)
           results[name] = searcher.search(results)
           $log.trace("#{log_tag}: process_queries: search: done",
                      :name => name)
@@ -278,10 +279,20 @@ module Droonga
       end
     end
 
-    class QuerySearcher
+    class SearchRequest
+      attr_reader :context, :query
+
       def initialize(context, query)
         @context = context
         @query = query
+      end
+    end
+
+    class QuerySearcher
+      def initialize(search_request)
+        @request = search_request
+        @context = @request.context
+        @query = @request.query
         @result = nil
         @condition = nil
         @start_time = nil
