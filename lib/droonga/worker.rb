@@ -47,9 +47,9 @@ module Droonga
     end
 
     private
-    def process(envelope)
+    def process(message)
       $log.trace("#{log_tag}: process: start")
-      @handler.process(envelope)
+      @handler.process(message)
       $log.trace("#{log_tag}: process: done")
     end
 
