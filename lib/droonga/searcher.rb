@@ -352,11 +352,11 @@ module Droonga
         end
 
         if need_element_output?("startTime")
-          formatted_result["startTime"] = @result.start_time.iso8601
+          format_start_time(formatted_result)
         end
 
         if need_element_output?("elapsedTime")
-          formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
+          format_elapsed_time(formatted_result)
         end
 
         formatted_result
@@ -496,6 +496,14 @@ module Droonga
 
       def accessor_name?(source)
         /\A[a-zA-Z\#@$_][a-zA-Z\d\#@$_\-.]*\z/ === source
+      end
+
+      def format_start_time(formatted_result)
+        formatted_result["startTime"] = @result.start_time.iso8601
+      end
+
+      def format_elapsed_time(formatted_result)
+        formatted_result["elapsedTime"] = @result.end_time.to_f - @result.start_time.to_f
       end
     end
   end
