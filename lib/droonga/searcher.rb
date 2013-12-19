@@ -72,7 +72,7 @@ module Droonga
           results[name] = search_result.records
           $log.trace("#{log_tag}: process_queries: search: done",
                      :name => name)
-          if searcher.need_output?
+          if search_request.need_output?
             $log.trace("#{log_tag}: process_queries: format: start",
                        :name => name)
             outputs[name] = ResultFormatter.format(search_request, search_result)
@@ -134,6 +134,10 @@ module Droonga
         @query = query
         @resolved_results = resolved_results
       end
+
+      def need_output?
+        @query.has_key?("output")
+      end
     end
 
     class QuerySearcher
@@ -145,10 +149,6 @@ module Droonga
         @result = SearchResult.new
         search_query
         @result
-      end
-
-      def need_output?
-        @result.records and @request.query.has_key?("output")
       end
 
       private
