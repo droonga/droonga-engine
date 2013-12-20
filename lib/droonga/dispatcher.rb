@@ -61,10 +61,6 @@ module Droonga
       @loop_thread.join
     end
 
-    def add_route(route)
-      envelope["via"].push(route)
-    end
-
     def handle_envelope(envelope)
       @envelope = envelope
       if envelope["type"] == "dispatcher"
