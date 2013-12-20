@@ -95,30 +95,30 @@ module Droonga
         command = "collector_" + type
         n_of_expects = component["n_of_expects"]
         synchronous = nil
-          synchronous = true unless n_of_expects.zero?
-          # TODO: check if asynchronous execution is available.
-          message = {
-            "task"=>task,
-            "name"=>name,
-            "value"=>value
-          }
-          unless synchronous
-            descendants = {}
-            component["descendants"].each do |name, indices|
-              descendants[name] = indices.collect do |index|
-                @components[index]["routes"].map do |route|
-                  @dispatcher.farm_path(route)
-                end
+        synchronous = true unless n_of_expects.zero?
+        # TODO: check if asynchronous execution is available.
+        message = {
+          "task"=>task,
+          "name"=>name,
+          "value"=>value
+        }
+        unless synchronous
+          descendants = {}
+          component["descendants"].each do |name, indices|
+            descendants[name] = indices.collect do |index|
+              @components[index]["routes"].map do |route|
+                @dispatcher.farm_path(route)
               end
             end
-            message["descendants"] = descendants
-            message["id"] = @id
           end
-          if @id == task["route"]
-            process(command, message)
-          else
-            @dispatcher.deliver(@id, task["route"], message, command, synchronous)
-          end
+          message["descendants"] = descendants
+          message["id"] = @id
+        end
+        if @id == task["route"]
+          process(command, message)
+        else
+          @dispatcher.deliver(@id, task["route"], message, command, synchronous)
+        end
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
         if synchronous
