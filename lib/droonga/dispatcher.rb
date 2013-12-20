@@ -74,39 +74,6 @@ module Droonga
       end
     end
 
-    def post(body, destination=nil)
-      $log.trace("#{log_tag}: post: start")
-      unless is_route?(destination)
-        destination = envelope["replyTo"]
-      end
-      command = nil
-      receiver = nil
-      arguments = nil
-      synchronous = nil
-      case destination
-      when String
-        command = destination
-      when Hash
-        command = destination["type"]
-        receiver = destination["to"]
-        arguments = destination["arguments"]
-        synchronous = destination["synchronous"]
-      end
-      if receiver
-        forward(envelope.merge("body" => body),
-                "type" => command,
-                "to" => receiver,
-                "arguments" => arguments)
-      else
-        if command == "dispatcher"
-          handle(body, arguments)
-        elsif @output_adapter.processable?(command)
-          @output_adapter.process(command, body, *arguments)
-        end
-      end
-      $log.trace("#{log_tag}: post: done")
-    end
-
     def forward(message, destination)
       @forwarder.forward(message, destination)
     end
