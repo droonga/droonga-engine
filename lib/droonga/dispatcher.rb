@@ -148,13 +148,11 @@ module Droonga
       end
     end
 
-    def deliver(id, route, message, type, synchronous)
-      if id == route
-        post(message, "type" => type, "synchronous"=> synchronous)
-      else
-        envelope = @envelope.merge("body" => message, "type" => type)
-        @farm.process(route, envelope, synchronous)
-      end
+    # TODO: Use more meaningful name
+    def process_in_farm(route, message, type, synchronous)
+      # TODO: validate route is farm path
+      envelope = @envelope.merge("body" => message, "type" => type)
+      @farm.process(route, envelope, synchronous)
     end
 
     def generate_id

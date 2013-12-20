@@ -53,7 +53,7 @@ module Droonga
           "task"        => task,
           "descendants" => descendants
         }
-        @dispatcher.deliver(@id, task["route"], message, command, synchronous)
+        @dispatcher.process_in_farm(task["route"], message, command, synchronous)
         @n_dones += 1
         @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
@@ -91,11 +91,7 @@ module Droonga
           message["descendants"] = descendants
           message["id"] = @id
         end
-        if @id == task["route"]
-          process(command, message)
-        else
-          @dispatcher.deliver(@id, task["route"], message, command, synchronous)
-        end
+        process(command, message)
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
         if synchronous
