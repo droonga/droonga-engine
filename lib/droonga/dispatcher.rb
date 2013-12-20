@@ -64,7 +64,7 @@ module Droonga
     def handle_envelope(envelope)
       @envelope = envelope
       if envelope["type"] == "dispatcher"
-        handle_internal_message(envelope["body"])
+        process_internal_message(envelope["body"])
       else
         process_input_message(envelope)
       end
@@ -82,7 +82,7 @@ module Droonga
                          adapted_message["replyTo"])
     end
 
-    def handle_internal_message(message)
+    def process_internal_message(message)
       id = message["id"]
       collector = @collectors[id]
       if collector
@@ -103,7 +103,7 @@ module Droonga
 
     def dispatch(message, destination)
       if local?(destination)
-        handle_internal_message(message)
+        process_internal_message(message)
       else
         @forwarder.forward(envelope.merge("body" => message),
                            "type" => "dispatcher",
