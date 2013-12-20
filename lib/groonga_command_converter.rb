@@ -67,7 +67,7 @@ module Droonga
     end
 
     private
-    def create_envelope(type, body)
+    def create_message(type, body)
       id = @options[:id]
       if id.nil?
         id = new_unique_id
@@ -99,11 +99,11 @@ module Droonga
     end
 
     def create_table_create_command(command)
-      create_envelope("table_create", command.arguments)
+      create_message("table_create", command.arguments)
     end
 
     def create_column_create_command(command)
-      create_envelope("column_create", command.arguments)
+      create_message("column_create", command.arguments)
     end
 
     def split_load_command_to_add_commands(command, &block)
@@ -126,12 +126,12 @@ module Droonga
         end
         body[:values] = record_values unless record_values.empty?
 
-        yield create_envelope("add", body)
+        yield create_message("add", body)
       end
     end
 
     def create_select_command(command)
-      create_envelope("select", command.arguments)
+      create_message("select", command.arguments)
     end
   end
 end
