@@ -76,11 +76,6 @@ module Droonga
 
     def post(body, destination=nil)
       $log.trace("#{log_tag}: post: start")
-      route = nil
-      unless is_route?(destination)
-        route = envelope["via"].pop
-        destination = route
-      end
       unless is_route?(destination)
         destination = envelope["replyTo"]
       end
@@ -109,8 +104,15 @@ module Droonga
           @output_adapter.process(command, body, *arguments)
         end
       end
-      add_route(route) if route
       $log.trace("#{log_tag}: post: done")
+    end
+
+    def reply(body)
+      @output_adapter.adapt(body)
+      if @envelope["via"].empty?
+        @forwarder.forward(@envelope.merge("body" => body),
+                           @envelope["replyTo"])
+      end
     end
 
     def handle_internal_message(message)

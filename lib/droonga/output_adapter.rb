@@ -27,6 +27,15 @@ module Droonga
       load_plugins(options[:plugins] || [])
     end
 
+    def adapt(body)
+      @dispatcher.envelope["via"].reverse_each do |command|
+        @plugins.each do |plugin|
+          next unless plugin.processable?(command)
+          process(command, body)
+        end
+      end
+    end
+
     private
     def instantiate_plugin(name)
       OutputAdapterPlugin.repository.instantiate(name, @dispatcher)
