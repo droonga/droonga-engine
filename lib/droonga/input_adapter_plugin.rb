@@ -25,27 +25,5 @@ module Droonga
       super()
       @dispatcher = dispatcher
     end
-
-    def add_route(route)
-      @dispatcher.add_route(route)
-    end
-
-    def post(body, destination=nil)
-      @dispatcher.post(body, destination)
-    end
-
-    def emit(value, name=nil)
-      if name
-        @output_values[name] = value
-      else
-        @output_values = value
-      end
-    end
-
-    def process(command, message)
-      @output_values = {}
-      super(command, message)
-      post(@output_values) unless @output_values.empty?
-    end
   end
 end
