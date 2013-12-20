@@ -40,43 +40,23 @@ module Droonga
         command = component["command"]
         n_of_expects = component["n_of_expects"]
         synchronous = nil
-        synchronous = true unless n_of_expects.zero?
         # TODO: check if asynchronous execution is available.
         message = {
           "task"=>task,
           "name"=>nil,
           "value"=>nil,
         }
-        unless synchronous
-          descendants = {}
-          component["descendants"].each do |name, indices|
-            descendants[name] = indices.collect do |index|
-              @components[index]["routes"].map do |route|
-                @dispatcher.farm_path(route)
-              end
+        descendants = {}
+        component["descendants"].each do |name, indices|
+          descendants[name] = indices.collect do |index|
+            @components[index]["routes"].map do |route|
+              @dispatcher.farm_path(route)
             end
           end
-          message["descendants"] = descendants
-          message["id"] = @id
         end
+        message["descendants"] = descendants
+        message["id"] = @id
         @dispatcher.deliver(@id, task["route"], message, command, synchronous)
-        if synchronous
-          result = task["values"]
-          post = component["post"]
-          @dispatcher.post(result, post) if post
-          component["descendants"].each do |name, indices|
-            message = {
-              "id" => @id,
-              "input" => name,
-              "value" => result[name]
-            }
-            indices.each do |index|
-              @components[index]["routes"].each do |route|
-                @dispatcher.dispatch(message, route)
-              end
-            end
-          end
-        end
         @n_dones += 1
         @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
