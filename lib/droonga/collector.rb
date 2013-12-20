@@ -79,21 +79,21 @@ module Droonga
         process(command, message)
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
-          result = task["values"]
-          post = component["post"]
-          @dispatcher.post(result, post) if post
-          component["descendants"].each do |name, indices|
-            message = {
-              "id" => @id,
-              "input" => name,
-              "value" => result[name]
-            }
-            indices.each do |index|
-              @components[index]["routes"].each do |route|
-                @dispatcher.dispatch(message, route)
-              end
+        result = task["values"]
+        post = component["post"]
+        @dispatcher.post(result, post) if post
+        component["descendants"].each do |name, indices|
+          message = {
+            "id" => @id,
+            "input" => name,
+            "value" => result[name]
+          }
+          indices.each do |index|
+            @components[index]["routes"].each do |route|
+              @dispatcher.dispatch(message, route)
             end
           end
+        end
         @n_dones += 1
         @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
