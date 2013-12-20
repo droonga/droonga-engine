@@ -130,7 +130,8 @@ module Droonga
         components = message["components"]
         if components
           planner = Planner.new(self, components)
-          collector = planner.get_collector(id)
+          collector = planner.create_collector(id)
+          @collectors[id] = collector
         else
           #todo: take cases receiving result before its query into account
         end
@@ -209,7 +210,7 @@ module Droonga
         @components = components
       end
 
-      def get_collector(id)
+      def create_collector(id)
         resolve_descendants
         tasks = []
         inputs = {}
@@ -230,7 +231,6 @@ module Droonga
           end
         end
         collector = Collector.new(id, @dispatcher, @components, tasks, inputs)
-        @dispatcher.collectors[id] = collector
         return collector
       end
 
