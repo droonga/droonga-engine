@@ -30,11 +30,11 @@ module Droonga
       @distributor.distribute(message)
     end
 
-    def scatter_all(envelope, key)
+    def scatter_all(message, key)
       message = [{
-        "command"=> envelope["type"],
-        "dataset"=> envelope["dataset"],
-        "body"=> envelope["body"],
+        "command"=> message["type"],
+        "dataset"=> message["dataset"],
+        "body"=> message["body"],
         "key"=> key,
         "type"=> "scatter",
         "replica"=> "all",
@@ -43,11 +43,11 @@ module Droonga
       distribute(message)
     end
 
-    def broadcast_all(envelope)
+    def broadcast_all(message)
       distribute_message = [{
-        "command"=> envelope["type"],
-        "dataset"=> envelope["dataset"],
-        "body"=> envelope["body"],
+        "command"=> message["type"],
+        "dataset"=> message["dataset"],
+        "body"=> message["body"],
         "type"=> "broadcast",
         "replica"=> "all",
         "post"=> true
