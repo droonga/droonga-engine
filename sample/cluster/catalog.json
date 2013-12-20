@@ -38,6 +38,6 @@
     }
   },
   "options": {
-    "plugins": ["select"]
+    "plugins": ["groonga"]
   }
 }

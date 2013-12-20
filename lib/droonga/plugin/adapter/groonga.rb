@@ -18,7 +18,7 @@ require "droonga/output_adapter_plugin"
 
 module Droonga
   class GroongaInputAdapter < Droonga::InputAdapterPlugin
-    repository.register("select", self)
+    repository.register("groonga", self)
 
     command :select
     def select(input_message)
@@ -32,7 +32,7 @@ module Droonga
   end
 
   class GroongaOutputAdapter < Droonga::OutputAdapterPlugin
-    repository.register("select", self)
+    repository.register("groonga", self)
 
     command :select_response
     def select_response(search_response)
