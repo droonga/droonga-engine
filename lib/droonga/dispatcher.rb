@@ -75,7 +75,9 @@ module Droonga
     end
 
     def forward(message, destination)
+      $log.trace("#{log_tag}: forward start")
       @forwarder.forward(message, destination)
+      $log.trace("#{log_tag}: forward done")
     end
 
     def reply(body)
