@@ -92,10 +92,9 @@ module Droonga
         task["n_of_inputs"] += 1
         component = task["component"]
         type = component["type"]
-        command = component["command"] || ("collector_" + type)
+        command = "collector_" + type
         n_of_expects = component["n_of_expects"]
         synchronous = nil
-        if command
           synchronous = true unless n_of_expects.zero?
           # TODO: check if asynchronous execution is available.
           message = {
@@ -120,7 +119,6 @@ module Droonga
           else
             @dispatcher.deliver(@id, task["route"], message, command, synchronous)
           end
-        end
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
         if synchronous
