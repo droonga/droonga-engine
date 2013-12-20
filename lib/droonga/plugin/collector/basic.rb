@@ -60,7 +60,7 @@ module Droonga
         end
         output = output["output"]
       end
-      emit(result, output)
+      emit(output, result)
     end
 
     def apply_output_range(items, output)
@@ -106,7 +106,7 @@ module Droonga
         value = request
         old_value = output_values[output]
         value = reduce(elements, old_value, request) if old_value
-        emit(value, output)
+        emit(output, value)
       end
     end
 

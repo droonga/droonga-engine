@@ -39,44 +39,13 @@ module Droonga
       @id = message["id"]
       @value = message["value"]
       @input_name = message["name"]
-      @descendants = message["descendants"]
       super(command, @value)
-      output if @descendants
       true
     end
 
     # TODO: consider better name
-    def emit(value, name=nil)
-      unless name
-        if @output_names
-          name = @output_names.first
-        else
-          @output_values = @task["values"] = value
-          return
-        end
-      end
+    def emit(name, value)
       @output_values[name] = value
-    end
-
-    def post(message, destination=nil)
-      @dispatcher.post(message, destination)
-    end
-
-    def output
-      result = @task["values"]
-      post(result, @component["post"]) if @component["post"]
-      @descendants.each do |name, dests|
-        message = {
-          "id" => @id,
-          "input" => name,
-          "value" => result[name]
-        }
-        dests.each do |routes|
-          routes.each do |route|
-            post(message, "to"=>route, "type"=>"dispatcher")
-          end
-        end
-      end
     end
   end
 end
