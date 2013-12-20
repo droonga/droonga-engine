@@ -42,7 +42,6 @@ module Droonga
         component = task["component"]
         type = component["type"]
         command = component["command"]
-        n_of_expects = component["n_of_expects"]
         synchronous = nil
         descendants = {}
         component["descendants"].each do |name, indices|
