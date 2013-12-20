@@ -32,16 +32,16 @@ module Droonga
     end
 
     def shutdown
-      $log.trace("processor: shutdown: start")
+      $log.trace("#{log_tag}: shutdown: start")
       @handler.shutdown
-      $log.trace("processor: shutdown: done")
+      $log.trace("#{log_tag}: shutdown: done")
     end
 
     def process(envelope, synchronous=nil)
-      $log.trace("proessor: process: start")
+      $log.trace("#{log_tag}: process: start")
       command = envelope["type"]
       if @handler.processable?(command)
-        $log.trace("proessor: process: handlable: #{command}")
+        $log.trace("#{log_tag}: process: handlable: #{command}")
         if synchronous.nil?
           synchronous = @handler.prefer_synchronous?(command)
         end
@@ -51,9 +51,14 @@ module Droonga
           @message_pusher.push(envelope)
         end
       else
-        $log.trace("proessor: process: ignore #{command}")
+        $log.trace("#{log_tag}: process: ignore #{command}")
       end
-      $log.trace("proessor: process: done")
+      $log.trace("#{log_tag}: process: done")
+    end
+
+    private
+    def log_tag
+      "processor"
     end
   end
 end
