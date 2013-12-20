@@ -124,7 +124,9 @@ module Droonga
     def handle_internal_message(message)
       id = message["id"]
       collector = @collectors[id]
-      unless collector
+      if collector
+        collector.receive(message["input"], message["value"])
+      else
         components = message["components"]
         if components
           planner = Planner.new(self, components)
@@ -132,8 +134,8 @@ module Droonga
         else
           #todo: take cases receiving result before its query into account
         end
+        collector.start
       end
-      collector.handle(message["input"], message["value"])
     end
 
     def dispatch(message, destination)
