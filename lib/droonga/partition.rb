@@ -55,9 +55,9 @@ module Droonga
       $log.trace("partition: shutdown: done")
     end
 
-    def process(envelope, synchronous=nil)
+    def process(message, synchronous=nil)
       $log.trace("partition: process: start")
-      @processor.process(envelope, synchronous)
+      @processor.process(message, synchronous)
       $log.trace("partition: process: done")
     end
 
