@@ -22,16 +22,16 @@ module Droonga
     repository.register("groonga", self)
 
     command :table_create
-    def table_create(envelope)
-      unless envelope["dataset"]
+    def table_create(message)
+      unless message["dataset"]
         raise "dataset must be set. FIXME: This error should return client."
       end
-      broadcast_all(envelope)
+      broadcast_all(message)
     end
 
     command :column_create
-    def column_create(envelope)
-      broadcast_all(envelope)
+    def column_create(message)
+      broadcast_all(message)
     end
   end
 end

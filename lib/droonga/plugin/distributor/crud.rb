@@ -22,22 +22,22 @@ module Droonga
     repository.register("crud", self)
 
     command :add
-    def add(envelope)
-      key = envelope["body"]["key"] || rand.to_s
-      scatter_all(envelope, key)
+    def add(message)
+      key = message["body"]["key"] || rand.to_s
+      scatter_all(message, key)
     end
 
     command :update
-    def update(envelope)
-      key = envelope["body"]["key"] || rand.to_s
-      scatter_all(envelope, key)
+    def update(message)
+      key = message["body"]["key"] || rand.to_s
+      scatter_all(message, key)
     end
 
     # TODO: What is this?
     command :reset
-    def reset(envelope)
-      key = envelope["body"]["key"] || rand.to_s
-      scatter_all(envelope, key)
+    def reset(message)
+      key = message["body"]["key"] || rand.to_s
+      scatter_all(message, key)
     end
   end
 end

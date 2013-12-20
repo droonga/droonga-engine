@@ -19,9 +19,9 @@ module Droonga
   class DistributedSearchPlanner
     attr_reader :messages
 
-    def initialize(search_request_envelope)
-      @source_envelope = search_request_envelope
-      @request = @source_envelope["body"]
+    def initialize(search_request_message)
+      @source_message = search_request_message
+      @request = @source_message["body"]
       @queries = @request["queries"]
 
       @input_names = []
@@ -52,7 +52,7 @@ module Droonga
       searcher = {
         "type" => "broadcast",
         "command" => "search", # XXX should be placed in the "body"?
-        "dataset" => @source_envelope["dataset"] || @request["dataset"],
+        "dataset" => @source_message["dataset"] || @request["dataset"],
         "body" => @request,
         "outputs" => @input_names, # XXX should be placed in the "body"?
         "replica" => "random", # XXX should be placed in the "body"?

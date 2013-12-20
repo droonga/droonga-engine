@@ -22,23 +22,23 @@ module Droonga
     repository.register("watch", self)
 
     command "watch.feed" => :feed
-    def feed(envelope)
-      broadcast_all(envelope)
+    def feed(message)
+      broadcast_all(message)
     end
 
     command "watch.subscribe" => :subscribe
-    def subscribe(envelope)
-      broadcast_all(envelope)
+    def subscribe(message)
+      broadcast_all(message)
     end
 
     command "watch.unsubscribe" => :unsubscribe
-    def unsubscribe(envelope)
-      broadcast_all(envelope)
+    def unsubscribe(message)
+      broadcast_all(message)
     end
 
     command "watch.sweep" => :sweep
-    def sweep(envelope)
-      broadcast_all(envelope)
+    def sweep(message)
+      broadcast_all(message)
     end
   end
 end

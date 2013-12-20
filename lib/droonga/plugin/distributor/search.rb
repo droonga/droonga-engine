@@ -23,8 +23,8 @@ module Droonga
     repository.register("search", self)
 
     command :search
-    def search(envelope)
-      planner = DistributedSearchPlanner.new(envelope)
+    def search(message)
+      planner = DistributedSearchPlanner.new(message)
       distribute(planner.messages)
     end
   end
