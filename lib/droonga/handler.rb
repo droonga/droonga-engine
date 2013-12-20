@@ -96,7 +96,6 @@ module Droonga
     private
     def parse_envelope(envelope)
       @envelope = envelope
-      envelope["via"] ||= []
       [envelope["body"], envelope["type"], envelope["arguments"]]
     end
 
