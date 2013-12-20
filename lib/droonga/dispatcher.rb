@@ -26,7 +26,7 @@ require "droonga/input_message"
 
 module Droonga
   class Dispatcher
-    attr_reader :name, :envelope, :collectors
+    attr_reader :name, :envelope
 
     def initialize(options)
       @options = options
@@ -137,6 +137,7 @@ module Droonga
         end
         collector.start
       end
+      @collectors.delete(id) if collector.done?
     end
 
     def dispatch(message, destination)

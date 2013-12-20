@@ -32,6 +32,10 @@ module Droonga
       load_plugins(["basic"]) # TODO: make customizable
     end
 
+    def done?
+      @n_dones == @tasks.size
+    end
+
     def start
       tasks = @inputs[nil]
       tasks.each do |task|
@@ -55,7 +59,6 @@ module Droonga
         }
         @dispatcher.process_in_farm(task["route"], message, command, synchronous)
         @n_dones += 1
-        @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
     end
 
@@ -95,7 +98,6 @@ module Droonga
           end
         end
         @n_dones += 1
-        @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
       end
     end
 
