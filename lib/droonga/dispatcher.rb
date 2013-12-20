@@ -173,23 +173,23 @@ module Droonga
       route.is_a?(String) || route.is_a?(Hash)
     end
 
-    def apply_input_adapters(envelope)
-      adapted_envelope = envelope
+    def apply_input_adapters(message)
+      adapted_message = message
       loop do
-        input_message = InputMessage.new(adapted_envelope)
+        input_message = InputMessage.new(adapted_message)
         command = input_message.command
         break unless @input_adapter.processable?(command)
         @input_adapter.process(command, input_message)
         new_command = input_message.command
-        adapted_envelope = input_message.adapted_envelope
+        adapted_message = input_message.adapted_message
         break if command == new_command
       end
-      adapted_envelope
+      adapted_message
     end
 
-    def process_input_message(envelope)
-      adapted_envelope = apply_input_adapters(envelope)
-      @distributor.process(adapted_envelope["type"], adapted_envelope)
+    def process_input_message(message)
+      adapted_message = apply_input_adapters(message)
+      @distributor.process(adapted_message["type"], adapted_message)
     end
 
     def log_tag

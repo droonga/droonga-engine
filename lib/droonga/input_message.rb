@@ -17,35 +17,35 @@
 
 module Droonga
   class InputMessage
-    def initialize(envelope)
-      @envelope = envelope
+    def initialize(raw_message)
+      @raw_message = raw_message
     end
 
-    def adapted_envelope
-      # TODO: We can create adapted envelope non-destructively.
+    def adapted_message
+      # TODO: We can create adapted message non-destructively.
       # If it is not performance issue, it is better that we don't
-      # change envelope destructively. Consider about it later.
-      @envelope
+      # change message destructively. Consider about it later.
+      @raw_message
     end
 
     def add_route(route)
-      @envelope["via"].push(route)
+      @raw_message["via"].push(route)
     end
 
     def body
-      @envelope["body"]
+      @raw_message["body"]
     end
 
     def body=(body)
-      @envelope["body"] = body
+      @raw_message["body"] = body
     end
 
     def command
-      @envelope["type"]
+      @raw_message["type"]
     end
 
     def command=(command)
-      @envelope["type"] = command
+      @raw_message["type"] = command
     end
   end
 end
