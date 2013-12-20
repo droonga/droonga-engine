@@ -25,5 +25,9 @@ module Droonga
       super()
       @dispatcher = dispatcher
     end
+
+    def forward(message, destination)
+      @dispatcher.forward(message, destination)
+    end
   end
 end
