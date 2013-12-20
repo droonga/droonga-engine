@@ -30,7 +30,7 @@ module Droonga
 
     def adapt(message)
       adapted_message = message
-      @dispatcher.envelope["via"].reverse_each do |command|
+      message["via"].reverse_each do |command|
         @plugins.each do |plugin|
           next unless plugin.processable?(command)
           output_message = OutputMessage.new(adapted_message)
