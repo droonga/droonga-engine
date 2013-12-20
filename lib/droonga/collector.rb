@@ -40,12 +40,6 @@ module Droonga
         command = component["command"]
         n_of_expects = component["n_of_expects"]
         synchronous = nil
-        # TODO: check if asynchronous execution is available.
-        message = {
-          "task"=>task,
-          "name"=>nil,
-          "value"=>nil,
-        }
         descendants = {}
         component["descendants"].each do |name, indices|
           descendants[name] = indices.collect do |index|
@@ -54,8 +48,11 @@ module Droonga
             end
           end
         end
-        message["descendants"] = descendants
-        message["id"] = @id
+        message = {
+          "id"          => @id,
+          "task"        => task,
+          "descendants" => descendants
+        }
         @dispatcher.deliver(@id, task["route"], message, command, synchronous)
         @n_dones += 1
         @dispatcher.collectors.delete(@id) if @n_dones == @tasks.size
