@@ -329,7 +329,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       @plugin.process("collector_gather", request)
       output_name = data[:mapping]
       output_name = output_name["output"] if output_name.is_a?(Hash)
-      assert_equal([data[:expected], output_name], @messages.last)
+      assert_equal([output_name, data[:expected]], @messages.last)
     end
   end
 
@@ -395,6 +395,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
+                     output_name,
                      {
                        "numeric_value" => 3,
                        "numeric_key_records" => [
@@ -414,7 +415,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                     output_name
                    ],
                    @messages.last)
     end
@@ -480,6 +480,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
+                     output_name,
                      {
                        "numeric_value" => 3,
                        "numeric_key_records" => [
@@ -495,7 +496,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                     output_name
                    ],
                    @messages.last)
     end
@@ -561,6 +561,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
+                     output_name,
                      {
                        "numeric_key_records" => [
                          create_record(1),
@@ -579,7 +580,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                     output_name
                    ],
                    @messages.last)
     end
@@ -645,6 +645,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
+                     output_name,
                      {
                        "numeric_key_records" => [
                          create_record(1),
@@ -659,7 +660,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                     output_name
                    ],
                    @messages.last)
     end
@@ -759,6 +759,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
+                     output_name,
                      {
                        "records" => [
                          [
@@ -805,7 +806,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                          ],
                        ],
                      },
-                     output_name
                    ],
                    @messages.last)
     end
