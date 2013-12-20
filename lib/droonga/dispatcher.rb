@@ -69,7 +69,7 @@ module Droonga
     def handle_envelope(envelope)
       @envelope = envelope
       if envelope["type"] == "dispatcher"
-        handle(envelope["body"], envelope["arguments"])
+        handle_internal_message(envelope["body"])
       else
         process_input_message(envelope)
       end
@@ -112,13 +112,6 @@ module Droonga
       end
       add_route(route) if route
       $log.trace("#{log_tag}: post: done")
-    end
-
-    def handle(message, arguments)
-      case message
-      when Hash
-        handle_internal_message(message)
-      end
     end
 
     def handle_internal_message(message)
