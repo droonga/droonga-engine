@@ -17,6 +17,7 @@
 
 require "droonga/pluggable"
 require "droonga/input_adapter_plugin"
+require "droonga/input_message"
 
 module Droonga
   class InputAdapter
@@ -25,6 +26,18 @@ module Droonga
     def initialize(dispatcher, options={})
       @dispatcher = dispatcher
       load_plugins(options[:plugins] || [])
+    end
+
+    def adapt(message)
+      adapted_message = message
+      @plugins.each do |plugin|
+        input_message = InputMessage.new(adapted_message)
+        command = input_message.command
+        next unless plugin.processable?(command)
+        process(command, input_message)
+        adapted_message = input_message.adapted_message
+      end
+      adapted_message
     end
 
     private
