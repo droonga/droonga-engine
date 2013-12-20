@@ -25,7 +25,7 @@ require "droonga/farm"
 
 module Droonga
   class Dispatcher
-    attr_reader :name, :envelope
+    attr_reader :name
 
     def initialize(options)
       @options = options
@@ -61,12 +61,12 @@ module Droonga
       @loop_thread.join
     end
 
-    def handle_message(envelope)
-      @envelope = envelope
-      if envelope["type"] == "dispatcher"
-        process_internal_message(envelope["body"])
+    def handle_message(message)
+      @message = message
+      if message["type"] == "dispatcher"
+        process_internal_message(message["body"])
       else
-        process_input_message(envelope)
+        process_input_message(message)
       end
     end
 
@@ -77,7 +77,7 @@ module Droonga
     end
 
     def reply(body)
-      adapted_message = @output_adapter.adapt(@envelope.merge("body" => body))
+      adapted_message = @output_adapter.adapt(@message.merge("body" => body))
       @forwarder.forward(adapted_message,
                          adapted_message["replyTo"])
     end
@@ -105,7 +105,7 @@ module Droonga
       if local?(destination)
         process_internal_message(message)
       else
-        @forwarder.forward(envelope.merge("body" => message),
+        @forwarder.forward(@message.merge("body" => message),
                            "type" => "dispatcher",
                            "to"   => farm_path(destination))
       end
@@ -114,8 +114,8 @@ module Droonga
     # TODO: Use more meaningful name
     def process_in_farm(route, message, type, synchronous)
       # TODO: validate route is farm path
-      envelope = @envelope.merge("body" => message, "type" => type)
-      @farm.process(route, envelope, synchronous)
+      message = @message.merge("body" => message, "type" => type)
+      @farm.process(route, message, synchronous)
     end
 
     def generate_id
