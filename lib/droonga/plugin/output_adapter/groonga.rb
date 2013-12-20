@@ -20,9 +20,9 @@ module Droonga
     repository.register("groonga", self)
 
     command :select_response
-    def select_response(search_response)
+    def select_response(output_message)
       command = Select.new
-      emit(command.convert(search_response))
+      output_message.body = command.convert(output_message.body)
     end
   end
 end

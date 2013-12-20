@@ -93,10 +93,10 @@ module Droonga
         synchronous = destination["synchronous"]
       end
       if receiver
-        @forwarder.forward(envelope.merge("body" => body),
-                           "type" => command,
-                           "to" => receiver,
-                           "arguments" => arguments)
+        forward(envelope.merge("body" => body),
+                "type" => command,
+                "to" => receiver,
+                "arguments" => arguments)
       else
         if command == "dispatcher"
           handle(body, arguments)
@@ -107,12 +107,14 @@ module Droonga
       $log.trace("#{log_tag}: post: done")
     end
 
+    def forward(message, destination)
+      @forwarder.forward(message, destination)
+    end
+
     def reply(body)
-      @output_adapter.adapt(body)
-      if @envelope["via"].empty?
-        @forwarder.forward(@envelope.merge("body" => body),
-                           @envelope["replyTo"])
-      end
+      adapted_message = @output_adapter.adapt(@envelope.merge("body" => body))
+      @forwarder.forward(adapted_message,
+                         adapted_message["replyTo"])
     end
 
     def handle_internal_message(message)

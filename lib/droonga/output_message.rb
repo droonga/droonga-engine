@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,19 +13,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
-
 module Droonga
-  class OutputAdapterPlugin < Plugin
-    extend PluginRegisterable
-
-    def initialize(dispatcher)
-      super()
-      @dispatcher = dispatcher
+  class OutputMessage
+    def initialize(raw_message)
+      @raw_message = raw_message
     end
 
-    def forward(message, destination)
-      @dispatcher.forward(message, destination)
+    def adapted_message
+      # TODO: We can create adapted message non-destructively.
+      # If it is not performance issue, it is better that we don't
+      # change message destructively. Consider about it later.
+      @raw_message
+    end
+
+    def body
+      @raw_message["body"]
+    end
+
+    def body=(body)
+      @raw_message["body"] = body
     end
   end
 end

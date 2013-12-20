@@ -17,6 +17,7 @@
 
 require "droonga/pluggable"
 require "droonga/output_adapter_plugin"
+require "droonga/output_message"
 
 module Droonga
   class OutputAdapter
@@ -27,13 +28,17 @@ module Droonga
       load_plugins(options[:plugins] || [])
     end
 
-    def adapt(body)
+    def adapt(message)
+      adapted_message = message
       @dispatcher.envelope["via"].reverse_each do |command|
         @plugins.each do |plugin|
           next unless plugin.processable?(command)
-          process(command, body)
+          output_message = OutputMessage.new(adapted_message)
+          process(command, output_message)
+          adapted_message = output_message.adapted_message
         end
       end
+      adapted_message
     end
 
     private
