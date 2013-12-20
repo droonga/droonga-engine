@@ -36,7 +36,7 @@ module Droonga
     end
 
     def process(message)
-      @dispatcher.handle_envelope(message)
+      @dispatcher.handle_message(message)
     end
   end
 end

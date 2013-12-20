@@ -61,7 +61,7 @@ module Droonga
       @loop_thread.join
     end
 
-    def handle_envelope(envelope)
+    def handle_message(envelope)
       @envelope = envelope
       if envelope["type"] == "dispatcher"
         process_internal_message(envelope["body"])
