@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,21 +13,22 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler_plugin"
-require "droonga/searcher"
-
 module Droonga
-  class SearchHandler < Droonga::HandlerPlugin
-    repository.register("search", self)
-
-    command :search
-    def search(message, messenger)
-      searcher = Droonga::Searcher.new(@context)
-      values = {}
-      searcher.search(message.request["queries"]).each do |output, value|
-        values[output] = value
+  module Test
+    class StubHandlerMessenger
+      attr_reader :values, :messages
+      def initialize
+        @values = []
+        @messages = []
       end
-      messenger.emit(values)
+
+      def emit(value)
+        @values << value
+      end
+
+      def forward(message, destination)
+        @messages << [message, destination]
+      end
     end
   end
 end

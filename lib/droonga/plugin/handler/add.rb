@@ -24,9 +24,9 @@ module Droonga
     repository.register("add", self)
 
     command :add
-    def add(request)
-      outputs = process_add(request)
-      emit(outputs)
+    def add(message, messenger)
+      outputs = process_add(message.request)
+      messenger.emit(outputs)
     end
 
     private

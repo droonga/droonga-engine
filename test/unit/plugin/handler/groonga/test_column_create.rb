@@ -15,9 +15,10 @@
 
 class ColumnCreateTest < GroongaHandlerTest
   def test_success
-    @plugin.table_create({"name" => "Books"})
-    @plugin.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
-    response = @messages.last.first
+    process(:table_create, {"name" => "Books"})
+    process(:column_create,
+            {"table" => "Books", "name" => "title", "type" => "ShortText"})
+    response = @messenger.values.last
     assert_equal(
       [[Droonga::GroongaHandler::Status::SUCCESS, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
       [normalize_header(response.first), response.last]
@@ -25,8 +26,9 @@ class ColumnCreateTest < GroongaHandlerTest
   end
 
   def test_name
-    @plugin.table_create({"name" => "Books"})
-    @plugin.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+    process(:table_create, {"name" => "Books"})
+    process(:column_create,
+            {"table" => "Books", "name" => "title", "type" => "ShortText"})
     assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
@@ -34,8 +36,9 @@ column_create Books title COLUMN_SCALAR ShortText
   end
 
   def test_type
-    @plugin.table_create({"name" => "Books"})
-    @plugin.column_create({"table" => "Books", "name" => "main_text", "type" => "LongText"})
+    process(:table_create, {"name" => "Books"})
+    process(:column_create,
+            {"table" => "Books", "name" => "main_text", "type" => "LongText"})
     assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books main_text COLUMN_SCALAR LongText
@@ -59,8 +62,8 @@ column_create Books main_text COLUMN_SCALAR LongText
           "type"  => "ShortText",
           "flags" => data[:flags],
         }
-        @plugin.table_create({"name" => "Books"})
-        @plugin.column_create(request)
+        process(:table_create, {"name" => "Books"})
+        process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title #{data[:flags]} ShortText
@@ -71,8 +74,9 @@ column_create Books title #{data[:flags]} ShortText
     class IndexTest < self
       def setup
         super
-        @plugin.table_create({"name" => "Books"})
-        @plugin.column_create({"table" => "Books", "name" => "title", "type" => "ShortText"})
+        process(:table_create, {"name" => "Books"})
+        process(:column_create,
+                {"table" => "Books", "name" => "title", "type" => "ShortText"})
       end
 
       def test_index_column_type
@@ -86,7 +90,7 @@ column_create Books title #{data[:flags]} ShortText
           "source" => "title",
           "flags"  => data[:flags],
         }
-        @plugin.column_create(request)
+        process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText
@@ -118,7 +122,7 @@ column_create Books entry_title #{data[:flags]} Books title
           "source" => "title",
           "flags"  => flags,
         }
-        @plugin.column_create(request)
+        process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books title COLUMN_SCALAR ShortText

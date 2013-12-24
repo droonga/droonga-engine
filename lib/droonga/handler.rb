@@ -18,7 +18,8 @@
 require "groonga"
 
 require "droonga/forwarder"
-require "droonga/replier"
+require "droonga/handler_message"
+require "droonga/handler_messenger"
 require "droonga/pluggable"
 require "droonga/handler_plugin"
 
@@ -66,30 +67,9 @@ module Droonga
         $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
         return
       end
-      process_command(plugin, command, body, arguments)
+      process_command(plugin, command, envelope, arguments)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
-    end
-
-    def emit(value)
-      if @descendants.empty?
-        @replier.reply(envelope.merge("body" => value))
-      else
-        @descendants.each do |name, dests|
-          message = {
-            "id" => @id,
-            "input" => name,
-            "value" => value[name],
-          }
-          dests.each do |dest|
-            forward(message, "to" => dest, "type" => "dispatcher")
-          end
-        end
-      end
-    end
-
-    def forward(message, destination)
-      @forwarder.forward(envelope.merge("body" => message), destination)
     end
 
     private
@@ -105,7 +85,6 @@ module Droonga
       end
       load_plugins(@options[:handlers] || [])
       @forwarder = Forwarder.new(@loop)
-      @replier = Replier.new(@forwarder)
     end
 
     def instantiate_plugin(name)
@@ -113,20 +92,11 @@ module Droonga
     end
 
     def process_command(plugin, command, request, arguments)
-      return false unless request.is_a? Hash
+      handler_message = HandlerMessage.new(request)
+      handler_message.validate
 
-      @task = request["task"]
-      return false unless @task.is_a? Hash
-
-      @component = @task["component"]
-      return false unless @component.is_a? Hash
-
-      @output_values = @task["values"]
-      @body = @component["body"]
-      @id = request["id"]
-      @descendants = request["descendants"]
-
-      plugin.process(command, @body, *arguments)
+      messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
+      plugin.process(command, handler_message, messenger, *arguments)
     end
 
     def log_tag

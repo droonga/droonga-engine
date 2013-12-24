@@ -30,6 +30,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
     @plugin = Droonga::SearchHandler.new(@handler)
+    @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
   def teardown_plugin
@@ -38,9 +39,10 @@ class SearchHandlerTest < Test::Unit::TestCase
   end
 
   private
-  def search(request)
-    @plugin.search(request)
-    results_to_result_set(@handler.messages.first)
+  def search(request, headers={})
+    message = Droonga::Test::StubHandlerMessage.new(request, headers)
+    @plugin.search(message, @messenger)
+    results_to_result_set(@messenger.values.first)
   end
 
   def results_to_result_set(results)

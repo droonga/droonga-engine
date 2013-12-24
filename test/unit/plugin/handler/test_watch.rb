@@ -35,10 +35,16 @@ class WatchHandlerTest < Test::Unit::TestCase
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
     @plugin = Droonga::WatchHandler.new(@handler)
+    @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
   def teardown_plugin
     @plugin = nil
+  end
+
+  def process(command, request, headers={})
+    message = Droonga::Test::StubHandlerMessage.new(request, headers)
+    @plugin.send(command, message, @messenger)
   end
 
   public
@@ -49,8 +55,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      mock(@plugin).emit([true])
-      @plugin.subscribe(request)
+      process(:subscribe, request)
+      assert_equal([[true]], @messenger.values)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -63,9 +69,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      @handler.envelope["from"] = "localhost:23004/output"
-      mock(@plugin).emit([true])
-      @plugin.subscribe(request)
+      process(:subscribe, request, "from" => "localhost:23004/output")
+      assert_equal([[true]], @messenger.values)
 
       assert_equal(
         ["localhost:23004/output"],
@@ -79,9 +84,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost",
         "route" => "localhost:23003/output"
       }
-      @handler.envelope["from"] = "localhost:23004/output"
-      mock(@plugin).emit([true])
-      @plugin.subscribe(request)
+      process(:subscribe, request, "from" => "localhost:23004/output")
+      assert_equal([[true]], @messenger.values)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -111,8 +115,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      mock(@plugin).emit([true])
-      @plugin.unsubscribe(request)
+      process(:unsubscribe, request)
+      assert_equal([[true]], @messenger.values)
     end
 
     private
@@ -122,8 +126,9 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      stub(@plugin).emit([true])
-      @plugin.subscribe(request)
+      process(:subscribe, request)
+      assert_equal([[true]], @messenger.values)
+      @messenger.values.clear
     end
   end
 
@@ -139,16 +144,25 @@ class WatchHandlerTest < Test::Unit::TestCase
           "text" => "たいやきおいしいです"
         }
       }
-      @plugin.feed(request)
+      process(:feed, request)
       assert_equal([
-                     [request,
+                     [
+                       {
+                         "body" => {
+                           "task" => {
+                             "component" => {
+                               "body" => request,
+                             },
+                           },
+                         },
+                       },
                        {
                          "to"   => "localhost:23003/output",
                          "type" => "watch.notification",
                        },
                      ],
                    ],
-                   @handler.messages)
+                   @messenger.messages)
     end
 
     def test_feed_not_match
@@ -157,8 +171,8 @@ class WatchHandlerTest < Test::Unit::TestCase
           "text" => "たこやきおいしいです"
         }
       }
-      @plugin.feed(request)
-      assert_equal([], @handler.messages)
+      process(:feed, request)
+      assert_equal([], @messenger.messages)
     end
 
     private
@@ -168,8 +182,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      stub(@plugin).emit([true])
-      @plugin.subscribe(request)
+      process(:subscribe, request)
+      assert_equal([[true]], @messenger.values)
     end
   end
 end

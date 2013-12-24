@@ -27,18 +27,6 @@ module Droonga
       @context = @handler.context
     end
 
-    def envelope
-      @handler.envelope
-    end
-
-    def emit(value)
-      @handler.emit(value)
-    end
-
-    def forward(body, destination)
-      @handler.forward(body, destination)
-    end
-
     def prefer_synchronous?(command)
       false
     end

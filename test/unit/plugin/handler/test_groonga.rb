@@ -20,7 +20,7 @@ class GroongaHandlerTest < Test::Unit::TestCase
 
   def setup
     setup_database
-    setup_plugin(Droonga::GroongaHandler)
+    setup_plugin
   end
 
   def teardown
@@ -29,9 +29,23 @@ class GroongaHandlerTest < Test::Unit::TestCase
   end
 
   private
+  def setup_plugin
+    @handler = Droonga::Test::StubHandler.new
+    @plugin = Droonga::GroongaHandler.new(@handler)
+    @messenger = Droonga::Test::StubHandlerMessenger.new
+  end
+
+  def teardown_plugin
+  end
+
   def dump
     database_dumper = Groonga::DatabaseDumper.new(:database => @database)
     database_dumper.dump
+  end
+
+  def process(command, request)
+    message = Droonga::Test::StubHandlerMessage.new(request)
+    @plugin.send(command, message, @messenger)
   end
 
   NORMALIZED_START_TIME = Time.parse("2013-07-11T16:04:28+0900").to_i

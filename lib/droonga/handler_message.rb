@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,21 +13,49 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler_plugin"
-require "droonga/searcher"
-
 module Droonga
-  class SearchHandler < Droonga::HandlerPlugin
-    repository.register("search", self)
+  class HandlerMessage
+    attr_reader :raw
+    def initialize(raw)
+      @raw = raw
+    end
 
-    command :search
-    def search(message, messenger)
-      searcher = Droonga::Searcher.new(@context)
-      values = {}
-      searcher.search(message.request["queries"]).each do |output, value|
-        values[output] = value
+    def validate
+      unless task.is_a?(Hash)
+        raise "<task> value isn't object: <#{@raw.inspect}>"
       end
-      messenger.emit(values)
+
+      unless component.is_a?(Hash)
+        raise "<task/component> value isn't object: <#{@raw.inspect}>"
+      end
+    end
+
+    def [](name)
+      @raw[name]
+    end
+
+    def body
+      @body ||= self["body"]
+    end
+
+    def task
+      @task ||= body["task"]
+    end
+
+    def component
+      @component ||= task["component"]
+    end
+
+    def request
+      @request ||= component["body"]
+    end
+
+    def id
+      @id ||= body["id"]
+    end
+
+    def descendants
+      @descendants ||= body["descendants"]
     end
   end
 end

@@ -23,7 +23,7 @@ module Droonga
   module Worker
     def initialize
       @loop = EventLoop.new
-      @handler = Handler.new(@loop, config)
+      @handler = Handler.new(@loop, config.merge(:dispatcher => nil))
       receiver_socket = config[:message_receiver]
       @message_receiver = MessageReceiver.new(@loop, receiver_socket) do |message|
         process(message)

@@ -24,17 +24,17 @@ module Droonga
     repository.register("groonga", self)
 
     command :table_create
-    def table_create(request)
+    def table_create(message, messenger)
       command = TableCreate.new(@context)
-      outputs = command.execute(request)
-      emit(outputs)
+      outputs = command.execute(message.request)
+      messenger.emit(outputs)
     end
 
     command :column_create
-    def column_create(request)
+    def column_create(message, messenger)
       command = ColumnCreate.new(@context)
-      outputs = command.execute(request)
-      emit(outputs)
+      outputs = command.execute(message.request)
+      messenger.emit(outputs)
     end
 
     def prefer_synchronous?(command)

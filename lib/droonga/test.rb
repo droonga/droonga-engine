@@ -17,3 +17,5 @@
 
 require "droonga/test/stub_distributor"
 require "droonga/test/stub_handler"
+require "droonga/test/stub_handler_message"
+require "droonga/test/stub_handler_messenger"

@@ -47,8 +47,8 @@ module Droonga
     end
 
     command "watch.subscribe" => :subscribe
-    def subscribe(request)
-      subscriber, condition, query, route = parse_request(request)
+    def subscribe(message, messenger)
+      subscriber, condition, query, route = parse_message(message)
       normalized_request = {
         :subscriber => subscriber,
         :condition  => condition,
@@ -56,39 +56,41 @@ module Droonga
         :route      => route,
       }
       @watcher.subscribe(normalized_request)
-      emit([true])
+      messenger.emit([true])
     end
 
     command "watch.unsubscribe" => :unsubscribe
-    def unsubscribe(request)
-      subscriber, condition, query, route = parse_request(request)
+    def unsubscribe(message, messenger)
+      subscriber, condition, query, route = parse_message(message)
       normalized_request = {
         :subscriber => subscriber,
         :condition  => condition,
         :query      => query,
       }
       @watcher.unsubscribe(normalized_request)
-      emit([true])
+      messenger.emit([true])
     end
 
     command "watch.feed" => :feed
-    def feed(request)
+    def feed(message, messenger)
+      request = message.request
       @watcher.feed(:targets => request["targets"]) do |route, subscribers|
-        message = request # return request itself
-        forward(message, "to" => route, "type" => "watch.notification")
+        messenger.forward(message.raw, # return request itself
+                          "to" => route, "type" => "watch.notification")
       end
     end
 
     command "watch.sweep" => :sweep
-    def sweep(request)
+    def sweep(message, messenger)
       @sweeper.sweep_expired_subscribers
     end
 
     private
-    def parse_request(request)
+    def parse_message(message)
+      request = message.request
       subscriber = request["subscriber"]
       condition = request["condition"]
-      route = request["route"] || envelope["from"]
+      route = request["route"] || message["from"]
       query = condition && condition.to_json
       [subscriber, condition, query, route]
     end

@@ -42,7 +42,7 @@ module Droonga
       @output_adapter =
         OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
       @loop = EventLoop.new
-      @farm = Farm.new(name, @loop)
+      @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
       @distributor = Distributor.new(self, @options)

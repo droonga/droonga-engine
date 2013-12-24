@@ -34,10 +34,16 @@ class AddHandlerTest < Test::Unit::TestCase
   def setup_handler
     @worker = StubWorker.new
     @handler = Droonga::AddHandler.new(@worker)
+    @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
   def teardown_handler
     @handler = nil
+  end
+
+  def process(request)
+    message = Droonga::Test::StubHandlerMessage.new(request)
+    @handler.add(message, @messenger)
   end
 
   public
@@ -58,8 +64,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {},
       }
-      mock(@handler).emit([true])
-      @handler.add(request)
+      process(request)
+      assert_equal([[true]], @messenger.values)
       table = @worker.context["Users"]
       assert_equal(["mori"], table.collect(&:key))
     end
@@ -70,8 +76,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "asami",
         "values" => {"country" => "japan"},
       }
-      mock(@handler).emit([true])
-      @handler.add(request)
+      process(request)
+      assert_equal([[true]], @messenger.values)
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
     end
@@ -92,8 +98,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {},
       }
-      mock(@handler).emit([true])
-      @handler.add(request)
+      process(request)
+      assert_equal([[true]], @messenger.values)
       table = @worker.context["Books"]
       assert_equal([nil], table.collect(&:title))
     end
@@ -103,8 +109,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {"title" => "CSS"},
       }
-      mock(@handler).emit([true])
-      @handler.add(request)
+      process(request)
+      assert_equal([[true]], @messenger.values)
       table = @worker.context["Books"]
       assert_equal(["CSS"], table.collect(&:title))
     end
@@ -116,8 +122,8 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Nonexistent",
         "values" => {},
       }
-      mock(@handler).emit([false])
-      @handler.add(request)
+      process(request)
+      assert_equal([[false]], @messenger.values)
     end
   end
 end
