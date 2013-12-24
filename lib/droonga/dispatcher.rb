@@ -116,6 +116,28 @@ module Droonga
       end
     end
 
+    def dispatch_components(components)
+      id = generate_id
+      destinations = {}
+      components.each do |component|
+        dataset = component["dataset"]
+        if dataset
+          routes = Droonga.catalog.get_routes(dataset, component)
+          component["routes"] = routes
+        else
+          component["routes"] ||= [id]
+        end
+        routes = component["routes"]
+        routes.each do |route|
+          destinations[farm_path(route)] = true
+        end
+      end
+      dispatch_message = { "id" => id, "components" => components }
+      destinations.each_key do |destination|
+        dispatch(dispatch_message, destination)
+      end
+    end
+
     # TODO: Use more meaningful name
     def process_in_farm(route, message, type, synchronous)
       # TODO: validate route is farm path

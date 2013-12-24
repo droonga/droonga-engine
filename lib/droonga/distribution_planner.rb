@@ -37,13 +37,12 @@ module Droonga
 
     include TSort
 
-    attr_reader :components
     def initialize(dispatcher, components)
       @dispatcher = dispatcher
       @components = components
     end
 
-    def resolve(id)
+    def plan
       @dependency = {}
       @components.each do |component|
         @dependency[component] = component["inputs"]
@@ -52,34 +51,15 @@ module Droonga
           @dependency[output] = [component]
         end
       end
-      @components = []
+      components = []
       each_strongly_connected_component do |cs|
         raise CyclicComponentsError.new(cs) if cs.size > 1
-        @components.concat(cs) unless cs.first.is_a? String
+        components.concat(cs) unless cs.first.is_a? String
       end
-      resolve_routes(id)
+      components
     end
 
     private
-    def resolve_routes(id)
-      local = [id]
-      destinations = Hash.new(0)
-      @components.each do |component|
-        dataset = component["dataset"]
-        routes =
-          if dataset
-            Droonga.catalog.get_routes(dataset, component)
-          else
-            local
-          end
-        routes.each do |route|
-          destinations[@dispatcher.farm_path(route)] += 1
-        end
-        component["routes"] = routes
-      end
-      return destinations
-    end
-
     def tsort_each_node(&block)
       @dependency.each_key(&block)
     end

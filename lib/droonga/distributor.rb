@@ -31,15 +31,10 @@ module Droonga
       load_plugins(options[:distributors] || ["search", "crud", "groonga", "watch"])
     end
 
-    def distribute(message)
-      id = @dispatcher.generate_id
-      planner = DistributionPlanner.new(@dispatcher, message)
-      destinations = planner.resolve(id)
-      components = planner.components
-      dispatch_message = { "id" => id, "components" => components }
-      destinations.each do |destination, frequency|
-        @dispatcher.dispatch(dispatch_message, destination)
-      end
+    def distribute(components)
+      planner = DistributionPlanner.new(@dispatcher, components)
+      planned_components = planner.plan
+      @dispatcher.dispatch_components(planned_components)
     end
 
     private
