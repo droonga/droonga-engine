@@ -37,11 +37,9 @@ module Droonga
         command = component["command"]
         synchronous = nil
         descendants = {}
-        component["descendants"].each do |name, indices|
-          descendants[name] = indices.collect do |index|
-            @components[index]["routes"].map do |route|
-              @dispatcher.farm_path(route)
-            end
+        component["descendants"].each do |name, routes|
+          descendants[name] = routes.map do |route|
+            @dispatcher.farm_path(route)
           end
         end
         message = {
@@ -77,16 +75,14 @@ module Droonga
         result = task["values"]
         post = component["post"]
         @dispatcher.reply(result) if post
-        component["descendants"].each do |name, indices|
+        component["descendants"].each do |name, routes|
           message = {
             "id" => @id,
             "input" => name,
             "value" => result[name]
           }
-          indices.each do |index|
-            @components[index]["routes"].each do |route|
-              @dispatcher.dispatch(message, route)
-            end
+          routes.each do |route|
+            @dispatcher.dispatch(message, route)
           end
         end
         @n_dones += 1

@@ -219,23 +219,16 @@ module Droonga
           component["n_of_expects"] = 0
         end
         @components.each do |component|
-          descendants = get_descendants(component)
-          component["descendants"] = descendants
-          descendants.each do |key, indices|
-            indices.each do |index|
+          descendants = {}
+          (component["outputs"] || []).each do |output|
+            descendants[output] = []
+            @descendants[output].each do |index|
               @components[index]["n_of_expects"] += component["routes"].size
+              descendants[output].concat(@components[index]["routes"])
             end
           end
+          component["descendants"] = descendants
         end
-      end
-
-      def get_descendants(component)
-        return {} unless component["outputs"]
-        descendants = {}
-        component["outputs"].each do |output|
-          descendants[output] = @descendants[output]
-        end
-        descendants
       end
     end
   end

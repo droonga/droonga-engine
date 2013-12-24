@@ -80,10 +80,8 @@ module Droonga
             "input" => name,
             "value" => value[name],
           }
-          dests.each do |routes|
-            routes.each do |route|
-              forward(message, "to" => route, "type" => "dispatcher")
-            end
+          dests.each do |dest|
+            forward(message, "to" => dest, "type" => "dispatcher")
           end
         end
       end
