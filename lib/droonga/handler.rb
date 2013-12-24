@@ -61,22 +61,18 @@ module Droonga
 
     def process(message)
       $log.trace("#{log_tag}: process: start")
-      body, command, arguments = parse_message(message)
+      command = message["type"]
       plugin = find_plugin(command)
       if plugin.nil?
         $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
         return
       end
-      process_command(plugin, command, message, arguments)
+      process_command(plugin, command, message)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
     end
 
     private
-    def parse_message(message)
-      [message["body"], message["type"], message["arguments"]]
-    end
-
     def prepare
       if @database_name && !@database_name.empty?
         @context = Groonga::Context.new
@@ -90,12 +86,12 @@ module Droonga
       HandlerPlugin.repository.instantiate(name, self)
     end
 
-    def process_command(plugin, command, request, arguments)
-      handler_message = HandlerMessage.new(request)
+    def process_command(plugin, command, raw_message)
+      handler_message = HandlerMessage.new(raw_message)
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      plugin.process(command, handler_message, messenger, *arguments)
+      plugin.process(command, handler_message, messenger)
     end
 
     def log_tag
