@@ -215,7 +215,7 @@ module Droonga
             end
           end
         end
-        Session.new(id, @dispatcher, collector, @components, tasks, inputs)
+        Session.new(id, @dispatcher, collector, tasks, inputs)
       end
 
       def resolve_descendants

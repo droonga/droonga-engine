@@ -15,11 +15,10 @@
 
 module Droonga
   class Session
-    def initialize(id, dispatcher, collector, components, tasks, inputs)
+    def initialize(id, dispatcher, collector, tasks, inputs)
       @id = id
       @dispatcher = dispatcher
       @collector = collector
-      @components = components
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
