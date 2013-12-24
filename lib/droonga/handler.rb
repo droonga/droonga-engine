@@ -59,23 +59,23 @@ module Droonga
       find_plugin(command).prefer_synchronous?(command)
     end
 
-    def process(envelope)
+    def process(message)
       $log.trace("#{log_tag}: process: start")
-      body, command, arguments = parse_envelope(envelope)
+      body, command, arguments = parse_message(message)
       plugin = find_plugin(command)
       if plugin.nil?
         $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
         return
       end
-      process_command(plugin, command, envelope, arguments)
+      process_command(plugin, command, message, arguments)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
     end
 
     private
-    def parse_envelope(envelope)
-      @envelope = envelope
-      [envelope["body"], envelope["type"], envelope["arguments"]]
+    def parse_message(message)
+      @envelope = message
+      [message["body"], message["type"], message["arguments"]]
     end
 
     def prepare
