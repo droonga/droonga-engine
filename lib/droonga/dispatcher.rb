@@ -155,6 +155,11 @@ module Droonga
       @farm.process(partition_name, farm_message)
     end
 
+    def local?(route)
+      route =~ @local
+    end
+
+    private
     def generate_id
       id = @current_id
       @current_id = id.succ
@@ -169,11 +174,6 @@ module Droonga
       end
     end
 
-    def local?(route)
-      route =~ @local
-    end
-
-    private
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
       @distributor.process(adapted_message["type"], adapted_message)
