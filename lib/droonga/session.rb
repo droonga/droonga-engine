@@ -32,22 +32,11 @@ module Droonga
     def start
       tasks = @inputs[nil]
       tasks.each do |task|
-        component = task["component"]
-        type = component["type"]
-        command = component["command"]
-        synchronous = nil
-        descendants = {}
-        component["descendants"].each do |name, routes|
-          descendants[name] = routes.map do |route|
-            @dispatcher.farm_path(route)
-          end
-        end
-        message = {
-          "id"          => @id,
-          "task"        => task,
-          "descendants" => descendants
+        local_message = {
+          "id"   => @id,
+          "task" => task,
         }
-        @dispatcher.process_in_farm(task["route"], message, command, synchronous)
+        @dispatcher.process_local_message(local_message)
         @n_dones += 1
       end
     end

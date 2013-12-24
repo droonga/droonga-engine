@@ -138,11 +138,21 @@ module Droonga
       end
     end
 
-    # TODO: Use more meaningful name
-    def process_in_farm(route, message, type, synchronous)
-      # TODO: validate route is farm path
-      message = @message.merge("body" => message, "type" => type)
-      @farm.process(route, message, synchronous)
+    def process_local_message(local_message)
+      task = local_message["task"]
+      partition_name = task["route"]
+      component = task["component"]
+      command = component["command"]
+      descendants = {}
+      component["descendants"].each do |name, routes|
+        descendants[name] = routes.collect do |route|
+          farm_path(route)
+        end
+      end
+      local_message["descendants"] = descendants
+      farm_message = @message.merge("body" => local_message,
+                                    "type" => command)
+      @farm.process(partition_name, farm_message)
     end
 
     def generate_id

@@ -40,8 +40,8 @@ module Droonga
       end
     end
 
-    def process(partition_name, message, synchronous)
-      @partitions[partition_name].process(message, synchronous)
+    def process(partition_name, message)
+      @partitions[partition_name].process(message)
     end
   end
 end
