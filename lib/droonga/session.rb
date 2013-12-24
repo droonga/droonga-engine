@@ -23,7 +23,6 @@ module Droonga
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
-      @responses = {}
     end
 
     def done?
