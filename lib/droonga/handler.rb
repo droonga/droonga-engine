@@ -18,6 +18,7 @@
 require "groonga"
 
 require "droonga/forwarder"
+require "droonga/replier"
 require "droonga/pluggable"
 require "droonga/handler_plugin"
 
@@ -72,7 +73,7 @@ module Droonga
 
     def emit(value)
       if @descendants.empty?
-        forward(value, envelope["replyTo"])
+        @replier.reply(envelope.merge("body" => value))
       else
         @descendants.each do |name, dests|
           message = {
@@ -104,6 +105,7 @@ module Droonga
       end
       load_plugins(@options[:handlers] || [])
       @forwarder = Forwarder.new(@loop)
+      @replier = Replier.new(@forwarder)
     end
 
     def instantiate_plugin(name)

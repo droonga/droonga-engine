@@ -71,16 +71,11 @@ module Droonga
                    :params => params)
         return
       end
-      if command =~ /\.result$/
-        message = {
-          "inReplyTo" => message["id"],
-          "statusCode" => 200,
-          "type" => command,
-          "body" => message["body"],
-        }
-      else
-        message = message.merge("type" => command, "arguments" => arguments)
-      end
+      override_message = {
+        "type" => command,
+      }
+      override_message["arguments"] = arguments if arguments
+      message = message.merge(override_message)
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       $log.trace("#{log_tag}: output: post: start: #{log_info}")

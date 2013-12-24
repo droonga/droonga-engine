@@ -25,6 +25,7 @@ require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
 require "droonga/session"
+require "droonga/replier"
 
 module Droonga
   class Dispatcher
@@ -43,6 +44,7 @@ module Droonga
       @loop = EventLoop.new
       @farm = Farm.new(name, @loop)
       @forwarder = Forwarder.new(@loop)
+      @replier = Replier.new(@forwarder)
       @distributor = Distributor.new(self, @options)
       @collector = Collector.new
     end
@@ -83,8 +85,7 @@ module Droonga
 
     def reply(body)
       adapted_message = @output_adapter.adapt(@message.merge("body" => body))
-      @forwarder.forward(adapted_message,
-                         adapted_message["replyTo"])
+      @replier.reply(adapted_message)
     end
 
     def process_internal_message(message)
