@@ -153,12 +153,6 @@ module Droonga
     end
 
     class QuerySearcher
-      OPERATOR_CONVERSION_TABLE = {
-        "||" => Groonga::Operator::OR,
-        "&&" => Groonga::Operator::AND,
-        "-"  => Groonga::Operator::BUT
-      }.freeze
-
       class << self
         def search(search_request)
           new(search_request).search
@@ -202,12 +196,7 @@ module Droonga
         if condition["query"]
           options[:syntax] = :query
           if condition["defaultOperator"]
-            default_operator_string = condition["defaultOperator"]
-            default_operator = OPERATOR_CONVERSION_TABLE[default_operator_string]
-            unless default_operator
-              raise "undefined operator assigned #{default_operator_string}"
-            end
-            options[:default_operator] = default_operator
+            options[:default_operator] = condition["defaultOperator"]
           end
           if condition["allowPragma"]
             options[:allow_pragma] = true
@@ -229,10 +218,7 @@ module Droonga
       end
 
       def parse_condition_array(source, expression, condition)
-        operator = OPERATOR_CONVERSION_TABLE[condition[0]]
-        unless operator
-          raise "undefined operator assigned #{condition[0]}"
-        end
+        operator = condition[0]
         if condition[1]
           parse_condition(source, expression, condition[1])
         end
