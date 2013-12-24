@@ -174,10 +174,6 @@ module Droonga
     end
 
     private
-    def is_route?(route)
-      route.is_a?(String) || route.is_a?(Hash)
-    end
-
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
       @distributor.process(adapted_message["type"], adapted_message)
