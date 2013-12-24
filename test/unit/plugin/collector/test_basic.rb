@@ -16,15 +16,16 @@
 require "droonga/plugin/collector/basic"
 
 class BasicCollectorTest < Test::Unit::TestCase
-  include PluginHelper
-
   def setup
     setup_database
-    setup_plugin(Droonga::BasicCollector)
+    @plugin = Droonga::BasicCollector.new
+    @outputs = []
+    stub(@plugin).emit do |name, value|
+      @outputs << [name, value]
+    end
   end
 
   def teardown
-    teardown_plugin
     teardown_database
   end
 
@@ -329,7 +330,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       @plugin.process("collector_gather", request)
       output_name = data[:mapping]
       output_name = output_name["output"] if output_name.is_a?(Hash)
-      assert_equal([output_name, data[:expected]], @messages.last)
+      assert_equal([output_name, data[:expected]], @outputs.last)
     end
   end
 
@@ -416,7 +417,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                        ],
                      },
                    ],
-                   @messages.last)
+                   @outputs.last)
     end
 
     def test_sum_with_limit
@@ -497,7 +498,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                        ],
                      },
                    ],
-                   @messages.last)
+                   @outputs.last)
     end
 
     def test_sort
@@ -581,7 +582,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                        ],
                      },
                    ],
-                   @messages.last)
+                   @outputs.last)
     end
 
     def test_sort_with_limit
@@ -661,7 +662,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                        ],
                      },
                    ],
-                   @messages.last)
+                   @outputs.last)
     end
   end
 
@@ -807,7 +808,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                        ],
                      },
                    ],
-                   @messages.last)
+                   @outputs.last)
     end
   end
 end
