@@ -27,7 +27,7 @@ module Droonga
   class Handler
     include Pluggable
 
-    attr_reader :context, :envelope, :name
+    attr_reader :context, :name
 
     def initialize(loop, options={})
       @loop = loop
@@ -74,7 +74,6 @@ module Droonga
 
     private
     def parse_message(message)
-      @envelope = message
       [message["body"], message["type"], message["arguments"]]
     end
 
