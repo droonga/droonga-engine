@@ -33,7 +33,6 @@ module Droonga
     def initialize(options)
       @options = options
       @name = @options[:name]
-      @farm = Farm.new(name)
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
@@ -42,6 +41,7 @@ module Droonga
       @output_adapter =
         OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
       @loop = EventLoop.new
+      @farm = Farm.new(name, @loop)
       @forwarder = Forwarder.new(@loop)
       @distributor = Distributor.new(self, @options)
       @collector = Collector.new

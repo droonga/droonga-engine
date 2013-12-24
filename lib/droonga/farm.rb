@@ -19,11 +19,12 @@ require "droonga/partition"
 
 module Droonga
   class Farm
-    def initialize(name)
+    def initialize(name, loop)
       @name = name
+      @loop = loop
       @partitions = {}
       Droonga.catalog.get_partitions(name).each do |partition_name, options|
-        partition = Droonga::Partition.new(options)
+        partition = Droonga::Partition.new(@loop, options)
         @partitions[partition_name] = partition
       end
     end

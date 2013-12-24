@@ -25,10 +25,10 @@ require "droonga/processor"
 
 module Droonga
   class Partition
-    def initialize(options={})
+    def initialize(loop, options={})
       @options = options
       @n_workers = @options[:n_workers] || 0
-      @loop = EventLoop.new
+      @loop = loop
       @message_pusher = MessagePusher.new(@loop)
       @processor = Processor.new(@loop, @message_pusher, @options)
       @supervisor = nil
@@ -39,9 +39,6 @@ module Droonga
       @processor.start
       base_path = @options[:database]
       @message_pusher.start(base_path)
-      @loop_thread = Thread.new do
-        @loop.run
-      end
       start_supervisor if @n_workers > 0
     end
 
@@ -50,8 +47,6 @@ module Droonga
       shutdown_supervisor if @supervisor
       @message_pusher.shutdown
       @processor.shutdown
-      @loop.stop
-      @loop_thread.join
       $log.trace("partition: shutdown: done")
     end
 
