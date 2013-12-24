@@ -22,9 +22,8 @@ module Droonga
     extend PluginRegisterable
 
     attr_reader :task, :input_name, :component, :output_values, :body, :output_names
-    def initialize(dispatcher)
+    def initialize
       super()
-      @dispatcher = dispatcher
     end
 
     def process(command, message)

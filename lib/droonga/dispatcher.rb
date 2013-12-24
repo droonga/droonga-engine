@@ -22,6 +22,7 @@ require "droonga/distributor"
 require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
+require "droonga/session"
 
 module Droonga
   class Dispatcher
@@ -31,7 +32,7 @@ module Droonga
       @options = options
       @name = @options[:name]
       @farm = Farm.new(name)
-      @collectors = {}
+      @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
       @input_adapter =
@@ -41,6 +42,7 @@ module Droonga
       @loop = EventLoop.new
       @forwarder = Forwarder.new(@loop)
       @distributor = Distributor.new(self, @options)
+      @collector = Collector.new
     end
 
     def start
@@ -84,21 +86,21 @@ module Droonga
 
     def process_internal_message(message)
       id = message["id"]
-      collector = @collectors[id]
-      if collector
-        collector.receive(message["input"], message["value"])
+      session = @sessions[id]
+      if session
+        session.receive(message["input"], message["value"])
       else
         components = message["components"]
         if components
           planner = Planner.new(self, components)
-          collector = planner.create_collector(id)
-          @collectors[id] = collector
+          session = planner.create_session(id, @collector)
+          @sessions[id] = session
         else
           #todo: take cases receiving result before its query into account
         end
-        collector.start
+        session.start
       end
-      @collectors.delete(id) if collector.done?
+      @sessions.delete(id) if session.done?
     end
 
     def dispatch(message, destination)
@@ -158,7 +160,7 @@ module Droonga
         @components = components
       end
 
-      def create_collector(id)
+      def create_session(id, collector)
         resolve_descendants
         tasks = []
         inputs = {}
@@ -178,8 +180,7 @@ module Droonga
             end
           end
         end
-        collector = Collector.new(id, @dispatcher, @components, tasks, inputs)
-        return collector
+        Session.new(id, @dispatcher, collector, @components, tasks, inputs)
       end
 
       def resolve_descendants
