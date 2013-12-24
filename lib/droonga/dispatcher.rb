@@ -56,6 +56,7 @@ module Droonga
     def shutdown
       @forwarder.shutdown
       @distributor.shutdown
+      @collector.shutdown
       @input_adapter.shutdown
       @output_adapter.shutdown
       @farm.shutdown
