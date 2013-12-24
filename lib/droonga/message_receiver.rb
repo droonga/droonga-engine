@@ -55,7 +55,7 @@ module Droonga
     end
 
     def log_tag
-      "message_puller"
+      "message_receiver"
     end
   end
 end
