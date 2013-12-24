@@ -112,7 +112,7 @@ module Droonga
       else
         @forwarder.forward(@message.merge("body" => message),
                            "type" => "dispatcher",
-                           "to"   => farm_path(destination))
+                           "to"   => destination)
       end
     end
 
