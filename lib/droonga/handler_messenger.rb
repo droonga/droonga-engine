@@ -30,6 +30,7 @@ module Droonga
       descendants = @message.descendants
       raw_message = @message.raw
       if descendants.empty?
+        return if raw_message["replyTo"].nil?
         @replier.reply(raw_message.merge("body" => value))
       else
         descendants.each do |name, dests|
