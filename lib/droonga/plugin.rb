@@ -37,7 +37,8 @@ module Droonga
     rescue => exception
       Logger.error("error while processing #{command}",
                    arguments: arguments,
-                   exception: exception)
+                   exception: exception,
+                   backtrace: exception.backtrace)
     end
   end
 end
