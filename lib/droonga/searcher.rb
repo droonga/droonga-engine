@@ -156,7 +156,7 @@ module Droonga
       OPERATOR_CONVERSION_TABLE = {
         "||" => Groonga::Operator::OR,
         "&&" => Groonga::Operator::AND,
-        "-"  => Groonga::Operator::BUT
+        "-"  => Groonga::Operator::AND_NOT,
       }.freeze
 
       class << self
