@@ -36,9 +36,8 @@ module Droonga
       __send__(self.class.method_name(command), *arguments)
     rescue => exception
       Logger.error("error while processing #{command}",
-                   arguments: arguments,
-                   exception: exception,
-                   backtrace: exception.backtrace)
+                   exception,
+                   arguments: arguments)
     end
   end
 end

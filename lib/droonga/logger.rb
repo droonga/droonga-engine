@@ -24,10 +24,11 @@ module Droonga
       end
     end
 
-    def error(message, additional_information={})
+    def error(message, exception, additional_information={})
       if $log
-        $log.error(message, additional_information)
-        $log.error_backtrace
+        $log.error("#{message} #{exception.message}(#{exception.class})",
+          additional_information)
+        $log.error_backtrace(exception.backtrace)
       end
     end
   end
