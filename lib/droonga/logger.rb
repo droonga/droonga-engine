@@ -26,7 +26,7 @@ module Droonga
 
     def error(message, exception, additional_information={})
       if $log
-        $log.error("#{message} #{exception.message}(#{exception.class})",
+        $log.error("#{message}: #{exception.message}(#{exception.class})",
           additional_information)
         $log.error_backtrace(exception.backtrace)
       end
