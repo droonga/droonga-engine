@@ -51,8 +51,19 @@ module Droonga
       end
     end
 
-    def forward(message, destination)
-      @forwarder.forward(message, destination)
+    # Forwards a Droonga message to other Droonga Engine.
+    #
+    # @param [Hash] droonga_message
+    #   The Droonga message to be forwarded.
+    # @param [Hash] destination
+    #   The destination of the Droonga message. See {Forwarder#forward} to
+    #   know about how to specify destination.
+    #
+    # @return [void]
+    #
+    # @see Forwarder#forward
+    def forward(droonga_message, destination)
+      @forwarder.forward(droonga_message, destination)
     end
 
     def inspect
