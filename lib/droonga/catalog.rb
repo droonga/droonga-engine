@@ -134,7 +134,7 @@ module Droonga
 
     def dataset(name)
       dataset = @catalog["datasets"][name]
-      raise UnknownDataset.new(dataset) unless dataset
+      raise UnknownDataset.new(name) unless dataset
       dataset
     end
 
