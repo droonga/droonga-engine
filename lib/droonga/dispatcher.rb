@@ -26,16 +26,13 @@ require "droonga/collector"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
-require "droonga/responsible_error"
+require "droonga/message_processing_error"
 
 module Droonga
   class Dispatcher
     attr_reader :name
 
-    class InvalidRequest < ResponsibleClientError
-    end
-
-    class MissingDataset < InvalidRequest
+    class MissingDataset < BadRequest
       def initialize
         super("\"dataset\" must be specified.")
       end
@@ -86,7 +83,7 @@ module Droonga
         begin
           assert_valid_message
           process_input_message(message)
-        rescue ResponsibleError => error
+        rescue MessageProcessingError => error
           response = @output_adapter.adapt(@message.merge("statusCode" => error.status_code,
                                                           "body" => error.response_body))
           @replier.reply(response)
