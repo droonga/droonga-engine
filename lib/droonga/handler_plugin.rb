@@ -33,7 +33,7 @@ module Droonga
     end
 
     private
-    def run_command(command, message, messanger)
+    def run_command(command, message, messenger)
       begin
         super
       rescue HandlerError => error
