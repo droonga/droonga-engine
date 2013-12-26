@@ -49,6 +49,7 @@ module Droonga
         query_sorter = QuerySorter.new
         queries.each do |name, query|
           source = query["source"]
+          return true if source == name
           query_sorter.add(name, [source])
         end
         begin
@@ -86,6 +87,7 @@ module Droonga
       queries.each do |name, query|
         source = query["source"]
         raise MissingSourceParameter.new(name, queries) unless source
+        raise CyclicSource.new(queries) if name == source
         query_sorter.add(name, [source])
       end
       begin
