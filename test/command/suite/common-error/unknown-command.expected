@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 501,
+    "type": "unknown-command.result",
+    "body": {
+      "name": "UnknownType",
+      "message": "The command type \"unknown-command\" is not available for the dataset \"Droonga\"."
+    }
+  }
+]

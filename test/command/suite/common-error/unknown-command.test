@@ -1,0 +1,7 @@
+#@include fixture/user-table.jsons
+{
+  "type": "unknown-command",
+  "dataset": "Droonga",
+  "body": {
+  }
+}
