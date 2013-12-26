@@ -36,6 +36,10 @@ module Droonga
     UNLIMITED = -1
 
     def build_messages
+      if Searcher.have_circular_source?(@queries)
+        raise Searcher::CircularReferenceSource.new(@queries)
+      end
+
       ensure_unifiable!
 
       @queries.each do |input_name, query|

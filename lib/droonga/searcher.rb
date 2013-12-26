@@ -44,6 +44,22 @@ module Droonga
       end
     end
 
+    class << self
+      def have_circular_source?(queries)
+        query_sorter = QuerySorter.new
+        queries.each do |name, query|
+          source = query["source"]
+          query_sorter.add(name, [source])
+        end
+        begin
+          sorted_queries = query_sorter.tsort
+        rescue TSort::Cyclic
+          return true
+        end
+        false
+      end
+    end
+
     def initialize(context)
       @context = context
     end
