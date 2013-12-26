@@ -148,13 +148,8 @@ class WatchHandlerTest < Test::Unit::TestCase
       assert_equal([
                      [
                        {
-                         "body" => {
-                           "task" => {
-                             "component" => {
-                               "body" => request,
-                             },
-                           },
-                         },
+                         "body" => request,
+                         "to" => ["localhost"],
                        },
                        {
                          "to"   => "localhost:23003/output",
