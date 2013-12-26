@@ -72,7 +72,11 @@ module Droonga
         raise MissingSourceParameter.new(name, queries) unless source
         query_sorter.add(name, [source])
       end
-      sorted_queries = query_sorter.tsort
+      begin
+        sorted_queries = query_sorter.tsort
+      rescue TSort::Cyclic
+        raise CircularReferenceSource.new
+      end
       $log.trace("#{log_tag}: process_queries: sort: done")
       outputs = {}
       results = {}
