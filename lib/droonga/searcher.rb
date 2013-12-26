@@ -21,6 +21,14 @@ require "groonga"
 
 module Droonga
   class Searcher
+    class MissingSourceParameter < BadRequest
+      def initialize(query, queries)
+        super("The query #{query.inspect} has no source. " +
+                "Query must have a valid source.",
+              queries)
+      end
+    end
+
     class UnknownSource < NotFound
       def initialize(source, queries)
         super("The source #{source.inspect} does not exist. " +
@@ -53,7 +61,9 @@ module Droonga
       $log.trace("#{log_tag}: process_queries: sort: start")
       query_sorter = QuerySorter.new
       queries.each do |name, query|
-        query_sorter.add(name, [query["source"]])
+        source = query["source"]
+        raise MissingSourceParameter.new(name, queries) unless source
+        query_sorter.add(name, [source])
       end
       sorted_queries = query_sorter.tsort
       $log.trace("#{log_tag}: process_queries: sort: done")

@@ -166,6 +166,17 @@ class SearchHandlerTest < Test::Unit::TestCase
                         },
                       })
       end
+
+      def test_no_source
+        assert_raise(Droonga::Searcher::MissingSourceParameter) do
+          search({
+                   "queries" => {
+                     "no-source-result" => {
+                     },
+                   },
+                 })
+        end
+      end
     end
 
     class OutputTest < self
