@@ -37,15 +37,15 @@ module Droonga
       end
     end
 
-    class CircularReferenceSource < BadRequest
+    class CyclicSource < BadRequest
       def initialize(queries)
-        super("There is circular reference of queries.",
+        super("There is cyclic reference of sources.",
               queries)
       end
     end
 
     class << self
-      def have_circular_source?(queries)
+      def have_cyclic_source?(queries)
         query_sorter = QuerySorter.new
         queries.each do |name, query|
           source = query["source"]
@@ -91,7 +91,7 @@ module Droonga
       begin
         sorted_queries = query_sorter.tsort
       rescue TSort::Cyclic
-        raise CircularReferenceSource.new
+        raise CyclicSource.new(queries)
       end
       $log.trace("#{log_tag}: process_queries: sort: done")
       outputs = {}

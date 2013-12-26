@@ -6,8 +6,8 @@
     "statusCode": 400,
     "type": "search.result",
     "body": {
-      "name": "CircularReferenceSource",
-      "message": "There is circular reference of queries.",
+      "name": "CyclicSource",
+      "message": "There is cyclic reference of sources.",
       "detail": {
         "a": {
           "source": "b"

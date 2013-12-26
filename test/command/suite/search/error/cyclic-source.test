@@ -4,8 +4,8 @@
   "dataset": "Droonga",
   "body": {
     "queries": {
-      "recursive-source": {
-        "source": "recursive-source"
+      "cyclic-source": {
+        "source": "cyclic-source"
       }
     }
   }
