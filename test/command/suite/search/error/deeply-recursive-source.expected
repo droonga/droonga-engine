@@ -1,0 +1,21 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": "search.result",
+    "body": {
+      "name": "RecursiveSource",
+      "message": "There is recursion of sources.",
+      "detail": {
+        "a": {
+          "source": "b"
+        },
+        "b": {
+          "source": "a"
+        }
+      }
+    }
+  }
+]

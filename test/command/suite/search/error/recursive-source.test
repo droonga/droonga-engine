@@ -1,0 +1,12 @@
+#@include fixture/user-table.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "recursive-source": {
+        "source": "recursive-source"
+      }
+    }
+  }
+}

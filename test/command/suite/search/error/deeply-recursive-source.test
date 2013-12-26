@@ -1,0 +1,15 @@
+#@include fixture/user-table.jsons
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "a": {
+        "source": "b"
+      },
+      "b": {
+        "source": "a"
+      }
+    }
+  }
+}
