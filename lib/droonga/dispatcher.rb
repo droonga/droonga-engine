@@ -163,7 +163,6 @@ module Droonga
         dataset = component["dataset"]
         if dataset
           routes = Droonga.catalog.get_routes(dataset, component)
-          raise UnknownDataset.new(dataset) if routes.empty?
           component["routes"] = routes
         else
           component["routes"] ||= [id]
@@ -218,6 +217,8 @@ module Droonga
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
       @distributor.process(adapted_message["type"], adapted_message)
+    rescue Droonga::Catalog::UnknownDataset => error
+      raise UnknownDataset.new(error.dataset)
     rescue Droonga::Pluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end

@@ -17,6 +17,7 @@
 
 require "digest/sha1"
 require "zlib"
+require "droonga/message_processing_error"
 
 module Droonga
   class << self
@@ -26,6 +27,14 @@ module Droonga
   end
 
   class Catalog
+    class UnknownDataset < StandardError
+      attr_reader :dataset
+
+      def initialize(dataset)
+        @dataset = dataset
+      end
+    end
+
     CATALOG_FILE_PATH = "catalog.json"
 
     attr_reader :path
@@ -93,7 +102,6 @@ module Droonga
     def get_routes(name, args)
       routes = []
       dataset = dataset(name)
-      return routes unless dataset
       case args["type"]
       when "broadcast"
         dataset["ring"].each do |key, partition|
@@ -127,7 +135,9 @@ module Droonga
     end
 
     def dataset(name)
-      @catalog["datasets"][name]
+      dataset = @catalog["datasets"][name]
+      raise UnknownDataset.new(dataset) unless dataset
+      dataset
     end
 
     def select_range_and_replicas(partition, args, routes)
