@@ -54,6 +54,8 @@ class AddHandlerTest < Test::Unit::TestCase
                             :type => :hash,
                             :key_type => :short_text) do |table|
           table.short_text("country")
+          table.int32("age")
+          table.time("birthday")
         end
       end
     end
@@ -88,6 +90,36 @@ class AddHandlerTest < Test::Unit::TestCase
         "values" => {"country" => "japan"},
       }
       assert_raise(Droonga::AddHandler::MissingPrimaryKeyParameter) do
+        process(request)
+      end
+    end
+
+    def test_invalid_integer_value
+      request = {
+        "table"  => "Users",
+        "values" => {"age" => "secret"},
+      }
+      assert_raise(Droonga::AddHandler::InvalidValue) do
+        process(request)
+      end
+    end
+
+    def test_invalid_time_value
+      request = {
+        "table"  => "Users",
+        "values" => {"birthday" => "today"},
+      }
+      assert_raise(Droonga::AddHandler::InvalidValue) do
+        process(request)
+      end
+    end
+
+    def test_unknown_column
+      request = {
+        "table"  => "Users",
+        "values" => {"unknown" => "unknown"},
+      }
+      assert_raise(Droonga::AddHandler::UnknownColumn) do
         process(request)
       end
     end
