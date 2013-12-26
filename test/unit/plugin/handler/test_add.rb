@@ -16,6 +16,8 @@
 require "droonga/plugin/handler/add"
 
 class AddHandlerTest < Test::Unit::TestCase
+  SUCCESS_RESPONSE_BODY = true
+
   def setup
     setup_database
     setup_schema
@@ -67,7 +69,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "values" => {},
       }
       process(request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
       table = @worker.context["Users"]
       assert_equal(["mori"], table.collect(&:key))
     end
@@ -79,7 +81,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "values" => {"country" => "japan"},
       }
       process(request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
     end
@@ -144,7 +146,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "values" => {},
       }
       process(request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
       table = @worker.context["Books"]
       assert_equal([nil], table.collect(&:title))
     end
@@ -155,7 +157,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "values" => {"title" => "CSS"},
       }
       process(request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
       table = @worker.context["Books"]
       assert_equal(["CSS"], table.collect(&:title))
     end

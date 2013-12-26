@@ -5,8 +5,6 @@
     "inReplyTo": null,
     "statusCode": 200,
     "type": "add.result",
-    "body": [
-      true
-    ]
+    "body": true
   }
 ]
