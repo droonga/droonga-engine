@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": ".result",
+    "body": {
+      "name": "MissingType",
+      "message": "\"type\" must be specified."
+    }
+  }
+]
