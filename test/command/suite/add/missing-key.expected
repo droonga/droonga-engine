@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": "add.result",
+    "body": {
+      "name": "MissingPrimaryKey",
+      "message": "\"key\" must be specified. The table \"User\" requires a primary key for a new record."
+    }
+  }
+]
