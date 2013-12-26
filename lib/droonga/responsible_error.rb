@@ -14,9 +14,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class HandlerError < StandardError
+  class ResponsibleError
     attr_reader :message, :detail
-
+ 
     def initialize(message, detail=nil)
       @message = message
       @detail = detail
@@ -40,7 +40,7 @@ module Droonga
     end
   end
 
-  class HandlerClientError < HandlerError
+  class ResponsibleClientError < ResponsibleError
     def status_code
       400
     end

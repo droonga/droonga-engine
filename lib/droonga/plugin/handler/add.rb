@@ -18,12 +18,13 @@
 require "groonga"
 
 require "droonga/handler_plugin"
+require "droonga/responsible_error"
 
 module Droonga
   class AddHandler < Droonga::HandlerPlugin
     repository.register("add", self)
 
-    class InvalidRequest < HandlerClientError
+    class InvalidRequest < ResponsibleClientError
     end
 
     class MissingTable < InvalidRequest

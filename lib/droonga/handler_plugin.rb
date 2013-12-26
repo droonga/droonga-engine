@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin"
-require "droonga/handler_error"
+require "droonga/responsible_error"
 
 module Droonga
   class HandlerPlugin < Plugin
@@ -36,7 +36,7 @@ module Droonga
     def run_command(command, message, messenger)
       begin
         super
-      rescue HandlerError => error
+      rescue ResponsibleError => error
         messenger.error(error.status_code, error.response_body)
       end
     end
