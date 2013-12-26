@@ -27,23 +27,21 @@ module Droonga
     end
 
     class MissingTable < InvalidRequest
-      def initialize(options={})
-        super("\"table\" must be specified.", options)
+      def initialize
+        super("\"table\" must be specified.")
       end
     end
 
     class MissingPrimaryKey < InvalidRequest
-      def initialize(table_name, options={})
+      def initialize(table_name)
         super("\"key\" must be specified. " +
-                "The table #{table_name.inspect} requires a primary key for a new record.",
-              options)
+                "The table #{table_name.inspect} requires a primary key for a new record.")
       end
     end
 
     class UnknownTable < InvalidRequest
-      def initialize(table_name, options={})
-        super("The table #{table_name.inspect} does not exist in the dataset.",
-              options)
+      def initialize(table_name)
+        super("The table #{table_name.inspect} does not exist in the dataset.")
       end
 
       def status_code
