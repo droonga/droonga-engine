@@ -74,10 +74,9 @@ module Droonga
         unless request.include?("key")
           raise MissingPrimaryKeyParameter.new(request["table"])
         end
-        add_record(table, request)
-      else
-        add_record(table, nil, request["values"], request)
       end
+
+      add_record(table, request)
       [true]
     end
 
