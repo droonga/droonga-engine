@@ -23,7 +23,7 @@ module Droonga
     end
 
     def name
-      self.class.to_s
+      self.class.name.split["::"].last
     end
 
     def status_code
