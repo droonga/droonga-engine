@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 404,
+    "type": "add.result",
+    "body": {
+      "name": "UnknownDataset",
+      "message": "The dataset \"Unknown\" does not exist."
+    }
+  }
+]
