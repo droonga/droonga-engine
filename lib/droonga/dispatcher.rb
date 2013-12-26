@@ -32,7 +32,7 @@ module Droonga
   class Dispatcher
     attr_reader :name
 
-    class MissingDataset < BadRequest
+    class MissingDatasetParameter < BadRequest
       def initialize
         super("\"dataset\" must be specified.")
       end
@@ -195,7 +195,7 @@ module Droonga
     end
 
     def assert_valid_message
-      raise MissingDataset.new unless @message.include?("dataset")
+      raise MissingDatasetParameter.new unless @message.include?("dataset")
     end
 
     def log_tag

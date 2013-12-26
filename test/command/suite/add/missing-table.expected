@@ -6,7 +6,7 @@
     "statusCode": 400,
     "type": "add.result",
     "body": {
-      "name": "MissingTable",
+      "name": "MissingTableParameter",
       "message": "\"table\" must be specified."
     }
   }

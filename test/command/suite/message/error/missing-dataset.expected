@@ -6,7 +6,7 @@
     "statusCode": 400,
     "type": "add.result",
     "body": {
-      "name": "MissingDataset",
+      "name": "MissingDatasetParameter",
       "message": "\"dataset\" must be specified."
     }
   }

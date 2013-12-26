@@ -6,7 +6,7 @@
     "statusCode": 400,
     "type": "add.result",
     "body": {
-      "name": "MissingPrimaryKey",
+      "name": "MissingPrimaryKeyParameter",
       "message": "\"key\" must be specified. The table \"User\" requires a primary key for a new record."
     }
   }

@@ -24,13 +24,13 @@ module Droonga
   class AddHandler < Droonga::HandlerPlugin
     repository.register("add", self)
 
-    class MissingTable < BadRequest
+    class MissingTableParameter < BadRequest
       def initialize
         super("\"table\" must be specified.")
       end
     end
 
-    class MissingPrimaryKey < BadRequest
+    class MissingPrimaryKeyParameter < BadRequest
       def initialize(table_name)
         super("\"key\" must be specified. " +
                 "The table #{table_name.inspect} requires a primary key for a new record.")
@@ -55,13 +55,15 @@ module Droonga
 
     private
     def process_add(request)
-      raise MissingTable.new unless request.include?("table")
+      raise MissingTableParameter.new unless request.include?("table")
 
       table = @context[request["table"]]
       raise UnknownTable.new(request["table"]) unless table
 
       if table.support_key?
-        raise MissingPrimaryKey.new(request["table"]) unless request.include?("key")
+        unless request.include?("key")
+          raise MissingPrimaryKeyParameter.new(request["table"])
+        end
         table.add(request["key"], request["values"])
       else
         table.add(request["values"])
