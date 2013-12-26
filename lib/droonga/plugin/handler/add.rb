@@ -18,10 +18,37 @@
 require "groonga"
 
 require "droonga/handler_plugin"
+require "droonga/responsible_error"
 
 module Droonga
   class AddHandler < Droonga::HandlerPlugin
     repository.register("add", self)
+
+    class InvalidRequest < ResponsibleClientError
+    end
+
+    class MissingTable < InvalidRequest
+      def initialize
+        super("\"table\" must be specified.")
+      end
+    end
+
+    class MissingPrimaryKey < InvalidRequest
+      def initialize(table_name)
+        super("\"key\" must be specified. " +
+                "The table #{table_name.inspect} requires a primary key for a new record.")
+      end
+    end
+
+    class UnknownTable < InvalidRequest
+      def initialize(table_name)
+        super("The table #{table_name.inspect} does not exist in the dataset.")
+      end
+
+      def status_code
+        404
+      end
+    end
 
     command :add
     def add(message, messenger)
@@ -31,9 +58,13 @@ module Droonga
 
     private
     def process_add(request)
+      raise MissingTable.new unless request.include?("table")
+
       table = @context[request["table"]]
-      return [false] unless table
+      raise UnknownTable.new(request["table"]) unless table
+
       if table.support_key?
+        raise MissingPrimaryKey.new(request["table"]) unless request.include?("key")
         table.add(request["key"], request["values"])
       else
         table.add(request["values"])

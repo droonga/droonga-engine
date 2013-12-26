@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,30 +13,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
-require "droonga/responsible_error"
-
 module Droonga
-  class HandlerPlugin < Plugin
-    extend PluginRegisterable
-
-    def initialize(handler)
-      super()
-      @handler = handler
-      @context = @handler.context
+  class ResponsibleError < StandardError
+    attr_reader :message, :detail
+ 
+    def initialize(message, detail=nil)
+      @message = message
+      @detail = detail
     end
 
-    def prefer_synchronous?(command)
-      false
+    def name
+      self.class.name.split("::").last
     end
 
-    private
-    def run_command(command, message, messenger)
-      begin
-        super
-      rescue ResponsibleError => error
-        messenger.error(error.status_code, error.response_body)
-      end
+    def status_code
+      500
+    end
+
+    def response_body
+      body = {
+        "name"    => name,
+        "message" => @message,
+      }
+      body["detail"] = @detail unless @detail.nil?
+      body
+    end
+  end
+
+  class ResponsibleClientError < ResponsibleError
+    def status_code
+      400
     end
   end
 end
