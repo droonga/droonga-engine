@@ -35,4 +35,13 @@
     "flags" : "COLUMN_VECTOR"
   }
 }
+{
+  "type": "column_create",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "User",
+    "name"  : "birthday",
+    "type"  : "Time"
+  }
+}
 #@enable-logging
