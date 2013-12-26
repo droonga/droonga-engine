@@ -37,9 +37,9 @@ module Droonga
       end
     end
 
-    class RecursiveSource < BadRequest
+    class CircularReferenceSource < BadRequest
       def initialize(queries)
-        super("There is recursion of sources.",
+        super("There is circular reference of queries.",
               queries)
       end
     end

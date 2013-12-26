@@ -6,8 +6,8 @@
     "statusCode": 400,
     "type": "search.result",
     "body": {
-      "name": "RecursiveSource",
-      "message": "There is recursion of sources.",
+      "name": "CircularReferenceSource",
+      "message": "There is circular reference of queries.",
       "detail": {
         "a": {
           "source": "b"
