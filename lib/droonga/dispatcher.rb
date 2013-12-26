@@ -38,6 +38,12 @@ module Droonga
       end
     end
 
+    class UnknownDataset < BadRequest
+      def initialize(dataset)
+        super("The dataset #{dataset.inspect} does not exist.")
+      end
+    end
+
     class UnknownCommand < BadRequest
       def initialize(command, dataset)
         super("The command #{command.inspect} is not available " +
@@ -157,6 +163,7 @@ module Droonga
         dataset = component["dataset"]
         if dataset
           routes = Droonga.catalog.get_routes(dataset, component)
+          raise UnknownDataset.new(dataset) if routes.empty?
           component["routes"] = routes
         else
           component["routes"] ||= [id]
