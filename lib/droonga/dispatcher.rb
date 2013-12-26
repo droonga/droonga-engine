@@ -35,6 +35,12 @@ module Droonga
     class InvalidRequest < ResponsibleClientError
     end
 
+    class MissingType < InvalidRequest
+      def initialize
+        super("\"type\" must be specified.")
+      end
+    end
+
     class MissingDataset < InvalidRequest
       def initialize
         super("\"dataset\" must be specified.")
@@ -83,8 +89,14 @@ module Droonga
       if message["type"] == "dispatcher"
         process_internal_message(message["body"])
       else
-        return unless assert_have_dataset
-        process_input_message(message)
+        begin
+          assert_valid_message
+          process_input_message(message)
+        rescue ResponsibleError => error
+          response = @output_adapter.adapt(@message.merge("statusCode" => error.status_code,
+                                                          "body" => error.response_body))
+          @replier.reply(response)
+        end
       end
     end
 
@@ -191,15 +203,9 @@ module Droonga
       @distributor.process(adapted_message["type"], adapted_message)
     end
 
-    def assert_have_dataset
-      unless @message.include?("dataset")
-        error = MissingDataset.new
-        response = @output_adapter.adapt(@message.merge("statusCode" => error.status_code,
-                                                        "body" => error.response_body))
-        @replier.reply(response)
-        return false
-      end
-      true
+    def assert_valid_message
+      raise MissingType.new unless @message.include?("type")
+      raise MissingDataset.new unless @message.include?("dataset")
     end
 
     def log_tag
