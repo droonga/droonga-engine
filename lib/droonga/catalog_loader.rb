@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,25 +13,21 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog_loader"
+require "json"
+
+require "droonga/catalog/version1"
 
 module Droonga
-  class << self
-    def catalog
-      @catalog ||= Catalog.load
+  class CatalogLoader
+    def initialize(path)
+      @path = path
     end
-  end
 
-  module Catalog
-    PATH = "catalog.json"
-
-    class << self
-      def load(path=nil)
-        path = ENV["DROONGA_CATALOG"] || PATH
-        path = File.expand_path(path)
-        loader = CatalogLoader.new(path)
-        loader.load
+    def load
+      data = File.open(@path) do |file|
+        JSON.parse(file.read)
       end
+      Catalog::Version1.new(data, File.dirname(@path))
     end
   end
 end

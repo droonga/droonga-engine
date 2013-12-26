@@ -13,11 +13,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog"
+require "droonga/catalog/version1"
 
 class CatalogTest < Test::Unit::TestCase
   def setup
-    @catalog = Droonga::Catalog.new(catalog_path)
+    data = JSON.parse(File.read(catalog_path))
+    @catalog = Droonga::Catalog::Version1.new(data, base_path)
   end
 
   def test_option
@@ -26,7 +27,6 @@ class CatalogTest < Test::Unit::TestCase
 
   def test_get_partitions
     partitions = @catalog.get_partitions("localhost:23003/test")
-    base_path = File.expand_path("../fixtures", __FILE__)
     assert_equal({
                    "localhost:23003/test.000" => {
                      :database  => "#{base_path}/000/db",
@@ -53,7 +53,15 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   private
+  def fixture_path(base_path)
+    File.expand_path("../../fixtures/#{base_path}", __FILE__)
+  end
+
   def catalog_path
-    @catalog_path ||= File.expand_path("../fixtures/catalog.json", __FILE__)
+    @catalog_path ||= fixture_path("catalog/version1.json")
+  end
+
+  def base_path
+    File.dirname(catalog_path)
   end
 end

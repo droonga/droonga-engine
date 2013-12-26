@@ -26,15 +26,12 @@ module Droonga
         end
       end
 
-      attr_reader :path
+      attr_reader :base_path
+      def initialize(data, base_path)
+        @data = data
+        @base_path = base_path
 
-      def initialize(path=nil)
-        @path = path || default_path
-
-        open(@path) do |file|
-          @catalog = JSON.parse(file.read)
-        end
-        @catalog["datasets"].each do |name, dataset|
+        @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
           total_weight = dataset["ring"].reduce do |a, b|
@@ -50,11 +47,7 @@ module Droonga
           end
           dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
         end
-        @options = @catalog["options"] || {}
-      end
-
-      def base_path
-        @base_path ||= File.dirname(@path)
+        @options = @data["options"] || {}
       end
 
       def option(name)
@@ -62,10 +55,10 @@ module Droonga
       end
 
       def get_partitions(name)
-        device = @catalog["farms"][name]["device"]
+        device = @data["farms"][name]["device"]
         pattern = Regexp.new("^#{name}\.")
         results = {}
-        @catalog["datasets"].each do |key, dataset|
+        @data["datasets"].each do |key, dataset|
           workers = dataset["workers"]
           plugins = dataset["plugins"]
           dataset["ring"].each do |key, part|
@@ -124,7 +117,7 @@ module Droonga
       end
 
       def dataset(name)
-        dataset = @catalog["datasets"][name]
+        dataset = @data["datasets"][name]
         raise UnknownDataset.new(name) unless dataset
         dataset
       end
