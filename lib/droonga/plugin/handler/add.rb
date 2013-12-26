@@ -50,7 +50,7 @@ module Droonga
       end
     end
 
-    class UnknownColumn < BadRequest
+    class UnknownColumn < NotFound
       def initialize(column, table, request)
         super("The column #{column.inspect} does not exist in the table #{table.inspect}.",
               request)

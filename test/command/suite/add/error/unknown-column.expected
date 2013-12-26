@@ -3,7 +3,7 @@
   0,
   {
     "inReplyTo": null,
-    "statusCode": 400,
+    "statusCode": 404,
     "type": "add.result",
     "body": {
       "name": "UnknownColumn",
