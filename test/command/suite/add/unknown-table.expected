@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 404,
+    "type": "add.result",
+    "body": {
+      "name": "UnknownTable",
+      "message": "The table \"Unknown\" does not exist in the dataset."
+    }
+  }
+]
