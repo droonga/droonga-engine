@@ -21,14 +21,11 @@ require "groonga"
 
 module Droonga
   class Searcher
-    class Error < StandardError
-    end
-
-    class UndefinedSourceError < Error
-      attr_reader :name
-      def initialize(name)
-        @name = name
-        super("undefined source was used: <#{name}>")
+    class UnknownSource < BadRequest
+      def initialize(source, queries)
+        super("The source #{source.inspect} does not exist. " +
+                "It must be a name of an existing table or another query.",
+              queries)
       end
     end
 
@@ -81,7 +78,7 @@ module Droonga
         elsif @context[name]
           results[name] = @context[name]
         else
-          raise UndefinedSourceError.new(name)
+          raise UnknownSource.new(name, queries)
         end
       end
       $log.trace("#{log_tag}: process_queries: done")
