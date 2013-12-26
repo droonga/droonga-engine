@@ -83,7 +83,7 @@ module Droonga
 
     def add_record(table, request)
       record = nil
-      if request["key"]
+      if table.support_key?
         record = table.add(request["key"])
       else
         record = table.add
