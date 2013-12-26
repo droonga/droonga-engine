@@ -23,6 +23,30 @@ module Droonga
   class AddHandler < Droonga::HandlerPlugin
     repository.register("add", self)
 
+    class InvalidRequest < Droonga::HandlerError::HandlerClientError
+    end
+
+    class MissingTable < InvalidRequest
+      def initialize(options={})
+        super("\"table\" must be specified.", options)
+      end
+    end
+
+    class MissingPrimaryKey < InvalidRequest
+      def initialize(table_name, options={})
+        super("\"key\" must be specified. " +
+                "The table #{table_name.inspect} requires a primary key for a new record.",
+              options)
+      end
+    end
+
+    class UnknownTable < InvalidRequest
+      def initialize(table_name, options={})
+        super("The table #{table_name.inspect} does not exist in the dataset.",
+              options)
+      end
+    end
+
     command :add
     def add(message, messenger)
       outputs = process_add(message.request)
@@ -31,9 +55,13 @@ module Droonga
 
     private
     def process_add(request)
+      raise MissingTable.new unless request.include?("table")
+
       table = @context[request["table"]]
-      return [false] unless table
+      raise UnknownTable.new(request["table"]) unless table
+
       if table.support_key?
+        raise MissingPrimaryKey.new(request["table"]) unless request.include?("key")
         table.add(request["key"], request["values"])
       else
         table.add(request["values"])

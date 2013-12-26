@@ -51,6 +51,24 @@ module Droonga
       end
     end
 
+    def error(error)
+      descendants = @message.descendants
+      raw_message = @message.raw
+      if descendants.empty?
+        return if raw_message["replyTo"].nil?
+        response = raw_message.merge("statusCode" => error.status_code,
+                                     "body" => {
+                                       "name"    => error.name,
+                                       "message" => error.message,
+                                       "detail"  => error.detail,
+                                     })
+        @replier.reply(response)
+      else
+        #XXX IMPLEMENT ME!!
+        raise error
+      end
+    end
+
     def forward(message, destination)
       @forwarder.forward(message, destination)
     end

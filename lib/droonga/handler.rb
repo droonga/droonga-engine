@@ -20,6 +20,7 @@ require "groonga"
 require "droonga/forwarder"
 require "droonga/handler_message"
 require "droonga/handler_messenger"
+require "droonga/handler_error"
 require "droonga/pluggable"
 require "droonga/handler_plugin"
 
@@ -91,7 +92,11 @@ module Droonga
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      plugin.process(command, handler_message, messenger)
+      begin
+        plugin.process(command, handler_message, messenger)
+      rescue HandlerError => error
+        messenger.error(error)
+      end
     end
 
     def log_tag
