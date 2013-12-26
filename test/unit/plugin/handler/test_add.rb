@@ -75,7 +75,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_values
       request = {
         "table"  => "Users",
-        "key"    => "asami",
+        "key"    => "mori",
         "values" => {"country" => "japan"},
       }
       process(request)
@@ -97,6 +97,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_invalid_integer_value
       request = {
         "table"  => "Users",
+        "key"    => "mori",
         "values" => {"age" => "secret"},
       }
       assert_raise(Droonga::AddHandler::InvalidValue) do
@@ -107,6 +108,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_invalid_time_value
       request = {
         "table"  => "Users",
+        "key"    => "mori",
         "values" => {"birthday" => "today"},
       }
       assert_raise(Droonga::AddHandler::InvalidValue) do
@@ -117,6 +119,7 @@ class AddHandlerTest < Test::Unit::TestCase
     def test_unknown_column
       request = {
         "table"  => "Users",
+        "key"    => "mori",
         "values" => {"unknown" => "unknown"},
       }
       assert_raise(Droonga::AddHandler::UnknownColumn) do
