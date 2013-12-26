@@ -90,8 +90,6 @@ module Droonga
         begin
           assert_valid_message
           process_input_message(message)
-        rescue Droonga::Pluggable::UnknownPlugin => error
-          raise UnknownCommand.new(error.command, message["dataset"])
         rescue MessageProcessingError => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
@@ -213,6 +211,8 @@ module Droonga
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
       @distributor.process(adapted_message["type"], adapted_message)
+    rescue Droonga::Pluggable::UnknownPlugin => error
+      raise UnknownCommand.new(error.command, message["dataset"])
     end
 
     def assert_valid_message
