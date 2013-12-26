@@ -35,12 +35,6 @@ module Droonga
     class InvalidRequest < ResponsibleClientError
     end
 
-    class MissingType < InvalidRequest
-      def initialize
-        super("\"type\" must be specified.")
-      end
-    end
-
     class MissingDataset < InvalidRequest
       def initialize
         super("\"dataset\" must be specified.")
@@ -204,7 +198,6 @@ module Droonga
     end
 
     def assert_valid_message
-      raise MissingType.new unless @message.include?("type")
       raise MissingDataset.new unless @message.include?("dataset")
     end
 

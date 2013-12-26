@@ -64,7 +64,7 @@ module Fluent
       reply_to = message["replyTo"]
       if reply_to.is_a? String
         message["replyTo"] = {
-          "type" => "#{message["type"] || ""}.result",
+          "type" => "#{message["type"]}.result",
           "to" => reply_to
         }
       end
