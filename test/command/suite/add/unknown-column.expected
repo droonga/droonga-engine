@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": "add.result",
+    "body": {
+      "name": "UnknownColumn",
+      "message": "The column \"unknown\" does not exist in the table \"User\""
+    }
+  }
+]
