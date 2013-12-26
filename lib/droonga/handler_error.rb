@@ -15,11 +15,11 @@
 
 module Droonga
   class HandlerError < StandardError
-    attr_reader :message, :detail
+    attr_reader :message
 
     def initialize(message, options={})
       @message = message
-      @detial = options[:detail] || nil
+      self.detail = options[:detail] if options.include?(:detail)
     end
 
     def name
@@ -28,6 +28,24 @@ module Droonga
 
     def status_code
       500
+    end
+
+    def detail
+      @detail
+    end
+
+    def detail=(value)
+      @have_detail = true
+      @detail = value
+    end
+
+    def to_response_body
+      body = {
+        "name"    => name,
+        "message" => @message,
+      }
+      body["detail"] = @detail if @have_detail
+      body
     end
   end
 

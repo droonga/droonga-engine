@@ -57,11 +57,7 @@ module Droonga
       if descendants.empty?
         return if raw_message["replyTo"].nil?
         response = raw_message.merge("statusCode" => error.status_code,
-                                     "body" => {
-                                       "name"    => error.name,
-                                       "message" => error.message,
-                                       "detail"  => error.detail,
-                                     })
+                                     "body" => error.to_response_body)
         @replier.reply(response)
       else
         #XXX IMPLEMENT ME!!
