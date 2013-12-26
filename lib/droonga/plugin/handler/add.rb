@@ -91,11 +91,11 @@ module Droonga
         begin
           record[column] = value
         rescue Groonga::InvalidArgument => error
+          record.delete if record.added?
           raise InvalidValue.new(column, value, request)
         rescue ArgumentError => error
-          raise InvalidValue.new(column, value, request)
-        ensure
           record.delete if record.added?
+          raise InvalidValue.new(column, value, request)
         end
       end
     end
