@@ -77,7 +77,7 @@ module Droonga
       end
 
       add_record(table, request)
-      [true]
+      true
     end
 
     def add_record(table, request)
