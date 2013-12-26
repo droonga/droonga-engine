@@ -38,12 +38,6 @@ module Droonga
       end
     end
 
-    class UnknownDataset < NotFound
-      def initialize(dataset)
-        super("The dataset #{dataset.inspect} does not exist.")
-      end
-    end
-
     class UnknownCommand < BadRequest
       def initialize(command, dataset)
         super("The command #{command.inspect} is not available " +
@@ -217,15 +211,8 @@ module Droonga
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
       @distributor.process(adapted_message["type"], adapted_message)
-    rescue StandardError => error
-      case error
-      when Droonga::Catalog::UnknownDataset
-        raise UnknownDataset.new(error.dataset)
-      when Droonga::Pluggable::UnknownPlugin
-        raise UnknownCommand.new(error.command, message["dataset"])
-      else
-        raise error
-      end
+    rescue Droonga::Pluggable::UnknownPlugin => error
+      raise UnknownCommand.new(error.command, message["dataset"])
     end
 
     def assert_valid_message

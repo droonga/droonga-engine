@@ -54,5 +54,14 @@ module Droonga
       }]
       distribute(distribute_message)
     end
+
+    private
+    def process_error(command, error, arguments)
+      if error.is_a?(MessageProcessingError)
+        raise error
+      else
+        super
+      end
+    end
   end
 end

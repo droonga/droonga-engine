@@ -27,11 +27,9 @@ module Droonga
   end
 
   class Catalog
-    class UnknownDataset < StandardError
-      attr_reader :dataset
-
+    class UnknownDataset < NotFound
       def initialize(dataset)
-        @dataset = dataset
+        super("The dataset #{dataset.inspect} does not exist.")
       end
     end
 
