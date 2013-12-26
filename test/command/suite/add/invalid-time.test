@@ -6,7 +6,7 @@
     "table": "User",
     "key": "key",
     "values": {
-      "age": "secret"
+      "birthday": "today"
     }
   }
 }
