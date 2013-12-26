@@ -33,11 +33,11 @@ module Droonga
     end
 
     private
-    def process_error(command, error, arguments)
-      if error.is_a?(MessageProcessingError)
-        messenger.error(error.status_code, error.response_body)
-      else
+    def run_command(command, message, messenger)
+      begin
         super
+      rescue MessageProcessingError => error
+        messenger.error(error.status_code, error.response_body)
       end
     end
   end
