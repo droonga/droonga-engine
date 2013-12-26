@@ -37,6 +37,13 @@ module Droonga
       end
     end
 
+    class RecursiveSource < BadRequest
+      def initialize(queries)
+        super("There is recursion of sources.",
+              queries)
+      end
+    end
+
     def initialize(context)
       @context = context
     end
