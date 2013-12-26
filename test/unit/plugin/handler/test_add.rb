@@ -87,7 +87,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Users",
         "values" => {"country" => "japan"},
       }
-      assert_raise(Droonga::AddHandler::MissingPrimaryKey) do
+      assert_raise(Droonga::AddHandler::MissingPrimaryKeyParameter) do
         process(request)
       end
     end
@@ -131,7 +131,7 @@ class AddHandlerTest < Test::Unit::TestCase
       request = {
         "values" => {},
       }
-      assert_raise(Droonga::AddHandler::MissingTable) do
+      assert_raise(Droonga::AddHandler::MissingTableParameter) do
         process(request)
       end
     end
