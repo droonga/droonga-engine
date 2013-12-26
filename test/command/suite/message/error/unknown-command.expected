@@ -3,11 +3,11 @@
   0,
   {
     "inReplyTo": null,
-    "statusCode": 501,
+    "statusCode": 400,
     "type": "unknown-command.result",
     "body": {
-      "name": "UnknownType",
-      "message": "The command type \"unknown-command\" is not available for the dataset \"Droonga\"."
+      "name": "UnknownCommand",
+      "message": "The command \"unknown-command\" is not available for the dataset \"Droonga\"."
     }
   }
 ]
