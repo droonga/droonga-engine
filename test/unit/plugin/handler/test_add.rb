@@ -117,6 +117,15 @@ class AddHandlerTest < Test::Unit::TestCase
   end
 
   class FailureTest < self
+    def test_missing_table_parameter
+      request = {
+        "values" => {},
+      }
+      assert_raise(Droonga::AddHandler::MissingTable) do
+        process(request)
+      end
+    end
+
     def test_nonexistent_table
       request = {
         "table"  => "Nonexistent",
