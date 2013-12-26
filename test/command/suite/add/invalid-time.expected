@@ -6,13 +6,13 @@
     "statusCode": 400,
     "type": "add.result",
     "body": {
-      "name": "UnknownColumn",
-      "message": "The column \"unknown\" does not exist in the table \"User\"",
+      "name": "InvalidValue",
+      "message": "The column \"birthday\" cannot store the value \"today\".",
       "detail": {
         "table": "User",
         "key": "key",
         "values": {
-          "unknown": "unknown"
+          "birthday": "today"
         }
       }
     }

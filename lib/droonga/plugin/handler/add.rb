@@ -37,13 +37,23 @@ module Droonga
       end
     end
 
-    class UnknownTable < BadRequest
+    class UnknownTable < NotFound
       def initialize(table_name)
         super("The table #{table_name.inspect} does not exist in the dataset.")
       end
+    end
 
-      def status_code
-        404
+    class InvalidValue < BadRequest
+      def initialize(column, value, request)
+        super("The column #{column.inspect} cannot store the value #{value.inspect}.",
+              request)
+      end
+    end
+
+    class UnknownColumn < BadRequest
+      def initialize(column, table, request)
+        super("The column #{column.inspect} does not exist in the table #{table.inspect}.",
+              request)
       end
     end
 
@@ -64,11 +74,29 @@ module Droonga
         unless request.include?("key")
           raise MissingPrimaryKeyParameter.new(request["table"])
         end
-        table.add(request["key"], request["values"])
+        add_record(table, request)
       else
-        table.add(request["values"])
+        add_record(table, nil, request["values"], request)
       end
       [true]
+    end
+
+    def add_record(table, request)
+      record = nil
+      if request["key"]
+        record = table.add(request["key"])
+      else
+        record = table.add
+      end
+      request["values"].each do |column, value|
+        begin
+          record[column] = value
+        rescue Groonga::InvalidArgument => error
+          raise InvalidValue.new(column, value, request)
+        rescue ArgumentError => error
+          raise InvalidValue.new(column, value, request)
+        end
+      end
     end
   end
 end
