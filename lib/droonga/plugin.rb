@@ -33,11 +33,16 @@ module Droonga
     end
 
     def process(command, *arguments)
-      __send__(self.class.method_name(command), *arguments)
+      run_command(command, *arguments)
     rescue => exception
       Logger.error("error while processing #{command}",
                    exception,
                    arguments: arguments)
+    end
+    
+    private
+    def run_command(command, *arguments)
+      __send__(self.class.method_name(command), *arguments)
     end
   end
 end

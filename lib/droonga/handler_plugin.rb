@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin"
+require "droonga/handler_error"
 
 module Droonga
   class HandlerPlugin < Plugin
@@ -29,6 +30,15 @@ module Droonga
 
     def prefer_synchronous?(command)
       false
+    end
+
+    private
+    def run_command(command, message, messanger)
+      begin
+        super
+      rescue HandlerError => error
+        messenger.error(error.status_code, error.response_body)
+      end
     end
   end
 end
