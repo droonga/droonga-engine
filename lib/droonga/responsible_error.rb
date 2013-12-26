@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class ResponsibleError
+  class ResponsibleError < StandardError
     attr_reader :message, :detail
  
     def initialize(message, detail=nil)
