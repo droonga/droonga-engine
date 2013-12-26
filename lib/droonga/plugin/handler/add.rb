@@ -94,6 +94,8 @@ module Droonga
           raise InvalidValue.new(column, value, request)
         rescue ArgumentError => error
           raise InvalidValue.new(column, value, request)
+        ensure
+          record.delete if record.added?
         end
       end
     end
