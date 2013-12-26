@@ -15,28 +15,25 @@
 
 module Droonga
   class HandlerError < StandardError
-    attr_reader :message, :detail, :status
+    attr_reader :message, :detail
 
     def initialize(message, options={})
       @message = message
       @detial = options[:detail] || nil
-      @status_code = options[:status_code] || default_status_code
     end
 
     def name
       self.class.to_s
     end
 
-    private
-    def default_status_code
+    def status_code
       500
     end
+  end
 
-    class HandlerClientError < self
-      private
-      def default_status_code
-        400
-      end
+  class HandlerClientError < HandlerError
+    def status_code
+      400
     end
   end
 end

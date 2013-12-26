@@ -23,7 +23,7 @@ module Droonga
   class AddHandler < Droonga::HandlerPlugin
     repository.register("add", self)
 
-    class InvalidRequest < Droonga::HandlerError::HandlerClientError
+    class InvalidRequest < HandlerClientError
     end
 
     class MissingTable < InvalidRequest
@@ -44,6 +44,10 @@ module Droonga
       def initialize(table_name, options={})
         super("The table #{table_name.inspect} does not exist in the dataset.",
               options)
+      end
+
+      def status_code
+        404
       end
     end
 
