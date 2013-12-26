@@ -122,8 +122,9 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Nonexistent",
         "values" => {},
       }
-      process(request)
-      assert_equal([[false]], @messenger.values)
+      assert_raise(Droonga::AddHandler::UnknownTable) do
+        process(request)
+      end
     end
   end
 end
