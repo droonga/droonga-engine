@@ -1,0 +1,17 @@
+#@include fixture/user-table.jsons
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Unknown",
+    "key": "key",
+    "values": {
+      "name": "Alice",
+      "age": 20,
+      "email": [
+        "alice@example.com",
+        "alice@example.jp"
+      ]
+    }
+  }
+}

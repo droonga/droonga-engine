@@ -1,0 +1,13 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": "add.result",
+    "body": {
+      "name": "MissingTable",
+      "message": "\"table\" must be specified."
+    }
+  }
+]
