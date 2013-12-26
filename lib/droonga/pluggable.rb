@@ -17,6 +17,14 @@
 
 module Droonga
   module Pluggable
+    class UnknownPlugin < StandardError
+      attr_reader :command
+
+      def initialize(command)
+        @command = command
+      end
+    end
+
     def shutdown
       $log.trace("#{log_tag}: shutdown: plugin: start")
       @plugins.each do |plugin|
@@ -33,10 +41,7 @@ module Droonga
       plugin = find_plugin(command)
       $log.trace("#{log_tag}: process: start: <#{command}>",
                  :plugin => plugin.class)
-      if plugin.nil?
-        raise "unknown plugin: <#{command}>: " +
-                "TODO: improve error handling"
-      end
+      raise UnknownPlugin.new(command) if plugin.nil?
       plugin.process(command, *arguments)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)

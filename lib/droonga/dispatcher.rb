@@ -38,6 +38,13 @@ module Droonga
       end
     end
 
+    class UnknownCommand < BadRequest
+      def initialize(command, dataset)
+        super("The command #{command.inspect} is not available " +
+                "for the dataset #{dataset.inspect}.")
+      end
+    end
+
     def initialize(options)
       @options = options
       @name = @options[:name]
@@ -83,6 +90,8 @@ module Droonga
         begin
           assert_valid_message
           process_input_message(message)
+        rescue Droonga::Pluggable::UnknownPlugin => error
+          raise UnknownCommand.new(error.command, message["dataset"])
         rescue MessageProcessingError => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
