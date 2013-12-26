@@ -1,16 +1,5 @@
 #@include fixture/user-table.jsons
 {
   "type": "add",
-  "body": {
-    "table": "User",
-    "key": "key",
-    "values": {
-      "name": "Alice",
-      "age": 20,
-      "email": [
-        "alice@example.com",
-        "alice@example.jp"
-      ]
-    }
-  }
+  "body": {}
 }
