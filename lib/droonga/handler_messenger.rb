@@ -51,13 +51,13 @@ module Droonga
       end
     end
 
-    def error(error)
+    def error(status_code, body)
       descendants = @message.descendants
       raw_message = @message.raw
       if descendants.empty?
         return if raw_message["replyTo"].nil?
-        response = raw_message.merge("statusCode" => error.status_code,
-                                     "body" => error.to_response_body)
+        response = raw_message.merge("statusCode" => status_code,
+                                     "body" => body)
         @replier.reply(response)
       else
         #XXX IMPLEMENT ME!!

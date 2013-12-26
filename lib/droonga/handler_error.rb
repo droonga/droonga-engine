@@ -30,7 +30,7 @@ module Droonga
       500
     end
 
-    def to_response_body
+    def response_body
       body = {
         "name"    => name,
         "message" => @message,

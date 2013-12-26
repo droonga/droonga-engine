@@ -95,7 +95,7 @@ module Droonga
       begin
         plugin.process(command, handler_message, messenger)
       rescue HandlerError => error
-        messenger.error(error)
+        messenger.error(error.status_code, error.response_body)
       end
     end
 
