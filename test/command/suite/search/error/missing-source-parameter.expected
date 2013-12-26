@@ -1,0 +1,19 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": null,
+    "statusCode": 400,
+    "type": "search.result",
+    "body": {
+      "name": "MissingSourceParameter",
+      "message": "The query \"no-source\" has no source. Query must have a valid source.",
+      "detail": {
+        "queries": {
+          "no-source": {
+          }
+        }
+      }
+    }
+  }
+]
