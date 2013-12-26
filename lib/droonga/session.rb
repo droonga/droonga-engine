@@ -62,7 +62,7 @@ module Droonga
         #the task is done
         result = task["values"]
         post = component["post"]
-        @dispatcher.reply(result) if post
+        @dispatcher.reply("body" => result) if post
         component["descendants"].each do |name, routes|
           message = {
             "id" => @id,

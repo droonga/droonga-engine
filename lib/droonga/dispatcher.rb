@@ -84,9 +84,8 @@ module Droonga
           assert_valid_message
           process_input_message(message)
         rescue MessageProcessingError => error
-          response = @output_adapter.adapt(@message.merge("statusCode" => error.status_code,
-                                                          "body" => error.response_body))
-          @replier.reply(response)
+          reply("statusCode" => error.status_code,
+                "body"       => error.response_body)
         end
       end
     end
@@ -97,8 +96,21 @@ module Droonga
       $log.trace("#{log_tag}: forward done")
     end
 
-    def reply(body)
-      adapted_message = @output_adapter.adapt(@message.merge("body" => body))
+    # Replies response to replyTo.
+    #
+    # @param [Hash] message
+    #   The message to be replied. See {Replier#reply} for available keys.
+    #
+    #   The key-value pairs in request message are used as the default
+    #   key-value pairs. For example, if the passed message doesn't
+    #   include `id` key, `id` key's value is used in request message.
+    #
+    # @return [void]
+    #
+    # @see Replier#reply
+    def reply(message)
+      adapted_message = @output_adapter.adapt(@message.merge(message))
+      return if adapted_message["replyTo"].nil?
       @replier.reply(adapted_message)
     end
 
