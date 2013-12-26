@@ -38,7 +38,7 @@ module Droonga
       end
     end
 
-    class UnknownDataset < BadRequest
+    class UnknownDataset < NotFound
       def initialize(dataset)
         super("The dataset #{dataset.inspect} does not exist.")
       end

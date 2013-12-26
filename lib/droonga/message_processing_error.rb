@@ -45,4 +45,10 @@ module Droonga
       400
     end
   end
+
+  class NotFound < MessageProcessingError
+    def status_code
+      404
+    end
+  end
 end
