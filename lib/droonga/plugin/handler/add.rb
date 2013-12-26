@@ -96,6 +96,9 @@ module Droonga
         rescue ArgumentError => error
           record.delete if record.added?
           raise InvalidValue.new(column, value, request)
+        rescue Groonga::NoSuchColumn => error
+          record.delete if record.added?
+          raise UnknownColumn.new(column, table, request)
         end
       end
     end
