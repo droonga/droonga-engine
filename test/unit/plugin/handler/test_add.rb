@@ -81,6 +81,16 @@ class AddHandlerTest < Test::Unit::TestCase
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
     end
+
+    def test_missing_key_parameter
+      request = {
+        "table"  => "Users",
+        "values" => {"country" => "japan"},
+      }
+      assert_raise(Droonga::AddHandler::MissingPrimaryKey) do
+        process(request)
+      end
+    end
   end
 
   class NoKeyTest < self
