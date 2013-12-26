@@ -21,7 +21,7 @@ require "groonga"
 
 module Droonga
   class Searcher
-    class UnknownSource < BadRequest
+    class UnknownSource < NotFound
       def initialize(source, queries)
         super("The source #{source.inspect} does not exist. " +
                 "It must be a name of an existing table or another query.",
