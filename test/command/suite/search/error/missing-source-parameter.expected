@@ -9,9 +9,7 @@
       "name": "MissingSourceParameter",
       "message": "The query \"no-source\" has no source. Query must have a valid source.",
       "detail": {
-        "queries": {
-          "no-source": {
-          }
+        "no-source": {
         }
       }
     }
