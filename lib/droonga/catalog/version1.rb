@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,24 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/version1"
+require "droonga/catalog/base"
 
 module Droonga
-  class << self
-    def catalog
-      @catalog ||= Catalog.load
-    end
-  end
-
   module Catalog
-    PATH = "catalog.json"
-
-    class << self
-      def load(path=nil)
-        path = ENV["DROONGA_CATALOG"] || PATH
-        path = File.expand_path(path)
-        Version1.new(path)
-      end
+    class Version1 < Base
     end
   end
 end
