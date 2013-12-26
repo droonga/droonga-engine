@@ -87,7 +87,7 @@ module Droonga
       else
         record = table.add
       end
-      request["values"].each do |column, value|
+      (request["values"] || []).each do |column, value|
         begin
           record[column] = value
         rescue Groonga::InvalidArgument => error
