@@ -44,28 +44,6 @@ module Droonga
       end
     end
 
-    class << self
-      def sort_queries(queries)
-        query_sorter = QuerySorter.new
-        queries.each do |name, query|
-          source = query["source"]
-          raise MissingSourceParameter.new(name, queries) unless source
-          raise CyclicSource.new(queries) if name == source
-          query_sorter.add(name, [source])
-        end
-        begin
-          sorted_queries = query_sorter.tsort
-        rescue TSort::Cyclic
-          raise CyclicSource.new(queries)
-        end
-        sorted_queries
-      end
-
-      def validate_sources(queries)
-        sort_queries(queries)
-      end
-    end
-
     def initialize(context)
       @context = context
     end
@@ -88,7 +66,7 @@ module Droonga
         return {}
       end
       $log.trace("#{log_tag}: process_queries: sort: start")
-      sorted_queries = self.class.sort_queries(queries)
+      sorted_queries = QuerySorter.sort(queries)
       $log.trace("#{log_tag}: process_queries: sort: done")
       outputs = {}
       results = {}
@@ -124,6 +102,29 @@ module Droonga
 
     class QuerySorter
       include TSort
+
+      class << self
+        def sort(queries)
+          query_sorter = new
+          queries.each do |name, query|
+            source = query["source"]
+            raise MissingSourceParameter.new(name, queries) unless source
+            raise CyclicSource.new(queries) if name == source
+            query_sorter.add(name, [source])
+          end
+          begin
+            sorted_queries = query_sorter.tsort
+          rescue TSort::Cyclic
+            raise CyclicSource.new(queries)
+          end
+          sorted_queries
+        end
+
+        def validate_sources(queries)
+          sort(queries)
+        end
+      end
+
       def initialize()
         @queries = {}
       end

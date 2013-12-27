@@ -36,7 +36,7 @@ module Droonga
     UNLIMITED = -1
 
     def build_messages
-      Searcher.validate_sources(@queries)
+      QuerySorter.validate_sources(@queries)
 
       ensure_unifiable!
 
