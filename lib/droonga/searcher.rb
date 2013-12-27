@@ -120,7 +120,7 @@ module Droonga
           sorted_queries
         end
 
-        def validate_sources(queries)
+        def validate_dependencies(queries)
           sort(queries)
         end
       end
