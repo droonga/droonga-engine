@@ -45,19 +45,24 @@ module Droonga
     end
 
     class << self
-      def have_cyclic_source?(queries)
+      def sort_queries(queries)
         query_sorter = QuerySorter.new
         queries.each do |name, query|
           source = query["source"]
-          return true if source == name
+          raise MissingSourceParameter.new(name, queries) unless source
+          raise CyclicSource.new(queries) if name == source
           query_sorter.add(name, [source])
         end
         begin
           sorted_queries = query_sorter.tsort
         rescue TSort::Cyclic
-          return true
+          raise CyclicSource.new(queries)
         end
-        false
+        sorted_queries
+      end
+
+      def validate_sources(queries)
+        sort_queries(queries)
       end
     end
 
@@ -83,18 +88,7 @@ module Droonga
         return {}
       end
       $log.trace("#{log_tag}: process_queries: sort: start")
-      query_sorter = QuerySorter.new
-      queries.each do |name, query|
-        source = query["source"]
-        raise MissingSourceParameter.new(name, queries) unless source
-        raise CyclicSource.new(queries) if name == source
-        query_sorter.add(name, [source])
-      end
-      begin
-        sorted_queries = query_sorter.tsort
-      rescue TSort::Cyclic
-        raise CyclicSource.new(queries)
-      end
+      sorted_queries = self.class.sort_queries(queries)
       $log.trace("#{log_tag}: process_queries: sort: done")
       outputs = {}
       results = {}

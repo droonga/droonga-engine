@@ -36,9 +36,7 @@ module Droonga
     UNLIMITED = -1
 
     def build_messages
-      if Searcher.have_cyclic_source?(@queries)
-        raise Searcher::CyclicSource.new(@queries)
-      end
+      Searcher.validate_sources(@queries)
 
       ensure_unifiable!
 
