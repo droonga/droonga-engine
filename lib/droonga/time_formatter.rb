@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,48 +13,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "msgpack"
-
-require "droonga/time_formatter"
+require "time"
 
 module Droonga
-  class MessagePackPacker
+  class TimeFormatter
     class << self
-      def pack(object)
-        packer = new
-        packer.pack(object)
-        packer.to_s
+      def format(object)
+        formatter = new(object)
+        formatter.format
       end
     end
 
     MICRO_SECONDS_DECIMAL_PLACE = 6
 
-    def initialize
-      @packer = MessagePack::Packer.new
+    def initialize(time)
+      @time = time
     end
 
-    def pack(object)
-      case object
-      when Array
-        @packer.write_array_header(object.size)
-        object.each do |element|
-          pack(element)
-        end
-      when Hash
-        @packer.write_map_header(object.size)
-        object.each do |key, value|
-          pack(key)
-          pack(value)
-        end
-      when Time
-        @packer.write(TimeFormatter.format(object))
-      else
-        @packer.write(object)
-      end
-    end
-
-    def to_s
-      @packer.to_s
+    def format
+      @time.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
     end
   end
 end

@@ -19,6 +19,8 @@ require "English"
 require "tsort"
 require "groonga"
 
+require "droonga/time_formatter"
+
 module Droonga
   class Searcher
     class MissingSourceParameter < BadRequest
@@ -535,7 +537,7 @@ module Droonga
       end
 
       def format_start_time
-        @result.start_time.iso8601
+        TimeFormatter.format(@result.start_time)
       end
 
       def format_elapsed_time

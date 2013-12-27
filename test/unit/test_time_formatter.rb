@@ -13,39 +13,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/message_pack_packer"
+require "droonga/time_formatter"
 
-class MessagePackPackerTest < Test::Unit::TestCase
-  def test_integer
-    assert_equal(29, unpack(pack(29)))
-  end
-
-  def test_string
-    assert_equal("Droonga", unpack(pack("Droonga")))
-  end
-
-  def test_time
-    w3c_dtf_time = "2013-11-29T08:00:00.000000Z"
+class TimeFormatterTest < Test::Unit::TestCase
+  def test_fraction
+    w3c_dtf_time = "2013-11-29T08:00:00.292929Z"
     time = Time.parse(w3c_dtf_time)
-    assert_equal(w3c_dtf_time, unpack(pack(time)))
-  end
-
-  def test_hash
-    hash = {"key" => "value"}
-    assert_equal(hash, unpack(pack(hash)))
-  end
-
-  def test_array
-    array = ["Groonga", "Rroonga", "Droonga"]
-    assert_equal(array, unpack(pack(array)))
+    assert_equal(w3c_dtf_time, format(time))
   end
 
   private
-  def pack(object)
-    Droonga::MessagePackPacker.pack(object)
-  end
-
-  def unpack(msgpack)
-    MessagePack.unpack(msgpack)
+  def format(time)
+    Droonga::TimeFormatter.format(time)
   end
 end
