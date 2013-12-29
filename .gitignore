@@ -2,3 +2,4 @@
 /test/command/tmp
 /doc/
 /.yardoc/
+/pkg/
