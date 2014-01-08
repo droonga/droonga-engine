@@ -153,7 +153,7 @@ class WatchHandlerTest < Test::Unit::TestCase
                        },
                        {
                          "to"   => "localhost:23003/output",
-                         "type" => "watch.notification",
+                         "type" => "watch.publish",
                        },
                      ],
                    ],

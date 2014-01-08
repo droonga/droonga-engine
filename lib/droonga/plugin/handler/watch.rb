@@ -75,13 +75,13 @@ module Droonga
     def feed(message, messenger)
       request = message.request
       @watcher.feed(:targets => request["targets"]) do |route, subscribers|
-        notification_message = {
+        published_message = {
           "to"   => subscribers,
           "body" => request,
         }
-        notification_message = message.raw.merge(notification_message)
-        messenger.forward(notification_message,
-                          "to" => route, "type" => "watch.notification")
+        published_message = message.raw.merge(published_message)
+        messenger.forward(published_message,
+                          "to" => route, "type" => "watch.publish")
       end
     end
 
