@@ -407,6 +407,14 @@ module Droonga
         @request.output["elements"] || []
       end
 
+      def output_offset
+        @request.output["offset"] || 0
+      end
+
+      def output_limit
+        @request.output["limit"] || 10
+      end
+
       def format_count
         @result.count
       end
@@ -433,12 +441,12 @@ module Droonga
       end
 
       def format_records
-        params = @request.output
-
-        offset = params["offset"] || 0
-        limit = params["limit"] || 10
         formatted_records = nil
-        @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
+        cursor_options = {
+          :offset => output_offset,
+          :limit => output_limit
+        }
+        @result.records.open_cursor(cursor_options) do |cursor|
           if @request.complex_output?
             formatted_records = cursor.collect do |record|
               complex_record(output_target_attributes, record)
