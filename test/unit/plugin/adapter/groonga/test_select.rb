@@ -13,11 +13,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/adapter/groonga/select"
+require "droonga/plugin/input_adapter/groonga/select"
+require "droonga/plugin/output_adapter/groonga/select"
 
-class AdapterGroongaSelectTest < Test::Unit::TestCase
+class InputAdapterGroongaSelectTest < Test::Unit::TestCase
   def setup
-    @select = Droonga::GroongaAdapter::Select.new
+    @select = Droonga::GroongaInputAdapter::Select.new
   end
 
   class RequestTest < self
@@ -52,7 +53,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(select_request)
-      @select.convert_request(select_request)
+      @select.convert(select_request)
     end
 
     class OutputColumnsTest < self
@@ -244,6 +245,12 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
       end
     end
   end
+end
+
+class OutputAdapterGroongaSelectTest < Test::Unit::TestCase
+  def setup
+    @select = Droonga::GroongaOutputAdapter::Select.new
+  end
 
   class ResponseTest < self
     def test_empty
@@ -274,7 +281,7 @@ class AdapterGroongaSelectTest < Test::Unit::TestCase
 
     private
     def convert(search_response)
-      @select.convert_response(search_response)
+      @select.convert(search_response)
     end
   end
 end
