@@ -1,3 +1,4 @@
+
 # Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -14,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin/input_adapter/groonga/select"
-require "droonga/plugin/output_adapter/groonga/select"
 
 class InputAdapterGroongaSelectTest < Test::Unit::TestCase
   def setup
@@ -243,45 +243,6 @@ class InputAdapterGroongaSelectTest < Test::Unit::TestCase
       def test_default
         assert_limit(10, nil)
       end
-    end
-  end
-end
-
-class OutputAdapterGroongaSelectTest < Test::Unit::TestCase
-  def setup
-    @select = Droonga::GroongaOutputAdapter::Select.new
-  end
-
-  class ResponseTest < self
-    def test_empty
-      start_time = "2001-08-02T10:45:23.5+09:00"
-      elapsed_time = 0
-      count = 0
-
-      search_response = {
-        "EmptyTable" => {
-          "startTime"   => start_time,
-          "elapsedTime" => elapsed_time,
-          "count"       => count,
-          "attributes"  => [
-            {"name" => "_id", "type" => "UInt32", "vector" => false},
-          ],
-          "records"     => [],
-        },
-      }
-
-      status_code = 0
-      start_time_in_unix_time = Time.parse(start_time).to_f
-      headers = [["_id","UInt32"]]
-      expected_select_response = [[status_code, start_time_in_unix_time, elapsed_time],
-                                  [[[count], headers]]]
-
-      assert_equal(expected_select_response, convert(search_response))
-    end
-
-    private
-    def convert(search_response)
-      @select.convert(search_response)
     end
   end
 end
