@@ -427,22 +427,25 @@ module Droonga
         attributes
       end
 
+      def output_target_attributes
+        attributes = @request.output["attributes"]
+        normalize_target_attributes(attributes)
+      end
+
       def format_records
         params = @request.output
 
-        attributes = params["attributes"]
-        target_attributes = normalize_target_attributes(attributes)
         offset = params["offset"] || 0
         limit = params["limit"] || 10
         formatted_records = nil
         @result.records.open_cursor(:offset => offset, :limit => limit) do |cursor|
           if @request.complex_output?
             formatted_records = cursor.collect do |record|
-              complex_record(target_attributes, record)
+              complex_record(output_target_attributes, record)
             end
           else
             formatted_records = cursor.collect do |record|
-              simple_record(target_attributes, record)
+              simple_record(output_target_attributes, record)
             end
           end
         end
