@@ -434,31 +434,38 @@ module Droonga
 
       def format_attributes_simple(attributes)
         attributes.collect do |attribute|
-          format_attribute(attribute)
+          format_attribute(attribute, @result.records)
         end
       end
 
       def format_attributes_complex(attributes)
         formatted_attributes = {}
         attributes.collect do |attribute|
-          formatted_attribute = format_attribute(attribute)
+          formatted_attribute = format_attribute(attribute, @result.records)
           attribute_name = formatted_attribute.delete("name")
           formatted_attributes[attribute_name] = formatted_attribute
         end
         formatted_attributes
       end
 
-      def format_attribute(attribute)
+      def format_attribute(attribute, table)
         label = attribute[:label]
         source = attribute[:source]
         if source == "_subrecs"
-          # TODO implement
+          sub_record_table = table.range
+          sub_attributes = attribute[:attributes].collect do |sub_attribute|
+            format_attribute(sub_attribute, sub_record_table)
+          end
+          {
+            "name" => label,
+            "attributes" => sub_attributes,
+          }
         else
           expression = attribute[:expression]
           if expression
             # TODO implement
           else
-            column = @result.records.column(source)
+            column = table.column(source)
             vector = column.respond_to?(:vector?) ? column.vector? : false
             {"name" => label, "type" => column.range.name, "vector" => vector}
           end
@@ -558,13 +565,17 @@ module Droonga
             condition.value = @result.condition
             source = nil
           end
-          {
+          normalized_attributes = {
             label: attribute["label"] || attribute["source"],
             source: source,
             expression: expression,
             variable: variable,
-            attributes: attribute["attributes"]
           }
+          if attribute["attributes"]
+            normalized_attributes[:attributes] =
+              normalize_target_attributes(attribute["attributes"], domain.range)
+          end
+          normalized_attributes
         end
       end
 

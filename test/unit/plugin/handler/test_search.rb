@@ -298,7 +298,6 @@ class SearchHandlerTest < Test::Unit::TestCase
       end
 
       def test_attributes_subrecs_simple
-        pend "Not implemented yet"
         assert_search({
                         "sections-result" => {
                           "attributes" => [
@@ -320,6 +319,11 @@ class SearchHandlerTest < Test::Unit::TestCase
                             {
                               "name" => "subrecs",
                               "attributes" => [
+                                {
+                                  "name" => "_key",
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
                                 {
                                   "name" => "sectionTitle",
                                   "type" => "ShortText",
