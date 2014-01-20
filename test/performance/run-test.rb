@@ -19,6 +19,9 @@ require "rbconfig"
 require "fileutils"
 
 def run(*command_line)
+  command_line.collect! do |argument|
+    argument.to_s
+  end
   return if system(*command_line)
   puts("failed to run: #{command_line.join(' ')}")
   exit(false)
