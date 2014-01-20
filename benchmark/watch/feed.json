@@ -1,0 +1,9 @@
+{
+  "type":    "watch.feed",
+  "dataset": "Watch",
+  "body":    {
+    "targets": {
+      "body": "a content including the keyword"
+    }
+  }
+}
