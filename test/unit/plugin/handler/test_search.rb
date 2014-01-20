@@ -222,6 +222,46 @@ class SearchHandlerTest < Test::Unit::TestCase
                       })
       end
 
+      def test_attributes_simple
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => [
+                            {
+                              "name" => "key",
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            {
+                              "name" => "title",
+                              "type" => "ShortText",
+                              "vector" => false
+                            }
+                          ]
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      # TODO test_attributes_complex
+
       class AttributesTest < self
         def test_source_only
           expected = {

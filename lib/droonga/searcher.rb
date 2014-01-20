@@ -429,7 +429,9 @@ module Droonga
         else
           # should convert columns to an object like:
           # [{"name" => "_id", "type" => "UInt32", "vector" => false}]
-          attributes = []
+          attributes = output_target_attributes.collect do |attribute|
+            format_attribute(attribute)
+          end
         end
 
         attributes
@@ -438,6 +440,23 @@ module Droonga
       def output_target_attributes
         attributes = @request.output["attributes"]
         normalize_target_attributes(attributes)
+      end
+
+      def format_attribute(attribute)
+        label = attribute[:label]
+        source = attribute[:source]
+        if source == "_subrecs"
+          # TODO implement
+        else
+          expression = attribute[:expression]
+          if expression
+            # TODO implement
+          else
+            column = @result.records.column(source)
+            vector = column.respond_to?(:vector?) ? column.vector? : false
+            {"name" => label, "type" => column.range.name, "vector" => vector}
+          end
+        end
       end
 
       def format_records
