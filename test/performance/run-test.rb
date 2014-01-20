@@ -51,4 +51,5 @@ drnbench_options.concat(["--engine-config-path",
 drnbench_options.concat(["--fluentd-options", "-I#{lib_dir}"])
 drnbench_options.concat(ARGV)
 
-run("bundle", "exec", "drnbench-publish-subscribe", *drnbench_options)
+drnbench_publish_subscribe = File.join(base_dir, "..", "..", "bin", "drnbench-publish-subscribe")
+run("bundle", "exec", drnbench_publish_subscribe, *drnbench_options)
