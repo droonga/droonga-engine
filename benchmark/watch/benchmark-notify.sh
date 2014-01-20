@@ -1,13 +1,14 @@
 #!/bin/sh
 
 base_dir=$(cd $(dirname $0); pwd)
+work_dir=$base_dir/../../performance/watch
 
 rm -rf $base_dir/watch
 mkdir -p $base_dir/watch
 
-DROONGA_CATALOG=$base_dir/catalog.json \
+DROONGA_CATALOG=$work_dir/catalog.json \
   bundle exec fluentd \
-    --config $base_dir/fluentd.conf &
+    --config $work_dir/fluentd.conf &
 FLUENTD_PID=$!
 
 sleep 1
