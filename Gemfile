@@ -50,3 +50,10 @@ if File.exist?(drntest_dir)
 else
   gem "drntest", :github => "droonga/drntest"
 end
+
+drnbench_dir = File.join(parent_dir, "drnbench")
+if File.exist?(drnbench_dir)
+  gem "drnbench", :path => drnbench_dir
+else
+  gem "drnbench", :github => "droonga/drnbench"
+end
