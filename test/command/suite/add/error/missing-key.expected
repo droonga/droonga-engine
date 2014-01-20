@@ -2,7 +2,7 @@
   "droonga.message",
   0,
   {
-    "inReplyTo": null,
+    "inReplyTo": "request-id",
     "statusCode": 400,
     "type": "add.result",
     "body": {
