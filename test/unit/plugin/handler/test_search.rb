@@ -297,8 +297,6 @@ class SearchHandlerTest < Test::Unit::TestCase
                       })
       end
 
-      # TODO test_attributes_complex
-
       class AttributesTest < self
         def test_source_only
           expected = {
