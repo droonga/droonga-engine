@@ -40,10 +40,11 @@ drnbench_options.concat(["--subscribe-request-file",
 drnbench_options.concat(["--feed-file",
                          File.join(base_dir, "watch", "feed.json")])
 
-drnbench_options.concat(["--protocol-adapter-port", 13000])
-drnbench_options.concat(["--protocol-adapter-application-dir",
-                         File.join(base_dir, "..", "..", "..", "express-droonga")])
-drnbench_options.concat(["--protocol-adapter-port", 13000])
+protocol_adapter_dir = File.join(base_dir, "..", "..", "..", "express-droonga")
+if File.exist?(protocol_adapter_dir)
+  drnbench_options.concat(["--protocol-adapter-application-dir", protocol_adapter_dir])
+  drnbench_options.concat(["--protocol-adapter-port", 13000])
+end
 
 drnbench_options.concat(["--engine-config-path",
                          File.join(base_dir, "watch")])
