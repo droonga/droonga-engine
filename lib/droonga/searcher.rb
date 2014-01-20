@@ -420,26 +420,32 @@ module Droonga
       end
 
       def format_attributes
-        # XXX IMPLEMENT ME!!!
-        attributes = nil
         if @request.complex_output?
-          # should convert columns to an object like:
-          # {"_id" => {"type" => "UInt32", "vector" => false}}
-          attributes = {}
+          format_attributes_complex(output_target_attributes)
         else
-          # should convert columns to an object like:
-          # [{"name" => "_id", "type" => "UInt32", "vector" => false}]
-          attributes = output_target_attributes.collect do |attribute|
-            format_attribute(attribute)
-          end
+          format_attributes_simple(output_target_attributes)
         end
-
-        attributes
       end
 
       def output_target_attributes
         attributes = @request.output["attributes"]
         normalize_target_attributes(attributes)
+      end
+
+      def format_attributes_simple(attributes)
+        attributes.collect do |attribute|
+          format_attribute(attribute)
+        end
+      end
+
+      def format_attributes_complex(attributes)
+        formatted_attributes = {}
+        attributes.collect do |attribute|
+          formatted_attribute = format_attribute(attribute)
+          attribute_name = formatted_attribute.delete("name")
+          formatted_attributes[attribute_name] = formatted_attribute
+        end
+        formatted_attributes
       end
 
       def format_attribute(attribute)
