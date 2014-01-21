@@ -51,5 +51,6 @@ drnbench_options.concat(["--engine-config-path",
 drnbench_options.concat(["--fluentd-options", "-I#{lib_dir}"])
 drnbench_options.concat(ARGV)
 
-drnbench_publish_subscribe = File.join(base_dir, "..", "..", "bin", "drnbench-publish-subscribe")
-run("bundle", "exec", drnbench_publish_subscribe, *drnbench_options)
+drnbench_publish_subscribe = Gem.bin_path("drnbench",
+                                          "drnbench-publish-subscribe")
+run(drnbench_publish_subscribe, *drnbench_options)
