@@ -31,9 +31,9 @@ base_dir = File.dirname(__FILE__)
 lib_dir = File.expand_path(File.join(base_dir, "..", "..", "lib"))
 
 drnbench_options = []
-drnbench_options.concat(["--start-n-subscribers", 1000])
-drnbench_options.concat(["--n-publishings", 1000])
-drnbench_options.concat(["--n-steps", 10])
+drnbench_options.concat(["--start-n-subscribers", 10])
+drnbench_options.concat(["--n-publishings", 10])
+drnbench_options.concat(["--n-steps", 9])
 drnbench_options.concat(["--timeout", 5])
 drnbench_options.concat(["--subscribe-request-file",
                          File.join(base_dir, "watch", "subscribe.json")])
