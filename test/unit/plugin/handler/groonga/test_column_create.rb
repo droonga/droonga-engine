@@ -25,6 +25,16 @@ class ColumnCreateTest < GroongaHandlerTest
     )
   end
 
+  def test_unknown_table
+    process(:column_create,
+            {"table" => "Unknown", "name" => "title", "type" => "ShortText"})
+    response = @messenger.values.last
+    assert_equal(
+      [[Droonga::GroongaHandler::Status::INVALID_ARGUMENT, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
+      [normalize_header(response.first), response.last]
+    )
+  end
+
   def test_name
     process(:table_create, {"name" => "Books"})
     process(:column_create,
