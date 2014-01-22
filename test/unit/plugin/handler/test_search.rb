@@ -381,7 +381,6 @@ class SearchHandlerTest < Test::Unit::TestCase
       end
 
       def test_attributes_subrecs_complex
-        pend "Not implemented"
         assert_search({
                         "sections-result" => {
                           "attributes" => {
