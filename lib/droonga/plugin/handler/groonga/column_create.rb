@@ -25,6 +25,13 @@ module Droonga
         command_class = Groonga::Command.find("column_create")
         @command = command_class.new("column_create", request)
 
+        table_name = @command["table"]
+        if table_name.nil? || @context[table_name].nil?
+          raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                 :message => "table doesn't exist:<#{table_name.to_s}>",
+                                 :result => false)
+        end
+
         if @command.column_index?
           define_index
         else

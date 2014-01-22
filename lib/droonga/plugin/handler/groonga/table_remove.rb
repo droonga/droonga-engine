@@ -26,9 +26,9 @@ module Droonga
         @command = command_class.new("table_remove", request)
 
         name = @command["name"]
-        unless name
+        if name.nil? || @context[name].nil?
           raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                 :message => "Cannot remove anonymous table",
+                                 :message => "table not found",
                                  :result => false)
         end
 
