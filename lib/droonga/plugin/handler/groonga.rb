@@ -31,7 +31,7 @@ module Droonga
     end
 
     command :table_remove
-    def table_create(message, messenger)
+    def table_remove(message, messenger)
       command = TableRemove.new(@context)
       outputs = command.execute(message.request)
       messenger.emit(outputs)
