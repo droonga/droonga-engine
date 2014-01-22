@@ -35,6 +35,8 @@ module Droonga
         case command.name
         when "table_create"
           yield create_table_create_command(command)
+        when "table_remove"
+          yield create_table_remove_command(command)
         when "column_create"
           yield create_column_create_command(command)
         when "select"
@@ -100,6 +102,10 @@ module Droonga
 
     def create_table_create_command(command)
       create_message("table_create", command.arguments)
+    end
+
+    def create_table_remove_command(command)
+      create_message("table_remove", command.arguments)
     end
 
     def create_column_create_command(command)

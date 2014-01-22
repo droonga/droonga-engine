@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,31 +15,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/distributor_plugin"
+require "groonga"
+require "groonga/command/table-remove"
 
 module Droonga
-  class GroongaDistributor < Droonga::DistributorPlugin
-    repository.register("groonga", self)
+  class GroongaHandler
+    class TableRemove < Command
+      def process_request(request)
+        command_class = Groonga::Command.find("table_remove")
+        @command = command_class.new("table_remove", request)
 
-    command :table_create
-    def table_create(message)
-      unless message["dataset"]
-        raise "dataset must be set. FIXME: This error should return client."
+        name = @command["name"]
+        unless name
+          raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                 :message => "Cannot remove anonymous table",
+                                 :result => false)
+        end
+
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.remove_table(name)
+        end
+        true
       end
-      broadcast_all(message)
-    end
-
-    command :table_remove
-    def table_remove(message)
-      unless message["dataset"]
-        raise "dataset must be set. FIXME: This error should return client."
-      end
-      broadcast_all(message)
-    end
-
-    command :column_create
-    def column_create(message)
-      broadcast_all(message)
     end
   end
 end

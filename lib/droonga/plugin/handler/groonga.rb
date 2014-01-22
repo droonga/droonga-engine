@@ -30,6 +30,13 @@ module Droonga
       messenger.emit(outputs)
     end
 
+    command :table_remove
+    def table_create(message, messenger)
+      command = TableRemove.new(@context)
+      outputs = command.execute(message.request)
+      messenger.emit(outputs)
+    end
+
     command :column_create
     def column_create(message, messenger)
       command = ColumnCreate.new(@context)
@@ -81,4 +88,5 @@ module Droonga
 end
 
 require "droonga/plugin/handler/groonga/table_create"
+require "droonga/plugin/handler/groonga/table_remove"
 require "droonga/plugin/handler/groonga/column_create"
