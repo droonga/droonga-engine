@@ -380,6 +380,84 @@ class SearchHandlerTest < Test::Unit::TestCase
                       })
       end
 
+      def test_attributes_subrecs_complex
+        pend "Not implemented"
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => {
+                            "key" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            "title" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            "_nsubrecs" => {
+                              "type" => "Int32",
+                              "vector" => false
+                            },
+                            "subrecs" => {
+                              "attributes" => {
+                                "_key" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                "sectionTitle" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                "documentTitle" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                }
+                              }
+                            }
+                          }
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "groupBy" => {
+                              "key" => "document",
+                              "maxNSubRecords" => 1
+                            },
+                            "output" => {
+                              "format" => "complex",
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                                "_nsubrecs",
+                                {
+                                  "label" => "subrecs",
+                                  "source" => "_subrecs",
+                                  "attributes" => [
+                                    "_key",
+                                    {
+                                      "label" => "sectionTitle",
+                                      "source" => "title"
+                                    },
+                                    {
+                                      "label" => "documentTitle",
+                                      "source" => "document.title"
+                                    }
+                                  ]
+                                }
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
       class AttributesTest < self
         def test_source_only
           expected = {
