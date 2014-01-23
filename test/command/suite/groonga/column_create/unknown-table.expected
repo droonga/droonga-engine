@@ -1,0 +1,17 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "column_create.result",
+    "body": [
+      [
+        -22,
+        0.0,
+        0.0
+      ],
+      false
+    ]
+  }
+]
