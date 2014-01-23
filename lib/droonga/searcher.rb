@@ -489,26 +489,18 @@ module Droonga
       end
 
       def format_attributes
+        attributes_formatter = nil
         if @request.complex_output?
-          format_attributes_complex(output_target_attributes)
+          attributes_formatter = ComplexAttributesFormatter.new
         else
-          format_attributes_simple(output_target_attributes)
+          attributes_formatter = SimpleAttributesFormatter.new
         end
+        attributes_formatter.format(output_target_attributes, @result.records)
       end
 
       def output_target_attributes
         attributes = @request.output["attributes"]
         normalize_target_attributes(attributes)
-      end
-
-      def format_attributes_simple(attributes)
-        formatter = SimpleAttributesFormatter.new
-        formatter.format(attributes, @result.records)
-      end
-
-      def format_attributes_complex(attributes)
-        formatter = ComplexAttributesFormatter.new
-        formatter.format(attributes, @result.records)
       end
 
       def format_records
