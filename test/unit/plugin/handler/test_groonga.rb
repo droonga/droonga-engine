@@ -55,4 +55,16 @@ class GroongaHandlerTest < Test::Unit::TestCase
     elapsed_time = NORMALIZED_ELAPSED_TIME
     [header[0], start_time, elapsed_time]
   end
+
+
+  NORMALIZED_HEADER_SUCCESS = [
+    Droonga::GroongaHandler::Status::SUCCESS,
+    NORMALIZED_START_TIME,
+    NORMALIZED_ELAPSED_TIME,
+  ]
+  NORMALIZED_HEADER_INVALID_ARGUMENT = [
+    Droonga::GroongaHandler::Status::INVALID_ARGUMENT,
+    NORMALIZED_START_TIME,
+    NORMALIZED_ELAPSED_TIME,
+  ]
 end

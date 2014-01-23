@@ -18,7 +18,7 @@ class TableCreateTest < GroongaHandlerTest
     process(:table_create, {"name" => "Books"})
     response = @messenger.values.last
     assert_equal(
-      [[Droonga::GroongaHandler::Status::SUCCESS, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], true],
+      [NORMALIZED_HEADER_SUCCESS, true],
       [normalize_header(response.first), response.last]
     )
   end
@@ -27,7 +27,7 @@ class TableCreateTest < GroongaHandlerTest
     process(:table_create, {})
     response = @messenger.values.last
     assert_equal(
-      [[Droonga::GroongaHandler::Status::INVALID_ARGUMENT, NORMALIZED_START_TIME, NORMALIZED_ELAPSED_TIME], false],
+      [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
       [normalize_header(response.first), response.last]
     )
   end
