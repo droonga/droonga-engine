@@ -28,11 +28,14 @@ module Droonga
     DEFAULT_PATH = "catalog.json"
 
     class << self
-      def load(path=nil)
-        path = ENV["DROONGA_CATALOG"] || DEFAULT_PATH
-        path = File.expand_path(path)
+      def load
         loader = CatalogLoader.new(path)
         loader.load
+      end
+
+      def path
+        path = ENV["DROONGA_CATALOG"] || DEFAULT_PATH
+        File.expand_path(path)
       end
     end
   end
