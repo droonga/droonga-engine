@@ -222,6 +222,241 @@ class SearchHandlerTest < Test::Unit::TestCase
                       })
       end
 
+      def test_attributes_simple
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => [
+                            {
+                              "name" => "key",
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            {
+                              "name" => "title",
+                              "type" => "ShortText",
+                              "vector" => false
+                            }
+                          ]
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      def test_attributes_complex
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => {
+                            "key" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            "title" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            }
+                          }
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "format" => "complex",
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      def test_attributes_subrecs_simple
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => [
+                            {
+                              "name" => "key",
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            {
+                              "name" => "title",
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            {
+                              "name" => "_nsubrecs",
+                              "type" => "Int32",
+                              "vector" => false
+                            },
+                            {
+                              "name" => "subrecs",
+                              "attributes" => [
+                                {
+                                  "name" => "_key",
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                {
+                                  "name" => "sectionTitle",
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                {
+                                  "name" => "documentTitle",
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "groupBy" => {
+                              "key" => "document",
+                              "maxNSubRecords" => 1
+                            },
+                            "output" => {
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                                "_nsubrecs",
+                                {
+                                  "label" => "subrecs",
+                                  "source" => "_subrecs",
+                                  "attributes" => [
+                                    "_key",
+                                    {
+                                      "label" => "sectionTitle",
+                                      "source" => "title"
+                                    },
+                                    {
+                                      "label" => "documentTitle",
+                                      "source" => "document.title"
+                                    }
+                                  ]
+                                }
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      def test_attributes_subrecs_complex
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => {
+                            "key" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            "title" => {
+                              "type" => "ShortText",
+                              "vector" => false
+                            },
+                            "_nsubrecs" => {
+                              "type" => "Int32",
+                              "vector" => false
+                            },
+                            "subrecs" => {
+                              "attributes" => {
+                                "_key" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                "sectionTitle" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                },
+                                "documentTitle" => {
+                                  "type" => "ShortText",
+                                  "vector" => false
+                                }
+                              }
+                            }
+                          }
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "groupBy" => {
+                              "key" => "document",
+                              "maxNSubRecords" => 1
+                            },
+                            "output" => {
+                              "format" => "complex",
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "key",
+                                  "source" => "_key",
+                                },
+                                "title",
+                                "_nsubrecs",
+                                {
+                                  "label" => "subrecs",
+                                  "source" => "_subrecs",
+                                  "attributes" => [
+                                    "_key",
+                                    {
+                                      "label" => "sectionTitle",
+                                      "source" => "title"
+                                    },
+                                    {
+                                      "label" => "documentTitle",
+                                      "source" => "document.title"
+                                    }
+                                  ]
+                                }
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
       class AttributesTest < self
         def test_source_only
           expected = {
