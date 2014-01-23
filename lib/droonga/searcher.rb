@@ -429,6 +429,74 @@ module Droonga
       end
     end
 
+    module RecordsFormattable
+      def record_value(record, attribute)
+        if attribute[:source] == "_subrecs"
+          if @request.complex_output?
+            record.sub_records.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              complex_record(target_attributes, sub_record)
+            end
+          else
+            record.sub_records.collect do |sub_record|
+              target_attributes = resolve_attributes(attribute, sub_record)
+              simple_record(target_attributes, sub_record)
+            end
+          end
+        else
+          expression = attribute[:expression]
+          if expression
+            variable = attribute[:variable]
+            variable.value = record
+            expression.execute
+          else
+            value = record[attribute[:source]]
+            if value.is_a?(Groonga::Record)
+              value.record_id
+            else
+              value
+            end
+          end
+        end
+      end
+
+      def format_records(output_target_attributes, records, output_limit, output_offset)
+        cursor_options = {
+          :offset => output_offset,
+          :limit => output_limit
+        }
+        formatted_records = nil
+        records.open_cursor(cursor_options) do |cursor|
+          formatted_records = cursor.collect do |record|
+            format_record(output_target_attributes, record)
+          end
+        end
+        formatted_records
+      end
+    end
+
+    class SimpleRecordsFormatter
+      include RecordsFormattable
+
+      def format_record(attributes, record)
+        attributes.collect do |attribute|
+          record_value(record, attribute)
+        end
+      end
+    end
+
+    class ComplexRecordsFormatter
+      include RecordsFormattable
+
+      def format_record(attributes, record)
+        values = {}
+        attributes.collect do |attribute|
+          values[attribute[:label]] = record_value(record, attribute)
+        end
+        values
+      end
+    end
+
     class ResultFormatter
       class << self
         def format(search_request, search_result)
@@ -503,68 +571,13 @@ module Droonga
       end
 
       def format_records
-        formatted_records = nil
-        cursor_options = {
-          :offset => output_offset,
-          :limit => output_limit
-        }
-        @result.records.open_cursor(cursor_options) do |cursor|
-          if @request.complex_output?
-            formatted_records = cursor.collect do |record|
-              complex_record(output_target_attributes, record)
-            end
-          else
-            formatted_records = cursor.collect do |record|
-              simple_record(output_target_attributes, record)
-            end
-          end
-        end
-
-        formatted_records
-      end
-
-      def complex_record(attributes, record)
-        values = {}
-        attributes.collect do |attribute|
-          values[attribute[:label]] = record_value(record, attribute)
-        end
-        values
-      end
-
-      def simple_record(attributes, record)
-        attributes.collect do |attribute|
-          record_value(record, attribute)
-        end
-      end
-
-      def record_value(record, attribute)
-        if attribute[:source] == "_subrecs"
-          if @request.complex_output?
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              complex_record(target_attributes, sub_record)
-            end
-          else
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              simple_record(target_attributes, sub_record)
-            end
-          end
+        records_formatter = nil
+        if @request.complex_output?
+          records_formatter = ComplexRecordsFormatter.new
         else
-          expression = attribute[:expression]
-          if expression
-            variable = attribute[:variable]
-            variable.value = record
-            expression.execute
-          else
-            value = record[attribute[:source]]
-            if value.is_a?(Groonga::Record)
-              value.record_id
-            else
-              value
-            end
-          end
+          records_formatter = SimpleRecordsFormatter.new
         end
+        records_formatter.format_records(output_target_attributes, @result.records, output_limit, output_offset)
       end
 
       def resolve_attributes(attribute, record)
