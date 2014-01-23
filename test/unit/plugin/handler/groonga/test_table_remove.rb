@@ -17,9 +17,6 @@ class TableRemoveTest < GroongaHandlerTest
   def setup
     super
     process(:table_create, {"name" => "Books"})
-    assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
-    SCHEMA
   end
 
   def test_success
