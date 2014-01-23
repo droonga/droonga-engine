@@ -19,24 +19,6 @@ require "droonga/catalog_loader"
 
 module Droonga
   class << self
-    def catalog
-      @catalog ||= Catalog.load
-    end
-  end
-
-  module Catalog
-    DEFAULT_PATH = "catalog.json"
-
-    class << self
-      def load
-        loader = CatalogLoader.new(path)
-        loader.load
-      end
-
-      def path
-        path = ENV["DROONGA_CATALOG"] || DEFAULT_PATH
-        File.expand_path(path)
-      end
-    end
+    attr_accessor :catalog
   end
 end

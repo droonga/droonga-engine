@@ -27,6 +27,7 @@ require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
 require "droonga/message_processing_error"
+require "droonga/catalog_observer"
 
 module Droonga
   class Dispatcher
@@ -48,6 +49,8 @@ module Droonga
     def initialize(options)
       @options = options
       @name = @options[:name]
+      @loop = EventLoop.new
+      @catalog_observer = CatalogObserver.new(@loop)
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
@@ -55,7 +58,6 @@ module Droonga
         InputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
       @output_adapter =
         OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
-      @loop = EventLoop.new
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
