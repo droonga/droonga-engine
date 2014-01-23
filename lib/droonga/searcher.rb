@@ -420,7 +420,7 @@ module Droonga
 
       def format(attributes, table)
         formatted_attributes = {}
-        attributes.collect do |attribute|
+        attributes.each do |attribute|
           formatted_attribute = format_attribute(attribute, table)
           attribute_name = attribute[:label]
           formatted_attributes[attribute_name] = formatted_attribute
@@ -483,7 +483,7 @@ module Droonga
 
       def format_record(attributes, record)
         values = {}
-        attributes.collect do |attribute|
+        attributes.each do |attribute|
           values[attribute[:label]] = record_value(record, attribute)
         end
         values
