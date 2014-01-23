@@ -367,7 +367,7 @@ module Droonga
         source = attribute[:source]
         if source == "_subrecs"
           sub_record_table = table.range
-          sub_attributes = format(attribute[:attributes], sub_record_table)
+          sub_attributes = format_attributes(attribute[:attributes], sub_record_table)
 
           format_attribute_subrecs(label, sub_attributes)
         else
