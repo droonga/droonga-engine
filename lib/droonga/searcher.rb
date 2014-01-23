@@ -361,6 +361,38 @@ module Droonga
       end
     end
 
+    class SimpleAttributesFormatter
+      def format_attribute(attribute, table)
+        label = attribute[:label]
+        source = attribute[:source]
+        if source == "_subrecs"
+          sub_record_table = table.range
+          sub_attributes = attribute[:attributes].collect do |sub_attribute|
+            format_attribute(sub_attribute, sub_record_table)
+          end
+          {
+            "name" => label,
+            "attributes" => sub_attributes,
+          }
+        else
+          expression = attribute[:expression]
+          if expression
+            # TODO implement
+          else
+            column = table.column(source)
+            vector = column.respond_to?(:vector?) ? column.vector? : false
+            {"name" => label, "type" => column.range.name, "vector" => vector}
+          end
+        end
+      end
+
+      def format(attributes, table)
+        attributes.collect do |attribute|
+          format_attribute(attribute, table)
+        end
+      end
+    end
+
     class ResultFormatter
       class << self
         def format(search_request, search_result)
@@ -433,9 +465,8 @@ module Droonga
       end
 
       def format_attributes_simple(attributes)
-        attributes.collect do |attribute|
-          format_attribute_simple(attribute, @result.records)
-        end
+        formatter = SimpleAttributesFormatter.new
+        formatter.format(attributes, @result.records)
       end
 
       def format_attributes_complex(attributes)
@@ -446,30 +477,6 @@ module Droonga
           formatted_attributes[attribute_name] = formatted_attribute
         end
         formatted_attributes
-      end
-
-      def format_attribute_simple(attribute, table)
-        label = attribute[:label]
-        source = attribute[:source]
-        if source == "_subrecs"
-          sub_record_table = table.range
-          sub_attributes = attribute[:attributes].collect do |sub_attribute|
-            format_attribute_simple(sub_attribute, sub_record_table)
-          end
-          {
-            "name" => label,
-            "attributes" => sub_attributes,
-          }
-        else
-          expression = attribute[:expression]
-          if expression
-            # TODO implement
-          else
-            column = table.column(source)
-            vector = column.respond_to?(:vector?) ? column.vector? : false
-            {"name" => label, "type" => column.range.name, "vector" => vector}
-          end
-        end
       end
 
       def format_attribute_complex(attribute, table)
