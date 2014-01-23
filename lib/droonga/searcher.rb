@@ -432,16 +432,9 @@ module Droonga
     module RecordsFormattable
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
-          if @request.complex_output?
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              complex_record(target_attributes, sub_record)
-            end
-          else
-            record.sub_records.collect do |sub_record|
-              target_attributes = resolve_attributes(attribute, sub_record)
-              simple_record(target_attributes, sub_record)
-            end
+          record.sub_records.collect do |sub_record|
+            sub_attributes = attribute[:attributes]
+            format_record(sub_attributes, sub_record)
           end
         else
           expression = attribute[:expression]
