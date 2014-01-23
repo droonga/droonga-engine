@@ -367,9 +367,7 @@ module Droonga
         source = attribute[:source]
         if source == "_subrecs"
           sub_record_table = table.range
-          sub_attributes = attribute[:attributes].collect do |sub_attribute|
-            format_attribute(sub_attribute, sub_record_table)
-          end
+          sub_attributes = format(attribute[:attributes], sub_record_table)
           {
             "name" => label,
             "attributes" => sub_attributes,
@@ -398,12 +396,7 @@ module Droonga
         source = attribute[:source]
         if source == "_subrecs"
           sub_record_table = table.range
-          sub_attributes = {}
-          attribute[:attributes].each do |sub_attribute|
-            sub_label = sub_attribute[:label]
-            sub_attributes[sub_label] =
-              format_attribute(sub_attribute, sub_record_table)
-          end
+          sub_attributes = format(attribute[:attributes], sub_record_table)
           {
             "attributes" => sub_attributes
           }
