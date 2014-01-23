@@ -397,7 +397,7 @@ module Droonga
         {"name" => label, "type" => column.range.name, "vector" => vector}
       end
 
-      def format(attributes, table)
+      def format_attributes(attributes, table)
         attributes.collect do |attribute|
           format_attribute(attribute, table)
         end
@@ -418,7 +418,7 @@ module Droonga
         {"type" => column.range.name, "vector" => vector}
       end
 
-      def format(attributes, table)
+      def format_attributes(attributes, table)
         formatted_attributes = {}
         attributes.each do |attribute|
           formatted_attribute = format_attribute(attribute, table)
@@ -555,7 +555,10 @@ module Droonga
         else
           attributes_formatter = SimpleAttributesFormatter.new
         end
-        attributes_formatter.format(output_target_attributes, @result.records)
+        attributes_formatter.format_attributes(
+          output_target_attributes,
+          @result.records
+        )
       end
 
       def output_target_attributes
