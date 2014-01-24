@@ -21,8 +21,6 @@ module Droonga
   class SearchCollector < BasicCollector
     repository.register("search", self)
 
-    UNLIMITED = -1.freeze
-
     command :collector_search_gather
     def collector_search_gather(result)
       output = body ? body[input_name] : input_name
@@ -61,21 +59,6 @@ module Droonga
         output = output["output"]
       end
       emit(output, result)
-    end
-
-    def apply_output_range(items, output)
-      if items && items.is_a?(Array)
-        offset = output["offset"] || 0
-        unless offset.zero?
-          items = items[offset..-1] || []
-        end
-
-        limit = output["limit"] || 0
-        unless limit == UNLIMITED
-          items = items[0...limit]
-        end
-      end
-      items
     end
 
     def apply_output_attributes_and_format(items, output)

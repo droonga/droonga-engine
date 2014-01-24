@@ -21,6 +21,8 @@ module Droonga
   class BasicCollector < Droonga::CollectorPlugin
     repository.register("basic", self)
 
+    UNLIMITED = -1.freeze
+
     command :collector_gather
     def collector_gather(result)
       output = body ? body[input_name] : input_name
@@ -55,6 +57,21 @@ module Droonga
         end
 
         reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
+    end
+
+    def apply_output_range(items, output)
+      if items && items.is_a?(Array)
+        offset = output["offset"] || 0
+        unless offset.zero?
+          items = items[offset..-1] || []
+        end
+
+        limit = output["limit"] || 0
+        unless limit == UNLIMITED
+          items = items[0...limit]
+        end
+      end
+      items
     end
 
     def merge(x, y, options={})
