@@ -102,20 +102,12 @@ module Droonga
     command :collector_reduce
     def collector_reduce(request)
       return unless request
-      body[input_name].each do |output, elements|
+      body[input_name].each do |output, deal|
         value = request
         old_value = output_values[output]
-        value = reduce_elements(elements, old_value, request) if old_value
+        value = reduce(deal, old_value, request) if old_value
         emit(output, value)
       end
-    end
-
-    def reduce_elements(elements, left_values, right_values)
-      result = {}
-      elements.each do |key, deal|
-        result[key] = reduce(deal, left_values[key], right_values[key])
-      end
-      result
     end
 
     def reduce(deal, left_value, right_value)
