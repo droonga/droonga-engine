@@ -71,7 +71,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     message = []
 
     message << {
-      "type" => "reduce",
+      "type" => "search_reduce",
       "body" => {
         "query1" => {
           "query1_reduced" => {
@@ -90,7 +90,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       "outputs" => ["query1_reduced"],
     }
     message << {
-      "type" => "reduce",
+      "type" => "search_reduce",
       "body" => {
         "query2" => {
           "query2_reduced" => {
@@ -109,7 +109,7 @@ class SearchDistributorTest < Test::Unit::TestCase
       "outputs" => ["query2_reduced"],
     }
     message << {
-      "type" => "reduce",
+      "type" => "search_reduce",
       "body" => {
         "query3" => {
           "query3_reduced" => {
@@ -129,7 +129,7 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
 
     gatherer = {
-      "type" => "gather",
+      "type" => "search_gather",
       "body" => {
         "query1_reduced" => {
           "output" => "query1",
