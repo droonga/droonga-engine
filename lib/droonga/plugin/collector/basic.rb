@@ -44,19 +44,19 @@ module Droonga
     end
 
     def reduce(deal, left_value, right_value)
-        reduced_values = nil
+        reduced_value = nil
 
         case deal["type"]
         when "sum"
-          reduced_values = left_value + right_value
+          reduced_value = left_value + right_value
         when "sort"
-          reduced_values = merge(left_value,
-                                 right_value,
-                                 :operators => deal["operators"],
-                                 :key_column => deal["key_column"])
+          reduced_value = merge(left_value,
+                                right_value,
+                                :operators => deal["operators"],
+                                :key_column => deal["key_column"])
         end
 
-        reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
+        reduced_value = apply_output_range(reduced_value, "limit" => deal["limit"])
     end
 
     def apply_output_range(items, output)
