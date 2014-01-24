@@ -31,29 +31,12 @@ module Droonga
     end
 
     def scatter_all(message, key)
-      distribute_message = {
-        "command"=> message["type"],
-        "dataset"=> message["dataset"],
-        "body"=> message["body"],
-        "key"=> key,
-        "type"=> "scatter",
-        "replica"=> "all",
-        "post"=> true
-      }
-      messages = [distribute_message]
+      messages = [reducer(message), gatherer(message), scatterer(message, key)]
       distribute(messages)
     end
 
     def broadcast_all(message)
-      distribute_message = {
-        "command"=> message["type"],
-        "dataset"=> message["dataset"],
-        "body"=> message["body"],
-        "type"=> "broadcast",
-        "replica"=> "all",
-        "post"=> true
-      }
-      messages = [distribute_message]
+      messages = [reducer(message), gatherer(message), broadcaster(message)]
       distribute(messages)
     end
 
@@ -64,6 +47,47 @@ module Droonga
       else
         super
       end
+    end
+
+    def scatterer(message, key)
+      {
+        "command"=> message["type"],
+        "dataset"=> message["dataset"],
+        "body"=> message["body"],
+        "key"=> key,
+        "type"=> "scatter",
+        "replica"=> "all",
+        "post"=> true
+      }
+    end
+
+    def broadcaster(message)
+      {
+        "command"=> message["type"],
+        "dataset"=> message["dataset"],
+        "body"=> message["body"],
+        "type"=> "broadcast",
+        "replica"=> "all",
+        "post"=> true
+      }
+    end
+
+    def reducer(message)
+      {
+        "type" => "reduce",
+        "body" => {},
+        "inputs" => [],
+        "outputs" => [],
+      }
+    end
+
+    def gatherer(message)
+      {
+        "type" => "gather",
+        "body" => {},
+        "inputs" => [],
+        "post" => true,
+      }
     end
   end
 end
