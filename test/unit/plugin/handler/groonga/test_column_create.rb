@@ -19,7 +19,9 @@ class ColumnCreateTest < GroongaHandlerTest
     process(:column_create,
             {"table" => "Books", "name" => "title", "type" => "ShortText"})
     response = @messenger.values.last
-    assert_result_equal(
+    assert_valid_output(response)
+    response = response["result"]
+    assert_equal(
       [NORMALIZED_HEADER_SUCCESS, true],
       [normalize_header(response.first), response.last]
     )
@@ -29,7 +31,9 @@ class ColumnCreateTest < GroongaHandlerTest
     process(:column_create,
             {"table" => "Unknown", "name" => "title", "type" => "ShortText"})
     response = @messenger.values.last
-    assert_result_equal(
+    assert_valid_output(response)
+    response = response["result"]
+    assert_equal(
       [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
       [normalize_header(response.first), response.last]
     )

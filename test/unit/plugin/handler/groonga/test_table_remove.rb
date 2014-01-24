@@ -22,7 +22,9 @@ class TableRemoveTest < GroongaHandlerTest
   def test_success
     process(:table_remove, {"name" => "Books"})
     response = @messenger.values.last
-    assert_result_equal(
+    assert_valid_output(response)
+    response = response["result"]
+    assert_equal(
       [NORMALIZED_HEADER_SUCCESS, true],
       [normalize_header(response.first), response.last]
     )
@@ -33,7 +35,9 @@ class TableRemoveTest < GroongaHandlerTest
   def test_failure
     process(:table_remove, {})
     response = @messenger.values.last
-    assert_result_equal(
+    assert_valid_output(response)
+    response = response["result"]
+    assert_equal(
       [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
       [normalize_header(response.first), response.last]
     )

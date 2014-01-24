@@ -67,13 +67,16 @@ class GroongaHandlerTest < Test::Unit::TestCase
     NORMALIZED_ELAPSED_TIME,
   ]
 
-  def format_outputs(result)
-    {
-      "result" => result,
+  def assert_valid_output(output)
+    expected = {
+      "result" => [],
     }
-  end
-
-  def assert_result_equal(expected, actual)
-    assert_equal(format_outputs(expected), format_outputs(actual))
+    normalized_output = Marshal.load(Marshal.dump(output))
+    normalized_output.each do |key, value|
+      if value.is_a?(Array)
+        normalized_output[key] = []
+      end
+    end
+    assert_equal(expected, normalized_output)
   end
 end
