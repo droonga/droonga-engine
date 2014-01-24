@@ -17,7 +17,7 @@ require "droonga/input_adapter_plugin"
 
 module Droonga
   class CRUDInputAdapter < Droonga::InputAdapterPlugin
-    repository.register("add", self)
+    repository.register("crud", self)
 
     command :add
     def add(input_message)
