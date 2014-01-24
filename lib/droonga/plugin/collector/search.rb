@@ -21,6 +21,8 @@ module Droonga
   class SearchCollector < BasicCollector
     repository.register("search", self)
 
+    UNLIMITED = -1.freeze
+
     command :collector_gather
     def collector_gather(result)
       output = body ? body[input_name] : input_name
