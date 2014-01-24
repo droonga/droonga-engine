@@ -56,7 +56,6 @@ class GroongaHandlerTest < Test::Unit::TestCase
     [header[0], start_time, elapsed_time]
   end
 
-
   NORMALIZED_HEADER_SUCCESS = [
     Droonga::GroongaHandler::Status::SUCCESS,
     NORMALIZED_START_TIME,
@@ -67,4 +66,14 @@ class GroongaHandlerTest < Test::Unit::TestCase
     NORMALIZED_START_TIME,
     NORMALIZED_ELAPSED_TIME,
   ]
+
+  def format_outputs(result)
+    {
+      "result" => result,
+    }
+  end
+
+  def assert_result_equal(expected, actual)
+    assert_equal(format_outputs(expected), format_outputs(actual))
+  end
 end
