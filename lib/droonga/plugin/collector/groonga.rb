@@ -36,10 +36,46 @@ module Droonga
 
       case deal["type"]
       when "groonga_result"
-        reduced_value = left_value && right_value
+        reduced_value = merge_groonga_result(left_value, right_value)
+      else
+        reduced_value = super
       end
 
       reduced_value
+    end
+
+    def merge_groonga_result(left_value, right_value)
+      result = []
+
+      result << merge_groonga_header(left_value.first, right_value.first)
+
+      left_body = left_value[1..-1]
+      right_body = right_value[1..-1]
+      left_body.each_with_index do |left, index|
+        right = right_body[index]
+        result << reduce({ "type" => "and" }, left, right)
+      end
+
+      result
+    end
+
+    def merge_groonga_header(left_header, right_header)
+      left_status = left_header.shift
+      right_status = right_header.shift
+      status = [left_status, right_status].min
+
+      left_start_time = left_header.shift
+      right_start_time = right_header.shift
+      start_time = (left_start_time + right_start_time) / 2
+
+      left_elapsed_time = left_header.shift
+      right_elapsed_time = right_header.shift
+      elapsed_time = (left_elapsed_time + right_elapsed_time) / 2
+
+      #XXX we should merge error informations more smarter...
+      error_information = left_header + right_header
+
+      [status, start_time, elapsed_time] + error_information
     end
   end
 end
