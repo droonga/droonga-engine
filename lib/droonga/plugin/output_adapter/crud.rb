@@ -21,7 +21,7 @@ module Droonga
 
     command :crud_generic_response
     def crud_generic_response(output_message)
-      if output_message.status_code == Droonga::Replier::STATUS_OK
+      if output_message.body.include?("success")
         output_message.body = output_message.body["success"]
       end
     end
