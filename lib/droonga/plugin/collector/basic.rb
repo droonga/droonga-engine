@@ -105,31 +105,33 @@ module Droonga
       body[input_name].each do |output, elements|
         value = request
         old_value = output_values[output]
-        value = reduce(elements, old_value, request) if old_value
+        value = reduce_elements(elements, old_value, request) if old_value
         emit(output, value)
       end
     end
 
-    def reduce(elements, *values)
+    def reduce_elements(elements, left_values, right_values)
       result = {}
       elements.each do |key, deal|
+        result[key] = reduce(deal, left_values[key], right_values[key])
+      end
+      result
+    end
+
+    def reduce(deal, left_value, right_value)
         reduced_values = nil
 
         case deal["type"]
         when "sum"
-          reduced_values = values[0][key] + values[1][key]
+          reduced_values = left_value + right_value
         when "sort"
-          reduced_values = merge(values[0][key],
-                                 values[1][key],
+          reduced_values = merge(left_value,
+                                 right_value,
                                  :operators => deal["operators"],
                                  :key_column => deal["key_column"])
         end
 
         reduced_values = apply_output_range(reduced_values, "limit" => deal["limit"])
-
-        result[key] = reduced_values
-      end
-      return result
     end
 
     def merge(x, y, options={})
