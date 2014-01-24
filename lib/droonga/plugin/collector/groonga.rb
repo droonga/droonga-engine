@@ -71,11 +71,14 @@ module Droonga
       left_elapsed_time = left_header.shift
       right_elapsed_time = right_header.shift
       elapsed_time = reduce({ "type" => "average" },
-                          left_header.shift,
-                          right_header.shift)
+                            left_header.shift,
+                            right_header.shift)
 
       #XXX we should merge error informations more smarter...
-      error_information = left_header + right_header
+      error_information = reduce({ "type" => "sum",
+                                   "limit" => UNLIMITED },
+                                 left_header,
+                                 right_header)
 
       [status, start_time, elapsed_time] + error_information
     end
