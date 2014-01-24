@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -66,250 +66,6 @@ class BasicCollectorTest < Test::Unit::TestCase
         },
         :mapping => {
           "output" => "search_result",
-        },
-      },
-      :offset_and_limit => {
-        :expected => {
-          "count" => 3,
-          "records" => [
-            create_record(1),
-          ],
-        },
-        :source => {
-          "count" => 3,
-          "records" => [
-            create_record(0),
-            create_record(1),
-            create_record(2),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "offset" => 1,
-              "limit" => 1,
-            },
-          },
-        },
-      },
-      :offset_and_unlimited_limit => {
-        :expected => {
-          "count" => 3,
-          "records" => [
-            create_record(1),
-            create_record(2),
-          ],
-        },
-        :source => {
-          "count" => 3,
-          "records" => [
-            create_record(0),
-            create_record(1),
-            create_record(2),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "offset" => 1,
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :too_large_offset => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-          ],
-        },
-        :source => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2),
-            create_record(2, 2.1, 2.2),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "format" => "simple",
-              "attributes" => [],
-              "offset" => 10000,
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :attributes => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2, 1.3, 1.4),
-            create_record(2, 2.1, 2.2, 2.3, 2.4),
-          ],
-        },
-        :source => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2, 1.3, 1.4),
-            create_record(2, 2.1, 2.2, 2.3, 2.4),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "attributes" => ["_key", "chapter", "section", "subsection", "paragraph"],
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :attributes_with_sort_attributes => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2),
-            create_record(2, 2.1, 2.2),
-          ],
-        },
-        :source => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2, 1.3, 1.4),
-            create_record(2, 2.1, 2.2, 2.3, 2.4),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "attributes" => ["_key", "chapter", "section"],
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :format_simple => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2),
-            create_record(2, 2.1, 2.2),
-          ],
-        },
-        :source => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2),
-            create_record(2, 2.1, 2.2),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "format" => "simple",
-              "attributes" => ["_key", "chapter", "section"],
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :format_complex => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-            { "_key" => 1, "chapter" => 1.1, "section" => 1.2 },
-            { "_key" => 2, "chapter" => 2.1, "section" => 2.2 },
-          ],
-        },
-        :source => {
-          "count" => 2,
-          "records" => [
-            create_record(1, 1.1, 1.2),
-            create_record(2, 2.1, 2.2),
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "records" => {
-              "type" => "sort",
-              "format" => "complex",
-              "attributes" => ["_key", "chapter", "section"],
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :count_with_records => {
-        :expected => {
-          "count" => 2,
-          "records" => [
-            [],
-            [],
-          ],
-        },
-        :source => {
-          "count" => 5,
-          "records" => [
-            [],
-            [],
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "count" => {
-              "type" => "count",
-              "target" => "records",
-            },
-            "records" => {
-              "type" => "sort",
-              "format" => "simple",
-              "attributes" => [],
-              "limit" => -1,
-            },
-          },
-        },
-      },
-      :count_only => {
-        :expected => {
-          "count" => 2,
-        },
-        :source => {
-          "count" => 5,
-          "records" => [
-            [],
-            [],
-          ],
-        },
-        :mapping => {
-          "output" => "search_result",
-          "elements" => {
-            "count" => {
-              "type" => "count",
-              "target" => "records",
-            },
-            "records" => {
-              "type" => "sort",
-              "format" => "simple",
-              "attributes" => [],
-              "limit" => -1,
-              "no_output" => true,
-            },
-          },
         },
       },
     )
@@ -673,8 +429,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       request = {
         "task" => {
           "values" => {
-            output_name => {
-              "records" => [
+            output_name => [
                 [
                   "group1",
                   10,
@@ -702,21 +457,18 @@ class BasicCollectorTest < Test::Unit::TestCase
                     create_record("C"),
                   ],
                 ],
-              ],
-            },
+            ],
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "records" => {
                     "type" => "sort",
                     "operators" => [
                       { "column" => 1, "operator" => "<" },
                     ],
                     "key_column" => 0,
                     "limit" => -1,
-                  },
                 },
               },
             },
@@ -724,8 +476,7 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "records" => [
+        "value" => [
             [
               "group1",
               30,
@@ -753,16 +504,14 @@ class BasicCollectorTest < Test::Unit::TestCase
                 create_record("F"),
               ],
             ],
-          ],
-        },
+        ],
         "name" => input_name,
         "descendants" => nil,
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
                      output_name,
-                     {
-                       "records" => [
+                     [
                          [
                            "group3",
                            30,
@@ -805,8 +554,7 @@ class BasicCollectorTest < Test::Unit::TestCase
                              create_record("e"),
                            ],
                          ],
-                       ],
-                     },
+                     ],
                    ],
                    @outputs.last)
     end
