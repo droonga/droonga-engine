@@ -16,15 +16,15 @@
 require "droonga/plugin/distributor/distributed_search_planner"
 
 class DistributedSearchPlannerTest < Test::Unit::TestCase
-  def assert_planned(expected, search_request_envelope)
-    plan = Droonga::DistributedSearchPlanner.new(search_request_envelope)
+  def assert_planned(expected, search_request)
+    plan = Droonga::DistributedSearchPlanner.new(search_request)
     actual = plan.messages
     assert_equal(expected, actual)
   end
 
   class MultipleQueriesTest < self
     def test_distribute
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -63,9 +63,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
+      expected_plan = []
 
-      message << {
+      expected_plan << {
         "type" => "reduce",
         "body" => {
           "query1" => {
@@ -84,7 +84,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         "inputs" => ["query1"],
         "outputs" => ["query1_reduced"],
       }
-      message << {
+      expected_plan << {
         "type" => "reduce",
         "body" => {
           "query2" => {
@@ -103,7 +103,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         "inputs" => ["query2"],
         "outputs" => ["query2_reduced"],
       }
-      message << {
+      expected_plan << {
         "type" => "reduce",
         "body" => {
           "query3" => {
@@ -170,7 +170,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         ],
         "post" => true,
       }
-      message << gatherer
+      expected_plan << gatherer
 
       searcher = {
         "type" => "broadcast",
@@ -217,15 +217,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         ],
         "replica" => "random",
       }
-      message << searcher
+      expected_plan << searcher
 
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
   end
 
   class SingleQueryTest < self
     def test_no_output
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -242,14 +242,14 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << gatherer(envelope, :no_output => true)
-      message << searcher(envelope, :no_output => true)
-      assert_planned(message, envelope)
+      expected_plan = []
+      expected_plan << gatherer(request, :no_output => true)
+      expected_plan << searcher(request, :no_output => true)
+      assert_planned(expected_plan, request)
     end
 
     def test_no_records_element
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -269,20 +269,20 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "count" => {
           "type" => "sum",
         },
       })
-      message << gatherer(envelope)
-      message << searcher(envelope, :sort_limit => 1,
+      expected_plan << gatherer(request)
+      expected_plan << searcher(request, :sort_limit => 1,
                                     :output_limit => 0)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_no_output_limit
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -298,20 +298,20 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "count" => {
           "type" => "sum",
         },
       })
-      message << gatherer(envelope)
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << gatherer(request)
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => 0)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_records
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -330,15 +330,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [],
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => 1,
@@ -346,13 +346,13 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => 1)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_output_offset
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -371,15 +371,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [],
           "limit" => 2,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 1,
                                         :limit => 1,
@@ -387,13 +387,13 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => 2)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_simple_sortBy
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -413,8 +413,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -423,7 +423,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => 1,
@@ -431,13 +431,13 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => 1)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -459,8 +459,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -469,7 +469,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => 1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => 1,
@@ -477,15 +477,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => 1,
                                     :output_offset => 0,
                                     :output_limit => 1)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_offset_limit
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -511,8 +511,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
       sort_limit = 1 + 4 + [2, 8].max
       output_limit = 1 + 4 + [2, 8].min
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -521,7 +521,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => output_limit,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 5,
                                         :limit => 2,
@@ -529,15 +529,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => sort_limit,
                                     :output_offset => 0,
                                     :output_limit => output_limit)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_with_infinity_output_limit
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -562,8 +562,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       }
 
       limit = 1 + 4 + 2
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -572,7 +572,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => limit,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 5,
                                         :limit => 2,
@@ -580,15 +580,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => limit,
                                     :output_offset => 0,
                                     :output_limit => limit)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_with_infinity_sort_limit
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -613,8 +613,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       }
 
       limit = 1 + 4 + 8
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -623,7 +623,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => limit,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 5,
                                         :limit => 8,
@@ -631,15 +631,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => limit,
                                     :output_offset => 0,
                                     :output_limit => limit)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_with_infinity_limit
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -663,8 +663,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -673,7 +673,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 5,
                                         :limit => -1,
@@ -681,15 +681,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
                                     :output_limit => -1)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_with_multiple_sort_keys
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -711,8 +711,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -722,7 +722,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => -1,
@@ -730,15 +730,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
                                     :output_limit => -1)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_have_sortBy_with_missing_sort_attributes
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -760,8 +760,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -771,7 +771,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => -1,
@@ -779,16 +779,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
                                     :output_limit => -1,
                                     :extra_attributes => ["public_age", "public_name"])
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_hash_attributes
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -814,8 +814,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [
@@ -825,7 +825,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => -1,
@@ -833,16 +833,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["id", "name", "age"],
                                       ),
                                     })
-      message << searcher(envelope, :sort_offset => 0,
+      expected_plan << searcher(request, :sort_offset => 0,
                                     :sort_limit => -1,
                                     :output_offset => 0,
                                     :output_limit => -1,
                                     :extra_attributes => ["public_age", "public_name"])
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_groupBy
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -861,8 +861,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [],
@@ -870,7 +870,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => -1,
@@ -878,14 +878,14 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["_key", "_nsubrecs"],
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => -1,
                                     :unifiable => true)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_groupBy_count
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -901,8 +901,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "count" => {
           "type" => "sum",
         },
@@ -913,7 +913,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "count" => count_mapper,
                                       "records" => records_mapper(
                                         :limit => -1,
@@ -921,15 +921,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :no_output => true,
                                       ),
                                     })
-      message << searcher(envelope, :output_limit => -1,
+      expected_plan << searcher(request, :output_limit => -1,
                                     :extra_attributes => ["_key"],
                                     :extra_elements => ["records"],
                                     :unifiable => true)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     def test_groupBy_hash
-      envelope = {
+      request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -957,8 +957,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       }
 
-      message = []
-      message << reducer(envelope, {
+      expected_plan = []
+      expected_plan << reducer(request, {
         "records" => {
           "type" => "sort",
           "operators" => [],
@@ -966,7 +966,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit" => -1,
         },
       })
-      message << gatherer(envelope, :elements => {
+      expected_plan << gatherer(request, :elements => {
                                       "records" => records_mapper(
                                         :offset => 0,
                                         :limit => -1,
@@ -974,16 +974,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                         :attributes => ["family_name", "count", "users"],
                                       ),
                                     })
-      message << searcher(envelope, :output_offset => 0,
+      expected_plan << searcher(request, :output_offset => 0,
                                     :output_limit => -1,
                                     :extra_attributes => ["_key"],
                                     :unifiable => true)
-      assert_planned(message, envelope)
+      assert_planned(expected_plan, request)
     end
 
     private
-    def reducer(search_request_envelope, reducer_body)
-      queries = search_request_envelope["body"]["queries"]
+    def reducer(search_request, reducer_body)
+      queries = search_request["body"]["queries"]
       query_name = queries.keys.first
 
       reducer = {
@@ -1022,8 +1022,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       mapper
     end
 
-    def gatherer(search_request_envelope, options={})
-      queries = search_request_envelope["body"]["queries"]
+    def gatherer(search_request, options={})
+      queries = search_request["body"]["queries"]
       query_name = queries.keys.first
 
       gatherer = {
@@ -1047,9 +1047,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       gatherer
     end
 
-    def searcher(search_request_envelope, options={})
+    def searcher(search_request, options={})
       # dup and clone don't copy it deeply...
-      searcher = Marshal.load(Marshal.dump(search_request_envelope))
+      searcher = Marshal.load(Marshal.dump(search_request))
 
       queries = searcher["body"]["queries"]
       query_name = queries.keys.first
