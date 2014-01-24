@@ -44,7 +44,11 @@ module Droonga
     private
     def reducer(message)
       reducer = super
-      reducer["body"]
+      reducer["body"]["result"] = {
+        "result_reduced" => {
+          "type" => "and",
+        },
+      }
       reducer["inputs"] << "result"
       reducer["outputs"] << "result_reduced"
       reducer
