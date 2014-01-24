@@ -51,9 +51,10 @@ module Droonga
 
     def reducer(message)
       reducer = super
+      reducer["type"] = "groonga_reduce"
       reducer["body"]["result"] = {
         "result_reduced" => {
-          "type" => "sum",
+          "type" => "groonga_result",
         },
       }
       reducer["inputs"] << "result"
@@ -63,6 +64,7 @@ module Droonga
 
     def gatherer(message)
       gatherer = super
+      reducer["type"] = "groonga_gather"
       gatherer["body"]["result_reduced"] = {
         "output" => "result",
       }
