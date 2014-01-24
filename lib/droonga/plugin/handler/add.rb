@@ -61,7 +61,7 @@ module Droonga
     def add(message, messenger)
       succeeded = process_add(message.request)
       outputs = {
-        "success" => succeeded
+        "success" => succeeded,
       }
       messenger.emit(outputs)
     end
