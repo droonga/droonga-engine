@@ -21,6 +21,82 @@ module Droonga
   class SearchCollector < BasicCollector
     repository.register("search", self)
 
+    command :collector_gather
+    def collector_gather(result)
+      output = body ? body[input_name] : input_name
+      if output.is_a?(Hash)
+        elements = output["elements"]
+        if elements && elements.is_a?(Hash)
+          # phase 1: pre-process
+          elements.each do |element, mapper|
+            case mapper["type"]
+            when "count"
+              result[element] = result[mapper["target"]].size
+            when "sort"
+              # do nothing on this phase!
+            end
+          end
+          # phase 2: post-process
+          elements.each do |element, mapper|
+            if mapper["no_output"]
+              result.delete(element)
+              next
+            end
+
+            case mapper["type"]
+            when "count"
+              # do nothing on this phase!
+            when "sort"
+              # because "count" type mapper requires all items of the array,
+              # I have to apply "sort" type mapper later.
+              if result[element]
+                result[element] = apply_output_range(result[element], mapper)
+                result[element] = apply_output_attributes_and_format(result[element], mapper)
+              end
+            end
+          end
+        end
+        output = output["output"]
+      end
+      emit(output, result)
+    end
+
+    def apply_output_range(items, output)
+      if items && items.is_a?(Array)
+        offset = output["offset"] || 0
+        unless offset.zero?
+          items = items[offset..-1] || []
+        end
+
+        limit = output["limit"] || 0
+        unless limit == UNLIMITED
+          items = items[0...limit]
+        end
+      end
+      items
+    end
+
+    def apply_output_attributes_and_format(items, output)
+      attributes = output["attributes"]
+      if attributes
+        format = output["format"]
+        if format == "complex"
+          items.collect! do |item|
+            complex_item = {}
+            attributes.each_with_index do |label, index|
+              complex_item[label] = item[index]
+            end
+            complex_item
+          end
+        else
+          items.collect! do |item|
+            item[0...attributes.size]
+          end
+        end
+      end
+      items
+    end
+
     command :collector_reduce
     def collector_reduce(request)
       return unless request
