@@ -45,7 +45,7 @@ module Droonga
       end
 
       gatherer = {
-        "type" => "gather",
+        "type" => "search_gather",
         "body" => @output_mappers,
         "inputs" => @output_names, # XXX should be placed in the "body"?
         "post" => true, # XXX should be placed in the "body"?
@@ -96,7 +96,7 @@ module Droonga
       transformer = QueryTransformer.new(query)
 
       reducer = {
-        "type" => "reduce",
+        "type" => "search_reduce",
         "body" => {
           input_name => {
             output_name => transformer.reducers,

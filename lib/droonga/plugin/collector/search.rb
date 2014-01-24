@@ -23,8 +23,8 @@ module Droonga
 
     UNLIMITED = -1.freeze
 
-    command :collector_gather
-    def collector_gather(result)
+    command :collector_search_gather
+    def collector_search_gather(result)
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
         elements = output["elements"]
@@ -99,8 +99,8 @@ module Droonga
       items
     end
 
-    command :collector_reduce
-    def collector_reduce(request)
+    command :collector_search_reduce
+    def collector_search_reduce(request)
       return unless request
       body[input_name].each do |output, elements|
         value = request
