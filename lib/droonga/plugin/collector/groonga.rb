@@ -28,7 +28,7 @@ module Droonga
 
     command :collector_groonga_reduce
     def collector_groonga_reduce(request)
-      collector_reduce(result)
+      collector_reduce(request)
     end
 
     def reduce(deal, left_value, right_value)
