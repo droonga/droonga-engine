@@ -91,42 +91,67 @@ class BasicCollectorTest < Test::Unit::TestCase
   end
 
   class ReduceTest < self
-    def test_sum
+    data(
+      :numeric_values => {
+        :expected => 3,
+        :value => 1,
+        :source => 2,
+      },
+      :numeric_key_records => {
+        :expected => [
+          create_record(1),
+          create_record(2),
+          create_record(3),
+          create_record(4),
+          create_record(5),
+          create_record(6),
+        ],
+        :value => [
+          create_record(1),
+          create_record(2),
+          create_record(3),
+        ],
+        :source => [
+          create_record(4),
+          create_record(5),
+          create_record(6),
+        ],
+      },
+      :string_key_records => {
+        :expected => [
+          create_record("a"),
+          create_record("b"),
+          create_record("c"),
+          create_record("d"),
+          create_record("e"),
+          create_record("f"),
+        ],
+        :value => [
+          create_record("a"),
+          create_record("b"),
+          create_record("c"),
+        ],
+        :source => [
+          create_record("d"),
+          create_record("e"),
+          create_record("f"),
+        ],
+      },
+    )
+    def test_sum(data)
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
         "task" => {
           "values" => {
-            output_name => {
-              "numeric_value" => 1,
-              "numeric_key_records" => [
-                create_record(1),
-                create_record(2),
-                create_record(3),
-              ],
-              "string_key_records" => [
-                create_record("a"),
-                create_record("b"),
-                create_record("c"),
-              ],
-            },
+            output_name => data[:value],
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_value" => {
-                    "type" => "sum",
-                    "limit" => -1,
-                  },
-                  "numeric_key_records" => {
-                    "type" => "sum",
-                    "limit" => -1,
-                  },
-                  "string_key_records" => {
-                    "type" => "sum",
-                    "limit" => -1,
-                  },
+                  "type" => "sum",
+                  "limit" => -1,
                 },
               },
             },
@@ -134,84 +159,74 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "numeric_value" => 2,
-          "numeric_key_records" => [
-            create_record(4),
-            create_record(5),
-            create_record(6),
-          ],
-          "string_key_records" => [
-            create_record("d"),
-            create_record("e"),
-            create_record("f"),
-          ],
-        },
+        "value" => data[:source],
         "name" => input_name,
         "descendants" => nil,
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
                      output_name,
-                     {
-                       "numeric_value" => 3,
-                       "numeric_key_records" => [
-                         create_record(1),
-                         create_record(2),
-                         create_record(3),
-                         create_record(4),
-                         create_record(5),
-                         create_record(6),
-                       ],
-                       "string_key_records" => [
-                         create_record("a"),
-                         create_record("b"),
-                         create_record("c"),
-                         create_record("d"),
-                         create_record("e"),
-                         create_record("f"),
-                       ],
-                     },
+                     data[:expected],
                    ],
                    @outputs.last)
     end
 
-    def test_sum_with_limit
+    data(
+      :numeric_values => {
+        :expected => 3,
+        :value => 1,
+        :source => 2,
+        :limit => 2,
+      },
+      :numeric_key_records => {
+        :expected => [
+          create_record(1),
+          create_record(2),
+        ],
+        :value => [
+          create_record(1),
+          create_record(2),
+          create_record(3),
+        ],
+        :source => [
+          create_record(4),
+          create_record(5),
+          create_record(6),
+        ],
+        :limit => 2,
+      },
+      :string_key_records => {
+        :expected => [
+          create_record("a"),
+          create_record("b"),
+        ],
+        :value => [
+          create_record("a"),
+          create_record("b"),
+          create_record("c"),
+        ],
+        :source => [
+          create_record("d"),
+          create_record("e"),
+          create_record("f"),
+        ],
+        :limit => 2,
+      },
+    )
+    def test_sum_with_limit(data)
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
         "task" => {
           "values" => {
-            output_name => {
-              "numeric_value" => 1,
-              "numeric_key_records" => [
-                create_record(1),
-                create_record(2),
-                create_record(3),
-              ],
-              "string_key_records" => [
-                create_record("a"),
-                create_record("b"),
-                create_record("c"),
-              ],
-            },
+            output_name => data[:value],
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_value" => {
-                    "type" => "sum",
-                    "limit" => 2,
-                  },
-                  "numeric_key_records" => {
-                    "type" => "sum",
-                    "limit" => 2,
-                  },
-                  "string_key_records" => {
-                    "type" => "sum",
-                    "limit" => -1,
-                  },
+                  "type" => "sum",
+                  "limit" => data[:limit],
                 },
               },
             },
@@ -219,81 +234,77 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "numeric_value" => 2,
-          "numeric_key_records" => [
-            create_record(4),
-            create_record(5),
-            create_record(6),
-          ],
-          "string_key_records" => [
-            create_record("d"),
-            create_record("e"),
-            create_record("f"),
-          ],
-        },
+        "value" => data[:source],
         "name" => input_name,
         "descendants" => nil,
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
                      output_name,
-                     {
-                       "numeric_value" => 3,
-                       "numeric_key_records" => [
-                         create_record(1),
-                         create_record(2),
-                       ],
-                       "string_key_records" => [
-                         create_record("a"),
-                         create_record("b"),
-                         create_record("c"),
-                         create_record("d"),
-                         create_record("e"),
-                         create_record("f"),
-                       ],
-                     },
+                     data[:expected],
                    ],
                    @outputs.last)
     end
 
-    def test_sort
+    data(
+      :numeric_key_records => {
+        :expected => [
+          create_record(1),
+          create_record(2),
+          create_record(3),
+          create_record(4),
+          create_record(5),
+          create_record(6),
+        ],
+        :value => [
+          create_record(1),
+          create_record(3),
+          create_record(5),
+        ],
+        :source => [
+          create_record(2),
+          create_record(4),
+          create_record(6),
+        ],
+      },
+      :string_key_records => {
+        :expected => [
+          create_record("a"),
+          create_record("b"),
+          create_record("c"),
+          create_record("d"),
+          create_record("e"),
+          create_record("f"),
+        ],
+        :value => [
+          create_record("a"),
+          create_record("c"),
+          create_record("e"),
+        ],
+        :source => [
+          create_record("b"),
+          create_record("d"),
+          create_record("f"),
+        ],
+      },
+    )
+    def test_sort(data)
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
         "task" => {
           "values" => {
-            output_name => {
-              "numeric_key_records" => [
-                create_record(1),
-                create_record(3),
-                create_record(5),
-              ],
-              "string_key_records" => [
-                create_record("a"),
-                create_record("c"),
-                create_record("e"),
-              ],
-            },
+            output_name => data[:value],
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_key_records" => {
-                    "type" => "sort",
-                    "operators" => [
-                      { "column" => 0, "operator" => "<" },
-                    ],
-                    "limit" => -1,
-                  },
-                  "string_key_records" => {
-                    "type" => "sort",
-                    "operators" => [
-                      { "column" => 0, "operator" => "<" },
-                    ],
-                    "limit" => -1,
-                  },
+                  "type" => "sort",
+                  "operators" => [
+                    { "column" => 0, "operator" => "<" },
+                  ],
+                  "limit" => -1,
                 },
               },
             },
@@ -301,83 +312,72 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "numeric_key_records" => [
-            create_record(2),
-            create_record(4),
-            create_record(6),
-          ],
-          "string_key_records" => [
-            create_record("b"),
-            create_record("d"),
-            create_record("f"),
-          ],
-        },
+        "value" => data[:source],
         "name" => input_name,
         "descendants" => nil,
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
                      output_name,
-                     {
-                       "numeric_key_records" => [
-                         create_record(1),
-                         create_record(2),
-                         create_record(3),
-                         create_record(4),
-                         create_record(5),
-                         create_record(6),
-                       ],
-                       "string_key_records" => [
-                         create_record("a"),
-                         create_record("b"),
-                         create_record("c"),
-                         create_record("d"),
-                         create_record("e"),
-                         create_record("f"),
-                       ],
-                     },
+                     data[:expected],
                    ],
                    @outputs.last)
     end
 
-    def test_sort_with_limit
+
+    data(
+      :numeric_key_records => {
+        :expected => [
+          create_record(1),
+          create_record(2),
+        ],
+        :value => [
+          create_record(1),
+          create_record(3),
+          create_record(5),
+        ],
+        :source => [
+          create_record(2),
+          create_record(4),
+          create_record(6),
+        ],
+        :limit => 2,
+      },
+      :string_key_records => {
+        :expected => [
+          create_record("a"),
+          create_record("b"),
+        ],
+        :value => [
+          create_record("a"),
+          create_record("c"),
+          create_record("e"),
+        ],
+        :source => [
+          create_record("b"),
+          create_record("d"),
+          create_record("f"),
+        ],
+        :limit => 2,
+      },
+    )
+    def test_sort_with_limit(data)
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
         "task" => {
           "values" => {
-            output_name => {
-              "numeric_key_records" => [
-                create_record(1),
-                create_record(3),
-                create_record(5),
-              ],
-              "string_key_records" => [
-                create_record("a"),
-                create_record("c"),
-                create_record("e"),
-              ],
-            },
+            output_name => data[:value],
           },
           "component" => {
             "body" => {
               input_name => {
                 output_name => {
-                  "numeric_key_records" => {
-                    "type" => "sort",
-                    "operators" => [
-                      { "column" => 0, "operator" => "<" },
-                    ],
-                    "limit" => 2,
-                  },
-                  "string_key_records" => {
-                    "type" => "sort",
-                    "operators" => [
-                      { "column" => 0, "operator" => "<" },
-                    ],
-                    "limit" => -1,
-                  },
+                  "type" => "sort",
+                  "operators" => [
+                    { "column" => 0, "operator" => "<" },
+                  ],
+                  "limit" => 2,
                 },
               },
             },
@@ -385,38 +385,14 @@ class BasicCollectorTest < Test::Unit::TestCase
           },
         },
         "id" => nil,
-        "value" => {
-          "numeric_key_records" => [
-            create_record(2),
-            create_record(4),
-            create_record(6),
-          ],
-          "string_key_records" => [
-            create_record("b"),
-            create_record("d"),
-            create_record("f"),
-          ],
-        },
+        "value" => data[:source],
         "name" => input_name,
         "descendants" => nil,
       }
       @plugin.process("collector_reduce", request)
       assert_equal([
                      output_name,
-                     {
-                       "numeric_key_records" => [
-                         create_record(1),
-                         create_record(2),
-                       ],
-                       "string_key_records" => [
-                         create_record("a"),
-                         create_record("b"),
-                         create_record("c"),
-                         create_record("d"),
-                         create_record("e"),
-                         create_record("f"),
-                       ],
-                     },
+                     data[:expected],
                    ],
                    @outputs.last)
     end
