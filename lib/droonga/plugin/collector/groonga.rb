@@ -64,13 +64,15 @@ module Droonga
       right_status = right_header.shift
       status = [left_status, right_status].min
 
-      left_start_time = left_header.shift
-      right_start_time = right_header.shift
-      start_time = (left_start_time + right_start_time) / 2
+      start_time = reduce({ "type" => "average" },
+                          left_header.shift,
+                          right_header.shift)
 
       left_elapsed_time = left_header.shift
       right_elapsed_time = right_header.shift
-      elapsed_time = (left_elapsed_time + right_elapsed_time) / 2
+      elapsed_time = reduce({ "type" => "average" },
+                          left_header.shift,
+                          right_header.shift)
 
       #XXX we should merge error informations more smarter...
       error_information = left_header + right_header

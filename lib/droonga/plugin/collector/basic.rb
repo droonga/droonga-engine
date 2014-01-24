@@ -51,6 +51,8 @@ module Droonga
           reduced_value = left_value && right_value
         when "sum"
           reduced_value = left_value + right_value
+        when "average"
+          reduced_value = (left_value + right_value) / 2
         when "sort"
           reduced_value = merge(left_value,
                                 right_value,
