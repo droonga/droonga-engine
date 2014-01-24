@@ -16,7 +16,9 @@
 require "droonga/plugin/handler/add"
 
 class AddHandlerTest < Test::Unit::TestCase
-  SUCCESS_RESPONSE_BODY = true
+  SUCCESS_RESPONSE_BODY = {
+    "success" => true,
+  }
 
   def setup
     setup_database
