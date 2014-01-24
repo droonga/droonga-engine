@@ -277,7 +277,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       })
       expected_plan << gatherer(request)
       expected_plan << searcher(request, :sort_limit => 1,
-                                    :output_limit => 0)
+                                         :output_limit => 0)
       assert_planned(expected_plan, request)
     end
 
@@ -306,7 +306,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       })
       expected_plan << gatherer(request)
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => 0)
+                                         :output_limit => 0)
       assert_planned(expected_plan, request)
     end
 
@@ -339,15 +339,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => 1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => 1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => 1)
+                                         :output_limit => 1)
       assert_planned(expected_plan, request)
     end
 
@@ -380,15 +380,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 1,
-                                        :limit => 1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 1,
+                                             :limit => 1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => 2)
+                                         :output_limit => 2)
       assert_planned(expected_plan, request)
     end
 
@@ -424,15 +424,15 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => 1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => 1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => 1)
+                                         :output_limit => 1)
       assert_planned(expected_plan, request)
     end
 
@@ -470,17 +470,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => 1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => 1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => 1,
-                                    :output_offset => 0,
-                                    :output_limit => 1)
+                                         :sort_limit => 1,
+                                         :output_offset => 0,
+                                         :output_limit => 1)
       assert_planned(expected_plan, request)
     end
 
@@ -522,17 +522,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 5,
-                                        :limit => 2,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 5,
+                                             :limit => 2,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => sort_limit,
-                                    :output_offset => 0,
-                                    :output_limit => output_limit)
+                                         :sort_limit => sort_limit,
+                                         :output_offset => 0,
+                                         :output_limit => output_limit)
       assert_planned(expected_plan, request)
     end
 
@@ -573,17 +573,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 5,
-                                        :limit => 2,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 5,
+                                             :limit => 2,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => limit,
-                                    :output_offset => 0,
-                                    :output_limit => limit)
+                                         :sort_limit => limit,
+                                         :output_offset => 0,
+                                         :output_limit => limit)
       assert_planned(expected_plan, request)
     end
 
@@ -624,17 +624,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 5,
-                                        :limit => 8,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 5,
+                                             :limit => 8,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => limit,
-                                    :output_offset => 0,
-                                    :output_limit => limit)
+                                         :sort_limit => limit,
+                                         :output_offset => 0,
+                                         :output_limit => limit)
       assert_planned(expected_plan, request)
     end
 
@@ -674,17 +674,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 5,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 5,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => -1,
-                                    :output_offset => 0,
-                                    :output_limit => -1)
+                                         :sort_limit => -1,
+                                         :output_offset => 0,
+                                         :output_limit => -1)
       assert_planned(expected_plan, request)
     end
 
@@ -723,17 +723,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => -1,
-                                    :output_offset => 0,
-                                    :output_limit => -1)
+                                         :sort_limit => -1,
+                                         :output_offset => 0,
+                                         :output_limit => -1)
       assert_planned(expected_plan, request)
     end
 
@@ -772,18 +772,18 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => -1,
-                                    :output_offset => 0,
-                                    :output_limit => -1,
-                                    :extra_attributes => ["public_age", "public_name"])
+                                         :sort_limit => -1,
+                                         :output_offset => 0,
+                                         :output_limit => -1,
+                                         :extra_attributes => ["public_age", "public_name"])
       assert_planned(expected_plan, request)
     end
 
@@ -826,18 +826,18 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["id", "name", "age"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["id", "name", "age"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :sort_offset => 0,
-                                    :sort_limit => -1,
-                                    :output_offset => 0,
-                                    :output_limit => -1,
-                                    :extra_attributes => ["public_age", "public_name"])
+                                         :sort_limit => -1,
+                                         :output_offset => 0,
+                                         :output_limit => -1,
+                                         :extra_attributes => ["public_age", "public_name"])
       assert_planned(expected_plan, request)
     end
 
@@ -871,16 +871,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["_key", "_nsubrecs"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["_key", "_nsubrecs"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => -1,
-                                    :unifiable => true)
+                                         :output_limit => -1,
+                                         :unifiable => true)
       assert_planned(expected_plan, request)
     end
 
@@ -914,17 +914,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "count" => count_mapper,
-                                      "records" => records_mapper(
-                                        :limit => -1,
-                                        :attributes => ["_key"],
-                                        :no_output => true,
-                                      ),
-                                    })
+                                           "count" => count_mapper,
+                                           "records" => records_mapper(
+                                             :limit => -1,
+                                             :attributes => ["_key"],
+                                             :no_output => true,
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_limit => -1,
-                                    :extra_attributes => ["_key"],
-                                    :extra_elements => ["records"],
-                                    :unifiable => true)
+                                         :extra_attributes => ["_key"],
+                                         :extra_elements => ["records"],
+                                         :unifiable => true)
       assert_planned(expected_plan, request)
     end
 
@@ -967,17 +967,17 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         },
       })
       expected_plan << gatherer(request, :elements => {
-                                      "records" => records_mapper(
-                                        :offset => 0,
-                                        :limit => -1,
-                                        :format => "complex",
-                                        :attributes => ["family_name", "count", "users"],
-                                      ),
-                                    })
+                                           "records" => records_mapper(
+                                             :offset => 0,
+                                             :limit => -1,
+                                             :format => "complex",
+                                             :attributes => ["family_name", "count", "users"],
+                                           ),
+                                         })
       expected_plan << searcher(request, :output_offset => 0,
-                                    :output_limit => -1,
-                                    :extra_attributes => ["_key"],
-                                    :unifiable => true)
+                                         :output_limit => -1,
+                                         :extra_attributes => ["_key"],
+                                         :unifiable => true)
       assert_planned(expected_plan, request)
     end
 
