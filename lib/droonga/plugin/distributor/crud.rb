@@ -39,5 +39,26 @@ module Droonga
       key = message["body"]["key"] || rand.to_s
       scatter_all(message, key)
     end
+
+=begin
+    private
+    def reducer(message)
+      reducer = super
+      reducer["body"]
+      reducer["inputs"] << "result"
+      reducer["outputs"] << "result_reduced"
+      reducer
+    end
+
+    def gatherer(message)
+      gatherer = super
+      gatherer["body"]["result_reduced"] = {
+        "output" => "result",
+        "elements" => {},
+      }
+      gatherer["inputs"] << "result_reduced"
+      gatherer
+    end
   end
+=end
 end
