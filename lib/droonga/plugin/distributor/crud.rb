@@ -59,6 +59,6 @@ module Droonga
       gatherer["inputs"] << "result_reduced"
       gatherer
     end
-  end
 =end
+  end
 end
