@@ -40,29 +40,32 @@ module Droonga
       scatter_all(message, key)
     end
 
-=begin
     private
+    def scatterer(message, key)
+      scatterer = super
+      scatterer["outputs"] << "success"
+      scatterer
+    end
+
     def reducer(message)
       reducer = super
-      reducer["body"]["result"] = {
-        "result_reduced" => {
+      reducer["body"]["success"] = {
+        "success_reduced" => {
           "type" => "and",
         },
       }
-      reducer["inputs"] << "result"
-      reducer["outputs"] << "result_reduced"
+      reducer["inputs"] << "success"
+      reducer["outputs"] << "success_reduced"
       reducer
     end
 
     def gatherer(message)
       gatherer = super
-      gatherer["body"]["result_reduced"] = {
-        "output" => "result",
-        "elements" => {},
+      gatherer["body"]["success_reduced"] = {
+        "output" => "success",
       }
-      gatherer["inputs"] << "result_reduced"
+      gatherer["inputs"] << "success_reduced"
       gatherer
     end
-=end
   end
 end

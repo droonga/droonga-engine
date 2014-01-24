@@ -56,6 +56,7 @@ module Droonga
         "body"=> message["body"],
         "key"=> key,
         "type"=> "scatter",
+        "outputs"=>[],
         "replica"=> "all",
         "post"=> true
       }
@@ -67,6 +68,7 @@ module Droonga
         "dataset"=> message["dataset"],
         "body"=> message["body"],
         "type"=> "broadcast",
+        "outputs"=>[],
         "replica"=> "all",
         "post"=> true
       }
