@@ -23,7 +23,7 @@ module Droonga
     include Pluggable
 
     def initialize
-      load_plugins(["basic"]) # TODO: make customizable
+      load_plugins(["basic", "search"]) # TODO: make customizable
     end
 
     private
