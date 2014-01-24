@@ -66,7 +66,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan = []
 
       expected_plan << {
-        "type" => "reduce",
+        "type" => "search_reduce",
         "body" => {
           "query1" => {
             "query1_reduced" => {
@@ -85,7 +85,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         "outputs" => ["query1_reduced"],
       }
       expected_plan << {
-        "type" => "reduce",
+        "type" => "search_reduce",
         "body" => {
           "query2" => {
             "query2_reduced" => {
@@ -104,7 +104,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         "outputs" => ["query2_reduced"],
       }
       expected_plan << {
-        "type" => "reduce",
+        "type" => "search_reduce",
         "body" => {
           "query3" => {
             "query3_reduced" => {
@@ -124,7 +124,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       }
 
       gatherer = {
-        "type" => "gather",
+        "type" => "search_gather",
         "body" => {
           "query1_reduced" => {
             "output" => "query1",
@@ -987,7 +987,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       query_name = queries.keys.first
 
       reducer = {
-        "type" => "reduce",
+        "type" => "search_reduce",
         "body" => {
           query_name => {
             "#{query_name}_reduced" => reducer_body,
@@ -1027,7 +1027,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       query_name = queries.keys.first
 
       gatherer = {
-        "type" => "gather",
+        "type" => "search_gather",
         "body" => {
         },
         "inputs" => [
