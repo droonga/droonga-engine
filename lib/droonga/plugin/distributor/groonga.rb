@@ -41,5 +41,33 @@ module Droonga
     def column_create(message)
       broadcast_all(message)
     end
+
+    private
+    def scatterer(message, key)
+      scatterer = super
+      scatterer["outputs"] << "result"
+      scatterer
+    end
+
+    def reducer(message)
+      reducer = super
+      reducer["body"]["result"] = {
+        "result_reduced" => {
+          "type" => "sum",
+        },
+      }
+      reducer["inputs"] << "result"
+      reducer["outputs"] << "result_reduced"
+      reducer
+    end
+
+    def gatherer(message)
+      gatherer = super
+      gatherer["body"]["result_reduced"] = {
+        "output" => "result",
+      }
+      gatherer["inputs"] << "result_reduced"
+      gatherer
+    end
   end
 end

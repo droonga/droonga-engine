@@ -27,7 +27,9 @@ module Droonga
 
     command :groonga_generic_response
     def groonga_generic_response(output_message)
-      output_message.body = output_message.body["result"]
+      if output_message.body.include?("result")
+        output_message.body = output_message.body["result"]
+      end
     end
   end
 end
