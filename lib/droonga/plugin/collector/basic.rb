@@ -51,6 +51,8 @@ module Droonga
           reduced_value = left_value && right_value
         when "sum"
           reduced_value = left_value + right_value
+          reduced_value = apply_output_range(reduced_value,
+                                             "limit" => deal["limit"])
         when "average"
           reduced_value = (left_value + right_value) / 2
         when "sort"
@@ -58,9 +60,9 @@ module Droonga
                                 right_value,
                                 :operators => deal["operators"],
                                 :key_column => deal["key_column"])
+          reduced_value = apply_output_range(reduced_value,
+                                             "limit" => deal["limit"])
         end
-
-        reduced_value = apply_output_range(reduced_value, "limit" => deal["limit"])
     end
 
     def apply_output_range(items, output)
