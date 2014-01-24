@@ -43,10 +43,10 @@ module Droonga
     end
 
     private
-    def scatterer(message, key)
-      scatterer = super
-      scatterer["outputs"] << "result"
-      scatterer
+    def broadcaster(message)
+      broadcaster = super
+      broadcaster["outputs"] << "result"
+      broadcaster
     end
 
     def reducer(message)
