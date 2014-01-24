@@ -47,6 +47,8 @@ module Droonga
         reduced_value = nil
 
         case deal["type"]
+        when "and"
+          reduced_value = left_value && right_value
         when "sum"
           reduced_value = left_value + right_value
         when "sort"
