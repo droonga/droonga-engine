@@ -26,10 +26,6 @@ module Droonga
       @raw_message
     end
 
-    def status_code
-      @raw_message["statusCode"]
-    end
-
     def body
       @raw_message["body"]
     end
