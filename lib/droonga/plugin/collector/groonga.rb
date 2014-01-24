@@ -47,12 +47,10 @@ module Droonga
     def merge_groonga_result(left_value, right_value)
       result = []
 
-      result << merge_groonga_header(left_value.first, right_value.first)
+      result << merge_groonga_header(left_value.shift, right_value.shift)
 
-      left_body = left_value[1..-1]
-      right_body = right_value[1..-1]
-      left_body.each_with_index do |left, index|
-        right = right_body[index]
+      left_value.each_with_index do |left, index|
+        right = right_value[index]
         result << reduce({ "type" => "and" }, left, right)
       end
 
@@ -60,16 +58,12 @@ module Droonga
     end
 
     def merge_groonga_header(left_header, right_header)
-      left_status = left_header.shift
-      right_status = right_header.shift
-      status = [left_status, right_status].min
+      status = [left_header.shift, right_header.shift].min
 
       start_time = reduce({ "type" => "average" },
                           left_header.shift,
                           right_header.shift)
 
-      left_elapsed_time = left_header.shift
-      right_elapsed_time = right_header.shift
       elapsed_time = reduce({ "type" => "average" },
                             left_header.shift,
                             right_header.shift)
