@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,21 @@ module Droonga
       input_message.add_route("select_response")
       input_message.command = "search"
       input_message.body = search_request
+    end
+
+    command :table_create
+    def table_create(input_message)
+      input_message.add_route("groonga_generic_response")
+    end
+
+    command :table_remove
+    def table_remove(input_message)
+      input_message.add_route("groonga_generic_response")
+    end
+
+    command :column_create
+    def column_create(input_message)
+      input_message.add_route("groonga_generic_response")
     end
   end
 end

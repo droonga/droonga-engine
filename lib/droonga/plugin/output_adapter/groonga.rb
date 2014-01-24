@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,11 @@ module Droonga
     def select_response(output_message)
       command = Select.new
       output_message.body = command.convert(output_message.body)
+    end
+
+    command :groonga_generic_response
+    def groonga_generic_response(output_message)
+      output_message.body = output_message.body["result"]
     end
   end
 end
