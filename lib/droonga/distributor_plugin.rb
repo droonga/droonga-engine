@@ -31,7 +31,7 @@ module Droonga
     end
 
     def scatter_all(message, key)
-      distribute_message = [{
+      distribute_message = {
         "command"=> message["type"],
         "dataset"=> message["dataset"],
         "body"=> message["body"],
@@ -39,20 +39,22 @@ module Droonga
         "type"=> "scatter",
         "replica"=> "all",
         "post"=> true
-      }]
-      distribute(distribute_message)
+      }
+      messages = [distribute_message]
+      distribute(messages)
     end
 
     def broadcast_all(message)
-      distribute_message = [{
+      distribute_message = {
         "command"=> message["type"],
         "dataset"=> message["dataset"],
         "body"=> message["body"],
         "type"=> "broadcast",
         "replica"=> "all",
         "post"=> true
-      }]
-      distribute(distribute_message)
+      }
+      messages = [distribute_message]
+      distribute(messages)
     end
 
     private
