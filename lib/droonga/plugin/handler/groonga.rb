@@ -26,26 +26,33 @@ module Droonga
     command :table_create
     def table_create(message, messenger)
       command = TableCreate.new(@context)
-      outputs = command.execute(message.request)
+      outputs = format_outputs(command.execute(message.request))
       messenger.emit(outputs)
     end
 
     command :table_remove
     def table_remove(message, messenger)
       command = TableRemove.new(@context)
-      outputs = command.execute(message.request)
+      outputs = format_outputs(command.execute(message.request))
       messenger.emit(outputs)
     end
 
     command :column_create
     def column_create(message, messenger)
       command = ColumnCreate.new(@context)
-      outputs = command.execute(message.request)
+      outputs = format_outputs(command.execute(message.request))
       messenger.emit(outputs)
     end
 
     def prefer_synchronous?(command)
       return true
+    end
+
+    private
+    def format_outputs(result)
+      {
+        "result" => result,
+      }
     end
 
     module Status
