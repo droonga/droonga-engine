@@ -15,6 +15,8 @@
 
 module Droonga
   class Replier
+    STATUS_OK = 200.freeze
+
     def initialize(forwarder)
       @forwarder = forwarder
     end
@@ -24,7 +26,7 @@ module Droonga
       destination = message["replyTo"]
       reply_message = {
         "inReplyTo"  => message["id"],
-        "statusCode" => message["statusCode"] || 200,
+        "statusCode" => message["statusCode"] || STATUS_OK,
         "type"       => destination["type"],
         "body"       => message["body"],
       }
