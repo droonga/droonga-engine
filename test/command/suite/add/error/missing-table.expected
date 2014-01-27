@@ -8,6 +8,22 @@
     "body": {
       "name": "MissingTableParameter",
       "message": "\"table\" must be specified."
+    },
+    "errors": {
+      "sources0": {
+        "status_code": 400,
+        "body": {
+          "name": "MissingTableParameter",
+          "message": "\"table\" must be specified."
+        }
+      },
+      "sources1": {
+        "status_code": 400,
+        "body": {
+          "name": "MissingTableParameter",
+          "message": "\"table\" must be specified."
+        }
+      }
     }
   }
 ]

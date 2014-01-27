@@ -15,6 +15,36 @@
           "birthday": "today"
         }
       }
+    },
+    "errors": {
+      "sources0": {
+        "status_code": 400,
+        "body": {
+          "name": "InvalidValue",
+          "message": "The column \"birthday\" cannot store the value \"today\".",
+          "detail": {
+            "table": "User",
+            "key": "key",
+            "values": {
+              "birthday": "today"
+            }
+          }
+        }
+      },
+      "sources1": {
+        "status_code": 400,
+        "body": {
+          "name": "InvalidValue",
+          "message": "The column \"birthday\" cannot store the value \"today\".",
+          "detail": {
+            "table": "User",
+            "key": "key",
+            "values": {
+              "birthday": "today"
+            }
+          }
+        }
+      }
     }
   }
 ]
