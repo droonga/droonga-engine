@@ -30,6 +30,10 @@ module Droonga
         "type"       => destination["type"],
         "body"       => message["body"],
       }
+      if message.include?("errors")
+        errors = message["errors"]
+        reply_message["errors"] = errors unless errors.empty?
+      end
       @forwarder.forward(reply_message, destination)
       $log.trace("#{log_tag}: reply: done")
     end
