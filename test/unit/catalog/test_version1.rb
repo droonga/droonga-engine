@@ -64,4 +64,38 @@ class CatalogTest < Test::Unit::TestCase
   def base_path
     File.dirname(catalog_path)
   end
+
+  class DataSetTest < self
+    class RingTest < self
+      class TotalWeightTest < self
+        def setup
+        end
+
+        def test_three_zones
+          dataset = {
+            "ring" => {
+              "zone1" => {
+                "weight" => 10,
+              },
+              "zone2" => {
+                "weight" => 20,
+              },
+              "zone3" => {
+                "weight" => 30,
+              },
+            }
+          }
+          assert_equal(10 + 20 + 30,
+                       total_weight(dataset))
+        end
+
+        private
+        def total_weight(dataset)
+          catalog = Droonga::Catalog::Version1.new({"datasets" => []},
+                                                   "base-path")
+          catalog.send(:compute_total_weight, dataset)
+        end
+      end
+    end
+  end
 end

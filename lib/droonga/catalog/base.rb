@@ -34,9 +34,7 @@ module Droonga
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
-          total_weight = dataset["ring"].reduce do |a, b|
-            a[1]["weight"] + b[1]["weight"]
-          end
+          total_weight = compute_total_weight(dataset)
           continuum = []
           dataset["ring"].each do |key, value|
             points = number_of_partitions * 160 * value["weight"] / total_weight
@@ -133,6 +131,13 @@ module Droonga
           when "all"
             routes.concat(replicas)
           end
+        end
+      end
+
+      private
+      def compute_total_weight(dataset)
+        dataset["ring"].reduce(0) do |result, zone|
+          result + zone[1]["weight"]
         end
       end
     end
