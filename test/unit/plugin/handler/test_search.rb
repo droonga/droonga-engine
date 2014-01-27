@@ -297,6 +297,65 @@ class SearchHandlerTest < Test::Unit::TestCase
                       })
       end
 
+      def test_attributes_expression_simple
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => [
+                            {
+                              "name" => "text", # TODO include some information
+                            },
+                          ]
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "text",
+                                  "source" => "'hello'",
+                                },
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
+      def test_attributes_expression_complex
+        assert_search({
+                        "sections-result" => {
+                          "attributes" => {
+                            "text" => {} # TODO include some information
+                          },
+                        },
+                      },
+                      {
+                        "queries" => {
+                          "sections-result" => {
+                            "source" => "Sections",
+                            "output" => {
+                              "format" => "complex",
+                              "elements" => [
+                                "attributes"
+                              ],
+                              "attributes" => [
+                                {
+                                  "label" => "text",
+                                  "source" => "'hello'",
+                                },
+                              ],
+                            },
+                          },
+                        },
+                      })
+      end
+
       def test_attributes_subrecs_simple
         assert_search({
                         "sections-result" => {

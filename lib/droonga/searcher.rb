@@ -373,7 +373,7 @@ module Droonga
         else
           expression = attribute[:expression]
           if expression
-            # TODO implement
+            format_attribute_expression(label, expression)
           else
             column = table.column(source)
             format_attribute_column(label, column)
@@ -397,6 +397,10 @@ module Droonga
         {"name" => label, "type" => column.range.name, "vector" => vector}
       end
 
+      def format_attribute_expression(label, expression)
+        {"name" => label} # TODO include detailed information of expression
+      end
+
       def format_attributes(attributes, table)
         attributes.collect do |attribute|
           format_attribute(attribute, table)
@@ -416,6 +420,10 @@ module Droonga
       def format_attribute_column(label, column)
         vector = column.respond_to?(:vector?) ? column.vector? : false
         {"type" => column.range.name, "vector" => vector}
+      end
+
+      def format_attribute_expression(label, expression)
+        {} # TODO include detailed information of expression
       end
 
       def format_attributes(attributes, table)
