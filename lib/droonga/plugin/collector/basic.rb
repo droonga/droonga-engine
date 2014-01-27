@@ -35,9 +35,9 @@ module Droonga
     command :collector_reduce
     def collector_reduce(request)
       body[input_name].each do |output, deal|
-        value = request
-        old_value = output_values[output]
-        value = reduce(deal, old_value, request) if old_value
+        left_value = output_values[output]
+        right_value = request
+        value = reduce(deal, left_value, right_value)
         emit(output, value)
       end
     end
