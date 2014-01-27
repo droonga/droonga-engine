@@ -53,7 +53,7 @@ module Droonga
         reduced_value = apply_output_range(reduced_value,
                                            "limit" => deal["limit"])
       when "average"
-        reduced_value = (left_value + right_value) / 2
+        reduced_value = (left_value.to_f + right_value.to_f) / 2
       when "sort"
         reduced_value = merge(left_value,
                               right_value,
