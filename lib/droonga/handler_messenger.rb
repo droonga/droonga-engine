@@ -67,7 +67,10 @@ module Droonga
           "id"    => @message.id,
           "input" => "errors",
           "value" => {
-            database_name => body,
+            database_name => {
+              "status_code" => status_code,
+              "body" => body,
+            },
           },
         }
         all_dests = []
