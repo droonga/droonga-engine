@@ -37,7 +37,7 @@ module Droonga
             output_message.status_code = MessageProcessingError::STATUS_CODE
           end
 
-          output_message.body = errors.values.first
+          output_message.body = errors.values.first["body"]
         end
       end
       if output_message.body.include?("success")
