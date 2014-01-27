@@ -39,7 +39,7 @@ module Droonga
         #XXX how to merge multiple erros?
         #XXX how to mix regular results and erros?
         # reduced_value = merge_groonga_result(left_value, right_value)
-        reduced_value = left_value
+        reduced_value = left_value || right_value
       else
         reduced_value = super
       end
