@@ -18,7 +18,7 @@ module Droonga
     STATUS_CODE = 500
 
     attr_reader :message, :detail
- 
+
     def initialize(message, detail=nil)
       @message = message
       @detail = detail
