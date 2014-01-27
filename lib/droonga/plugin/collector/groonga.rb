@@ -36,7 +36,10 @@ module Droonga
 
       case deal["type"]
       when "groonga_result"
-        reduced_value = merge_groonga_result(left_value, right_value)
+        #XXX how to merge multiple erros?
+        #XXX how to mix regular results and erros?
+        # reduced_value = merge_groonga_result(left_value, right_value)
+        reduced_value = left_value
       else
         reduced_value = super
       end
