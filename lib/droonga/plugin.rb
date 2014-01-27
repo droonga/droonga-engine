@@ -37,7 +37,7 @@ module Droonga
     rescue => exception
       process_error(command, exception, arguments)
     end
-    
+
     private
     def run_command(command, *arguments)
       __send__(self.class.method_name(command), *arguments)
