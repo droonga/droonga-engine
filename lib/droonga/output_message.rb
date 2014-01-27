@@ -26,6 +26,22 @@ module Droonga
       @raw_message
     end
 
+    def status_code
+      @raw_message["statusCode"]
+    end
+
+    def status_code=(status_code)
+      @raw_message["statusCode"] = status_code
+    end
+
+    def errors
+      @raw_message["errors"]
+    end
+
+    def errors=(errors)
+      @raw_message["errors"] = errors
+    end
+
     def body
       @raw_message["body"]
     end
