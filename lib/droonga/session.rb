@@ -29,7 +29,7 @@ module Droonga
     end
 
     def start
-      tasks = @inputs[nil]
+      tasks = @inputs[nil] || []
       tasks.each do |task|
         local_message = {
           "id"   => @id,
