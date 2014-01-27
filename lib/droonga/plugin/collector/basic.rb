@@ -43,6 +43,10 @@ module Droonga
     end
 
     def reduce(deal, left_value, right_value)
+      if left_value.nil? || right_value.nil?
+        return right_value || left_value
+      end
+
       reduced_value = nil
 
       case deal["type"]
