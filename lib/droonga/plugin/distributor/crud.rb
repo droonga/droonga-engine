@@ -44,6 +44,7 @@ module Droonga
     def scatterer(message, key)
       scatterer = super
       scatterer["outputs"] << "success"
+      scatterer["outputs"] << "errors"
       scatterer
     end
 
@@ -56,6 +57,14 @@ module Droonga
       }
       reducer["inputs"] << "success"
       reducer["outputs"] << "success_reduced"
+      reducer["body"]["errors"] = {
+        "errors_reduced" => {
+          "type" => "sum",
+          "limit" => -1,
+        },
+      }
+      reducer["inputs"] << "errors"
+      reducer["outputs"] << "errors_reduced"
       reducer
     end
 
@@ -65,6 +74,10 @@ module Droonga
         "output" => "success",
       }
       gatherer["inputs"] << "success_reduced"
+      gatherer["body"]["errors_reduced"] = {
+        "output" => "errors",
+      }
+      gatherer["inputs"] << "errors_reduced"
       gatherer
     end
   end

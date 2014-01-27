@@ -18,12 +18,15 @@ require "droonga/forwarder"
 
 module Droonga
   class HandlerMessenger
+    attr_reader :database_name
+
     def initialize(forwarder, message, options={})
       @forwarder = forwarder
       @message = message
       @options = options
       @replier = Replier.new(@forwarder)
       @dispatcher = @options[:dispatcher]
+      @database_name = options[:database]
     end
 
     def emit(value)
@@ -54,10 +57,32 @@ module Droonga
     def error(status_code, body)
       descendants = @message.descendants
       raw_message = @message.raw
-      unless raw_message["replyTo"].nil?
+      if descendants.empty?
+        return if raw_message["replyTo"].nil?
         response = raw_message.merge("statusCode" => status_code,
                                      "body" => body)
         @replier.reply(response)
+      else
+        body = {
+          "id"    => @message.id,
+          "input" => "errors",
+          "value" => {
+            database_name => body,
+          },
+        }
+        all_dests = []
+        descendants.each do |name, dests|
+          all_dests += dests
+        end
+        all_dests.each do |dest|
+          if @dispatcher
+            @dispatcher.dispatch(body, dest)
+          else
+            message = raw_message.merge("statusCode" => status_code,
+                                        "body" => body,)
+            forward(message, "to" => dest, "type" => "dispatcher")
+          end
+        end
       end
     end
 
