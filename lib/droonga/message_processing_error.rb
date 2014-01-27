@@ -15,6 +15,8 @@
 
 module Droonga
   class MessageProcessingError < StandardError
+    STATUS_CODE = 500.freeze
+
     attr_reader :message, :detail
  
     def initialize(message, detail=nil)
@@ -27,7 +29,7 @@ module Droonga
     end
 
     def status_code
-      500
+      STATUS_CODE
     end
 
     def response_body
@@ -41,14 +43,10 @@ module Droonga
   end
 
   class BadRequest < MessageProcessingError
-    def status_code
-      400
-    end
+    STATUS_CODE = 400.freeze
   end
 
   class NotFound < MessageProcessingError
-    def status_code
-      404
-    end
+    STATUS_CODE = 404.freeze
   end
 end
