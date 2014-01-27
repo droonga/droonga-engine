@@ -27,7 +27,7 @@ module Droonga
           output_message.errors = errors
 
           status_codes = []
-          errors.each do |error|
+          errors.values.each do |error|
             status_codes << error["status_code"]
           end
           status_codes = status_codes.uniq
