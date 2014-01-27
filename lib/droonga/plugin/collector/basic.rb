@@ -89,11 +89,7 @@ module Droonga
       return x || y if x.nil? or y.nil?
 
       if x.is_a?(Hash) && y.is_a?(Hash)
-        all_keys = (x.keys + y.keys).uniq
-        all_keys.each do |key|
-          x[key] = sum(x[key], y[key])
-        end
-        x
+        x.merge(y)
       else
         x + y
       end
