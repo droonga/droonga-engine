@@ -53,7 +53,7 @@ module Droonga
       when "and"
         reduced_value = left_value && right_value
       when "sum"
-        reduced_value = left_value + right_value
+        reduced_value = sum(left_value, right_value)
         reduced_value = apply_output_range(reduced_value,
                                            "limit" => deal["limit"])
       when "average"
@@ -83,6 +83,20 @@ module Droonga
         end
       end
       items
+    end
+
+    def sum(x, y)
+      return x || y if x.nil? or y.nil?
+
+      if x.is_a?(Hash) && y.is_a?(Hash)
+        all_keys = (x.keys + y.keys).uniq
+        all_keys.each do |key|
+          x[key] = sum(x[key], y[key])
+        end
+        x
+      else
+        x + y
+      end
     end
 
     def merge(x, y, options={})
