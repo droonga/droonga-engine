@@ -62,6 +62,8 @@ module Droonga
           reduced_value = apply_output_range(reduced_value,
                                              "limit" => deal["limit"])
         end
+
+        reduced_value
     end
 
     def apply_output_range(items, output)
