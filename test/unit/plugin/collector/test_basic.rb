@@ -92,6 +92,60 @@ class BasicCollectorTest < Test::Unit::TestCase
 
   class ReduceTest < self
     data(
+      :true_and_false => {
+        :expected => false,
+        :value => true,
+        :source => false,
+      },
+      :false_and_true => {
+        :expected => false,
+        :value => false,
+        :source => true,
+      },
+      :both_true => {
+        :expected => true,
+        :value => true,
+        :source => true,
+      },
+      :both_false => {
+        :expected => false,
+        :value => false,
+        :source => false,
+      },
+    )
+    def test_and(data)
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => data[:value],
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "type" => "and",
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => data[:source],
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @plugin.process("collector_reduce", request)
+      assert_equal([
+                     output_name,
+                     data[:expected],
+                   ],
+                   @outputs.last)
+    end
+
+    data(
       :numeric_values => {
         :expected => 3,
         :value => 1,
@@ -323,7 +377,6 @@ class BasicCollectorTest < Test::Unit::TestCase
                    ],
                    @outputs.last)
     end
-
 
     data(
       :numeric_key_records => {
