@@ -29,7 +29,7 @@ module Droonga
     end
 
     def status_code
-      STATUS_CODE
+      self.class::STATUS_CODE
     end
 
     def response_body
@@ -44,17 +44,9 @@ module Droonga
 
   class BadRequest < MessageProcessingError
     STATUS_CODE = 400
-
-    def status_code
-      STATUS_CODE
-    end
   end
 
   class NotFound < MessageProcessingError
     STATUS_CODE = 404
-
-    def status_code
-      STATUS_CODE
-    end
   end
 end
