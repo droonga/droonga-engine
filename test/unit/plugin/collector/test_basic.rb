@@ -92,6 +92,50 @@ class BasicCollectorTest < Test::Unit::TestCase
 
   class ReduceTest < self
     data(
+      :int => {
+        :expected => 1.5,
+        :value => 1,
+        :source => 2,
+      },
+      :float => {
+        :expected => 1.5,
+        :value => 1.0,
+        :source => 2.0,
+      },
+    )
+    def test_average(data)
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => data[:value],
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "type" => "average",
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => data[:source],
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @plugin.process("collector_reduce", request)
+      assert_equal([
+                     output_name,
+                     data[:expected],
+                   ],
+                   @outputs.last)
+    end
+
+    data(
       :true_and_false => {
         :expected => false,
         :value => true,
