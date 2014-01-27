@@ -44,9 +44,17 @@ module Droonga
 
   class BadRequest < MessageProcessingError
     STATUS_CODE = 400.freeze
+
+    def status_code
+      STATUS_CODE
+    end
   end
 
   class NotFound < MessageProcessingError
     STATUS_CODE = 404.freeze
+
+    def status_code
+      STATUS_CODE
+    end
   end
 end
