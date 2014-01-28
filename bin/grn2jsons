@@ -45,9 +45,6 @@ option_parser = OptionParser.new do |parser|
 end
 args = option_parser.parse!(ARGV)
 
-if options.reply_to.nil?
-  raise "You must specify the value of the \"replyTo\" field by --reply-to option."
-end
 if options.dataset.nil?
   raise "You must specify the name of the dataset by --dataset option."
 end
