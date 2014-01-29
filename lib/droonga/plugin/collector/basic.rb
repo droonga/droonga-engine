@@ -21,7 +21,7 @@ module Droonga
   class BasicCollector < Droonga::CollectorPlugin
     repository.register("basic", self)
 
-    UNLIMITED = -1.freeze
+    UNLIMITED = -1
 
     command :collector_gather
     def collector_gather(result)

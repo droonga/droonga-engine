@@ -21,7 +21,7 @@ require "time"
 
 module Droonga
   class GroongaCommandConverter
-    STATUS_OK = 200.freeze
+    STATUS_OK = 200
 
     def initialize(options={})
       @options = options

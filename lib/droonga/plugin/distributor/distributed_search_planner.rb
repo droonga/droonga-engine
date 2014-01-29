@@ -361,8 +361,8 @@ module Droonga
         sort_attributes
       end
 
-      ASCENDING_OPERATOR = "<".freeze
-      DESCENDING_OPERATOR = ">".freeze
+      ASCENDING_OPERATOR = "<"
+      DESCENDING_OPERATOR = ">"
 
       def build_records_reducer
         attributes = @output["attributes"]

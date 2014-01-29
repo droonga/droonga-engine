@@ -190,7 +190,7 @@ module Droonga
         "||" => Groonga::Operator::OR,
         "&&" => Groonga::Operator::AND,
         "-"  => Groonga::Operator::AND_NOT,
-      }.freeze
+      }
 
       class << self
         def search(search_request)

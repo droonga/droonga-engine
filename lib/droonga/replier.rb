@@ -15,7 +15,7 @@
 
 module Droonga
   class Replier
-    STATUS_OK = 200.freeze
+    STATUS_OK = 200
 
     def initialize(forwarder)
       @forwarder = forwarder
