@@ -40,5 +40,14 @@ module Droonga
     def sweep(message)
       broadcast_all(message)
     end
+
+    private
+    def broadcast_all(message)
+      planner = DistributedCommandPlanner.new(message)
+      planner.outputs << "success"
+      planner.reduce("success", "type" => "or")
+      planner.broadcast_all
+      distribute(planner.messages)
+    end
   end
 end

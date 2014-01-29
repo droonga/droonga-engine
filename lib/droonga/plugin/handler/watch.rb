@@ -56,7 +56,10 @@ module Droonga
         :route      => route,
       }
       @watcher.subscribe(normalized_request)
-      messenger.emit([true])
+      outputs = {
+        "success" => true,
+      }
+      messenger.emit(outputs)
     end
 
     command "watch.unsubscribe" => :unsubscribe
@@ -68,7 +71,10 @@ module Droonga
         :query      => query,
       }
       @watcher.unsubscribe(normalized_request)
-      messenger.emit([true])
+      outputs = {
+        "success" => true,
+      }
+      messenger.emit(outputs)
     end
 
     command "watch.feed" => :feed
