@@ -18,7 +18,7 @@
     },
     "errors": {
       "sources0": {
-        "status_code": 400,
+        "statusCode": 400,
         "body": {
           "name": "InvalidValue",
           "message": "The column \"age\" cannot store the value \"secret\".",
@@ -32,7 +32,7 @@
         }
       },
       "sources1": {
-        "status_code": 400,
+        "statusCode": 400,
         "body": {
           "name": "InvalidValue",
           "message": "The column \"age\" cannot store the value \"secret\".",

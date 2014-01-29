@@ -18,7 +18,7 @@
     },
     "errors": {
       "sources0": {
-        "status_code": 404,
+        "statusCode": 404,
         "body": {
           "name": "UnknownColumn",
           "message": "The column \"unknown\" does not exist in the table \"User\".",
@@ -32,7 +32,7 @@
         }
       },
       "sources1": {
-        "status_code": 404,
+        "statusCode": 404,
         "body": {
           "name": "UnknownColumn",
           "message": "The column \"unknown\" does not exist in the table \"User\".",

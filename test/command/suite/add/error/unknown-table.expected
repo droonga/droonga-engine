@@ -11,14 +11,14 @@
     },
     "errors": {
       "sources0": {
-        "status_code": 404,
+        "statusCode": 404,
         "body": {
           "name": "UnknownTable",
           "message": "The table \"Unknown\" does not exist in the dataset."
         }
       },
       "sources1": {
-        "status_code": 404,
+        "statusCode": 404,
         "body": {
           "name": "UnknownTable",
           "message": "The table \"Unknown\" does not exist in the dataset."
