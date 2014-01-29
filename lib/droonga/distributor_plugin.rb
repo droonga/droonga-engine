@@ -56,7 +56,7 @@ module Droonga
         "body"    => message["body"],
         "key"     => key,
         "type"    => "scatter",
-        "outputs" => [],
+        "outputs" => ["errors"],
         "replica" => "all",
         "post"    => true
       }
@@ -68,7 +68,7 @@ module Droonga
         "dataset" => message["dataset"],
         "body"    => message["body"],
         "type"    => "broadcast",
-        "outputs" => [],
+        "outputs" => ["errors"],
         "replica" => "all",
         "post"    => true
       }
@@ -77,17 +77,28 @@ module Droonga
     def reducer(message)
       {
         "type"    => "reduce",
-        "body"    => {},
-        "inputs"  => [],
-        "outputs" => [],
+        "body"    => {
+          "errors" => {
+            "errors_reduced" => {
+              "type" => "sum",
+              "limit" => -1,
+            },
+          },
+        },
+        "inputs"  => ["errors"],
+        "outputs" => ["errors_reduced"],
       }
     end
 
     def gatherer(message)
       {
         "type"   => "gather",
-        "body"   => {},
-        "inputs" => [],
+        "body"   => {
+          "errors_reduced" => {
+            "output" => "errors",
+          },
+        },
+        "inputs" => ["errors_reduced"],
         "post"   => true,
       }
     end
