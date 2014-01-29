@@ -84,6 +84,10 @@ module Droonga
 
     command :collector_search_reduce
     def collector_search_reduce(request)
+      if input_name == "errors"
+        return collector_reduce(request)
+      end
+
       return unless request
       body[input_name].each do |output, elements|
         value = request
