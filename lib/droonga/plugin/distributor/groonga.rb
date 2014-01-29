@@ -43,33 +43,12 @@ module Droonga
     end
 
     private
-    def broadcaster(message)
-      broadcaster = super
-      broadcaster["outputs"] << "result"
-      broadcaster
-    end
-
-    def reducer(message)
-      reducer = super
-      reducer["type"] = "groonga_reduce"
-      reducer["body"]["result"] = {
-        "result_reduced" => {
-          "type" => "groonga_result",
-        },
-      }
-      reducer["inputs"] << "result"
-      reducer["outputs"] << "result_reduced"
-      reducer
-    end
-
-    def gatherer(message)
-      gatherer = super
-      gatherer["type"] = "groonga_gather"
-      gatherer["body"]["result_reduced"] = {
-        "output" => "result",
-      }
-      gatherer["inputs"] << "result_reduced"
-      gatherer
+    def broadcast_all(message)
+      planner = DistributedCommandPlanner.new(message)
+      planner.outputs << "result"
+      planner.reduce("result", "type" => "or")
+      planner.broadcast_all
+      distribute(planner.messages)
     end
   end
 end
