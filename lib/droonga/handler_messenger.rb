@@ -63,6 +63,9 @@ module Droonga
                                      "body" => body)
         @replier.reply(response)
       else
+        #XXX This is just a temporary solution. We should rewrite this,
+        #    to put errors outside of the message body. Otherwise
+        #    plugins cannot use the name "errors" for their message body.
         body = {
           "id"    => @message.id,
           "input" => "errors",

@@ -49,6 +49,11 @@ module Droonga
       end
     end
 
+    #XXX Now, default scatterer/broadcaster/reducer/gatherer includes
+    #    definitions to merge errors in the body. However, this makes
+    #    the term "errors" reserved, so plugins cannot use their custom
+    #    "errors" in the body. This must be rewritten. 
+
     def scatterer(message, key)
       {
         "command" => message["type"],

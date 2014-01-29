@@ -47,6 +47,7 @@ module Droonga
     end
 
     private
+    #XXX This is just a temporary solution. We should handle errors without "body", for safety.
     def adapt_errors(output_message)
       if output_message.body.include?("errors")
         errors = output_message.body["errors"]
