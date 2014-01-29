@@ -22,8 +22,6 @@ module Droonga
 
       @request = @source_message["body"]
       @queries = @request["queries"]
-
-      @query_outputs = []
     end
 
     def build_messages
@@ -69,7 +67,7 @@ module Droonga
         return
       end
 
-      @query_outputs << output_name(input_name)
+      @outputs << input_name
 
       transformer = QueryTransformer.new(query)
 
