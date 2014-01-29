@@ -73,7 +73,7 @@ module Droonga
 
       transformer = QueryTransformer.new(query)
 
-      @reducer << reducer_message("search_reduce",
+      @reducers << reducer_message("search_reduce",
                                   input_name,
                                   transformer.reducers)
       @gatherers << gatherer_message("search_gather",
