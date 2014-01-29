@@ -23,49 +23,28 @@ module Droonga
 
     command :add
     def add(message)
-      key = message["body"]["key"] || rand.to_s
-      scatter_all(message, key)
+      scatter_all(message)
     end
 
     command :update
     def update(message)
-      key = message["body"]["key"] || rand.to_s
-      scatter_all(message, key)
+      scatter_all(message)
     end
 
     # TODO: What is this?
     command :reset
     def reset(message)
-      key = message["body"]["key"] || rand.to_s
-      scatter_all(message, key)
+      scatter_all(message)
     end
 
     private
-    def scatterer(message, key)
-      scatterer = super
-      scatterer["outputs"] << "success"
-      scatterer
-    end
-
-    def reducer(message)
-      reducer = super
-      reducer["body"]["success"] = {
-        "success_reduced" => {
-          "type" => "and",
-        },
-      }
-      reducer["inputs"] << "success"
-      reducer["outputs"] << "success_reduced"
-      reducer
-    end
-
-    def gatherer(message)
-      gatherer = super
-      gatherer["body"]["success_reduced"] = {
-        "output" => "success",
-      }
-      gatherer["inputs"] << "success_reduced"
-      gatherer
+    def scatter_all(message)
+      planner = DistributedCommandPlanner.new(message)
+      planner.key = message["body"]["key"] || rand.to_s
+      planner.outputs << "success"
+      planner.reduce("success", "type" => "and")
+      planner.scatter_all
+      distribute(planner.messages)
     end
   end
 end

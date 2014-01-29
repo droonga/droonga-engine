@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin"
+require "droonga/distributed_command_planner"
 
 module Droonga
   class DistributorPlugin < Plugin
@@ -30,16 +31,6 @@ module Droonga
       @distributor.distribute(messages)
     end
 
-    def scatter_all(message, key)
-      messages = [reducer(message), gatherer(message), scatterer(message, key)]
-      distribute(messages)
-    end
-
-    def broadcast_all(message)
-      messages = [reducer(message), gatherer(message), broadcaster(message)]
-      distribute(messages)
-    end
-
     private
     def process_error(command, error, arguments)
       if error.is_a?(MessageProcessingError)
@@ -47,65 +38,6 @@ module Droonga
       else
         super
       end
-    end
-
-    #XXX Now, default scatterer/broadcaster/reducer/gatherer includes
-    #    definitions to merge errors in the body. However, this makes
-    #    the term "errors" reserved, so plugins cannot use their custom
-    #    "errors" in the body. This must be rewritten. 
-
-    def scatterer(message, key)
-      {
-        "command" => message["type"],
-        "dataset" => message["dataset"],
-        "body"    => message["body"],
-        "key"     => key,
-        "type"    => "scatter",
-        "outputs" => ["errors"],
-        "replica" => "all",
-        "post"    => true
-      }
-    end
-
-    def broadcaster(message)
-      {
-        "command" => message["type"],
-        "dataset" => message["dataset"],
-        "body"    => message["body"],
-        "type"    => "broadcast",
-        "outputs" => ["errors"],
-        "replica" => "all",
-        "post"    => true
-      }
-    end
-
-    def reducer(message)
-      {
-        "type"    => "reduce",
-        "body"    => {
-          "errors" => {
-            "errors_reduced" => {
-              "type" => "sum",
-              "limit" => -1,
-            },
-          },
-        },
-        "inputs"  => ["errors"],
-        "outputs" => ["errors_reduced"],
-      }
-    end
-
-    def gatherer(message)
-      {
-        "type"   => "gather",
-        "body"   => {
-          "errors_reduced" => {
-            "output" => "errors",
-          },
-        },
-        "inputs" => ["errors_reduced"],
-        "post"   => true,
-      }
     end
   end
 end
