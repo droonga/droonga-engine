@@ -25,12 +25,8 @@ module Droonga
     command :search
     def search(message)
       planner = DistributedSearchPlanner.new(message)
-
-      #XXX This is just a temporary solution. We should handle errors by the framework itself.
-      planner.searcher["outputs"] << "errors"
-      messages = planner.messages + [reducer(message), gatherer(message)]
-
-      distribute(messages)
+      planner.build_messages
+      distribute(planner.messages)
     end
   end
 end

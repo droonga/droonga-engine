@@ -16,31 +16,15 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class DistributedSearchPlanner
-    attr_reader :reducers, :gatherer, :searcher
-
+  class DistributedSearchPlanner < DistributedCommandPlanner
     def initialize(search_request_message)
-      @source_message = search_request_message
+      super
+
       @request = @source_message["body"]
       @queries = @request["queries"]
 
-      @input_names = []
-      @output_names = []
-      @output_mappers = {}
-
-      @reducers = []
-      @gatherer = nil
-      @searcher = nil
-
-      build_messages
+      @query_outputs = []
     end
-
-    def messages
-      @reducers + [@gatherer, @searcher]
-    end
-
-    private
-    UNLIMITED = -1
 
     def build_messages
       Searcher::QuerySorter.validate_dependencies(@queries)
@@ -51,22 +35,12 @@ module Droonga
         transform_query(input_name, query)
       end
 
-      @gatherer = {
-        "type" => "search_gather",
-        "body" => @output_mappers,
-        "inputs" => @output_names, # XXX should be placed in the "body"?
-        "post" => true, # XXX should be placed in the "body"?
-      }
-
-      @searcher = {
-        "type" => "broadcast",
-        "command" => "search", # XXX should be placed in the "body"?
-        "dataset" => @source_message["dataset"] || @request["dataset"],
-        "body" => @request,
-        "outputs" => @input_names, # XXX should be placed in the "body"?
-        "replica" => "random", # XXX should be placed in the "body"?
-      }
+      @dataset = @source_message["dataset"] || @request["dataset"]
+      broadcast_at_random(@request)
     end
+
+    private
+    UNLIMITED = -1
 
     def ensure_unifiable!
       @queries.each do |name, query|
@@ -95,28 +69,16 @@ module Droonga
         return
       end
 
-      @input_names << input_name
-      output_name = input_name + "_reduced"
-      @output_names << output_name
+      @query_outputs << output_name(input_name)
 
       transformer = QueryTransformer.new(query)
 
-      reducer = {
-        "type" => "search_reduce",
-        "body" => {
-          input_name => {
-            output_name => transformer.reducers,
-          },
-        },
-        "inputs" => [input_name], # XXX should be placed in the "body"?
-        "outputs" => [output_name], # XXX should be placed in the "body"?
-      }
-      @reducers << reducer
-
-      @output_mappers[output_name] = {
-        "output" => input_name,
-        "elements" => transformer.mappers,
-      }
+      @reducer << reducer_message("search_reduce",
+                                  input_name,
+                                  transformer.reducers)
+      @gatherers << gatherer_message("search_gather",
+                                     input_name,
+                                     "elements" => transformer.mappers)
     end
 
     class QueryTransformer

@@ -125,13 +125,13 @@ module Droonga
       }
     end
 
-    def gatherer_message(command, name)
+    def gatherer_message(command, name, gatherer={})
       {
         "type"   => command,
         "body"   => {
           output_name(name) => {
             "output" => name,
-          },
+          }.merge(gatherer),
         },
         "inputs" => [output_name(name)],
         "post"   => true,
