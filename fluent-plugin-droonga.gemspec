@@ -1,6 +1,6 @@
 # -*- mode: ruby; coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-droonga"
-  gem.version       = "0.9.0"
+  gem.version       = "1.0.0"
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
   gem.description   = "Droonga(distributed Groonga) plugin for Fluent event collector"
