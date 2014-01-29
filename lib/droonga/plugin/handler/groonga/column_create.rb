@@ -28,7 +28,7 @@ module Droonga
         table_name = @command["table"]
         if table_name.nil? || @context[table_name].nil?
           raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                 :message => "table doesn't exist:<#{table_name.to_s}>",
+                                 :message => "table doesn't exist: <#{table_name.to_s}>",
                                  :result => false)
         end
 
