@@ -38,37 +38,6 @@ module Droonga
       unified_reducers + unified_gatherers + @processors
     end
 
-    def unified_reducers
-      unified_reducers = {}
-      @reducers.each do |reducer|
-        type = reducer["type"]
-        unified = unified_reducers[type]
-        if unified
-          unified["body"] = unified["body"].merge(reducer["body"])
-          unified["inputs"] = unified["inputs"] + reducer["inputs"]
-          unified["outputs"] = unified["outputs"] + reducer["outputs"]
-        else
-          unified_reducers[type] = Marshal.load(Marshal.dump(reducer))
-        end
-      end
-      unified_reducers.values
-    end
-
-    def unified_gatherers
-      unified_gatherers = {}
-      @gatherers.each do |gatherer|
-        type = gatherer["type"]
-        unified = unified_gatherers[type]
-        if unified
-          unified["body"] = unified["body"].merge(gatherer["body"])
-          unified["inputs"] = unified["inputs"] + gatherer["inputs"]
-        else
-          unified_gatherers[type] = Marshal.load(Marshal.dump(gatherer))
-        end
-      end
-      unified_gatherers.values
-    end
-
     def reduce(name, reducer)
       @reducers << reducer_message("reduce", name, reducer)
       @gatherers << gatherer_message("gather", name)
@@ -112,6 +81,37 @@ module Droonga
     end
 
     private
+    def unified_reducers
+      unified_reducers = {}
+      @reducers.each do |reducer|
+        type = reducer["type"]
+        unified = unified_reducers[type]
+        if unified
+          unified["body"] = unified["body"].merge(reducer["body"])
+          unified["inputs"] = unified["inputs"] + reducer["inputs"]
+          unified["outputs"] = unified["outputs"] + reducer["outputs"]
+        else
+          unified_reducers[type] = Marshal.load(Marshal.dump(reducer))
+        end
+      end
+      unified_reducers.values
+    end
+
+    def unified_gatherers
+      unified_gatherers = {}
+      @gatherers.each do |gatherer|
+        type = gatherer["type"]
+        unified = unified_gatherers[type]
+        if unified
+          unified["body"] = unified["body"].merge(gatherer["body"])
+          unified["inputs"] = unified["inputs"] + gatherer["inputs"]
+        else
+          unified_gatherers[type] = Marshal.load(Marshal.dump(gatherer))
+        end
+      end
+      unified_gatherers.values
+    end
+
     def reducer_message(command, name, reducer)
       {
         "type"    => command,
