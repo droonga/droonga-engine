@@ -68,7 +68,7 @@ module Droonga
           "input" => "errors",
           "value" => {
             database_name => {
-              "status_code" => status_code,
+              "statusCode" => status_code,
               "body" => body,
             },
           },

@@ -28,7 +28,7 @@ module Droonga
 
           status_codes = []
           errors.values.each do |error|
-            status_codes << error["status_code"]
+            status_codes << error["statusCode"]
           end
           status_codes = status_codes.uniq
           if status_codes.size == 1
