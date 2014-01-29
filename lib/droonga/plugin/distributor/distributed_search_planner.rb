@@ -44,6 +44,21 @@ module Droonga
         transform_query(input_name, query)
       end
 
+      errors_reducer = {
+        "type" => "reduce",
+        "body" => {
+          "errors" => {
+            "errors_reduced" => {
+              "type" => "sum",
+              "limit" => -1,
+            },
+          },
+        },
+        "inputs" => ["errors"],
+        "outputs" => ["errors_reduced"],
+      }
+      @messages << errors_reducer
+
       gatherer = {
         "type" => "search_gather",
         "body" => @output_mappers.merge({
@@ -105,15 +120,9 @@ module Droonga
           input_name => {
             output_name => transformer.reducers,
           },
-          "errors" => {
-            "errors_reduced" => {
-              "type" => "sum",
-              "limit" => -1,
-            },
-          },
         },
-        "inputs" => [input_name, "errors"], # XXX should be placed in the "body"?
-        "outputs" => [output_name, "errors_reduced"], # XXX should be placed in the "body"?
+        "inputs" => [input_name], # XXX should be placed in the "body"?
+        "outputs" => [output_name], # XXX should be placed in the "body"?
       }
       @messages << reducer
 
