@@ -30,6 +30,11 @@ module Droonga
 
     def adapt(message)
       adapted_message = message
+
+      output_message = OutputMessage.new(adapted_message)
+      adapt_errors(output_message)
+      adapted_message = output_message.adapted_message
+
       message["via"].reverse_each do |command|
         @plugins.each do |plugin|
           next unless plugin.processable?(command)
@@ -42,6 +47,30 @@ module Droonga
     end
 
     private
+    def adapt_errors(output_message)
+      if output_message.body.include?("errors")
+        errors = output_message.body["errors"]
+        if errors && !errors.empty?
+          output_message.errors = errors
+
+          status_codes = []
+          errors.values.each do |error|
+            status_codes << error["statusCode"]
+          end
+          status_codes = status_codes.uniq
+          if status_codes.size == 1
+            output_message.status_code = status_codes.first
+          else
+            output_message.status_code = MessageProcessingError::STATUS_CODE
+          end
+
+          output_message.body = errors.values.first["body"]
+        else
+          output_message.body.delete("errors")
+        end
+      end
+    end
+
     def instantiate_plugin(name)
       OutputAdapterPlugin.repository.instantiate(name, @dispatcher)
     end

@@ -21,25 +21,6 @@ module Droonga
 
     command :crud_generic_response
     def crud_generic_response(output_message)
-      if output_message.body.include?("errors")
-        errors = output_message.body["errors"]
-        if errors && !errors.empty?
-          output_message.errors = errors
-
-          status_codes = []
-          errors.values.each do |error|
-            status_codes << error["statusCode"]
-          end
-          status_codes = status_codes.uniq
-          if status_codes.size == 1
-            output_message.status_code = status_codes.first
-          else
-            output_message.status_code = MessageProcessingError::STATUS_CODE
-          end
-
-          output_message.body = errors.values.first["body"]
-        end
-      end
       if output_message.body.include?("success")
         success = output_message.body["success"]
         unless success.nil?
