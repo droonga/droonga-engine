@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,12 @@ module Droonga
     command :search
     def search(message)
       planner = DistributedSearchPlanner.new(message)
-      distribute(planner.messages)
+
+      #XXX This is just a temporary solution. We should handle errors by the framework itself.
+      planner.searcher["outputs"] << "errors"
+      messages = planner.messages + [reducer(message), gatherer(message)]
+
+      distribute(messages)
     end
   end
 end

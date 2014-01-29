@@ -17,7 +17,7 @@
 
 module Droonga
   class DistributedSearchPlanner
-    attr_reader :messages
+    attr_reader :reducers, :gatherer, :searcher
 
     def initialize(search_request_message)
       @source_message = search_request_message
@@ -27,9 +27,16 @@ module Droonga
       @input_names = []
       @output_names = []
       @output_mappers = {}
-      @messages = []
+
+      @reducers = []
+      @gatherer = nil
+      @searcher = nil
 
       build_messages
+    end
+
+    def messages
+      @reducers + [@gatherer, @searcher]
     end
 
     private
@@ -44,41 +51,21 @@ module Droonga
         transform_query(input_name, query)
       end
 
-      errors_reducer = {
-        "type" => "reduce",
-        "body" => {
-          "errors" => {
-            "errors_reduced" => {
-              "type" => "sum",
-              "limit" => -1,
-            },
-          },
-        },
-        "inputs" => ["errors"],
-        "outputs" => ["errors_reduced"],
-      }
-      @messages << errors_reducer
-
-      gatherer = {
+      @gatherer = {
         "type" => "search_gather",
-        "body" => @output_mappers.merge({
-          "errors_reduced" => {
-            "output" => "errors",
-          },
-        }),
-        "inputs" => @output_names + ["errors_reduced"], # XXX should be placed in the "body"?
+        "body" => @output_mappers,
+        "inputs" => @output_names, # XXX should be placed in the "body"?
         "post" => true, # XXX should be placed in the "body"?
       }
-      @messages << gatherer
-      searcher = {
+
+      @searcher = {
         "type" => "broadcast",
         "command" => "search", # XXX should be placed in the "body"?
         "dataset" => @source_message["dataset"] || @request["dataset"],
         "body" => @request,
-        "outputs" => @input_names + ["errors"], # XXX should be placed in the "body"?
+        "outputs" => @input_names, # XXX should be placed in the "body"?
         "replica" => "random", # XXX should be placed in the "body"?
       }
-      @messages.push(searcher)
     end
 
     def ensure_unifiable!
@@ -124,7 +111,7 @@ module Droonga
         "inputs" => [input_name], # XXX should be placed in the "body"?
         "outputs" => [output_name], # XXX should be placed in the "body"?
       }
-      @messages << reducer
+      @reducers << reducer
 
       @output_mappers[output_name] = {
         "output" => input_name,
