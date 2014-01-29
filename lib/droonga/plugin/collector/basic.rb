@@ -52,6 +52,8 @@ module Droonga
       case deal["type"]
       when "and"
         reduced_value = left_value && right_value
+      when "or"
+        reduced_value = left_value || right_value
       when "sum"
         reduced_value = sum(left_value, right_value)
         reduced_value = apply_output_range(reduced_value,
