@@ -26,8 +26,8 @@ module Droonga
       @distributor = distributor
     end
 
-    def distribute(message)
-      @distributor.distribute(message)
+    def distribute(messages)
+      @distributor.distribute(messages)
     end
 
     def scatter_all(message, key)
