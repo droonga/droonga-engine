@@ -1,5 +1,18 @@
 # News
 
+## 0.9.0: 2014-01-29
+
+### Improvements
+
+  * `search`: Supported `"attributes"` for `elements` of `output`.
+  * `table_remove`: Implemented Groonga compatible `table_remove`
+    command.
+  * `column_create`: Implemented error handling.
+  * `catalog`: Supported auto reloading.
+  * Supported reducing responses from two or more nodes for Groonga
+    compatible commands.
+  * Supported three or more partitions.
+
 ## 0.8.0: 2013-12-29
 
 ### Improvements
