@@ -58,7 +58,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost"
       }
       process(:subscribe, request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -87,7 +87,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "route" => "localhost:23003/output"
       }
       process(:subscribe, request, "from" => "localhost:23004/output")
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
 
       assert_equal(
         ["localhost:23003/output"],
