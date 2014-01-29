@@ -46,8 +46,12 @@ module Droonga
 
       gatherer = {
         "type" => "search_gather",
-        "body" => @output_mappers,
-        "inputs" => @output_names, # XXX should be placed in the "body"?
+        "body" => @output_mappers.merge({
+          "errors_reduced" => {
+            "output" => "errors",
+          },
+        }),
+        "inputs" => @output_names + ["errors_reduced"], # XXX should be placed in the "body"?
         "post" => true, # XXX should be placed in the "body"?
       }
       @messages << gatherer
@@ -56,7 +60,7 @@ module Droonga
         "command" => "search", # XXX should be placed in the "body"?
         "dataset" => @source_message["dataset"] || @request["dataset"],
         "body" => @request,
-        "outputs" => @input_names, # XXX should be placed in the "body"?
+        "outputs" => @input_names + ["errors"], # XXX should be placed in the "body"?
         "replica" => "random", # XXX should be placed in the "body"?
       }
       @messages.push(searcher)
@@ -101,9 +105,15 @@ module Droonga
           input_name => {
             output_name => transformer.reducers,
           },
+          "errors" => {
+            "errors_reduced" => {
+              "type" => "sum",
+              "limit" => -1,
+            },
+          },
         },
-        "inputs" => [input_name], # XXX should be placed in the "body"?
-        "outputs" => [output_name], # XXX should be placed in the "body"?
+        "inputs" => [input_name, "errors"], # XXX should be placed in the "body"?
+        "outputs" => [output_name, "errors_reduced"], # XXX should be placed in the "body"?
       }
       @messages << reducer
 
