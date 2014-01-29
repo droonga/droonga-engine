@@ -20,6 +20,8 @@ require "droonga/plugin/handler/watch"
 class WatchHandlerTest < Test::Unit::TestCase
   include WatchHelper
 
+  SUCCESS_RESULT = { "success" => true }
+
   def setup
     setup_database
     setup_schema
@@ -70,7 +72,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost"
       }
       process(:subscribe, request, "from" => "localhost:23004/output")
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
 
       assert_equal(
         ["localhost:23004/output"],
@@ -116,7 +118,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost"
       }
       process(:unsubscribe, request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
     end
 
     private
@@ -127,7 +129,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost"
       }
       process(:subscribe, request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
       @messenger.values.clear
     end
   end
@@ -178,7 +180,7 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost"
       }
       process(:subscribe, request)
-      assert_equal([[true]], @messenger.values)
+      assert_equal([SUCCESS_RESULT], @messenger.values)
     end
   end
 end
