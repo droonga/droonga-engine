@@ -26,25 +26,25 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     @messages ||= plan(@request)
   end
 
-  def broadcast_message(messages)
+  def broadcast_message
     messages.find do |message|
       message["type"] == "broadcast"
     end
   end
 
-  def reduce_message(messages)
+  def reduce_message
     messages.find do |message|
       message["type"] == "search_reduce"
     end
   end
 
-  def gather_message(messages)
+  def gather_message
     messages.find do |message|
       message["type"] == "search_gather"
     end
   end
 
-  def dependencies(messages)
+  def dependencies
     messages.collect do |message|
       {
         "type"    => message["type"],
@@ -115,7 +115,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "outputs" => search_reduce_inputs,
                        },
                      ],
-                     dependencies(messages))
+                     dependencies)
       end
     end
   end
@@ -156,7 +156,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "outputs" => search_reduce_inputs,
                        },
                      ],
-                     dependencies(messages))
+                     dependencies)
       end
 
       def test_broadcast_body
@@ -167,7 +167,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          },
                        },
                      },
-                     broadcast_message(messages)["body"])
+                     broadcast_message["body"])
       end
 
       def test_reduce_body
@@ -179,7 +179,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          },
                        },
                      },
-                     reduce_message(messages)["body"])
+                     reduce_message["body"])
       end
 
       def test_gather_body
@@ -188,7 +188,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "output" => "errors",
                        },
                      },
-                     gather_message(messages)["body"])
+                     gather_message["body"])
       end
     end
 
@@ -241,7 +241,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "outputs" => search_reduce_inputs,
                        },
                      ],
-                     dependencies(messages))
+                     dependencies)
       end
 
       def test_broadcast_body
@@ -256,7 +256,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          },
                        },
                      },
-                     broadcast_message(messages)["body"])
+                     broadcast_message["body"])
       end
 
       def test_gather_records
@@ -268,7 +268,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        },
                        "output" => "users",
                      },
-                     gather_message(messages)["body"]["users_reduced"])
+                     gather_message["body"]["users_reduced"])
       end
     end
   end
