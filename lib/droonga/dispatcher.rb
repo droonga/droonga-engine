@@ -55,7 +55,7 @@ module Droonga
       @current_id = 0
       @local = Regexp.new("^#{@name}")
       @input_adapter =
-        InputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
+        InputAdapter.new(self, Droonga.catalog.input_adapter_options)
       @output_adapter =
         OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
       @farm = Farm.new(name, @loop, :dispatcher => self)

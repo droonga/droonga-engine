@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,15 +15,17 @@
 
 require "droonga/pluggable"
 require "droonga/input_adapter_plugin"
+require "droonga/input_adapter_options"
 require "droonga/input_message"
 
 module Droonga
   class InputAdapter
     include Pluggable
 
-    def initialize(dispatcher, options={})
+    def initialize(dispatcher, options=nil)
       @dispatcher = dispatcher
-      load_plugins(options[:plugins] || [])
+      @options = options || InputAdapterOptions.new({})
+      load_plugins(@options.plugins)
     end
 
     def adapt(message)
