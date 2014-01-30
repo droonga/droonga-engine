@@ -23,6 +23,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   class MultipleQueriesTest < self
+    class MultipleOutputsTest < self
     def setup
       @request = {
         "type" => "search",
@@ -229,6 +230,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan << searcher
 
       assert_equal(expected_plan, plan(@request))
+    end
     end
   end
 
