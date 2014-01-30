@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@ require "droonga/catalog/version1"
 class CatalogTest < Test::Unit::TestCase
   def setup
     data = JSON.parse(File.read(catalog_path))
-    @catalog = Droonga::Catalog::Version1.new(data, base_path)
+    @catalog = create_catalog(data, base_path)
   end
 
   def test_option
@@ -53,6 +53,10 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   private
+  def create_catalog(data, base_path)
+    Droonga::Catalog::Version1.new(data, base_path)
+  end
+
   def fixture_path(base_path)
     File.expand_path("../../fixtures/#{base_path}", __FILE__)
   end
@@ -91,8 +95,7 @@ class CatalogTest < Test::Unit::TestCase
 
         private
         def total_weight(dataset)
-          catalog = Droonga::Catalog::Version1.new({"datasets" => []},
-                                                   "base-path")
+          catalog = create_catalog({"datasets" => []}, "base-path")
           catalog.send(:compute_total_weight, dataset)
         end
       end
