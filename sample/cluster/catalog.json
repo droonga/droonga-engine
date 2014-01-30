@@ -40,5 +40,8 @@
   },
   "options": {
     "plugins": ["groonga"]
+  },
+  "input_adapter": {
+    "plugins": ["groonga"]
   }
 }

@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 require "digest/sha1"
 require "zlib"
 require "droonga/message_processing_error"
+require "droonga/input_adapter_options"
 
 module Droonga
   module Catalog
@@ -132,6 +133,10 @@ module Droonga
             routes.concat(replicas)
           end
         end
+      end
+
+      def input_adapter_options
+        InputAdapterOptions.new(@data["input_adapter"])
       end
 
       private
