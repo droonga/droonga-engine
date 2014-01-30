@@ -24,213 +24,213 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
   class MultipleQueriesTest < self
     class MultipleOutputsTest < self
-    def setup
-      @request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "query1" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 10,
+      def setup
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "query1" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "complex",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 10,
+                },
               },
-            },
-            "query2" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 20,
+              "query2" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "complex",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 20,
+                },
               },
-            },
-            "query3" => {
-              "source" => "User",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 30,
+              "query3" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "complex",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 30,
+                },
               },
             },
           },
-        },
-      }
-    end
+        }
+      end
 
-    def test_distribute
-      expected_plan = []
+      def test_distribute
+        expected_plan = []
 
-      expected_plan << {
-        "type" => "search_reduce",
-        "body" => {
-          "errors" => {
+        expected_plan << {
+          "type" => "search_reduce",
+          "body" => {
+            "errors" => {
+              "errors_reduced" => {
+                "limit" => -1,
+                "type"  => "sum",
+              }
+            },
+            "query1" => {
+              "query1_reduced" => {
+                "count" => {
+                  "type" => "sum",
+                },
+                "records" => {
+                  "type" => "sort",
+                  "operators" => [],
+                  "limit" => 10,
+                },
+              },
+            },
+            "query2" => {
+              "query2_reduced" => {
+                "count" => {
+                  "type" => "sum",
+                },
+                "records" => {
+                  "type" => "sort",
+                  "operators" => [],
+                  "limit" => 20,
+                },
+              },
+            },
+            "query3" => {
+              "query3_reduced" => {
+                "count" => {
+                  "type" => "sum",
+                },
+                "records" => {
+                  "type" => "sort",
+                  "operators" => [],
+                  "limit" => 30,
+                },
+              },
+            },
+          },
+          "inputs" => [
+            "errors",
+            "query1",
+            "query2",
+            "query3",
+          ],
+          "outputs" => [
+            "errors_reduced",
+            "query1_reduced",
+            "query2_reduced",
+            "query3_reduced",
+          ],
+        }
+
+        gatherer = {
+          "type" => "search_gather",
+          "body" => {
             "errors_reduced" => {
-              "limit" => -1,
-              "type"  => "sum",
-            }
-          },
-          "query1" => {
+              "output" => "errors",
+            },
             "query1_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 10,
+              "output" => "query1",
+              "elements" => {
+                "records" => {
+                  "type" => "sort",
+                  "offset" => 0,
+                  "limit" => 10,
+                  "format" => "complex",
+                  "attributes" => [],
+                },
               },
             },
-          },
-          "query2" => {
             "query2_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 20,
+              "output" => "query2",
+              "elements" => {
+                "records" => {
+                  "type" => "sort",
+                  "offset" => 0,
+                  "limit" => 20,
+                  "format" => "complex",
+                  "attributes" => [],
+                },
               },
             },
-          },
-          "query3" => {
             "query3_reduced" => {
-              "count" => {
-                "type" => "sum",
-              },
-              "records" => {
-                "type" => "sort",
-                "operators" => [],
-                "limit" => 30,
+              "output" => "query3",
+              "elements" => {
+                "records" => {
+                  "type" => "sort",
+                  "offset" => 0,
+                  "limit" => 30,
+                  "format" => "complex",
+                  "attributes" => [],
+                },
               },
             },
           },
-        },
-        "inputs" => [
-          "errors",
-          "query1",
-          "query2",
-          "query3",
-        ],
-        "outputs" => [
-          "errors_reduced",
-          "query1_reduced",
-          "query2_reduced",
-          "query3_reduced",
-        ],
-      }
+          "inputs" => [
+            "errors_reduced",
+            "query1_reduced",
+            "query2_reduced",
+            "query3_reduced",
+          ],
+          "post" => true,
+        }
+        expected_plan << gatherer
 
-      gatherer = {
-        "type" => "search_gather",
-        "body" => {
-          "errors_reduced" => {
-            "output" => "errors",
-          },
-          "query1_reduced" => {
-            "output" => "query1",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 10,
-                "format" => "complex",
-                "attributes" => [],
+        searcher = {
+          "type" => "broadcast",
+          "command" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "query1" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "simple",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 10,
+                },
+              },
+              "query2" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "simple",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 20,
+                },
+              },
+              "query3" => {
+                "source" => "User",
+                "output" => {
+                  "format" => "simple",
+                  "elements" => ["count", "records"],
+                  "attributes" => [],
+                  "offset" => 0,
+                  "limit" => 30,
+                },
               },
             },
           },
-          "query2_reduced" => {
-            "output" => "query2",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 20,
-                "format" => "complex",
-                "attributes" => [],
-              },
-            },
-          },
-          "query3_reduced" => {
-            "output" => "query3",
-            "elements" => {
-              "records" => {
-                "type" => "sort",
-                "offset" => 0,
-                "limit" => 30,
-                "format" => "complex",
-                "attributes" => [],
-              },
-            },
-          },
-        },
-        "inputs" => [
-          "errors_reduced",
-          "query1_reduced",
-          "query2_reduced",
-          "query3_reduced",
-        ],
-        "post" => true,
-      }
-      expected_plan << gatherer
+          "outputs" => [
+            "errors",
+            "query1",
+            "query2",
+            "query3",
+          ],
+          "replica" => "random",
+        }
+        expected_plan << searcher
 
-      searcher = {
-        "type" => "broadcast",
-        "command" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "query1" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 10,
-              },
-            },
-            "query2" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 20,
-              },
-            },
-            "query3" => {
-              "source" => "User",
-              "output" => {
-                "format" => "simple",
-                "elements" => ["count", "records"],
-                "attributes" => [],
-                "offset" => 0,
-                "limit" => 30,
-              },
-            },
-          },
-        },
-        "outputs" => [
-          "errors",
-          "query1",
-          "query2",
-          "query3",
-        ],
-        "replica" => "random",
-      }
-      expected_plan << searcher
-
-      assert_equal(expected_plan, plan(@request))
-    end
+        assert_equal(expected_plan, plan(@request))
+      end
     end
   end
 
