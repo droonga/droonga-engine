@@ -1017,12 +1017,18 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       reducer = {
         "type" => "search_reduce",
         "body" => {
+          "errors" => {
+            "errors_reduced" => {
+              "limit" => -1,
+              "type"  => "sum",
+            },
+          },
           query_name => {
             "#{query_name}_reduced" => reducer_body,
           },
         },
-        "inputs" => [query_name],
-        "outputs" => ["#{query_name}_reduced"],
+        "inputs" => ["errors", query_name],
+        "outputs" => ["errors_reduced", "#{query_name}_reduced"],
       }
 
       reducer
@@ -1057,8 +1063,12 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       gatherer = {
         "type" => "search_gather",
         "body" => {
+          "errors_reduced" => {
+            "output" => "errors",
+          },
         },
         "inputs" => [
+          "errors_reduced",
         ],
         "post" => true,
       }
@@ -1117,7 +1127,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       query["output"]["format"] = "simple" if query["output"]
       query["output"]["unifiable"] = true if options[:unifiable]
 
-      outputs = []
+      outputs = ["errors"]
       outputs << query_name unless options[:no_output]
 
       searcher["type"] = "broadcast"
