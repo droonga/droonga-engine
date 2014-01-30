@@ -16,13 +16,35 @@
 require "droonga/catalog/version1"
 
 class CatalogTest < Test::Unit::TestCase
+  def minimum_data
+    {
+      "datasets" => [],
+    }
+  end
+
+  class OptionTest < self
+    def setup
+    end
+
+    def create_catalog(options)
+      super(minimum_data.merge("options" => options), "base-path")
+    end
+
+    def test_nonexistent
+      catalog = create_catalog({})
+      assert_nil(catalog.option("nonexistent"))
+    end
+
+    def test_existent
+      catalog = create_catalog("plugins" => ["crud", "groonga"])
+      assert_equal(["crud", "groonga"],
+                   catalog.option("plugins"))
+    end
+  end
+
   def setup
     data = JSON.parse(File.read(catalog_path))
     @catalog = create_catalog(data, base_path)
-  end
-
-  def test_option
-    assert_equal(["for_global"], @catalog.option("plugins"))
   end
 
   def test_get_partitions
@@ -107,9 +129,6 @@ class CatalogTest < Test::Unit::TestCase
     end
 
     def options(data)
-      minimum_data = {
-        "datasets" => [],
-      }
       catalog = create_catalog(minimum_data.merge(data), "base-path")
       catalog.input_adapter_options
     end
@@ -160,9 +179,6 @@ class CatalogTest < Test::Unit::TestCase
     end
 
     def options(data)
-      minimum_data = {
-        "datasets" => [],
-      }
       catalog = create_catalog(minimum_data.merge(data), "base-path")
       catalog.output_adapter_options
     end
