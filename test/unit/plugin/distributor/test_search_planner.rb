@@ -267,11 +267,11 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
 
       def test_dependencies
-        search_reduce_inputs = [
+        reduce_inputs = [
           "errors",
           "users",
         ]
-        search_gather_inputs = [
+        gather_inputs = [
           "errors_reduced",
           "users_reduced",
         ]
