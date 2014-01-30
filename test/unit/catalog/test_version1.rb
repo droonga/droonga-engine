@@ -16,16 +16,18 @@
 require "droonga/catalog/version1"
 
 class CatalogTest < Test::Unit::TestCase
+  private
   def minimum_data
     {
       "datasets" => [],
     }
   end
 
-  class OptionTest < self
-    def setup
-    end
+  def create_catalog(data, base_path)
+    Droonga::Catalog::Version1.new(data, base_path)
+  end
 
+  class OptionTest < self
     def create_catalog(options)
       super(minimum_data.merge("options" => options), "base-path")
     end
@@ -42,6 +44,7 @@ class CatalogTest < Test::Unit::TestCase
     end
   end
 
+  class PartitionTest < self
   def setup
     data = JSON.parse(File.read(catalog_path))
     @catalog = create_catalog(data, base_path)
@@ -74,11 +77,6 @@ class CatalogTest < Test::Unit::TestCase
                  partitions)
   end
 
-  private
-  def create_catalog(data, base_path)
-    Droonga::Catalog::Version1.new(data, base_path)
-  end
-
   def fixture_path(base_path)
     File.expand_path("../../fixtures/#{base_path}", __FILE__)
   end
@@ -90,13 +88,11 @@ class CatalogTest < Test::Unit::TestCase
   def base_path
     File.dirname(catalog_path)
   end
+  end
 
   class DataSetTest < self
     class RingTest < self
       class TotalWeightTest < self
-        def setup
-        end
-
         def test_three_zones
           dataset = {
             "ring" => {
@@ -125,9 +121,6 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   class InputAdapterOptionsTest < self
-    def setup
-    end
-
     def options(data)
       catalog = create_catalog(minimum_data.merge(data), "base-path")
       catalog.input_adapter_options
@@ -175,9 +168,6 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   class OutputAdapterOptionsTest < self
-    def setup
-    end
-
     def options(data)
       catalog = create_catalog(minimum_data.merge(data), "base-path")
       catalog.output_adapter_options
