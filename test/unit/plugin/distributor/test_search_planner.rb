@@ -54,6 +54,26 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     end
   end
 
+  def expected_dependencies(reduce_inputs, gather_inputs)
+    [
+      {
+        "type"    => "search_reduce",
+        "inputs"  => reduce_inputs,
+        "outputs" => gather_inputs,
+      },
+      {
+        "type"    => "search_gather",
+        "inputs"  => gather_inputs,
+        "outputs" => nil,
+      },
+      {
+        "type"    => "broadcast",
+        "inputs"  => nil,
+        "outputs" => reduce_inputs,
+      },
+    ]
+  end
+
   class MultipleQueriesTest < self
     class MultipleOutputsTest < self
       def setup
@@ -86,35 +106,19 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
 
       def test_dependencies
-        search_reduce_inputs = [
+        reduce_inputs = [
           "errors",
           "query1",
           "query2",
           "query3",
         ]
-        search_gather_inputs = [
+        gather_inputs = [
           "errors_reduced",
           "query1_reduced",
           "query2_reduced",
           "query3_reduced",
         ]
-        assert_equal([
-                       {
-                         "type"    => "search_reduce",
-                         "inputs"  => search_reduce_inputs,
-                         "outputs" => search_gather_inputs,
-                       },
-                       {
-                         "type"    => "search_gather",
-                         "inputs"  => search_gather_inputs,
-                         "outputs" => nil,
-                       },
-                       {
-                         "type"    => "broadcast",
-                         "inputs"  => nil,
-                         "outputs" => search_reduce_inputs,
-                       },
-                     ],
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                      dependencies)
       end
     end
@@ -137,25 +141,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
 
       def test_dependencies
-        search_reduce_inputs = ["errors"]
-        search_gather_inputs = ["errors_reduced"]
-        assert_equal([
-                       {
-                         "type"    => "search_reduce",
-                         "inputs"  => search_reduce_inputs,
-                         "outputs" => search_gather_inputs,
-                       },
-                       {
-                         "type"    => "search_gather",
-                         "inputs"  => search_gather_inputs,
-                         "outputs" => nil,
-                       },
-                       {
-                         "type"    => "broadcast",
-                         "inputs"  => nil,
-                         "outputs" => search_reduce_inputs,
-                       },
-                     ],
+        reduce_inputs = ["errors"]
+        gather_inputs = ["errors_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                      dependencies)
       end
 
@@ -224,23 +212,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "errors_reduced",
           "users_reduced",
         ]
-        assert_equal([
-                       {
-                         "type"    => "search_reduce",
-                         "inputs"  => search_reduce_inputs,
-                         "outputs" => search_gather_inputs,
-                       },
-                       {
-                         "type"    => "search_gather",
-                         "inputs"  => search_gather_inputs,
-                         "outputs" => nil,
-                       },
-                       {
-                         "type"    => "broadcast",
-                         "inputs"  => nil,
-                         "outputs" => search_reduce_inputs,
-                       },
-                     ],
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                      dependencies)
       end
 
