@@ -57,5 +57,8 @@
   },
   "options": {
     "plugins": ["crud", "groonga"]
+  },
+  "input_adapter": {
+    "plugins": ["crud", "groonga"]
   }
 }
