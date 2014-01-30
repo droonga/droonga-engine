@@ -22,6 +22,10 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     planner.messages
   end
 
+  def messages
+    @messages ||= plan(@request)
+  end
+
   def broadcast_message(messages)
     messages.find do |message|
       message["type"] == "broadcast"
@@ -73,6 +77,39 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
             },
           },
         }
+      end
+
+      def test_dependencies
+        search_reduce_inputs = [
+          "errors",
+          "query1",
+          "query2",
+          "query3",
+        ]
+        search_gather_inputs = [
+          "errors_reduced",
+          "query1_reduced",
+          "query2_reduced",
+          "query3_reduced",
+        ]
+        assert_equal([
+                       {
+                         "type"    => "search_reduce",
+                         "inputs"  => search_reduce_inputs,
+                         "outputs" => search_gather_inputs,
+                       },
+                       {
+                         "type"    => "search_gather",
+                         "inputs"  => search_gather_inputs,
+                         "outputs" => nil,
+                       },
+                       {
+                         "type"    => "broadcast",
+                         "inputs"  => nil,
+                         "outputs" => search_reduce_inputs,
+                       },
+                     ],
+                     dependencies(messages))
       end
 
       def test_distribute
@@ -1100,10 +1137,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           },
         },
       }
-    end
-
-    def messages
-      @messages ||= plan(@request)
     end
 
     def test_dependencies
