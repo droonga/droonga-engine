@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -73,6 +73,12 @@ class SearchDistributorTest < Test::Unit::TestCase
     message << {
       "type" => "search_reduce",
       "body" => {
+        "errors" => {
+          "errors_reduced" => {
+            "limit" => -1,
+            "type"  => "sum",
+          },
+        },
         "query1" => {
           "query1_reduced" => {
             "count" => {
@@ -85,13 +91,6 @@ class SearchDistributorTest < Test::Unit::TestCase
             },
           },
         },
-      },
-      "inputs" => ["query1"],
-      "outputs" => ["query1_reduced"],
-    }
-    message << {
-      "type" => "search_reduce",
-      "body" => {
         "query2" => {
           "query2_reduced" => {
             "count" => {
@@ -104,13 +103,6 @@ class SearchDistributorTest < Test::Unit::TestCase
             },
           },
         },
-      },
-      "inputs" => ["query2"],
-      "outputs" => ["query2_reduced"],
-    }
-    message << {
-      "type" => "search_reduce",
-      "body" => {
         "query3" => {
           "query3_reduced" => {
             "count" => {
@@ -124,13 +116,16 @@ class SearchDistributorTest < Test::Unit::TestCase
           },
         },
       },
-      "inputs" => ["query3"],
-      "outputs" => ["query3_reduced"],
+      "inputs" => ["errors", "query1", "query2", "query3"],
+      "outputs" => ["errors_reduced", "query1_reduced", "query2_reduced", "query3_reduced"],
     }
 
     gatherer = {
       "type" => "search_gather",
       "body" => {
+        "errors_reduced" => {
+          "output" => "errors",
+        },
         "query1_reduced" => {
           "output" => "query1",
           "elements" => {
@@ -169,6 +164,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         },
       },
       "inputs" => [
+        "errors_reduced",
         "query1_reduced",
         "query2_reduced",
         "query3_reduced",
@@ -216,6 +212,7 @@ class SearchDistributorTest < Test::Unit::TestCase
         },
       },
       "outputs" => [
+        "errors",
         "query1",
         "query2",
         "query3",
