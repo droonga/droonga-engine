@@ -22,6 +22,28 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     planner.messages
   end
 
+  def broadcast_message(messages)
+    messages.find do |message|
+      message["type"] == "broadcast"
+    end
+  end
+
+  def gather_message(messages)
+    messages.find do |message|
+      message["type"] == "search_gather"
+    end
+  end
+
+  def dependencies(messages)
+    messages.collect do |message|
+      {
+        "type"    => message["type"],
+        "inputs"  => message["inputs"],
+        "outputs" => message["outputs"],
+      }
+    end
+  end
+
   class MultipleQueriesTest < self
     class MultipleOutputsTest < self
       def setup
@@ -1108,6 +1130,82 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       searcher["outputs"] = outputs
       searcher["replica"] = "random"
       searcher
+    end
+  end
+
+  class FormatTest < self
+    def setup
+      @output = {
+        "format"     => "complex",
+        "elements"   => ["records"],
+        "attributes" => ["_id"],
+        "offset"     => 0,
+        "limit"      => 10,
+      }
+      @request = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "users" => {
+              "source" => "User",
+              "output" => @output,
+            },
+          },
+        },
+      }
+    end
+
+    def messages
+      @messages ||= plan(@request)
+    end
+
+    def test_dependencies
+      assert_equal([
+                     {
+                       "type"    => "search_reduce",
+                       "inputs"  => ["errors", "users"],
+                       "outputs" => ["errors_reduced", "users_reduced"],
+                     },
+                     {
+                       "type"    => "search_gather",
+                       "inputs"  => ["errors_reduced", "users_reduced"],
+                       "outputs" => nil,
+                     },
+                     {
+                       "type"    => "broadcast",
+                       "inputs"  => nil,
+                       "outputs" => ["errors", "users"],
+                     },
+                   ],
+                   dependencies(messages))
+    end
+
+    def test_broadcast_body
+      changed_output_parameters = {
+        "format" => "simple"
+      }
+      assert_equal({
+                     "queries" => {
+                       "users" => {
+                         "source" => "User",
+                         "output" => @output.merge(changed_output_parameters),
+                       },
+                     },
+                   },
+                   broadcast_message(messages)["body"])
+    end
+
+    def test_gather_records
+      records = @output.merge("type" => "sort")
+      records.delete("elements")
+      assert_equal({
+                     "elements" => {
+                       "records" => records,
+                     },
+                     "output" => "users",
+                   },
+                   gather_message(messages)["body"]["users_reduced"])
     end
   end
 end
