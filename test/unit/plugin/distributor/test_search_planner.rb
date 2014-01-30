@@ -32,6 +32,12 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     end
   end
 
+  def reduce_message(messages)
+    messages.find do |message|
+      message["type"] == "search_reduce"
+    end
+  end
+
   def gather_message(messages)
     messages.find do |message|
       message["type"] == "search_gather"
@@ -114,31 +120,80 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     end
   end
 
-  class SingleQueryTest < self
-    def test_no_output
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "no_output" => {
-              "source" => "User",
-              "sortBy" => {
-                "keys" => ["name"],
-                "offset" => 0,
-                "limit" => 1,
+  class OutputTest < self
+    class NothingTest < self
+      def setup
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "no_output" => {
+                "source" => "User",
               },
             },
           },
-        },
-      }
+        }
+      end
 
-      expected_plan = []
-      expected_plan << gatherer(request, :no_output => true)
-      expected_plan << searcher(request, :no_output => true)
-      assert_equal(expected_plan, plan(request))
+      def test_dependencies
+        search_reduce_inputs = ["errors"]
+        search_gather_inputs = ["errors_reduced"]
+        assert_equal([
+                       {
+                         "type"    => "search_reduce",
+                         "inputs"  => search_reduce_inputs,
+                         "outputs" => search_gather_inputs,
+                       },
+                       {
+                         "type"    => "search_gather",
+                         "inputs"  => search_gather_inputs,
+                         "outputs" => nil,
+                       },
+                       {
+                         "type"    => "broadcast",
+                         "inputs"  => nil,
+                         "outputs" => search_reduce_inputs,
+                       },
+                     ],
+                     dependencies(messages))
+      end
+
+      def test_broadcast_body
+        assert_equal({
+                       "queries" => {
+                         "no_output" => {
+                           "source" => "User",
+                         },
+                       },
+                     },
+                     broadcast_message(messages)["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "errors" => {
+                         "errors_reduced" => {
+                           "type"  => "sum",
+                           "limit" => -1,
+                         },
+                       },
+                     },
+                     reduce_message(messages)["body"])
+      end
+
+      def test_gather_body
+        assert_equal({
+                       "errors_reduced" => {
+                         "output" => "errors",
+                       },
+                     },
+                     gather_message(messages)["body"])
+      end
     end
+  end
 
+  class SingleQueryTest < self
     def test_no_records_element
       request = {
         "type" => "search",
