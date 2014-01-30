@@ -55,10 +55,10 @@
       }
     }
   },
-  "options": {
+  "input_adapter": {
     "plugins": ["crud", "groonga"]
   },
-  "input_adapter": {
+  "output_adapter": {
     "plugins": ["crud", "groonga"]
   }
 }

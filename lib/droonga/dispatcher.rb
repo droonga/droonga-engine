@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,7 @@ module Droonga
       @input_adapter =
         InputAdapter.new(self, Droonga.catalog.input_adapter_options)
       @output_adapter =
-        OutputAdapter.new(self, :plugins => Droonga.catalog.option("plugins"))
+        OutputAdapter.new(self, Droonga.catalog.output_adapter_options)
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)

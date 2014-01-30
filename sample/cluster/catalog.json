@@ -38,10 +38,10 @@
       }
     }
   },
-  "options": {
+  "input_adapter": {
     "plugins": ["groonga"]
   },
-  "input_adapter": {
+  "output_adapter": {
     "plugins": ["groonga"]
   }
 }

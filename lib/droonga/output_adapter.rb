@@ -17,15 +17,17 @@
 
 require "droonga/pluggable"
 require "droonga/output_adapter_plugin"
+require "droonga/output_adapter_options"
 require "droonga/output_message"
 
 module Droonga
   class OutputAdapter
     include Pluggable
 
-    def initialize(dispatcher, options={})
+    def initialize(dispatcher, options=nil)
       @dispatcher = dispatcher
-      load_plugins(options[:plugins] || [])
+      @options = options || OutputAdapterOptions
+      load_plugins(@options.plugins)
     end
 
     def adapt(message)
