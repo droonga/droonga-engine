@@ -18,6 +18,7 @@ require "droonga/plugin/distributor/distributed_search_planner"
 class DistributedSearchPlannerTest < Test::Unit::TestCase
   def plan(search_request)
     planner = Droonga::DistributedSearchPlanner.new(search_request)
+    planner.build_messages
     planner.messages
   end
 
