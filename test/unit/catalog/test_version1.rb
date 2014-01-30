@@ -45,49 +45,49 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   class PartitionTest < self
-  def setup
-    data = JSON.parse(File.read(catalog_path))
-    @catalog = create_catalog(data, base_path)
-  end
+    def setup
+      data = JSON.parse(File.read(catalog_path))
+      @catalog = create_catalog(data, base_path)
+    end
 
-  def test_get_partitions
-    partitions = @catalog.get_partitions("localhost:23003/test")
-    assert_equal({
-                   "localhost:23003/test.000" => {
-                     :database  => "#{base_path}/000/db",
-                     :handlers  => ["for_dataset"],
-                     :n_workers => 0
+    def test_get_partitions
+      partitions = @catalog.get_partitions("localhost:23003/test")
+      assert_equal({
+                     "localhost:23003/test.000" => {
+                       :database  => "#{base_path}/000/db",
+                       :handlers  => ["for_dataset"],
+                       :n_workers => 0
+                     },
+                     "localhost:23003/test.001" => {
+                       :database  => "#{base_path}/001/db",
+                       :handlers  => ["for_dataset"],
+                       :n_workers => 0
+                     },
+                     "localhost:23003/test.002" => {
+                       :database  => "#{base_path}/002/db",
+                       :handlers  => ["for_dataset"],
+                       :n_workers => 0
+                     },
+                     "localhost:23003/test.003" => {
+                       :database  => "#{base_path}/003/db",
+                       :handlers  => ["for_dataset"],
+                       :n_workers => 0
+                     },
                    },
-                   "localhost:23003/test.001" => {
-                     :database  => "#{base_path}/001/db",
-                     :handlers  => ["for_dataset"],
-                     :n_workers => 0
-                   },
-                   "localhost:23003/test.002" => {
-                     :database  => "#{base_path}/002/db",
-                     :handlers  => ["for_dataset"],
-                     :n_workers => 0
-                   },
-                   "localhost:23003/test.003" => {
-                     :database  => "#{base_path}/003/db",
-                     :handlers  => ["for_dataset"],
-                     :n_workers => 0
-                   },
-                 },
-                 partitions)
-  end
+                   partitions)
+    end
 
-  def fixture_path(base_path)
-    File.expand_path("../../fixtures/#{base_path}", __FILE__)
-  end
+    def fixture_path(base_path)
+      File.expand_path("../../fixtures/#{base_path}", __FILE__)
+    end
 
-  def catalog_path
-    @catalog_path ||= fixture_path("catalog/version1.json")
-  end
+    def catalog_path
+      @catalog_path ||= fixture_path("catalog/version1.json")
+    end
 
-  def base_path
-    File.dirname(catalog_path)
-  end
+    def base_path
+      File.dirname(catalog_path)
+    end
   end
 
   class DataSetTest < self
