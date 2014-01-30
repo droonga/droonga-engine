@@ -21,10 +21,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     planner.messages
   end
 
-  def assert_planned(expected, search_request)
-    assert_equal(expected, plan(search_request))
-  end
-
   class MultipleQueriesTest < self
     def test_distribute
       request = {
@@ -222,7 +218,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       }
       expected_plan << searcher
 
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
   end
 
@@ -248,7 +244,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan = []
       expected_plan << gatherer(request, :no_output => true)
       expected_plan << searcher(request, :no_output => true)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_no_records_element
@@ -281,7 +277,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan << gatherer(request)
       expected_plan << searcher(request, :sort_limit => 1,
                                          :output_limit => 0)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_no_output_limit
@@ -310,7 +306,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan << gatherer(request)
       expected_plan << searcher(request, :output_offset => 0,
                                          :output_limit => 0)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_records
@@ -351,7 +347,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          })
       expected_plan << searcher(request, :output_offset => 0,
                                          :output_limit => 1)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_output_offset
@@ -392,7 +388,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          })
       expected_plan << searcher(request, :output_offset => 0,
                                          :output_limit => 2)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_simple_sortBy
@@ -436,7 +432,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          })
       expected_plan << searcher(request, :output_offset => 0,
                                          :output_limit => 1)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy
@@ -484,7 +480,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => 1,
                                          :output_offset => 0,
                                          :output_limit => 1)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_offset_limit
@@ -536,7 +532,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => sort_limit,
                                          :output_offset => 0,
                                          :output_limit => output_limit)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_with_infinity_output_limit
@@ -587,7 +583,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => limit,
                                          :output_offset => 0,
                                          :output_limit => limit)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_with_infinity_sort_limit
@@ -638,7 +634,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => limit,
                                          :output_offset => 0,
                                          :output_limit => limit)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_with_infinity_limit
@@ -688,7 +684,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => -1,
                                          :output_offset => 0,
                                          :output_limit => -1)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_with_multiple_sort_keys
@@ -737,7 +733,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :sort_limit => -1,
                                          :output_offset => 0,
                                          :output_limit => -1)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_have_sortBy_with_missing_sort_attributes
@@ -787,7 +783,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :output_offset => 0,
                                          :output_limit => -1,
                                          :extra_attributes => ["public_age", "public_name"])
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_hash_attributes
@@ -841,7 +837,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :output_offset => 0,
                                          :output_limit => -1,
                                          :extra_attributes => ["public_age", "public_name"])
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_groupBy
@@ -884,7 +880,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan << searcher(request, :output_offset => 0,
                                          :output_limit => -1,
                                          :unifiable => true)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_groupBy_count
@@ -928,7 +924,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :extra_attributes => ["_key"],
                                          :extra_elements => ["records"],
                                          :unifiable => true)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     def test_groupBy_hash
@@ -981,7 +977,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                                          :output_limit => -1,
                                          :extra_attributes => ["_key"],
                                          :unifiable => true)
-      assert_planned(expected_plan, request)
+      assert_equal(expected_plan, plan(request))
     end
 
     private
