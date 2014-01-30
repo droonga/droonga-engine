@@ -180,6 +180,69 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
+    class ElementsTest < self
+      class CountTest < self
+        def setup
+          @request = {
+            "type" => "search",
+            "dataset" => "Droonga",
+            "body" => {
+              "queries" => {
+                "users" => {
+                  "source" => "User",
+                  "output" => {
+                    "elements" => ["count"],
+                  },
+                },
+              },
+            },
+          }
+        end
+
+        def test_dependencies
+          reduce_inputs = ["errors", "users"]
+          gather_inputs = ["errors_reduced", "users_reduced"]
+          assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                       dependencies)
+        end
+
+        def test_broadcast_body
+          assert_equal({
+                         "queries" => {
+                           "users" => {
+                             "output" => {
+                               "elements" => ["count"],
+                               "format"   => "simple", # TODO: remove me
+                               "limit"    => 0,        # TODO: remove me
+                             },
+                             "source" => "User",
+                           },
+                         },
+                       },
+                       broadcast_message["body"])
+        end
+
+        def test_reduce_body
+          assert_equal({
+                         "users_reduced" => {
+                           "count" => {
+                             "type" => "sum",
+                           },
+                         },
+                       },
+                       reduce_message["body"]["users"])
+        end
+
+        def test_gather_body
+          assert_equal({
+                         "elements" => {}, # TODO: remove me
+                         "output" => "users",
+                       },
+                       gather_message["body"]["users_reduced"])
+        end
+      end
+    end
+
     class FormatTest < self
       def setup
         @output = {
@@ -246,39 +309,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   class SingleQueryTest < self
-    def test_no_records_element
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "no_records" => {
-              "source" => "User",
-              "sortBy" => {
-                "keys" => ["name"],
-                "offset" => 0,
-                "limit" => 1,
-              },
-              "output" => {
-                "elements" => ["count"],
-              },
-            },
-          },
-        },
-      }
-
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "count" => {
-          "type" => "sum",
-        },
-      })
-      expected_plan << gatherer(request)
-      expected_plan << searcher(request, :sort_limit => 1,
-                                         :output_limit => 0)
-      assert_equal(expected_plan, plan(request))
-    end
-
     def test_no_output_limit
       request = {
         "type" => "search",
