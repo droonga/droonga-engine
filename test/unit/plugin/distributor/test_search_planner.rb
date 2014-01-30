@@ -68,6 +68,12 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       expected_plan << {
         "type" => "search_reduce",
         "body" => {
+          "errors" => {
+            "errors_reduced" => {
+              "limit" => -1,
+              "type"  => "sum",
+            }
+          },
           "query1" => {
             "query1_reduced" => {
               "count" => {
@@ -80,13 +86,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
               },
             },
           },
-        },
-        "inputs" => ["query1"],
-        "outputs" => ["query1_reduced"],
-      }
-      expected_plan << {
-        "type" => "search_reduce",
-        "body" => {
           "query2" => {
             "query2_reduced" => {
               "count" => {
@@ -99,13 +98,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
               },
             },
           },
-        },
-        "inputs" => ["query2"],
-        "outputs" => ["query2_reduced"],
-      }
-      expected_plan << {
-        "type" => "search_reduce",
-        "body" => {
           "query3" => {
             "query3_reduced" => {
               "count" => {
@@ -119,13 +111,26 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
             },
           },
         },
-        "inputs" => ["query3"],
-        "outputs" => ["query3_reduced"],
+        "inputs" => [
+          "errors",
+          "query1",
+          "query2",
+          "query3",
+        ],
+        "outputs" => [
+          "errors_reduced",
+          "query1_reduced",
+          "query2_reduced",
+          "query3_reduced",
+        ],
       }
 
       gatherer = {
         "type" => "search_gather",
         "body" => {
+          "errors_reduced" => {
+            "output" => "errors",
+          },
           "query1_reduced" => {
             "output" => "query1",
             "elements" => {
@@ -164,6 +169,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           },
         },
         "inputs" => [
+          "errors_reduced",
           "query1_reduced",
           "query2_reduced",
           "query3_reduced",
@@ -211,6 +217,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           },
         },
         "outputs" => [
+          "errors",
           "query1",
           "query2",
           "query3",
