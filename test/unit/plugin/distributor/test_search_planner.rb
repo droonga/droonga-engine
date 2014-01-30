@@ -16,10 +16,13 @@
 require "droonga/plugin/distributor/distributed_search_planner"
 
 class DistributedSearchPlannerTest < Test::Unit::TestCase
+  def plan(search_request)
+    planner = Droonga::DistributedSearchPlanner.new(search_request)
+    planner.messages
+  end
+
   def assert_planned(expected, search_request)
-    plan = Droonga::DistributedSearchPlanner.new(search_request)
-    actual = plan.messages
-    assert_equal(expected, actual)
+    assert_equal(expected, plan(search_request))
   end
 
   class MultipleQueriesTest < self
