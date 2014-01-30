@@ -23,8 +23,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   class MultipleQueriesTest < self
-    def test_distribute
-      request = {
+    def setup
+      @request = {
         "type" => "search",
         "dataset" => "Droonga",
         "body" => {
@@ -62,7 +62,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           },
         },
       }
+    end
 
+    def test_distribute
       expected_plan = []
 
       expected_plan << {
@@ -226,7 +228,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       }
       expected_plan << searcher
 
-      assert_equal(expected_plan, plan(request))
+      assert_equal(expected_plan, plan(@request))
     end
   end
 
