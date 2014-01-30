@@ -55,31 +55,19 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
               "query1" => {
                 "source" => "User",
                 "output" => {
-                  "format" => "complex",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 10,
+                  "elements" => ["count"],
                 },
               },
               "query2" => {
                 "source" => "User",
                 "output" => {
-                  "format" => "complex",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 20,
+                  "elements" => ["count"],
                 },
               },
               "query3" => {
                 "source" => "User",
                 "output" => {
-                  "format" => "complex",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 30,
+                  "elements" => ["count"],
                 },
               },
             },
@@ -104,11 +92,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                 "count" => {
                   "type" => "sum",
                 },
-                "records" => {
-                  "type" => "sort",
-                  "operators" => [],
-                  "limit" => 10,
-                },
               },
             },
             "query2" => {
@@ -116,22 +99,12 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                 "count" => {
                   "type" => "sum",
                 },
-                "records" => {
-                  "type" => "sort",
-                  "operators" => [],
-                  "limit" => 20,
-                },
               },
             },
             "query3" => {
               "query3_reduced" => {
                 "count" => {
                   "type" => "sum",
-                },
-                "records" => {
-                  "type" => "sort",
-                  "operators" => [],
-                  "limit" => 30,
                 },
               },
             },
@@ -159,37 +132,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
             "query1_reduced" => {
               "output" => "query1",
               "elements" => {
-                "records" => {
-                  "type" => "sort",
-                  "offset" => 0,
-                  "limit" => 10,
-                  "format" => "complex",
-                  "attributes" => [],
-                },
               },
             },
             "query2_reduced" => {
               "output" => "query2",
               "elements" => {
-                "records" => {
-                  "type" => "sort",
-                  "offset" => 0,
-                  "limit" => 20,
-                  "format" => "complex",
-                  "attributes" => [],
-                },
               },
             },
             "query3_reduced" => {
               "output" => "query3",
               "elements" => {
-                "records" => {
-                  "type" => "sort",
-                  "offset" => 0,
-                  "limit" => 30,
-                  "format" => "complex",
-                  "attributes" => [],
-                },
               },
             },
           },
@@ -213,30 +165,24 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                 "source" => "User",
                 "output" => {
                   "format" => "simple",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 10,
+                  "elements" => ["count"],
+                  "limit" => 0,
                 },
               },
               "query2" => {
                 "source" => "User",
                 "output" => {
                   "format" => "simple",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 20,
+                  "elements" => ["count"],
+                  "limit" => 0,
                 },
               },
               "query3" => {
                 "source" => "User",
                 "output" => {
                   "format" => "simple",
-                  "elements" => ["count", "records"],
-                  "attributes" => [],
-                  "offset" => 0,
-                  "limit" => 30,
+                  "elements" => ["count"],
+                  "limit" => 0,
                 },
               },
             },
