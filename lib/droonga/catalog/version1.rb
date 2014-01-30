@@ -21,12 +21,18 @@ module Droonga
       def initialize(*args)
         super
         normalize_input_adapter
+        normalize_output_adapter
       end
 
       private
       def normalize_input_adapter
         @data["input_adapter"] ||= {}
         @data["input_adapter"]["plugins"] ||= @options["plugins"]
+      end
+
+      def normalize_output_adapter
+        @data["output_adapter"] ||= {}
+        @data["output_adapter"]["plugins"] ||= @options["plugins"]
       end
     end
   end

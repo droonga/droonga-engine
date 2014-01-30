@@ -154,4 +154,57 @@ class CatalogTest < Test::Unit::TestCase
       end
     end
   end
+
+  class OutputAdapterOptionsTest < self
+    def setup
+    end
+
+    def options(data)
+      minimum_data = {
+        "datasets" => [],
+      }
+      catalog = create_catalog(minimum_data.merge(data), "base-path")
+      catalog.output_adapter_options
+    end
+
+    class PluginsTest < self
+      def plugins(data)
+        options(data).plugins
+      end
+
+      def test_nothing
+        assert_equal([], plugins({}))
+      end
+
+      def test_options
+        data = {
+          "options" => {
+            "plugins" => ["groonga"],
+          }
+        }
+        assert_equal(["groonga"], plugins(data))
+      end
+
+      def test_output_adapter
+        data = {
+          "output_adapter" => {
+            "plugins" => ["groonga"],
+          }
+        }
+        assert_equal(["groonga"], plugins(data))
+      end
+
+      def test_options_and_output_adapter
+        data = {
+          "options" => {
+            "plugins" => ["basic"],
+          },
+          "output_adapter" => {
+            "plugins" => ["groonga"],
+          }
+        }
+        assert_equal(["groonga"], plugins(data))
+      end
+    end
+  end
 end

@@ -17,6 +17,7 @@ require "digest/sha1"
 require "zlib"
 require "droonga/message_processing_error"
 require "droonga/input_adapter_options"
+require "droonga/output_adapter_options"
 
 module Droonga
   module Catalog
@@ -137,6 +138,10 @@ module Droonga
 
       def input_adapter_options
         InputAdapterOptions.new(@data["input_adapter"])
+      end
+
+      def output_adapter_options
+        OutputAdapterOptions.new(@data["output_adapter"])
       end
 
       private
