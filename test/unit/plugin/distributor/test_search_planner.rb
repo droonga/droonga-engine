@@ -1396,7 +1396,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       def setup
         @output = {
           "elements"   => ["records"],
-          "attributes" => ["_key", "_nsubrecs"],
+          "attributes" => ["_nsubrecs", "_key"],
           "limit"      => 1,
         }
         @group_by = "family_name"
@@ -1444,7 +1444,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "records" => {
                            "type"      => "sort",
                            "operators" => [],
-                          "key_column" => 0,
+                          "key_column" => 1,
                            "limit"     => 1,
                          },
                        },
@@ -1456,7 +1456,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         assert_equal({
                        "elements" => {
                          "records" => {
-                           "attributes" => ["_key", "_nsubrecs"],
+                           "attributes" => ["_nsubrecs", "_key"],
                            "limit"      => 1,
                          },
                        },
