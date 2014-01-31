@@ -554,8 +554,10 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      gather_message["body"]["users_reduced"])
       end
     end
+  end
 
-    class SimpleSortByTest < self
+  class SortByTest < self
+    class SimpleTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -626,7 +628,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class SimpleSortByHiddenColumnTest < self
+    class SimpleHiddenColumnTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -700,7 +702,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class ComplexSortByTest < self
+    class ComplexTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -778,7 +780,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class ComplexSortByHiddenColumnTest < self
+    class ComplexHiddenColumnTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -859,7 +861,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class ComplexSortWithHashAttributesTest < self
+    class WithHashAttributesTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -947,7 +949,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class ComplexSortByMultipleColumnsTest < self
+    class MultipleColumnsTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -1030,7 +1032,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class ComplexSortByOffsetLimitTest < self
+    class OffsetLimitTest < self
       def max_limit
         [@sort_by["limit"], @output["limit"]].max
       end
@@ -1387,6 +1389,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         end
       end
     end
+  end
+
+  class GroupByTest < self
   end
 
 
