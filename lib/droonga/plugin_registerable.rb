@@ -54,6 +54,10 @@ module Droonga
       @command_repository.register(command)
     end
 
+    def commands
+      @command_repository.commands
+    end
+
     def find_command(message)
       @command_repository.find(message)
     end

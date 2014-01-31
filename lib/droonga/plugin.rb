@@ -40,11 +40,16 @@ module Droonga
 
     private
     def run_command(command, *arguments)
-      __send__(self.class.method_name(command), *arguments)
+      if command.is_a?(Command)
+        method_name = command.method_name
+      else
+        method_name = self.class.method_name(command)
+      end
+      __send__(method_name, *arguments)
     end
 
     def process_error(command, error, arguments)
-      Logger.error("error while processing #{command}",
+      Logger.error("error while processing: <#{command}>",
                    error,
                    :arguments => arguments)
     end

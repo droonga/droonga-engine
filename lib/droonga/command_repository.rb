@@ -15,6 +15,7 @@
 
 module Droonga
   class CommandRepository
+    attr_reader :commands
     def initialize
       @commands = []
     end

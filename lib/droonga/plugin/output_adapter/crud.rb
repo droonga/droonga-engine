@@ -19,8 +19,9 @@ module Droonga
   class CRUDOutputAdapter < Droonga::OutputAdapterPlugin
     repository.register("crud", self)
 
-    command :crud_generic_response
-    def crud_generic_response(output_message)
+    command :convert_success,
+            :patterns => [["replyTo.type", :equal, "add.result"]]
+    def convert_success(output_message)
       if output_message.body.include?("success")
         success = output_message.body["success"]
         unless success.nil?

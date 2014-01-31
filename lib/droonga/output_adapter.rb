@@ -37,14 +37,26 @@ module Droonga
       adapt_errors(output_message)
       adapted_message = output_message.adapted_message
 
-      message["via"].reverse_each do |command|
+      if message["via"].empty?
         @plugins.each do |plugin|
-          next unless plugin.processable?(command)
-          output_message = OutputMessage.new(adapted_message)
-          process(command, output_message)
-          adapted_message = output_message.adapted_message
+          plugin.class.commands.each do |command|
+            next unless command.match?(adapted_message)
+            output_message = OutputMessage.new(adapted_message)
+            plugin.process(command, output_message)
+            adapted_message = output_message.adapted_message
+          end
+        end
+      else
+        message["via"].reverse_each do |command|
+          @plugins.each do |plugin|
+            next unless plugin.processable?(command)
+            output_message = OutputMessage.new(adapted_message)
+            process(command, output_message)
+            adapted_message = output_message.adapted_message
+          end
         end
       end
+
       adapted_message
     end
 
