@@ -86,9 +86,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     class MultipleOutputsTest < self
       def setup
         @request = {
-          "type" => "search",
+          "type"    => "search",
           "dataset" => "Droonga",
-          "body" => {
+          "body"    => {
             "queries" => {
               "query1" => {
                 "source" => "User",
@@ -143,9 +143,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   class BasicTest < self
     def setup
       @request = {
-        "type" => "search",
+        "type"    => "search",
         "dataset" => "Droonga",
-        "body" => {
+        "body"    => {
           "queries" => {
             "no_output" => {
               "source" => "User",
@@ -188,9 +188,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     class NoOutputTest < self
       def setup
         @request = {
-          "type" => "search",
+          "type"    => "search",
           "dataset" => "Droonga",
-          "body" => {
+          "body"    => {
             "queries" => {
               "users" => {
                 "source" => "User",
@@ -223,14 +223,14 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     class NoOutputLimitTest < self
       def setup
         @request = {
-          "type" => "search",
+          "type"    => "search",
           "dataset" => "Droonga",
-          "body" => {
+          "body"    => {
             "queries" => {
               "users" => {
                 "source" => "User",
                 "output" => {
-                  "format" => "complex",
+                  "format"   => "complex",
                   "elements" => ["count", "records"],
                 },
               },
@@ -253,7 +253,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "users" => {
                            "source" => "User",
                            "output" => {
-                             "format" => "simple",
+                             "format"   => "simple",
                              "elements" => ["count", "records"],
                            },
                          },
@@ -285,9 +285,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       class CountTest < self
         def setup
           @request = {
-            "type" => "search",
+            "type"    => "search",
             "dataset" => "Droonga",
-            "body" => {
+            "body"    => {
               "queries" => {
                 "users" => {
                   "source" => "User",
@@ -344,16 +344,16 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       class RecordsTest < self
         def setup
           @request = {
-            "type" => "search",
+            "type"    => "search",
             "dataset" => "Droonga",
-            "body" => {
+            "body"    => {
               "queries" => {
                 "users" => {
                   "source" => "User",
                   "output" => {
-                    "elements" => ["records"],
-                    "attributes" => ["_key", "name", "age"],
-                    "limit" => 1,
+                    "elements"   => ["records"],
+                    "attributes" => ["_key"],
+                    "limit"      => 1,
                   },
                 },
               },
@@ -374,9 +374,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                          "queries" => {
                            "users" => {
                              "output" => {
-                               "elements" => ["records"],
-                               "attributes" => ["_key", "name", "age"],
-                               "limit" => 1,
+                               "elements"   => ["records"],
+                               "attributes" => ["_key"],
+                               "limit"      => 1,
                              },
                              "source" => "User",
                            },
@@ -389,9 +389,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           assert_equal({
                          "users_reduced" => {
                            "records" => {
-                             "type" => "sort",
+                             "type"      => "sort",
                              "operators" => [],
-                             "limit" => 1,
+                             "limit"     => 1,
                            },
                          },
                        },
@@ -402,7 +402,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           assert_equal({
                        "elements" => {
                          "records" => {
-                           "attributes" => ["_key", "name", "age"],
+                           "attributes" => ["_key"],
                            "limit"      => 1,
                          },
                        },
@@ -423,9 +423,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "limit"      => 10,
         }
         @request = {
-          "type" => "search",
+          "type"    => "search",
           "dataset" => "Droonga",
-          "body" => {
+          "body"    => {
             "queries" => {
               "users" => {
                 "source" => "User",
