@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@ require_relative "helper/fixture"
 require_relative "helper/stub_worker"
 require_relative "helper/plugin_helper"
 require_relative "helper/watch_helper"
+require_relative "helper/distributed_search_planner_helper"
 
 class Test::Unit::TestCase
   include Sandbox
