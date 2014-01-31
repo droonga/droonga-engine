@@ -232,7 +232,6 @@ module Droonga
           @query["sortBy"]["limit"] = -1 if @query["sortBy"].is_a?(Hash)
           @output["limit"] = -1
           mapper = {
-            "type" => "count",
             "target" => "records",
           }
           unless @output["elements"].include?("records")
