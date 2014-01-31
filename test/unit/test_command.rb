@@ -79,5 +79,21 @@ class CommandTest < Test::Unit::TestCase
                             }))
       end
     end
+
+    class IncludeTest < self
+      def test_include
+        assert_true(match?([["type", :include?, "table_create", "table_remove"]],
+                           {
+                             "type" => "table_remove"
+                           }))
+      end
+
+      def test_not_included
+        assert_false(match?([["type", :include?, "table_create", "table_remove"]],
+                            {
+                              "type" => "column_create",
+                            }))
+      end
+    end
   end
 end
