@@ -253,8 +253,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                            "users" => {
                              "output" => {
                                "elements" => ["count"],
-                               "format"   => "simple", # TODO: remove me
-                               "limit"    => 0,        # TODO: remove me
                              },
                              "source" => "User",
                            },
@@ -276,7 +274,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
         def test_gather_body
           assert_equal({
-                         "elements" => {}, # TODO: remove me
                          "output" => "users",
                        },
                        gather_message["body"]["users_reduced"])

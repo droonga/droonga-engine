@@ -71,9 +71,12 @@ module Droonga
 
       transformer = QueryTransformer.new(query)
 
+      elements = transformer.mappers
+      mapper = {}
+      mapper["elements"] = elements unless elements.empty?
       reduce(input_name,
              transformer.reducers,
-             "elements" => transformer.mappers)
+             mapper)
     end
 
     def reduce(name, reducer, gatherer={})
@@ -98,7 +101,9 @@ module Droonga
         # So we have to override the format and restore it on the gathering
         # phase.
         @records_format = @output["format"] || "simple"
-        @output["format"] = "simple"
+        if @output["format"] && @output["format"] != "simple"
+          @output["format"] = "simple"
+        end
 
         @sort_keys = @query["sortBy"] || []
         @sort_keys = @sort_keys["keys"] || [] if @sort_keys.is_a?(Hash)
@@ -131,13 +136,22 @@ module Droonga
         @records_offset = final_offset
         @records_limit = final_limit
 
+        updated_sort_limit = nil
+        updated_output_limit = nil
         if final_limit == UNLIMITED
-          @output["limit"] = UNLIMITED
+          updated_output_limit = UNLIMITED
         else
           if rich_sort?
-            @query["sortBy"]["limit"] = final_offset + [sort_limit, output_limit].max
+            updated_sort_limit = final_offset + [sort_limit, output_limit].max
           end
-          @output["limit"] = final_offset + final_limit
+          updated_output_limit = final_offset + final_limit
+        end
+
+        if updated_sort_limit && updated_sort_limit != @query["sortBy"]["limit"]
+          @query["sortBy"]["limit"] = updated_sort_limit
+        end
+        if updated_output_limit && updated_output_limit != @output["limit"]
+          @output["limit"] = updated_output_limit
         end
       end
 
