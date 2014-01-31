@@ -949,6 +949,93 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
+    class WithComplexAttributesArrayTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => [
+            { "label" => "id",        "source" => "_key" },
+            { "label" => "real_name", "source" => "name" },
+          ],
+          "limit"      => 1,
+        }
+        @sort_by = {
+          "keys" => ["name"],
+        }
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "users" => {
+                "source" => "User",
+                "sortBy" => @sort_by,
+                "output" => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "users"]
+        gather_inputs = ["errors_reduced", "users_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_body
+        changed_sort_by_parameters = {
+          "offset" => 0,
+          "limit"  => 1,
+        }
+        changed_output_parameters = {
+          "attributes" => [
+            { "label" => "id",        "source" => "_key" },
+            { "label" => "real_name", "source" => "name" },
+          ],
+        }
+        assert_equal({
+                       "queries" => {
+                         "users" => {
+                           "source" => "User",
+                           "sortBy" => @sort_by.merge(changed_sort_by_parameters),
+                           "output" => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "users_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [
+                             { "column" => 1, "operator" => "<" },
+                           ],
+                           "limit"     => 1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["users"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["id", "real_name"],
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "users",
+                     },
+                     gather_message["body"]["users_reduced"])
+      end
+    end
+
     class MultipleColumnsTest < self
       def setup
         @output = {
