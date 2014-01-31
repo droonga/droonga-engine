@@ -30,9 +30,9 @@ module Droonga
       "table_remove.result",
       "column_create.result",
     ]
-    command :convert_groonga_result,
+    command :convert_generic_result,
             :patterns => [["replyTo.type", :in, *groonga_results]]
-    def convert_groonga_result(output_message)
+    def convert_generic_result(output_message)
       if output_message.body.include?("result")
         output_message.body = output_message.body["result"]
       end
