@@ -560,6 +560,153 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      gather_message["body"]["users_reduced"])
       end
     end
+
+    class SimpleSortByTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => ["_key"],
+          "limit"      => 1,
+        }
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "users" => {
+                "source" => "User",
+                "sortBy" => ["_key"],
+                "output" => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "users"]
+        gather_inputs = ["errors_reduced", "users_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_message
+        assert_valid_broadcast_message
+        assert_equal({
+                       "queries" => {
+                         "users" => {
+                           "source" => "User",
+                           "sortBy" => ["_key"],
+                           "output" => @output,
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "users_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [
+                             { "column" => 0, "operator" => "<" },
+                           ],
+                           "limit"     => 1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["users"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["_key"],
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "users",
+                     },
+                     gather_message["body"]["users_reduced"])
+      end
+    end
+
+    class SimpleSortByHiddenColumnTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => ["_key"],
+          "limit"      => 1,
+        }
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "users" => {
+                "source" => "User",
+                "sortBy" => ["name"],
+                "output" => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "users"]
+        gather_inputs = ["errors_reduced", "users_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_message
+        assert_valid_broadcast_message
+        changed_output_parameters = {
+          "attributes" => ["_key", "name"],
+        }
+        assert_equal({
+                       "queries" => {
+                         "users" => {
+                           "source" => "User",
+                           "sortBy" => ["name"],
+                           "output" => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "users_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [
+                             { "column" => 1, "operator" => "<" },
+                           ],
+                           "limit"     => 1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["users"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["_key"],
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "users",
+                     },
+                     gather_message["body"]["users_reduced"])
+      end
+    end
   end
 
 
