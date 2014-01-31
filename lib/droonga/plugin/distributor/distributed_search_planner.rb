@@ -150,7 +150,7 @@ module Droonga
         if updated_sort_limit && updated_sort_limit != @query["sortBy"]["limit"]
           @query["sortBy"]["limit"] = updated_sort_limit
         end
-        if updated_output_limit && updated_output_limit != @output["limit"]
+        if updated_output_limit && @output["limit"] && updated_output_limit != @output["limit"]
           @output["limit"] = updated_output_limit
         end
       end
