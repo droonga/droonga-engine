@@ -28,21 +28,6 @@ module Droonga
       input_message.command = "search"
       input_message.body = search_request
     end
-
-    command :table_create
-    def table_create(input_message)
-      input_message.add_route("groonga_generic_response")
-    end
-
-    command :table_remove
-    def table_remove(input_message)
-      input_message.add_route("groonga_generic_response")
-    end
-
-    command :column_create
-    def column_create(input_message)
-      input_message.add_route("groonga_generic_response")
-    end
   end
 end
 

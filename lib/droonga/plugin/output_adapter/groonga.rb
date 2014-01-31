@@ -25,8 +25,14 @@ module Droonga
       output_message.body = command.convert(output_message.body)
     end
 
-    command :groonga_generic_response
-    def groonga_generic_response(output_message)
+    groonga_results = [
+      "table_create.result",
+      "table_remove.result",
+      "column_create.result",
+    ]
+    command :convert_groonga_result,
+            :patterns => [["replyTo.type", :include?, *groonga_results]]
+    def convert_groonga_result(output_message)
       if output_message.body.include?("result")
         output_message.body = output_message.body["result"]
       end
