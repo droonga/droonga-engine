@@ -859,7 +859,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class SortByMultipleColumnsTest < self
+    class ComplexSortByMultipleColumnsTest < self
       def setup
         @output = {
           "elements"   => ["records"],
@@ -942,7 +942,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
-    class SortByOffsetLimitTest < self
+    class ComplexSortByOffsetLimitTest < self
       def max_limit
         [@sort_by["limit"], @output["limit"]].max
       end
