@@ -127,160 +127,85 @@ class BasicCollectorTest < Test::Unit::TestCase
     data(
       :int => {
         :expected => 1.5,
-        :value => 1,
-        :source => 2,
+        :left => 1,
+        :right => 2,
       },
       :float => {
         :expected => 1.5,
-        :value => 1.0,
-        :source => 2.0,
+        :left => 1.0,
+        :right => 2.0,
       },
     )
     def test_average(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "average",
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
+      reduced = @plugin.reduce({ "type" => "average" },
+                               data[:left],
+                               data[:right])
+      assert_equal(data[:expected], reduced)
     end
 
     data(
       :true_and_false => {
         :expected => false,
-        :value => true,
-        :source => false,
+        :left => true,
+        :right => false,
       },
       :false_and_true => {
         :expected => false,
-        :value => false,
-        :source => true,
+        :left => false,
+        :right => true,
       },
       :both_true => {
         :expected => true,
-        :value => true,
-        :source => true,
+        :left => true,
+        :right => true,
       },
       :both_false => {
         :expected => false,
-        :value => false,
-        :source => false,
+        :left => false,
+        :right => false,
       },
     )
     def test_and(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "and",
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
+      reduced = @plugin.reduce({ "type" => "and" },
+                               data[:left],
+                               data[:right])
+      assert_equal(data[:expected], reduced)
     end
 
     data(
       :true_and_false => {
         :expected => true,
-        :value => true,
-        :source => false,
+        :left => true,
+        :right => false,
       },
       :false_and_true => {
         :expected => true,
-        :value => false,
-        :source => true,
+        :left => false,
+        :right => true,
       },
       :both_true => {
         :expected => true,
-        :value => true,
-        :source => true,
+        :left => true,
+        :right => true,
       },
       :both_false => {
         :expected => false,
-        :value => false,
-        :source => false,
+        :left => false,
+        :right => false,
       },
     )
     def test_or(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "or",
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
+      reduced = @plugin.reduce({ "type" => "or" },
+                               data[:left],
+                               data[:right])
+      assert_equal(data[:expected], reduced)
     end
 
     data(
       :numeric_values => {
         :expected => 3,
-        :value => 1,
-        :source => 2,
+        :left => 1,
+        :right => 2,
       },
       :numeric_key_records => {
         :expected => [
@@ -291,12 +216,12 @@ class BasicCollectorTest < Test::Unit::TestCase
           create_record(5),
           create_record(6),
         ],
-        :value => [
+        :left => [
           create_record(1),
           create_record(2),
           create_record(3),
         ],
-        :source => [
+        :right => [
           create_record(4),
           create_record(5),
           create_record(6),
@@ -311,124 +236,64 @@ class BasicCollectorTest < Test::Unit::TestCase
           create_record("e"),
           create_record("f"),
         ],
-        :value => [
+        :left => [
           create_record("a"),
           create_record("b"),
           create_record("c"),
         ],
-        :source => [
+        :right => [
           create_record("d"),
           create_record("e"),
           create_record("f"),
         ],
+      },
+      :numeric_values_with_limit => {
+        :expected => 3,
+        :left => 1,
+        :right => 2,
+        :limit => 2,
+      },
+      :numeric_key_records_with_limit => {
+        :expected => [
+          create_record(1),
+          create_record(2),
+        ],
+        :left => [
+          create_record(1),
+          create_record(2),
+          create_record(3),
+        ],
+        :right => [
+          create_record(4),
+          create_record(5),
+          create_record(6),
+        ],
+        :limit => 2,
+      },
+      :string_key_records_with_limit => {
+        :expected => [
+          create_record("a"),
+          create_record("b"),
+        ],
+        :left => [
+          create_record("a"),
+          create_record("b"),
+          create_record("c"),
+        ],
+        :right => [
+          create_record("d"),
+          create_record("e"),
+          create_record("f"),
+        ],
+        :limit => 2,
       },
     )
     def test_sum(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "sum",
-                  "limit" => -1,
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
-    end
-
-    data(
-      :numeric_values => {
-        :expected => 3,
-        :value => 1,
-        :source => 2,
-        :limit => 2,
-      },
-      :numeric_key_records => {
-        :expected => [
-          create_record(1),
-          create_record(2),
-        ],
-        :value => [
-          create_record(1),
-          create_record(2),
-          create_record(3),
-        ],
-        :source => [
-          create_record(4),
-          create_record(5),
-          create_record(6),
-        ],
-        :limit => 2,
-      },
-      :string_key_records => {
-        :expected => [
-          create_record("a"),
-          create_record("b"),
-        ],
-        :value => [
-          create_record("a"),
-          create_record("b"),
-          create_record("c"),
-        ],
-        :source => [
-          create_record("d"),
-          create_record("e"),
-          create_record("f"),
-        ],
-        :limit => 2,
-      },
-    )
-    def test_sum_with_limit(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "sum",
-                  "limit" => data[:limit],
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
+      reduced = @plugin.reduce({ "type" => "sum",
+                                 "limit" => data[:limit] || -1 },
+                               data[:left],
+                               data[:right])
+      assert_equal(data[:expected], reduced)
     end
 
     data(
@@ -441,12 +306,12 @@ class BasicCollectorTest < Test::Unit::TestCase
           create_record(5),
           create_record(6),
         ],
-        :value => [
+        :left => [
           create_record(1),
           create_record(3),
           create_record(5),
         ],
-        :source => [
+        :right => [
           create_record(2),
           create_record(4),
           create_record(6),
@@ -461,83 +326,45 @@ class BasicCollectorTest < Test::Unit::TestCase
           create_record("e"),
           create_record("f"),
         ],
-        :value => [
+        :left => [
           create_record("a"),
           create_record("c"),
           create_record("e"),
         ],
-        :source => [
+        :right => [
           create_record("b"),
           create_record("d"),
           create_record("f"),
         ],
       },
-    )
-    def test_sort(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "sort",
-                  "operators" => [
-                    { "column" => 0, "operator" => "<" },
-                  ],
-                  "limit" => -1,
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
-    end
-
-    data(
-      :numeric_key_records => {
+      :numeric_key_records_with_limit => {
         :expected => [
           create_record(1),
           create_record(2),
         ],
-        :value => [
+        :left => [
           create_record(1),
           create_record(3),
           create_record(5),
         ],
-        :source => [
+        :right => [
           create_record(2),
           create_record(4),
           create_record(6),
         ],
         :limit => 2,
       },
-      :string_key_records => {
+      :string_key_records_with_limit => {
         :expected => [
           create_record("a"),
           create_record("b"),
         ],
-        :value => [
+        :left => [
           create_record("a"),
           create_record("c"),
           create_record("e"),
         ],
-        :source => [
+        :right => [
           create_record("b"),
           create_record("d"),
           create_record("f"),
@@ -545,40 +372,17 @@ class BasicCollectorTest < Test::Unit::TestCase
         :limit => 2,
       },
     )
-    def test_sort_with_limit(data)
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => data[:value],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                  "type" => "sort",
-                  "operators" => [
-                    { "column" => 0, "operator" => "<" },
-                  ],
-                  "limit" => 2,
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => data[:source],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     data[:expected],
-                   ],
-                   @outputs.last)
+    def test_sort(data)
+      reduced = @plugin.reduce({ 
+                                 "type" => "sort",
+                                 "operators" => [
+                                   { "column" => 0, "operator" => "<" },
+                                 ],
+                                 "limit" => data[:limit] || -1,
+                               },
+                               data[:left],
+                               data[:right])
+      assert_equal(data[:expected], reduced)
     end
   end
 
