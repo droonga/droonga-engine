@@ -299,7 +299,7 @@ module Droonga
             case attribute
             when String
               {
-                "label" => key,
+                "label"  => key,
                 "source" => attribute,
               }
             when Hash
@@ -359,12 +359,12 @@ module Droonga
           end
           {
             "operator" => operator,
-            "column" => attributes.index(sort_key),
+            "column"   => attributes.index(sort_key),
           }
         end
 
         reducer = {
-          "type" => "sort",
+          "type"      => "sort",
           "operators" => operators,
         }
         if unifiable? && !key_column_index.nil?
