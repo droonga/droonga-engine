@@ -27,32 +27,24 @@ module Droonga
       if output.is_a?(Hash)
         elements = output["elements"]
         if elements && elements.is_a?(Hash)
-          # phase 1: pre-process
-          elements.each do |element, mapper|
-            case mapper["type"]
-            when "count"
-              result[element] = result[mapper["target"]].size
-            when "sort"
-              # do nothing on this phase!
+          # because "count" mapper requires all records,
+          # I have to apply it at first, before "limit" and "offset" are applied.
+          count_mapper = elements["count"]
+          if count_mapper
+            if count_mapper["no_output"]
+              result.delete("count")
+            else
+              result["count"] = result[count_mapper["target"]].size
             end
           end
-          # phase 2: post-process
-          elements.each do |element, mapper|
-            if mapper["no_output"]
-              result.delete(element)
-              next
-            end
 
-            case mapper["type"]
-            when "count"
-              # do nothing on this phase!
-            when "sort"
-              # because "count" type mapper requires all items of the array,
-              # I have to apply "sort" type mapper later.
-              if result[element]
-                result[element] = apply_output_range(result[element], mapper)
-                result[element] = apply_output_attributes_and_format(result[element], mapper)
-              end
+          records_mapper = elements["records"]
+          if records_mapper && result["records"]
+            if records_mapper["no_output"]
+              result.delete("records")
+            else
+              result["records"] = apply_output_range(result["records"], records_mapper)
+              result["records"] = apply_output_attributes_and_format(result["records"], records_mapper)
             end
           end
         end
