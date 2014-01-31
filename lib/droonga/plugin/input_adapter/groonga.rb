@@ -24,7 +24,6 @@ module Droonga
       command = Select.new
       select_request = input_message.body
       search_request = command.convert(select_request)
-      input_message.add_route("select_response")
       input_message.command = "search"
       input_message.body = search_request
     end

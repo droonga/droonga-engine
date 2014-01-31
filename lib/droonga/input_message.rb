@@ -28,10 +28,6 @@ module Droonga
       @raw_message
     end
 
-    def add_route(route)
-      @raw_message["via"].push(route)
-    end
-
     def body
       @raw_message["body"]
     end
@@ -45,6 +41,10 @@ module Droonga
     end
 
     def command=(command)
+      original_command = @raw_message["type"]
+      return if original_command == command
+      @raw_message["originalTypes"] ||= []
+      @raw_message["originalTypes"] << original_command
       @raw_message["type"] = command
     end
   end

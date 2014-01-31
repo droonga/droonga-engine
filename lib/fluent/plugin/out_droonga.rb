@@ -60,7 +60,6 @@ module Fluent
           "body" => record
         }
       end
-      message["via"] ||= []
       reply_to = message["replyTo"]
       if reply_to.is_a? String
         message["replyTo"] = {

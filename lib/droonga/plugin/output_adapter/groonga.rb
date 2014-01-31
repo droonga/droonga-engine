@@ -19,8 +19,9 @@ module Droonga
   class GroongaOutputAdapter < Droonga::OutputAdapterPlugin
     repository.register("groonga", self)
 
-    command :select_response
-    def select_response(output_message)
+    command :convert_select,
+            :patterns => [["originalTypes", :include?, "select"]]
+    def convert_select(output_message)
       command = Select.new
       output_message.body = command.convert(output_message.body)
     end
