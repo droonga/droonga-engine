@@ -52,16 +52,6 @@ class SearchDistributorTest < Test::Unit::TestCase
               "limit" => 20,
             },
           },
-          "query3" => {
-            "source" => "User",
-            "output" => {
-              "format" => "complex",
-              "elements" => ["count", "records"],
-              "attributes" => [],
-              "offset" => 0,
-              "limit" => 30,
-            },
-          },
         },
       },
     }
@@ -103,21 +93,9 @@ class SearchDistributorTest < Test::Unit::TestCase
             },
           },
         },
-        "query3" => {
-          "query3_reduced" => {
-            "count" => {
-              "type" => "sum",
-            },
-            "records" => {
-              "type" => "sort",
-              "operators" => [],
-              "limit" => 30,
-            },
-          },
-        },
       },
-      "inputs" => ["errors", "query1", "query2", "query3"],
-      "outputs" => ["errors_reduced", "query1_reduced", "query2_reduced", "query3_reduced"],
+      "inputs" => ["errors", "query1", "query2"],
+      "outputs" => ["errors_reduced", "query1_reduced", "query2_reduced"],
     }
 
     gatherer = {
@@ -144,21 +122,11 @@ class SearchDistributorTest < Test::Unit::TestCase
             },
           },
         },
-        "query3_reduced" => {
-          "output" => "query3",
-          "elements" => {
-            "records" => {
-              "limit" => 30,
-              "format" => "complex",
-            },
-          },
-        },
       },
       "inputs" => [
         "errors_reduced",
         "query1_reduced",
         "query2_reduced",
-        "query3_reduced",
       ],
       "post" => true,
     }
@@ -190,23 +158,12 @@ class SearchDistributorTest < Test::Unit::TestCase
               "limit" => 20,
             },
           },
-          "query3" => {
-            "source" => "User",
-            "output" => {
-              "format" => "simple",
-              "elements" => ["count", "records"],
-              "attributes" => [],
-              "offset" => 0,
-              "limit" => 30,
-            },
-          },
         },
       },
       "outputs" => [
         "errors",
         "query1",
         "query2",
-        "query3",
       ],
       "replica" => "random",
     }
