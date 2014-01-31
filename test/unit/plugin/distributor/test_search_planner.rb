@@ -1516,9 +1516,9 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         assert_equal({
                        "queries" => {
                          "families" => {
-                           "source" => "User",
+                           "source"  => "User",
                            "groupBy" => @group_by,
-                           "output" => @output.merge(changed_output_parameters),
+                           "output"  => @output.merge(changed_output_parameters),
                          },
                        },
                      },
