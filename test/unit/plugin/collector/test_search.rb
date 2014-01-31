@@ -87,7 +87,7 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
+              "attributes" => ["_key"],
               "offset" => 1,
               "limit" => 1,
             },
@@ -114,7 +114,7 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
+              "attributes" => ["_key"],
               "offset" => 1,
               "limit" => -1,
             },
@@ -138,7 +138,6 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
               "format" => "simple",
               "attributes" => [],
               "offset" => 10000,
@@ -166,7 +165,6 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
               "attributes" => ["_key", "chapter", "section", "subsection", "paragraph"],
               "limit" => -1,
             },
@@ -192,7 +190,6 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
               "attributes" => ["_key", "chapter", "section"],
               "limit" => -1,
             },
@@ -218,7 +215,6 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
               "format" => "simple",
               "attributes" => ["_key", "chapter", "section"],
               "limit" => -1,
@@ -245,7 +241,6 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "records" => {
-              "type" => "sort",
               "format" => "complex",
               "attributes" => ["_key", "chapter", "section"],
               "limit" => -1,
@@ -272,11 +267,9 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "count" => {
-              "type" => "count",
               "target" => "records",
             },
             "records" => {
-              "type" => "sort",
               "format" => "simple",
               "attributes" => [],
               "limit" => -1,
@@ -299,11 +292,9 @@ class SearchCollectorTest < Test::Unit::TestCase
           "output" => "search_result",
           "elements" => {
             "count" => {
-              "type" => "count",
               "target" => "records",
             },
             "records" => {
-              "type" => "sort",
               "format" => "simple",
               "attributes" => [],
               "limit" => -1,
