@@ -130,11 +130,8 @@ class SearchDistributorTest < Test::Unit::TestCase
           "output" => "query1",
           "elements" => {
             "records" => {
-              "type" => "sort",
-              "offset" => 0,
               "limit" => 10,
               "format" => "complex",
-              "attributes" => [],
             },
           },
         },
@@ -142,11 +139,8 @@ class SearchDistributorTest < Test::Unit::TestCase
           "output" => "query2",
           "elements" => {
             "records" => {
-              "type" => "sort",
-              "offset" => 0,
               "limit" => 20,
               "format" => "complex",
-              "attributes" => [],
             },
           },
         },
@@ -154,11 +148,8 @@ class SearchDistributorTest < Test::Unit::TestCase
           "output" => "query3",
           "elements" => {
             "records" => {
-              "type" => "sort",
-              "offset" => 0,
               "limit" => 30,
               "format" => "complex",
-              "attributes" => [],
             },
           },
         },
