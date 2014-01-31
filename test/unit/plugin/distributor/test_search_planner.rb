@@ -1043,6 +1043,178 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        gather_message["body"]["users_reduced"])
         end
       end
+
+      class InifinitSortLimitTest < self
+        def setup
+          @output = {
+            "elements"   => ["records"],
+            "attributes" => ["_key"],
+            "offset"     => 4,
+            "limit"      => 8,
+          }
+          @sort_by = {
+            "keys"   => ["_key"],
+            "offset" => 1,
+            "limit"  => -1,
+          }
+          @request = {
+            "type" => "search",
+            "dataset" => "Droonga",
+            "body" => {
+              "queries" => {
+                "users" => {
+                  "source" => "User",
+                  "sortBy" => @sort_by,
+                  "output" => @output,
+                },
+              },
+            },
+          }
+        end
+
+        def test_dependencies
+          reduce_inputs = ["errors", "users"]
+          gather_inputs = ["errors_reduced", "users_reduced"]
+          assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                       dependencies)
+        end
+
+        def test_broadcast_body
+          changed_sort_by_parameters = {
+            "offset" => 0,
+            "limit"  => total_offset + max_limit,
+          }
+          changed_output_parameters = {
+            "offset" => 0,
+            "limit"  => total_offset + max_limit,
+          }
+          assert_equal({
+                         "queries" => {
+                           "users" => {
+                             "source" => "User",
+                             "sortBy" => @sort_by.merge(changed_sort_by_parameters),
+                             "output" => @output.merge(changed_output_parameters),
+                           },
+                         },
+                       },
+                       broadcast_message["body"])
+        end
+
+        def test_reduce_body
+          assert_equal({
+                         "users_reduced" => {
+                           "records" => {
+                             "type"      => "sort",
+                             "operators" => [
+                               { "column" => 0, "operator" => "<" },
+                             ],
+                             "limit"     => total_offset + max_limit,
+                           },
+                         },
+                       },
+                       reduce_message["body"]["users"])
+        end
+
+        def test_gather_records
+          assert_equal({
+                         "elements" => {
+                           "records" => {
+                             "attributes" => ["_key"],
+                             "offset"     => total_offset,
+                             "limit"      => max_limit,
+                           },
+                         },
+                         "output" => "users",
+                       },
+                       gather_message["body"]["users_reduced"])
+        end
+      end
+
+      class InifinitBothLimitTest < self
+        def setup
+          @output = {
+            "elements"   => ["records"],
+            "attributes" => ["_key"],
+            "offset"     => 4,
+            "limit"      => -1,
+          }
+          @sort_by = {
+            "keys"   => ["_key"],
+            "offset" => 1,
+            "limit"  => -1,
+          }
+          @request = {
+            "type" => "search",
+            "dataset" => "Droonga",
+            "body" => {
+              "queries" => {
+                "users" => {
+                  "source" => "User",
+                  "sortBy" => @sort_by,
+                  "output" => @output,
+                },
+              },
+            },
+          }
+        end
+
+        def test_dependencies
+          reduce_inputs = ["errors", "users"]
+          gather_inputs = ["errors_reduced", "users_reduced"]
+          assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                       dependencies)
+        end
+
+        def test_broadcast_body
+          changed_sort_by_parameters = {
+            "offset" => 0,
+            "limit"  => min_limit,
+          }
+          changed_output_parameters = {
+            "offset" => 0,
+            "limit"  => min_limit,
+          }
+          assert_equal({
+                         "queries" => {
+                           "users" => {
+                             "source" => "User",
+                             "sortBy" => @sort_by.merge(changed_sort_by_parameters),
+                             "output" => @output.merge(changed_output_parameters),
+                           },
+                         },
+                       },
+                       broadcast_message["body"])
+        end
+
+        def test_reduce_body
+          assert_equal({
+                         "users_reduced" => {
+                           "records" => {
+                             "type"      => "sort",
+                             "operators" => [
+                               { "column" => 0, "operator" => "<" },
+                             ],
+                             "limit"     => min_limit,
+                           },
+                         },
+                       },
+                       reduce_message["body"]["users"])
+        end
+
+        def test_gather_records
+          assert_equal({
+                         "elements" => {
+                           "records" => {
+                             "attributes" => ["_key"],
+                             "offset"     => total_offset,
+                             "limit"      => min_limit,
+                           },
+                         },
+                         "output" => "users",
+                       },
+                       gather_message["body"]["users_reduced"])
+        end
+      end
     end
   end
 
@@ -1052,107 +1224,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
 =begin
   class SingleQueryTest < self
-    def test_have_sortBy_with_infinity_sort_limit
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "have_records" => {
-              "source" => "User",
-              "sortBy" => {
-                "keys" => ["name"],
-                "offset" => 1,
-                "limit" => -1,
-              },
-              "output" => {
-                "format" => "complex",
-                "elements" => ["records"],
-                "attributes" => ["_key", "name", "age"],
-                "offset" => 4,
-                "limit" => 8,
-              },
-            },
-          },
-        },
-      }
-
-      limit = 1 + 4 + 8
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "records" => {
-          "type" => "sort",
-          "operators" => [
-            { "column" => 1, "operator" => "<" },
-          ],
-          "limit" => limit,
-        },
-      })
-      expected_plan << gatherer(request, :elements => {
-                                           "records" => records_mapper(
-                                             :offset => 5,
-                                             :limit => 8,
-                                             :format => "complex",
-                                             :attributes => ["_key", "name", "age"],
-                                           ),
-                                         })
-      expected_plan << searcher(request, :sort_offset => 0,
-                                         :sort_limit => limit,
-                                         :output_offset => 0,
-                                         :output_limit => limit)
-      assert_equal(expected_plan, plan(request))
-    end
-
-    def test_have_sortBy_with_infinity_limit
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "have_records" => {
-              "source" => "User",
-              "sortBy" => {
-                "keys" => ["name"],
-                "offset" => 1,
-                "limit" => -1,
-              },
-              "output" => {
-                "format" => "complex",
-                "elements" => ["records"],
-                "attributes" => ["_key", "name", "age"],
-                "offset" => 4,
-                "limit" => -1,
-              },
-            },
-          },
-        },
-      }
-
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "records" => {
-          "type" => "sort",
-          "operators" => [
-            { "column" => 1, "operator" => "<" },
-          ],
-          "limit" => -1,
-        },
-      })
-      expected_plan << gatherer(request, :elements => {
-                                           "records" => records_mapper(
-                                             :offset => 5,
-                                             :limit => -1,
-                                             :format => "complex",
-                                             :attributes => ["_key", "name", "age"],
-                                           ),
-                                         })
-      expected_plan << searcher(request, :sort_offset => 0,
-                                         :sort_limit => -1,
-                                         :output_offset => 0,
-                                         :output_limit => -1)
-      assert_equal(expected_plan, plan(request))
-    end
-
     def test_have_sortBy_with_multiple_sort_keys
       request = {
         "type" => "search",
