@@ -1392,6 +1392,159 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   class GroupByTest < self
+    class SimpleTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => ["_key", "_nsubrecs"],
+          "limit"      => 1,
+        }
+        @group_by = "family_name"
+        @request = {
+          "type"    => "search",
+          "dataset" => "Droonga",
+          "body"    => {
+            "queries" => {
+              "families" => {
+                "source"  => "User",
+                "groupBy" => @group_by,
+                "output"  => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "families"]
+        gather_inputs = ["errors_reduced", "families_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_body
+        changed_output_parameters = {
+          "unifiable" => true,
+        }
+        assert_equal({
+                       "queries" => {
+                         "families" => {
+                           "source" => "User",
+                           "groupBy" => @group_by,
+                           "output" => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "families_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [],
+                          "key_column" => 0,
+                           "limit"     => 1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["families"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["_key", "_nsubrecs"],
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "families",
+                     },
+                     gather_message["body"]["families_reduced"])
+      end
+    end
+
+    class CountOnlyTest < self
+      def setup
+        @output = {
+          "elements" => ["count"],
+        }
+        @group_by = "family_name"
+        @request = {
+          "type"    => "search",
+          "dataset" => "Droonga",
+          "body"    => {
+            "queries" => {
+              "families" => {
+                "source"  => "User",
+                "groupBy" => @group_by,
+                "output"  => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "families"]
+        gather_inputs = ["errors_reduced", "families_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_body
+        changed_output_parameters = {
+          "elements"   => ["count", "records"],
+          "attributes" => ["_key"],
+          "limit"      => -1,
+          "unifiable"  => true,
+        }
+        assert_equal({
+                       "queries" => {
+                         "families" => {
+                           "source"  => "User",
+                           "groupBy" => @group_by,
+                           "output"  => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "families_reduced" => {
+                         "count"   => {
+                           "type" => "sum",
+                         },
+                         "records" => {
+                           "type"       => "sort",
+                           "operators"  => [],
+                           "key_column" => 0,
+                           "limit"      => -1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["families"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "count" => {
+                           "target" => "records",
+                         },
+                         "records" => {
+                           "no_output" => true,
+                         },
+                       },
+                       "output" => "families",
+                     },
+                     gather_message["body"]["families_reduced"])
+      end
+    end
   end
 
 
@@ -1400,93 +1553,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
 =begin
   class SingleQueryTest < self
-    def test_groupBy
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "grouped_records" => {
-              "source" => "User",
-              "groupBy" => "family_name",
-              "output" => {
-                "format" => "complex",
-                "elements" => ["records"],
-                "attributes" => ["_key", "_nsubrecs"],
-                "limit" => -1,
-              },
-            },
-          },
-        },
-      }
-
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "records" => {
-          "type" => "sort",
-          "operators" => [],
-          "key_column" => 0,
-          "limit" => -1,
-        },
-      })
-      expected_plan << gatherer(request, :elements => {
-                                           "records" => records_mapper(
-                                             :offset => 0,
-                                             :limit => -1,
-                                             :format => "complex",
-                                             :attributes => ["_key", "_nsubrecs"],
-                                           ),
-                                         })
-      expected_plan << searcher(request, :output_offset => 0,
-                                         :output_limit => -1,
-                                         :unifiable => true)
-      assert_equal(expected_plan, plan(request))
-    end
-
-    def test_groupBy_count
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "grouped_records" => {
-              "source" => "User",
-              "groupBy" => "family_name",
-              "output" => {
-                "elements" => ["count"],
-              },
-            },
-          },
-        },
-      }
-
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "count" => {
-          "type" => "sum",
-        },
-        "records" => {
-          "type" => "sort",
-          "operators" => [],
-          "key_column" => 0,
-          "limit" => -1,
-        },
-      })
-      expected_plan << gatherer(request, :elements => {
-                                           "count" => count_mapper,
-                                           "records" => records_mapper(
-                                             :limit => -1,
-                                             :attributes => ["_key"],
-                                             :no_output => true,
-                                           ),
-                                         })
-      expected_plan << searcher(request, :output_limit => -1,
-                                         :extra_attributes => ["_key"],
-                                         :extra_elements => ["records"],
-                                         :unifiable => true)
-      assert_equal(expected_plan, plan(request))
-    end
-
     def test_groupBy_hash
       request = {
         "type" => "search",
