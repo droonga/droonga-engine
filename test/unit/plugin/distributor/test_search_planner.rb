@@ -305,14 +305,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
 
       def test_dependencies
-        reduce_inputs = [
-          "errors",
-          "users",
-        ]
-        gather_inputs = [
-          "errors_reduced",
-          "users_reduced",
-        ]
+        reduce_inputs = ["errors", "users"]
+        gather_inputs = ["errors_reduced", "users_reduced"]
         assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                      dependencies)
       end
