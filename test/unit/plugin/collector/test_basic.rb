@@ -40,32 +40,18 @@ class BasicCollectorTest < Test::Unit::TestCase
     end
   end
 
-  class GatherTest < self
+  class IOTest < self
     data(
       :simple_mapping => {
-        :expected => "result",
+        :expected => ["output_name", "result"],
         :source => "result",
-        :mapping => "string_name",
+        :mapping => "output_name",
       },
       :complex_mapping => {
-        :expected => {
-          "count" => 3,
-          "records" => [
-            create_record(0),
-            create_record(1),
-            create_record(2),
-          ],
-        },
-        :source => {
-          "count" => 3,
-          "records" => [
-            create_record(0),
-            create_record(1),
-            create_record(2),
-          ],
-        },
+        :expected => ["output_name", "result"],
+        :source => "result",
         :mapping => {
-          "output" => "search_result",
+          "output" => "output_name",
         },
       },
     )
@@ -84,14 +70,10 @@ class BasicCollectorTest < Test::Unit::TestCase
         "descendants" => nil,
       }
       @plugin.process("collector_gather", request)
-      output_name = data[:mapping]
-      output_name = output_name["output"] if output_name.is_a?(Hash)
-      assert_equal([output_name, data[:expected]], @outputs.last)
+      assert_equal(data[:expected], @outputs.last)
     end
-  end
 
-  class ReduceTest < self
-    def test_io
+    def test_reduce
       input_name = "input_#{Time.now.to_i}"
       output_name = "output_#{Time.now.to_i}"
       request = {
@@ -123,7 +105,9 @@ class BasicCollectorTest < Test::Unit::TestCase
                    ],
                    @outputs.last)
     end
+  end
 
+  class ReduceTest < self
     data(
       :int => {
         :expected => 1.5,
@@ -388,139 +372,121 @@ class BasicCollectorTest < Test::Unit::TestCase
 
   class MergeTest < self
     def test_grouped
-      input_name = "input_#{Time.now.to_i}"
-      output_name = "output_#{Time.now.to_i}"
-      request = {
-        "task" => {
-          "values" => {
-            output_name => [
-                [
-                  "group1",
-                  10,
-                  [
-                    create_record(1),
-                    create_record(3),
-                    create_record(5),
-                  ],
-                ],
-                [
-                  "group2",
-                  20,
-                  [
-                    create_record("a"),
-                    create_record("c"),
-                    create_record("e"),
-                  ],
-                ],
-                [
-                  "group3",
-                  30,
-                  [
-                    create_record("A"),
-                    create_record("B"),
-                    create_record("C"),
-                  ],
-                ],
-            ],
-          },
-          "component" => {
-            "body" => {
-              input_name => {
-                output_name => {
-                    "type" => "sort",
-                    "operators" => [
-                      { "column" => 1, "operator" => "<" },
-                    ],
-                    "key_column" => 0,
-                    "limit" => -1,
-                },
-              },
-            },
-            "outputs" => nil,
-          },
-        },
-        "id" => nil,
-        "value" => [
-            [
-              "group1",
-              30,
-              [
-                create_record(2),
-                create_record(4),
-                create_record(6),
-              ],
-            ],
-            [
-              "group2",
-              40,
-              [
-                create_record("b"),
-                create_record("d"),
-                create_record("f"),
-              ],
-            ],
-            [
-              "group4",
-              50,
-              [
-                create_record("D"),
-                create_record("E"),
-                create_record("F"),
-              ],
-            ],
+      expected = [
+        [
+          "group3",
+          30,
+          [
+            create_record("A"),
+            create_record("B"),
+            create_record("C"),
+          ],
         ],
-        "name" => input_name,
-        "descendants" => nil,
-      }
-      @plugin.process("collector_reduce", request)
-      assert_equal([
-                     output_name,
-                     [
-                         [
-                           "group3",
-                           30,
-                           [
-                             create_record("A"),
-                             create_record("B"),
-                             create_record("C"),
-                           ],
-                         ],
-                         [
-                           "group1",
-                           40,
-                           [
-                             create_record(2),
-                             create_record(4),
-                             create_record(6),
-                             create_record(1),
-                             create_record(3),
-                             create_record(5),
-                           ],
-                         ],
-                         [
-                           "group4",
-                           50,
-                           [
-                             create_record("D"),
-                             create_record("E"),
-                             create_record("F"),
-                           ],
-                         ],
-                         [
-                           "group2",
-                           60,
-                           [
-                             create_record("b"),
-                             create_record("d"),
-                             create_record("f"),
-                             create_record("a"),
-                             create_record("c"),
-                             create_record("e"),
-                           ],
-                         ],
-                     ],
-                   ],
-                   @outputs.last)
+        [
+          "group1",
+          40,
+          [
+            create_record(2),
+            create_record(4),
+            create_record(6),
+            create_record(1),
+            create_record(3),
+            create_record(5),
+          ],
+        ],
+        [
+          "group4",
+          50,
+          [
+            create_record("D"),
+            create_record("E"),
+            create_record("F"),
+          ],
+        ],
+        [
+          "group2",
+          60,
+          [
+            create_record("b"),
+            create_record("d"),
+            create_record("f"),
+            create_record("a"),
+            create_record("c"),
+            create_record("e"),
+          ],
+        ],
+      ]
+
+      left = [
+        [
+          "group1",
+          10,
+          [
+            create_record(1),
+            create_record(3),
+            create_record(5),
+          ],
+        ],
+        [
+          "group2",
+          20,
+          [
+            create_record("a"),
+            create_record("c"),
+            create_record("e"),
+          ],
+        ],
+        [
+          "group3",
+          30,
+          [
+            create_record("A"),
+            create_record("B"),
+            create_record("C"),
+          ],
+        ],
+      ]
+      right = [
+        [
+          "group1",
+          30,
+          [
+            create_record(2),
+            create_record(4),
+            create_record(6),
+          ],
+        ],
+        [
+          "group2",
+          40,
+          [
+            create_record("b"),
+            create_record("d"),
+            create_record("f"),
+          ],
+        ],
+        [
+          "group4",
+          50,
+          [
+            create_record("D"),
+            create_record("E"),
+            create_record("F"),
+          ],
+        ],
+      ]
+
+      reduced = @plugin.reduce({ 
+                                 "type" => "sort",
+                                 "operators" => [
+                                   { "column" => 1, "operator" => "<" },
+                                 ],
+                                 "key_column" => 0,
+                                 "limit" => -1,
+                               },
+                               left,
+                               right)
+      assert_equal(expected, reduced)
     end
   end
 end
