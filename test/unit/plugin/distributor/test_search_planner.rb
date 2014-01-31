@@ -102,12 +102,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                   "elements" => ["count"],
                 },
               },
-              "query3" => {
-                "source" => "User",
-                "output" => {
-                  "elements" => ["count"],
-                },
-              },
             },
           },
         }
@@ -118,13 +112,11 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
           "errors",
           "query1",
           "query2",
-          "query3",
         ]
         gather_inputs = [
           "errors_reduced",
           "query1_reduced",
           "query2_reduced",
-          "query3_reduced",
         ]
         assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                      dependencies)
