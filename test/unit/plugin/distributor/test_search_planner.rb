@@ -715,50 +715,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
 
   class SingleQueryTest < self
-    def test_have_simple_sortBy
-      request = {
-        "type" => "search",
-        "dataset" => "Droonga",
-        "body" => {
-          "queries" => {
-            "have_records" => {
-              "source" => "User",
-              "sortBy" => ["name"],
-              "output" => {
-                "format" => "complex",
-                "elements" => ["records"],
-                "attributes" => ["_key", "name", "age"],
-                "offset" => 0,
-                "limit" => 1,
-              },
-            },
-          },
-        },
-      }
-
-      expected_plan = []
-      expected_plan << reducer(request, {
-        "records" => {
-          "type" => "sort",
-          "operators" => [
-            { "column" => 1, "operator" => "<" },
-          ],
-          "limit" => 1,
-        },
-      })
-      expected_plan << gatherer(request, :elements => {
-                                           "records" => records_mapper(
-                                             :offset => 0,
-                                             :limit => 1,
-                                             :format => "complex",
-                                             :attributes => ["_key", "name", "age"],
-                                           ),
-                                         })
-      expected_plan << searcher(request, :output_offset => 0,
-                                         :output_limit => 1)
-      assert_equal(expected_plan, plan(request))
-    end
-
     def test_have_sortBy
       request = {
         "type" => "search",
