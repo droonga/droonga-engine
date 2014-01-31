@@ -21,6 +21,47 @@ module Droonga
     # @option options [Array<Array>] :patterns The patterns to be matched
     #    against message. If all of the patterns are matched to a message,
     #    the command will be applied.
+    #
+    #    Here is patterns syntax.
+    #
+    #      * PATTERNS = [PATTERN*]
+    #      * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
+    #      * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
+    #      * TARGET_PATH = "COMPONENT(.COMPONENT)*"
+    #      * OPERATOR = :equal (More operators may be added in the future.
+    #                           For example, :include?, :start_with and so on.)
+    #      * ARGUMENTS = OBJECT_DEFINED_IN_JSON*
+    #      * LOGICAL_OPERATOR = :or (:add will be added.)
+    #
+    #    For example:
+    #
+    #    ```
+    #    [["type", :equal, "search"]]
+    #    ```
+    #
+    #    matches to the following message:
+    #
+    #    ```
+    #    {"type" => "search"}
+    #    ```
+    #
+    #    Another example:
+    #
+    #    ```
+    #    [["body.output.limit", :equal, 10]]
+    #    ```
+    #
+    #    matches to the following message:
+    #
+    #    ```
+    #    {
+    #      "body" => {
+    #        "output" => {
+    #          "limit" => 10,
+    #        },
+    #      },
+    #    }
+    #    ```
     def initialize(method_name, options)
       @method_name = method_name
       @options = options
