@@ -28,7 +28,7 @@ module Droonga
     #      * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
     #      * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
     #      * TARGET_PATH = "COMPONENT(.COMPONENT)*"
-    #      * OPERATOR = :equal, :include?
+    #      * OPERATOR = :equal, :in
     #                   (More operators may be added in the future.
     #                    For example, :exist?, :start_with and so on.)
     #      * ARGUMENTS = OBJECT_DEFINED_IN_JSON*
@@ -97,7 +97,7 @@ module Droonga
       case operator
       when :equal
         [target] == arguments
-      when :include?
+      when :in
         arguments.include?(target)
       else
         raise ArgumentError, "Unknown operator"
