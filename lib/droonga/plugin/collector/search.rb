@@ -54,21 +54,18 @@ module Droonga
     end
 
     def apply_output_attributes_and_format(items, output)
-      attributes = output["attributes"]
-      if attributes
-        format = output["format"]
-        if format == "complex"
-          items.collect! do |item|
-            complex_item = {}
-            attributes.each_with_index do |label, index|
-              complex_item[label] = item[index]
-            end
-            complex_item
+      attributes = output["attributes"] || []
+      if output["format"] == "complex"
+        items.collect! do |item|
+          complex_item = {}
+          attributes.each_with_index do |label, index|
+            complex_item[label] = item[index]
           end
-        else
-          items.collect! do |item|
-            item[0...attributes.size]
-          end
+          complex_item
+        end
+      else
+        items.collect! do |item|
+          item[0...attributes.size]
         end
       end
       items
