@@ -459,6 +459,19 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      broadcast_message["body"])
       end
 
+      def test_reduce_body
+        assert_equal({
+                       "users_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [],
+                           "limit"     => 10,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["users"])
+      end
+
       def test_gather_records
         assert_equal({
                        "elements" => {
