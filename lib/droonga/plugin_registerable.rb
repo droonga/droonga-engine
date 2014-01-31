@@ -40,7 +40,7 @@ module Droonga
 
     def command(method_name_or_map, options={})
       if method_name_or_map.is_a?(Hash)
-        method_name, type = method_name_or_map.to_a.first
+        type, method_name = method_name_or_map.to_a.first
         options[:patterns] ||= []
         options[:patterns] << ["type", :equal, type.to_s]
       else
