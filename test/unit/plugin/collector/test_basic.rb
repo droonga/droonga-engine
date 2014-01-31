@@ -91,6 +91,39 @@ class BasicCollectorTest < Test::Unit::TestCase
   end
 
   class ReduceTest < self
+    def test_io
+      input_name = "input_#{Time.now.to_i}"
+      output_name = "output_#{Time.now.to_i}"
+      request = {
+        "task" => {
+          "values" => {
+            output_name => [0, 1, 2],
+          },
+          "component" => {
+            "body" => {
+              input_name => {
+                output_name => {
+                  "type" => "sum",
+                  "limit" => -1,
+                },
+              },
+            },
+            "outputs" => nil,
+          },
+        },
+        "id" => nil,
+        "value" => [3, 4, 5],
+        "name" => input_name,
+        "descendants" => nil,
+      }
+      @plugin.process("collector_reduce", request)
+      assert_equal([
+                     output_name,
+                     [0, 1, 2, 3, 4, 5],
+                   ],
+                   @outputs.last)
+    end
+
     data(
       :int => {
         :expected => 1.5,
