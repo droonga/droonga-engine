@@ -446,7 +446,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       def test_broadcast_message
         assert_valid_broadcast_message
         changed_output_parameters = {
-          "format" => "simple"
+          "format" => "simple",
         }
         assert_equal({
                        "queries" => {
