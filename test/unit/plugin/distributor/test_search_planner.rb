@@ -713,7 +713,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
 
 
 
-
+=begin
   class SingleQueryTest < self
     def test_have_sortBy
       request = {
@@ -1388,4 +1388,5 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       searcher
     end
   end
+=end
 end
