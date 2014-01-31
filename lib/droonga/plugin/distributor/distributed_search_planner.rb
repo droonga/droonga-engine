@@ -256,14 +256,15 @@ module Droonga
 
         @reducers["records"] = build_records_reducer
 
-        mapper = {
-          "type" => "sort",
-          "offset" => @records_offset,
-          "limit" => @records_limit,
-          "format" => @records_format,
-          "attributes" => final_attributes,
-        }
-        mapper["no_output"] = true unless @output_records
+        mapper = {}
+        if @output_records
+          mapper["format"]     = @records_format unless @records_format == "simple"
+          mapper["attributes"] = final_attributes unless final_attributes.empty?
+          mapper["offset"]     = @records_offset unless @records_offset.zero?
+          mapper["limit"]      = @records_limit unless @records_limit.zero?
+        else
+          mapper["no_output"] = true
+        end
         @mappers["records"] = mapper
       end
 
