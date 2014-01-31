@@ -1871,6 +1871,89 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
 
+    class SubRecodsTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => [
+            "_key",
+            "_nsubrecs",
+            { "label" => "users",
+              "source" => "_subrecs",
+              "attributes" => ["_key"] },
+          ],
+          "limit"      => 1,
+        }
+        @group_by = {
+          "key"            => "family_name",
+          "maxNSubRecords" => 3,
+        }
+        @request = {
+          "type"    => "search",
+          "dataset" => "Droonga",
+          "body"    => {
+            "queries" => {
+              "families" => {
+                "source"  => "User",
+                "groupBy" => @group_by,
+                "output"  => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "families"]
+        gather_inputs = ["errors_reduced", "families_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_body
+        changed_output_parameters = {
+          "unifiable"  => true,
+        }
+        assert_equal({
+                       "queries" => {
+                         "families" => {
+                           "source"  => "User",
+                           "groupBy" => @group_by,
+                           "output"  => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "families_reduced" => {
+                         "records" => {
+                           "type"       => "sort",
+                           "operators"  => [],
+                           "key_column" => 0,
+                           "limit"      => 1,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["families"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["_key", "_nsubrecs", "users"],
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "families",
+                     },
+                     gather_message["body"]["families_reduced"])
+      end
+    end
+
     class CountOnlyTest < self
       def setup
         @output = {
