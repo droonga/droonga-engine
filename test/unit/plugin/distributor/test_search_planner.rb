@@ -45,17 +45,24 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   def dependencies
-    messages.collect do |message|
+    dependencies = messages.collect do |message|
       {
         "type"    => message["type"],
         "inputs"  => message["inputs"],
         "outputs" => message["outputs"],
       }
     end
+    sort_dependencies(dependencies)
+  end
+
+  def sort_dependencies(dependencies)
+    dependencies.sort do |a, b|
+      a["type"] <=> b["type"]
+    end
   end
 
   def expected_dependencies(reduce_inputs, gather_inputs)
-    [
+    dependencies = [
       {
         "type"    => "search_reduce",
         "inputs"  => reduce_inputs,
@@ -72,6 +79,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         "outputs" => reduce_inputs,
       },
     ]
+    sort_dependencies(dependencies)
   end
 
   class MultipleQueriesTest < self
