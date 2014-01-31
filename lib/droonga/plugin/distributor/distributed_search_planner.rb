@@ -188,7 +188,7 @@ module Droonga
       end
 
       def calculate_output_offset!
-        @output["offset"] = 0 if have_records?
+        @output["offset"] = 0 if have_records? && @output["offset"]
       end
 
       def final_offset
