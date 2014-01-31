@@ -389,11 +389,13 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
 
       def test_gather_records
-        records = @output.merge("type" => "sort")
-        records.delete("elements")
         assert_equal({
                        "elements" => {
-                         "records" => records,
+                         "records" => {
+                           "format"     => "complex",
+                           "attributes" => ["_id"],
+                           "limit"      => 10,
+                         },
                        },
                        "output" => "users",
                      },
