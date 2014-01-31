@@ -286,7 +286,7 @@ module Droonga
       def update_output_attributes!
         @output["attributes"] = array_style_attributes
         @output["attributes"] += sort_attribute_names
-        if unifiable? && !@output["attributes"].include?("_key")
+        if unifiable? && !source_column_names.include?("_key")
           @output["attributes"] << "_key"
         end
       end
@@ -348,7 +348,7 @@ module Droonga
       DESCENDING_OPERATOR = ">"
 
       def build_records_reducer
-        attributes = @output["attributes"]
+        attributes = source_column_names
         key_column_index = attributes.index("_key")
 
         operators = @sort_keys.collect do |sort_key|
