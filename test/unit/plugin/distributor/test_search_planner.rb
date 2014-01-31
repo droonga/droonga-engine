@@ -486,6 +486,80 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      gather_message["body"]["users_reduced"])
       end
     end
+
+    class OutputOffsetTest < self
+      def setup
+        @output = {
+          "elements"   => ["records"],
+          "attributes" => ["_key"],
+          "offset"     => 1,
+          "limit"      => 1,
+        }
+        @request = {
+          "type" => "search",
+          "dataset" => "Droonga",
+          "body" => {
+            "queries" => {
+              "users" => {
+                "source" => "User",
+                "output" => @output,
+              },
+            },
+          },
+        }
+      end
+
+      def test_dependencies
+        reduce_inputs = ["errors", "users"]
+        gather_inputs = ["errors_reduced", "users_reduced"]
+        assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                     dependencies)
+      end
+
+      def test_broadcast_message
+        assert_valid_broadcast_message
+        changed_output_parameters = {
+          "offset" => 0,
+          "limit"  => 2,
+        }
+        assert_equal({
+                       "queries" => {
+                         "users" => {
+                           "source" => "User",
+                           "output" => @output.merge(changed_output_parameters),
+                         },
+                       },
+                     },
+                     broadcast_message["body"])
+      end
+
+      def test_reduce_body
+        assert_equal({
+                       "users_reduced" => {
+                         "records" => {
+                           "type"      => "sort",
+                           "operators" => [],
+                           "limit"     => 2,
+                         },
+                       },
+                     },
+                     reduce_message["body"]["users"])
+      end
+
+      def test_gather_records
+        assert_equal({
+                       "elements" => {
+                         "records" => {
+                           "attributes" => ["_key"],
+                           "offset"     => 1,
+                           "limit"      => 1,
+                         },
+                       },
+                       "output" => "users",
+                     },
+                     gather_message["body"]["users_reduced"])
+      end
+    end
   end
 
 
