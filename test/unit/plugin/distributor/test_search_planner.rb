@@ -124,6 +124,21 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     end
   end
 
+  def assert_valid_broadcast_message
+    message = broadcast_message
+    metadata = {
+      "command" => message["command"],
+      "dataset" => message["dataset"],
+      "replica" => message["replica"],
+    }
+    expected = {
+      "command" => @request["type"],
+      "dataset" => @request["dataset"],
+      "replica" => "random",
+    }
+    assert_equal(expected, metadata)
+  end
+
   class OutputTest < self
     class NothingTest < self
       def setup
@@ -147,7 +162,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_body
+      def test_broadcast_message
+        assert_valid_broadcast_message
         assert_equal({
                        "queries" => {
                          "no_output" => {
@@ -206,7 +222,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        dependencies)
         end
 
-        def test_broadcast_body
+        def test_broadcast_message
+          assert_valid_broadcast_message
           assert_equal({
                          "queries" => {
                            "users" => {
@@ -279,7 +296,8 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_body
+      def test_broadcast_message
+        assert_valid_broadcast_message
         changed_output_parameters = {
           "format" => "simple"
         }
