@@ -16,9 +16,48 @@
 require "droonga/command"
 
 class CommandTest < Test::Unit::TestCase
+  def command(method_name, options={})
+    Droonga::Command.new(method_name, options)
+  end
+
+  class ResolvePathTest < self
+    def command
+      super(:method_name)
+    end
+
+    def resolve_path(path, message)
+      command.send(:resolve_path, path, message)
+    end
+
+    def test_nonexistent
+      assert_equal(Droonga::Command::NONEXISTENT_PATH,
+                   resolve_path("nonexistent.path", {}))
+    end
+
+    def test_top_level
+      assert_equal("select",
+                   resolve_path("type",
+                                {
+                                  "type" => "select"
+                                }))
+    end
+
+    def test_nested
+      assert_equal(10,
+                   resolve_path("body.output.limit",
+                                {
+                                  "body" => {
+                                    "output" => {
+                                      "limit" => 10,
+                                    },
+                                  },
+                                }))
+    end
+  end
+
   class MatchTest < self
     def command(patterns)
-      Droonga::Command.new(:method_name, :patterns => patterns)
+      super(:method_name, :patterns => patterns)
     end
 
     def match?(patterns, message)
@@ -26,21 +65,10 @@ class CommandTest < Test::Unit::TestCase
     end
 
     class EqualTest < self
-      def test_top_level
+      def test_same_value
         assert_true(match?([["type", :equal, "select"]],
                            {
                              "type" => "select"
-                           }))
-      end
-
-      def test_nested
-        assert_true(match?([["body.output.limit", :equal, 10]],
-                           {
-                             "body" => {
-                               "output" => {
-                                 "limit" => 10,
-                               },
-                             },
                            }))
       end
 

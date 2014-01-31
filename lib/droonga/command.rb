@@ -80,10 +80,16 @@ module Droonga
 
     def match_pattern?(pattern, message)
       path, operator, *arguments = pattern
-      target = path.split(".").inject(message) do |result, component|
+      target = resolve_path(path, message)
+      apply_operator(operator, target, arguments)
+    end
+
+    NONEXISTENT_PATH = Object.new
+    def resolve_path(path, message)
+      path.split(".").inject(message) do |result, component|
+        return NONEXISTENT_PATH if result.nil?
         result[component]
       end
-      apply_operator(operator, target, arguments)
     end
 
     def apply_operator(operator, target, arguments)
