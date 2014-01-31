@@ -21,6 +21,7 @@ module Droonga
       super
 
       @request = @source_message["body"]
+      @request = Marshal.load(Marshal.dump(@request))
       @queries = @request["queries"]
     end
 
