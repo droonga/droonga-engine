@@ -185,14 +185,14 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
   end
 
   class OutputTest < self
-    class NothingTest < self
+    class NoOutputTest < self
       def setup
         @request = {
           "type" => "search",
           "dataset" => "Droonga",
           "body" => {
             "queries" => {
-              "no_output" => {
+              "users" => {
                 "source" => "User",
               },
             },
@@ -211,7 +211,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
         assert_valid_broadcast_message
         assert_equal({
                        "queries" => {
-                         "no_output" => {
+                         "users" => {
                            "source" => "User",
                          },
                        },
