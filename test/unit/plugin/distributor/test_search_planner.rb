@@ -124,21 +124,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     end
   end
 
-  def assert_valid_broadcast_message
-    message = broadcast_message
-    metadata = {
-      "command" => message["command"],
-      "dataset" => message["dataset"],
-      "replica" => message["replica"],
-    }
-    expected = {
-      "command" => @request["type"],
-      "dataset" => @request["dataset"],
-      "replica" => "random",
-    }
-    assert_equal(expected, metadata)
-  end
-
   # this should be moved to the test for DistributedCommandPlanner
   class BasicTest < self
     def setup
@@ -160,6 +145,21 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       gather_inputs = ["errors_reduced"]
       assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
                    dependencies)
+    end
+
+    def test_broadcast_message_metadata
+      message = broadcast_message
+      metadata = {
+        "command" => message["command"],
+        "dataset" => message["dataset"],
+        "replica" => message["replica"],
+      }
+      expected = {
+        "command" => @request["type"],
+        "dataset" => @request["dataset"],
+        "replica" => "random",
+      }
+      assert_equal(expected, metadata)
     end
 
     def test_reduce_body
@@ -207,8 +207,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         assert_equal({
                        "queries" => {
                          "users" => {
@@ -246,8 +245,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         assert_equal({
                        "queries" => {
                          "users" => {
@@ -307,8 +305,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        dependencies)
         end
 
-        def test_broadcast_message
-          assert_valid_broadcast_message
+        def test_broadcast_body
           assert_equal({
                          "queries" => {
                            "users" => {
@@ -368,8 +365,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        dependencies)
         end
 
-        def test_broadcast_message
-          assert_valid_broadcast_message
+        def test_broadcast_body
           assert_equal({
                          "queries" => {
                            "users" => {
@@ -443,8 +439,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         changed_output_parameters = {
           "format" => "simple",
         }
@@ -516,8 +511,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         changed_output_parameters = {
           "offset" => 0,
           "limit"  => 2,
@@ -590,8 +584,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         assert_equal({
                        "queries" => {
                          "users" => {
@@ -662,8 +655,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         changed_output_parameters = {
           "attributes" => ["_key", "name"],
         }
@@ -740,8 +732,7 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                      dependencies)
       end
 
-      def test_broadcast_message
-        assert_valid_broadcast_message
+      def test_broadcast_body
         changed_sort_by_parameters = {
           "offset" => 0,
           "limit"  => 1,
