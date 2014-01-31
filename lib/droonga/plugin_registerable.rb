@@ -15,7 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/command_mapper"
+require "droonga/command"
+require "droonga/command_repository"
 require "droonga/plugin_repository"
 
 module Droonga
@@ -33,19 +34,41 @@ module Droonga
 
     def inherited(sub_class)
       super
-      sub_class.instance_variable_set(:@command_mapper, CommandMapper.new)
+      sub_class.instance_variable_set(:@command_repository,
+                                      CommandRepository.new)
     end
 
-    def command(name_or_map)
-      @command_mapper.register(name_or_map)
+    def command(method_name_or_map, options={})
+      if method_name_or_map.is_a?(Hash)
+        method_name, type = method_name_or_map.to_a.first
+        options[:patterns] ||= []
+        options[:patterns] << ["type", :equal, type.to_s]
+      else
+        method_name = method_name_or_map
+        if options.empty?
+          options[:patterns] ||= []
+          options[:patterns] << ["type", :equal, method_name.to_s]
+        end
+      end
+      command = Command.new(method_name, options)
+      @command_repository.register(command)
     end
 
-    def method_name(command)
-      @command_mapper[command]
+    def find_command(message)
+      @command_repository.find(message)
     end
 
-    def processable?(command)
-      not method_name(command).nil?
+    def method_name(message)
+      message = {"type" => message.to_s} unless message.is_a?(Hash)
+      command = find_command(message)
+      return nil if command.nil?
+      command.method_name
+    end
+
+    def processable?(message)
+      message = {"type" => message.to_s} unless message.is_a?(Hash)
+      command = find_command(message)
+      not command.nil?
     end
   end
 end

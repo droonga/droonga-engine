@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,30 +14,19 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class CommandMapper
+  class CommandRepository
     def initialize
-      @commands = {}
+      @commands = []
     end
 
-    def register(name_or_map)
-      if name_or_map.is_a?(Hash)
-        command_map = name_or_map
-        command_map.each do |command_name, method_name|
-          @commands[command_name.to_s] = method_name
-        end
-      else
-        name = name_or_map
-        method_name = name
-        @commands[name.to_s] = method_name
+    def register(command)
+      @commands << command
+    end
+
+    def find(message)
+      @commands.find do |command|
+        command.match?(message)
       end
-    end
-
-    def [](command)
-      @commands[command.to_s]
-    end
-
-    def commands
-      @commands.keys
     end
   end
 end
