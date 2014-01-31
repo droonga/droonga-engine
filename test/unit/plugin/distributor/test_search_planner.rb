@@ -139,6 +139,51 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
     assert_equal(expected, metadata)
   end
 
+  # this should be moved to the test for DistributedCommandPlanner
+  class BasicTest < self
+    def setup
+      @request = {
+        "type" => "search",
+        "dataset" => "Droonga",
+        "body" => {
+          "queries" => {
+            "no_output" => {
+              "source" => "User",
+            },
+          },
+        },
+      }
+    end
+
+    def test_dependencies
+      reduce_inputs = ["errors"]
+      gather_inputs = ["errors_reduced"]
+      assert_equal(expected_dependencies(reduce_inputs, gather_inputs),
+                   dependencies)
+    end
+
+    def test_reduce_body
+      assert_equal({
+                     "errors" => {
+                       "errors_reduced" => {
+                         "type"  => "sum",
+                         "limit" => -1,
+                       },
+                     },
+                   },
+                   reduce_message["body"])
+    end
+
+    def test_gather_body
+      assert_equal({
+                     "errors_reduced" => {
+                       "output" => "errors",
+                     },
+                   },
+                   gather_message["body"])
+    end
+  end
+
   class OutputTest < self
     class NothingTest < self
       def setup
@@ -172,27 +217,6 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
                        },
                      },
                      broadcast_message["body"])
-      end
-
-      def test_reduce_body
-        assert_equal({
-                       "errors" => {
-                         "errors_reduced" => {
-                           "type"  => "sum",
-                           "limit" => -1,
-                         },
-                       },
-                     },
-                     reduce_message["body"])
-      end
-
-      def test_gather_body
-        assert_equal({
-                       "errors_reduced" => {
-                         "output" => "errors",
-                       },
-                     },
-                     gather_message["body"])
       end
     end
 
@@ -325,6 +349,11 @@ class DistributedSearchPlannerTest < Test::Unit::TestCase
       end
     end
   end
+
+
+
+
+
 
   class SingleQueryTest < self
     def test_no_output_limit
