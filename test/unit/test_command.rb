@@ -56,24 +56,24 @@ class CommandTest < Test::Unit::TestCase
   end
 
   class MatchTest < self
-    def command(patterns)
-      super(:method_name, :patterns => patterns)
+    def command(pattern)
+      super(:method_name, :pattern => pattern)
     end
 
-    def match?(patterns, message)
-      command(patterns).match?(message)
+    def match?(pattern, message)
+      command(pattern).match?(message)
     end
 
     class EqualTest < self
       def test_same_value
-        assert_true(match?([["type", :equal, "select"]],
+        assert_true(match?(["type", :equal, "select"],
                            {
                              "type" => "select"
                            }))
       end
 
       def test_different_value
-        assert_false(match?([["type", :equal, "select"]],
+        assert_false(match?(["type", :equal, "select"],
                             {
                               "type" => "search",
                             }))
@@ -82,14 +82,14 @@ class CommandTest < Test::Unit::TestCase
 
     class InTest < self
       def test_exist
-        assert_true(match?([["type", :in, "table_create", "table_remove"]],
+        assert_true(match?(["type", :in, "table_create", "table_remove"],
                            {
                              "type" => "table_remove"
                            }))
       end
 
       def test_not_exist
-        assert_false(match?([["type", :in, "table_create", "table_remove"]],
+        assert_false(match?(["type", :in, "table_create", "table_remove"],
                             {
                               "type" => "column_create",
                             }))
@@ -98,26 +98,26 @@ class CommandTest < Test::Unit::TestCase
 
     class IncludeTest < self
       def test_exist
-        assert_true(match?([["originalTypes", :include?, "select"]],
+        assert_true(match?(["originalTypes", :include?, "select"],
                            {
                              "originalTypes" => ["search", "select"],
                            }))
       end
 
       def test_not_exist
-        assert_false(match?([["originalTypes", :include?, "select"]],
+        assert_false(match?(["originalTypes", :include?, "select"],
                             {
                               "originalTypes" => ["load"],
                             }))
       end
 
       def test_no_key
-        assert_false(match?([["originalTypes", :include?, "select"]],
+        assert_false(match?(["originalTypes", :include?, "select"],
                             {}))
       end
 
       def test_not_enumerable
-        assert_false(match?([["originalTypes", :include?, "select"]],
+        assert_false(match?(["originalTypes", :include?, "select"],
                             {
                               "originalTypes" => 29,
                             }))

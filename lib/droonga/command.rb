@@ -18,13 +18,12 @@ module Droonga
     attr_reader :method_name
     #
     #
-    # @option options [Array<Array>] :patterns The patterns to be matched
-    #    against message. If all of the patterns are matched to a message,
+    # @option options [Array] :pattern The pattern to be matched
+    #    against message. If the pattern is matched to a message,
     #    the command will be applied.
     #
-    #    Here is patterns syntax.
+    #    Here is pattern syntax.
     #
-    #      * PATTERNS = [PATTERN*]
     #      * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
     #      * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
     #      * TARGET_PATH = "COMPONENT(.COMPONENT)*"
@@ -37,7 +36,7 @@ module Droonga
     #    For example:
     #
     #    ```
-    #    [["type", :equal, "search"]]
+    #    ["type", :equal, "search"]
     #    ```
     #
     #    matches to the following message:
@@ -49,7 +48,7 @@ module Droonga
     #    Another example:
     #
     #    ```
-    #    [["body.output.limit", :equal, 10]]
+    #    ["body.output.limit", :equal, 10]
     #    ```
     #
     #    matches to the following message:
@@ -69,17 +68,12 @@ module Droonga
     end
 
     def match?(message)
-      patterns.all? do |pattern|
-        match_pattern?(pattern, message)
-      end
+      match_pattern?(@options[:pattern], message)
     end
 
     private
-    def patterns
-      @options[:patterns] || []
-    end
-
     def match_pattern?(pattern, message)
+      return false if pattern.nil?
       path, operator, *arguments = pattern
       target = resolve_path(path, message)
       apply_operator(operator, target, arguments)

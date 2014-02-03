@@ -41,15 +41,10 @@ module Droonga
     def command(method_name_or_map, options={})
       if method_name_or_map.is_a?(Hash)
         type, method_name = method_name_or_map.to_a.first
-        options[:patterns] ||= []
-        options[:patterns] << ["type", :equal, type.to_s]
       else
         method_name = method_name_or_map
-        if options.empty?
-          options[:patterns] ||= []
-          options[:patterns] << ["type", :equal, method_name.to_s]
-        end
       end
+      options[:pattern] ||= ["type", :equal, method_name.to_s]
       command = Command.new(method_name, options)
       @command_repository.register(command)
     end

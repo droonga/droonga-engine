@@ -20,7 +20,7 @@ module Droonga
     repository.register("crud", self)
 
     command :convert_success,
-            :patterns => [["replyTo.type", :equal, "add.result"]]
+            :pattern => ["replyTo.type", :equal, "add.result"]
     def convert_success(output_message)
       if output_message.body.include?("success")
         success = output_message.body["success"]

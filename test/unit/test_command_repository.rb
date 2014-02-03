@@ -24,7 +24,7 @@ class CommandRepositoryTest < Test::Unit::TestCase
     def setup
       super
       @command = Droonga::Command.new(:select,
-                                      :patterns => [["type", :equal, "select"]])
+                                      :pattern => ["type", :equal, "select"])
       @repository.register(@command)
     end
 
