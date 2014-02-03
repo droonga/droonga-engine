@@ -45,7 +45,9 @@ module Droonga
     def broadcast(message)
       super(message,
             :write => true,
-            :reduce => { "success" => "type" => "and" })
+            :reduce => {
+              "success" => { "type" => "and" }
+            })
     end
   end
 end
