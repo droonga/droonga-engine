@@ -43,7 +43,7 @@ module Droonga
     def reduce(name, reducer)
       @reducers << reducer_message("reduce", name, reducer)
       @gatherers << gatherer_message("gather", name)
-      @outputs << output_name(name)
+      @outputs << name
     end
 
     def scatter(body=nil)
