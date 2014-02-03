@@ -36,16 +36,14 @@ module Droonga
       planner.scatter(nil)
       planner.key = options[:key]
       planner.reduce(options[:reduce])
-      planner.plan
-      distribute(planner.messages)
+      distribute(planner.plan)
     end
 
     def broadcast(message, options={})
       planner = DistributedCommandPlanner.new(message)
       planner.broadcast(nil, :write => options[:write])
       planner.reduce(options[:reduce])
-      planner.plan
-      distribute(planner.messages)
+      distribute(planner.plan)
     end
 
     private
