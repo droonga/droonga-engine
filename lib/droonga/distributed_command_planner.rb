@@ -20,6 +20,10 @@ module Droonga
     attr_accessor :key, :dataset
     attr_reader :messages
 
+    REDUCE_SUM = "sum"
+
+    DEFAULT_LIMIT = -1
+
     def initialize(source_message)
       @source_message = source_message
 
@@ -137,8 +141,8 @@ module Droonga
         reducer = {
           "type" => reducer,
         }
-        if reducer["type"] == "sum"
-          reducer["limit"] = -1
+        if reducer["type"] == REDUCE_SUM
+          reducer["limit"] = DEFAULT_LIMIT
         end
       end
       {
@@ -176,7 +180,7 @@ module Droonga
     #    cannot use their custom "errors" in the body.
     #    This must be rewritten. 
     def plan_errors_handling
-      reduce("errors"=> { "type" => "sum", "limit" => -1 })
+      reduce("errors"=> REDUCE_SUM)
     end
   end
 end
