@@ -19,7 +19,6 @@ module DistributedSearchPlannerHelper
   def plan(search_request)
     planner = Droonga::DistributedSearchPlanner.new(search_request)
     planner.plan
-    planner.messages
   end
 
   def messages

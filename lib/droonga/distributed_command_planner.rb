@@ -18,7 +18,6 @@
 module Droonga
   class DistributedCommandPlanner
     attr_accessor :key, :dataset
-    attr_reader :messages
 
     REDUCE_SUM = "sum"
 
@@ -35,13 +34,11 @@ module Droonga
       @gatherers = []
       @processor = nil
 
-      @messages = []
-
       plan_errors_handling
     end
 
     def plan
-      @messages = unified_reducers + unified_gatherers + [fixed_processor]
+      unified_reducers + unified_gatherers + [fixed_processor]
     end
 
     def reduce(params=nil)
