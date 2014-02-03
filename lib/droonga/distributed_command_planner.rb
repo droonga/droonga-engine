@@ -168,7 +168,7 @@ module Droonga
     #    cannot use their custom "errors" in the body.
     #    This must be rewritten. 
     def plan_errors_handling
-      reduce("errors", "type" => "sum", "limit" => -1)
+      reduce("errors"=> { "type" => "sum", "limit" => -1 })
     end
   end
 end
