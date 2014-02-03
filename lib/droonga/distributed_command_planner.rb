@@ -55,11 +55,11 @@ module Droonga
       end
     end
 
-    def scatter(body=nil)
+    def scatter(options={})
       @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
-        "body"    => body || @source_message["body"],
+        "body"    => options[:body] || @source_message["body"],
         "key"     => nil,
         "type"    => "scatter",
         "outputs" => [],
@@ -68,11 +68,11 @@ module Droonga
       }
     end
 
-    def broadcast(body=nil, options={})
+    def broadcast(options={})
       processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
-        "body"    => body || @source_message["body"],
+        "body"    => options[:body] || @source_message["body"],
         "type"    => "broadcast",
         "outputs" => [],
         "replica" => "random"

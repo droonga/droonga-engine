@@ -37,7 +37,7 @@ module Droonga
       end
 
       @dataset = @source_message["dataset"] || @request["dataset"]
-      broadcast(@request)
+      broadcast(:body => @request)
       
       super
     end
