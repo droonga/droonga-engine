@@ -47,7 +47,7 @@ module Droonga
       super(message,
             :write => true,
             :reduce => {
-              "result" => { "type" => "or" }
+              "result" => "or"
             })
     end
   end

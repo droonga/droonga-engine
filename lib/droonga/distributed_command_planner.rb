@@ -133,6 +133,14 @@ module Droonga
     end
 
     def reducer_message(command, name, reducer)
+      if reducer.is_a?(String)
+        reducer = {
+          "type" => reducer,
+        }
+        if reducer["type"] == "sum"
+          reducer["limit"] = -1
+        end
+      end
       {
         "type"    => command,
         "body"    => {

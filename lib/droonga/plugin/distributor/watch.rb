@@ -46,7 +46,7 @@ module Droonga
       super(message,
             :write => true,
             :reduce => {
-              "success" => { "type" => "and" }
+              "success" => "and"
             })
     end
   end

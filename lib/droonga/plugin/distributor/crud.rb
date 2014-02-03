@@ -42,7 +42,7 @@ module Droonga
       super(message,
             :key => message["body"]["key"] || rand.to_s,
             :reduce => {
-              "success" => { "type" => "and" }
+              "success" => "and"
             })
     end
   end
