@@ -26,7 +26,7 @@ module Droonga
       unless message["dataset"]
         raise "dataset must be set. FIXME: This error should return client."
       end
-      broadcast_all(message)
+      broadcast(message)
     end
 
     command :table_remove
@@ -34,21 +34,19 @@ module Droonga
       unless message["dataset"]
         raise "dataset must be set. FIXME: This error should return client."
       end
-      broadcast_all(message)
+      broadcast(message)
     end
 
     command :column_create
     def column_create(message)
-      broadcast_all(message)
+      broadcast(message)
     end
 
     private
-    def broadcast_all(message)
-      planner = DistributedCommandPlanner.new(message)
-      planner.broadcast(:write => true)
-      planner.reduce("result", "type" => "or")
-      planner.plan
-      distribute(planner.messages)
+    def broadcast(message)
+      super(message,
+            :write => true,
+            :reduce => { "result" => "type" => "or" })
     end
   end
 end

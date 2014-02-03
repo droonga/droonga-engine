@@ -23,28 +23,25 @@ module Droonga
 
     command :add
     def add(message)
-      scatter_all(message)
+      scatter(message)
     end
 
     command :update
     def update(message)
-      scatter_all(message)
+      scatter(message)
     end
 
     # TODO: What is this?
     command :reset
     def reset(message)
-      scatter_all(message)
+      scatter(message)
     end
 
     private
-    def scatter_all(message)
-      planner = DistributedCommandPlanner.new(message)
-      planner.key = message["body"]["key"] || rand.to_s
-      planner.scatter
-      planner.reduce("success", "type" => "and")
-      planner.plan
-      distribute(planner.messages)
+    def scatter(message)
+      super(message,
+            :key => message["body"]["key"] || rand.to_s,
+            :reduce => { "success" => "type" => "and" })
     end
   end
 end

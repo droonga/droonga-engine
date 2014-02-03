@@ -23,31 +23,29 @@ module Droonga
 
     command "watch.feed" => :feed
     def feed(message)
-      broadcast_all(message)
+      broadcast(message)
     end
 
     command "watch.subscribe" => :subscribe
     def subscribe(message)
-      broadcast_all(message)
+      broadcast(message)
     end
 
     command "watch.unsubscribe" => :unsubscribe
     def unsubscribe(message)
-      broadcast_all(message)
+      broadcast(message)
     end
 
     command "watch.sweep" => :sweep
     def sweep(message)
-      broadcast_all(message)
+      broadcast(message)
     end
 
     private
-    def broadcast_all(message)
-      planner = DistributedCommandPlanner.new(message)
-      planner.broadcast(:write => true)
-      planner.reduce("success", "type" => "or")
-      planner.plan
-      distribute(planner.messages)
+    def broadcast(message)
+      super(message,
+            :write => true,
+            :reduce => { "success" => "type" => "and" })
     end
   end
 end

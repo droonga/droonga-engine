@@ -31,6 +31,23 @@ module Droonga
       @distributor.distribute(messages)
     end
 
+    def scatter(message, options={})
+      planner = DistributedCommandPlanner.new(message)
+      planner.scatter
+      planner.key = options[:key]
+      planner.reduce(options[:reduce])
+      planner.plan
+      distribute(planner.messages)
+    end
+
+    def broadcast(message, options={})
+      planner = DistributedCommandPlanner.new(message)
+      planner.broadcast(:write => options[:write])
+      planner.reduce(options[:reduce])
+      planner.plan
+      distribute(planner.messages)
+    end
+
     private
     def process_error(command, error, arguments)
       if error.is_a?(MessageProcessingError)
