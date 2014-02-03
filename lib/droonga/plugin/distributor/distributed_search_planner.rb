@@ -45,6 +45,14 @@ module Droonga
     private
     UNLIMITED = -1
 
+    def reduce_command
+      "search_reduce"
+    end
+
+    def gather_command
+      "search_gather"
+    end
+
     def ensure_unifiable!
       @queries.each do |name, query|
         if unifiable?(name) && query["output"]
@@ -77,15 +85,8 @@ module Droonga
       elements = transformer.mappers
       mapper = {}
       mapper["elements"] = elements unless elements.empty?
-      reduce(input_name,
-             transformer.reducers,
-             mapper)
-    end
-
-    def reduce(name, reducer, gatherer={})
-      @reducers << reducer_message("search_reduce", name, reducer)
-      @gatherers << gatherer_message("search_gather", name, gatherer)
-      @outputs << name
+      reduce(input_name => { :reduce => transformer.reducers,
+                             :gather => mapper })
     end
 
     class QueryTransformer

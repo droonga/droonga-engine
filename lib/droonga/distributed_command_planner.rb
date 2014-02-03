@@ -40,10 +40,18 @@ module Droonga
       @messages = unified_reducers + unified_gatherers + [fixed_processor]
     end
 
-    def reduce(name, reducer)
-      @reducers << reducer_message("reduce", name, reducer)
-      @gatherers << gatherer_message("gather", name)
-      @outputs << name
+    def reduce(params=nil)
+      return unless params
+      params.each do |name, reducer|
+        gatherer = nil
+        if reducer[:gather]
+          gatherer = reducer[:gather]
+          reducer = reducer[:reduce]
+        end
+        @reducers << reducer_message(reduce_command, name, reducer)
+        @gatherers << gatherer_message(gather_command, name, gatherer)
+        @outputs << name
+      end
     end
 
     def scatter(body=nil)
@@ -77,6 +85,14 @@ module Droonga
     end
 
     private
+    def reduce_command
+      "reduce"
+    end
+
+    def gather_command
+      "gather"
+    end
+
     def unified_reducers
       unified_reducers = {}
       @reducers.each do |reducer|
@@ -129,7 +145,8 @@ module Droonga
       }
     end
 
-    def gatherer_message(command, name, gatherer={})
+    def gatherer_message(command, name, gatherer=nil)
+      gatherer ||= {}
       {
         "type"   => command,
         "body"   => {
