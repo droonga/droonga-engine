@@ -62,7 +62,8 @@ module Droonga
         results = {}
         @data["datasets"].each do |key, dataset|
           workers = dataset["workers"]
-          plugins = dataset["plugins"]
+          handler = dataset["handler"] || {}
+          plugins = handler["plugins"] || dataset["plugins"]
           dataset["ring"].each do |key, part|
             part["partitions"].each do |range, partitions|
               partitions.each do |partition|

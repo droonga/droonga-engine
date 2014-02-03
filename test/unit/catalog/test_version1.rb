@@ -88,6 +88,60 @@ class CatalogTest < Test::Unit::TestCase
     def base_path
       File.dirname(catalog_path)
     end
+
+    class HandlersTest < self
+      def setup
+        @data = {
+          "farms" => {
+            farm_name => {
+              "device" => ".",
+            },
+          },
+          "datasets" => {
+            "Droonga" => {
+              "number_of_partitions" => 1,
+              "ring" => {
+                "localhost:23041" => {
+                  "weight" =>  50,
+                  "partitions" => {
+                    "2014-02-09" => [
+                      "#{farm_name}.000",
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        }
+      end
+
+      def farm_name
+        "localhost:23041/droonga"
+      end
+
+      def handlers(data)
+        catalog = create_catalog(data, base_path)
+        catalog.get_partitions(farm_name).collect do |partition, options|
+          options[:handlers]
+        end
+      end
+
+      def test_plugins
+        @data["datasets"]["Droonga"]["plugins"] = ["search", "groonga", "add"]
+        assert_equal([["search", "groonga", "add"]],
+                     handlers(@data))
+
+      end
+
+      def test_handler_plugins
+        @data["datasets"]["Droonga"]["handler"] = {
+          "plugins" => ["search", "groonga", "add"],
+        }
+        assert_equal([["search", "groonga", "add"]],
+                     handlers(@data))
+
+      end
+    end
   end
 
   class DataSetTest < self

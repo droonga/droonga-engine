@@ -11,7 +11,9 @@
   "datasets": {
     "Droonga": {
       "workers": 2,
-      "plugins": ["search", "groonga", "add"],
+      "handler": {
+        "plugins": ["search", "groonga", "add"]
+      },
       "number_of_replicas": 2,
       "number_of_partitions": 2,
       "partition_key": "_key",
