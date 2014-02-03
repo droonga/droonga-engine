@@ -43,5 +43,8 @@
   },
   "output_adapter": {
     "plugins": ["crud", "groonga"]
+  },
+  "collector": {
+    "plugins": ["basic", "search"]
   }
 }

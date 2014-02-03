@@ -18,6 +18,7 @@ require "zlib"
 require "droonga/message_processing_error"
 require "droonga/input_adapter_options"
 require "droonga/output_adapter_options"
+require "droonga/collector_options"
 
 module Droonga
   module Catalog
@@ -142,6 +143,10 @@ module Droonga
 
       def output_adapter_options
         OutputAdapterOptions.new(@data["output_adapter"])
+      end
+
+      def collector_options
+        CollectorOptions.new(@data["collector"])
       end
 
       private

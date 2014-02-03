@@ -213,4 +213,30 @@ class CatalogTest < Test::Unit::TestCase
       end
     end
   end
+
+  class CollectorOptionsTest < self
+    def options(data)
+      catalog = create_catalog(minimum_data.merge(data), "base-path")
+      catalog.collector_options
+    end
+
+    class PluginsTest < self
+      def plugins(data)
+        options(data).plugins
+      end
+
+      def test_nothing
+        assert_equal([], plugins({}))
+      end
+
+      def test_collector
+        data = {
+          "collector" => {
+            "plugins" => ["basic", "search"],
+          }
+        }
+        assert_equal(["basic", "search"], plugins(data))
+      end
+    end
+  end
 end

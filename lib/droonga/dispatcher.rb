@@ -60,7 +60,7 @@ module Droonga
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
       @distributor = Distributor.new(self, @options)
-      @collector = Collector.new
+      @collector = Collector.new(Droonga.catalog.collector_options)
     end
 
     def start
