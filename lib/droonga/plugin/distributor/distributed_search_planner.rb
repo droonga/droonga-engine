@@ -38,6 +38,8 @@ module Droonga
 
       @dataset = @source_message["dataset"] || @request["dataset"]
       broadcast(@request)
+      
+      super
     end
 
     private
