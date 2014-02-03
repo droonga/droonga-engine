@@ -54,6 +54,7 @@ module Droonga
         "body"    => body || @source_message["body"],
         "key"     => @key,
         "type"    => "scatter",
+        "outputs" => [],
         "replica" => "all",
         "post"    => true
       }
@@ -65,6 +66,7 @@ module Droonga
         "dataset" => @dataset || @source_message["dataset"],
         "body"    => body || @source_message["body"],
         "type"    => "broadcast",
+        "outputs" => [],
         "replica" => "random"
       }
       if options[:write]

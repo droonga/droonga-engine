@@ -85,6 +85,7 @@ module Droonga
     def reduce(name, reducer, gatherer={})
       @reducers << reducer_message("search_reduce", name, reducer)
       @gatherers << gatherer_message("search_gather", name, gatherer)
+      @outputs << output_name(name)
     end
 
     class QueryTransformer
