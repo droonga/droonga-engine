@@ -59,7 +59,7 @@ module Droonga
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @distributor = Distributor.new(self, @options)
+      @distributor = Distributor.new(self, Droonga.catalog.distributor_options)
       @collector = Collector.new(Droonga.catalog.collector_options)
     end
 

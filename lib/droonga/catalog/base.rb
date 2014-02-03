@@ -19,6 +19,7 @@ require "droonga/message_processing_error"
 require "droonga/input_adapter_options"
 require "droonga/output_adapter_options"
 require "droonga/collector_options"
+require "droonga/distributor_options"
 
 module Droonga
   module Catalog
@@ -147,6 +148,10 @@ module Droonga
 
       def collector_options
         CollectorOptions.new(@data["collector"])
+      end
+
+      def distributor_options
+        DistributorOptions.new(@data["distributor"])
       end
 
       private

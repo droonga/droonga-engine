@@ -27,8 +27,7 @@ module Droonga
       @dispatcher = dispatcher
       @plugins = []
       @options = options
-      # TODO: don't put the default distributions
-      load_plugins(options[:distributors] || ["search", "crud", "groonga", "watch"])
+      load_plugins(@options.plugins)
     end
 
     def distribute(components)

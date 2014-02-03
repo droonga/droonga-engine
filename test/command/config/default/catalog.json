@@ -63,5 +63,8 @@
   },
   "collector": {
     "plugins": ["basic", "search"]
+  },
+  "distributor": {
+    "plugins": ["search", "crud", "groonga", "watch"]
   }
 }
