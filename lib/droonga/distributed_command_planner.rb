@@ -52,7 +52,7 @@ module Droonga
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
         "body"    => body || @source_message["body"],
-        "key"     => @key,
+        "key"     => nil,
         "type"    => "scatter",
         "outputs" => [],
         "replica" => "all",
@@ -110,6 +110,9 @@ module Droonga
 
     def fixed_processor
       @processor["outputs"] = @outputs
+      if @processor["type"] == "scatter"
+        @processor["key"] = @key
+      end
       @processor
     end
 
