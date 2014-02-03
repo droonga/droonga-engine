@@ -18,7 +18,7 @@
 module Droonga
   class DistributedCommandPlanner
     attr_accessor :key, :dataset
-    attr_reader :outputs
+    attr_reader :messages
 
     def initialize(source_message)
       @source_message = source_message
@@ -29,55 +29,49 @@ module Droonga
 
       @reducers = []
       @gatherers = []
-      @processors = []
+      @processor = nil
+
+      @messages = []
 
       plan_errors_handling
     end
 
-    def messages
-      unified_reducers + unified_gatherers + @processors
+    def plan
+      @messages = unified_reducers + unified_gatherers + [fixed_processor]
     end
 
     def reduce(name, reducer)
       @reducers << reducer_message("reduce", name, reducer)
       @gatherers << gatherer_message("gather", name)
+      @outputs << output_name(name)
     end
 
-    def scatter_all(body=nil)
+    def scatter(body=nil)
       raise MessageProcessingError.new("missing key") unless @key
-      @processors << {
+      @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
         "body"    => body || @source_message["body"],
         "key"     => @key,
         "type"    => "scatter",
-        "outputs" => @outputs,
         "replica" => "all",
         "post"    => true
       }
     end
 
-    def broadcast_all(body=nil)
-      @processors << {
+    def broadcast(body=nil, options={})
+      processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
         "body"    => body || @source_message["body"],
         "type"    => "broadcast",
-        "outputs" => @outputs,
-        "replica" => "all",
-        "post"    => true
+        "replica" => "random"
       }
-    end
-
-    def broadcast_at_random(body=nil)
-      @processors << {
-        "command" => @source_message["type"],
-        "dataset" => @dataset || @source_message["dataset"],
-        "body"    => body || @source_message["body"],
-        "type"    => "broadcast",
-        "outputs" => @outputs,
-        "replica" => "random",
-      }
+      if options[:write]
+        processor["replica"] = "all"
+        processor["post"]    = true
+      end
+      @processor = processor
     end
 
     private
@@ -110,6 +104,11 @@ module Droonga
         end
       end
       unified_gatherers.values
+    end
+
+    def fixed_processor
+      @processor["outputs"] = @outputs
+      @processor
     end
 
     def reducer_message(command, name, reducer)
@@ -147,7 +146,6 @@ module Droonga
     #    cannot use their custom "errors" in the body.
     #    This must be rewritten. 
     def plan_errors_handling
-      @outputs << "errors"
       reduce("errors", "type" => "sum", "limit" => -1)
     end
   end

@@ -45,9 +45,9 @@ module Droonga
     private
     def broadcast_all(message)
       planner = DistributedCommandPlanner.new(message)
-      planner.outputs << "result"
+      planner.broadcast(:write => true)
       planner.reduce("result", "type" => "or")
-      planner.broadcast_all
+      planner.plan
       distribute(planner.messages)
     end
   end

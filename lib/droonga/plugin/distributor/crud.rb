@@ -41,9 +41,9 @@ module Droonga
     def scatter_all(message)
       planner = DistributedCommandPlanner.new(message)
       planner.key = message["body"]["key"] || rand.to_s
-      planner.outputs << "success"
+      planner.scatter
       planner.reduce("success", "type" => "and")
-      planner.scatter_all
+      planner.plan
       distribute(planner.messages)
     end
   end

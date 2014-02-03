@@ -27,7 +27,7 @@ module Droonga
       @queries = @request["queries"]
     end
 
-    def build_messages
+    def plan
       Searcher::QuerySorter.validate_dependencies(@queries)
 
       ensure_unifiable!
@@ -37,7 +37,7 @@ module Droonga
       end
 
       @dataset = @source_message["dataset"] || @request["dataset"]
-      broadcast_at_random(@request)
+      broadcast(@request)
     end
 
     private
@@ -69,8 +69,6 @@ module Droonga
             !output["elements"].include?("records"))
         return
       end
-
-      @outputs << input_name
 
       transformer = QueryTransformer.new(query)
 

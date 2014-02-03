@@ -18,7 +18,7 @@ require "droonga/plugin/distributor/distributed_search_planner"
 module DistributedSearchPlannerHelper
   def plan(search_request)
     planner = Droonga::DistributedSearchPlanner.new(search_request)
-    planner.build_messages
+    planner.plan
     planner.messages
   end
 

@@ -25,7 +25,7 @@ module Droonga
     command :search
     def search(message)
       planner = DistributedSearchPlanner.new(message)
-      planner.build_messages
+      planner.plan
       distribute(planner.messages)
     end
   end
