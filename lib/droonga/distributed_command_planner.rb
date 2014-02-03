@@ -59,7 +59,6 @@ module Droonga
     end
 
     def scatter(body=nil)
-      raise MessageProcessingError.new("missing key") unless @key
       @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
@@ -131,6 +130,7 @@ module Droonga
     def fixed_processor
       @processor["outputs"] = @outputs
       if @processor["type"] == "scatter"
+        raise MessageProcessingError.new("missing key") unless @key
         @processor["key"] = @key
       end
       @processor
