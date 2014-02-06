@@ -1,0 +1,21 @@
+{
+    "type": "search",
+    "dataset": "Droonga",
+    "body": {
+	"queries": {
+	    "search": {
+		"source": "Memo",
+		"condition": {
+		    "matchTo": ["content"],
+		    "query": "パン",
+		    "useMeCabFilter": true
+		},
+		"output": {
+		    "elements": ["count", "records"],
+		    "attributes": ["_key", "content"],
+		    "limit": 10
+		}
+	    }
+	}
+    }
+}

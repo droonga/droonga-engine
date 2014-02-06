@@ -1,0 +1,7 @@
+load --table Memo
+[
+{"_key": "1", "content": "アンパサンド"},
+{"_key": "2", "content": "ジャパン"},
+{"_key": "3", "content": "食パン"},
+{"_key": "4", "content": "フランスのパン"}
+]

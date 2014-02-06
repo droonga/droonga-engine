@@ -1,0 +1,7 @@
+table_create Memo TABLE_HASH_KEY ShortText
+column_create Memo content COLUMN_SCALAR ShortText
+
+table_create Terms TABLE_PAT_KEY ShortText \
+  --default_tokenizer TokenBigram \
+  --normalizer NormalizerAuto
+column_create Terms memo_context COLUMN_INDEX|WITH_POSITION Memo content
