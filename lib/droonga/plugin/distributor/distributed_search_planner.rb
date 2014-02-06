@@ -23,6 +23,8 @@ module Droonga
       super
 
       @request = @source_message["body"]
+      raise NoQuery.new unless @request
+
       @request = Marshal.load(Marshal.dump(@request))
       @queries = @request["queries"]
     end

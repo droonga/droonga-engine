@@ -26,7 +26,9 @@ module Droonga
     def search(message, messenger)
       searcher = Droonga::Searcher.new(@context)
       values = {}
-      searcher.search(message.request["queries"]).each do |output, value|
+      request = message.request
+      raise Droonga::Searcher::NoQuery.new unless request
+      searcher.search(request["queries"]).each do |output, value|
         values[output] = value
       end
       messenger.emit(values)

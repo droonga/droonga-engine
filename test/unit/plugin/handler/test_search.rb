@@ -82,12 +82,24 @@ class SearchHandlerTest < Test::Unit::TestCase
           search({})
         end
       end
+
+      def test_nil
+        assert_raise(Droonga::Searcher::NoQuery) do
+          search(nil)
+        end
+      end
     end
 
     class QueriesTest < self
       def test_empty
         assert_raise(Droonga::Searcher::NoQuery) do
           search({"queries" => {}})
+        end
+      end
+
+      def test_nil
+        assert_raise(Droonga::Searcher::NoQuery) do
+          search({"queries" => nil})
         end
       end
     end
