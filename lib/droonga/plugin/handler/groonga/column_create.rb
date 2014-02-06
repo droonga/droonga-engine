@@ -73,12 +73,14 @@ module Droonga
       def define_index
         table_name = @command["table"]
         target_table = @command["type"]
-        target_column = @command["source"]
+        target_columns = (@command["source"] || "").split(/\s*,\s*/)
 
         options = create_index_options
         Groonga::Schema.define(:context => @context) do |schema|
           schema.change_table(table_name) do |table|
-            table.index("#{target_table}.#{target_column}", options)
+            arguments = [target_table, *target_columns]
+            arguments << options
+            table.index(*arguments)
           end
         end
         true
