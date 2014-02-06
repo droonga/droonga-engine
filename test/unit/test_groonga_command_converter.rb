@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,6 @@ class GroongaCommandConverterTest < Test::Unit::TestCase
       :id => "test",
       :date => date,
       :reply_to => reply_to,
-      :status_code => status_code,
       :dataset => dataset,
     }
     @converter = Droonga::GroongaCommandConverter.new(options)
@@ -41,7 +40,6 @@ table_create Terms TABLE_PAT_KEY ShortText \
                      :id => "test:0",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "table_create",
                      :body => {
@@ -69,7 +67,6 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
                      :id => "test:0",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "column_create",
                      :body => {
@@ -103,7 +100,6 @@ load --table Users
                      :id => "test:0",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "add",
                      :body => {
@@ -118,7 +114,6 @@ load --table Users
                      :id => "test:1",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "add",
                      :body => {
@@ -133,7 +128,6 @@ load --table Users
                      :id => "test:2",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "add",
                      :body => {
@@ -161,7 +155,6 @@ select --filter "age<=30" --output_type "json" --table "Users"
                      :id => "test:0",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "select",
                      :body => {
@@ -189,7 +182,6 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
                      :id => "test:0",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "table_create",
                      :body => {
@@ -204,7 +196,6 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
                      :id => "test:1",
                      :date => formatted_date,
                      :replyTo => reply_to,
-                     :statusCode => status_code,
                      :dataset => dataset,
                      :type => "column_create",
                      :body => {
@@ -230,10 +221,6 @@ column_create Terms Users_name COLUMN_INDEX|WITH_POSITION Users name
 
   def reply_to
     "localhost:20033"
-  end
-
-  def status_code
-    200
   end
 
   def dataset
