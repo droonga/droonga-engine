@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,6 @@ require "time"
 
 module Droonga
   class GroongaCommandConverter
-    STATUS_OK = 200
-
     def initialize(options={})
       @options = options
       @count = 0
@@ -82,7 +80,6 @@ module Droonga
         :id => id,
         :date => format_date(@options[:date] || Time.now),
         :replyTo => @options[:reply_to],
-        :statusCode => @options[:status_code] || STATUS_OK,
         :dataset => @options[:dataset],
         :type => type,
         :body => body,
