@@ -93,6 +93,11 @@ module Droonga
         rescue MessageProcessingError => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
+        rescue => error
+          formatted_error = MessageProcessingError.new("Unknown internal error")
+          reply("statusCode" => formatted_error.status_code,
+                "body"       => formatted_error.response_body)
+          raise error
         end
       end
     end
