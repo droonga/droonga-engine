@@ -119,6 +119,8 @@ module Droonga
         }
 
         if record.is_a?(Hash)
+          record = record.dup
+          body[:key] = record.delete("_key")
           record_values = record
         else
           record.each_with_index do |value, column_index|
