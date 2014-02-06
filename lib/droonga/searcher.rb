@@ -641,3 +641,7 @@ module Droonga
     end
   end
 end
+
+if ENV["DROONGA_ENABLE_SEARCH_MECAB_FILTER"] == "yes"
+  require "droonga/searcher/mecab_filter"
+end
