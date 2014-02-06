@@ -28,6 +28,8 @@ module Droonga
     end
 
     def plan
+      raise Searcher::NoQuery.new if @queries.nil? || @queries.empty?
+
       Searcher::QuerySorter.validate_dependencies(@queries)
 
       ensure_unifiable!

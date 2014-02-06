@@ -24,6 +24,12 @@ require "droonga/message_processing_error"
 
 module Droonga
   class Searcher
+    class NoQuery < BadRequest
+      def initialize
+        super("You must specify one or more query.")
+      end
+    end
+
     class MissingSourceParameter < BadRequest
       def initialize(query, queries)
         super("The query #{query.inspect} has no source. " +
@@ -64,9 +70,8 @@ module Droonga
     private
     def process_queries(queries)
       $log.trace("#{log_tag}: process_queries: start")
-      unless queries
-        $log.trace("#{log_tag}: process_queries: done")
-        return {}
+      if queries.nil? || queries.empty?
+        raise NoQuery.new
       end
       $log.trace("#{log_tag}: process_queries: sort: start")
       sorted_queries = QuerySorter.sort(queries)
