@@ -123,6 +123,7 @@ module Droonga
           body[:key] = record.delete("_key")
           record_values = record
         else
+          record_values = {}
           record.each_with_index do |value, column_index|
             column = columns[column_index]
             if column == "_key"
