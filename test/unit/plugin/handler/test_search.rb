@@ -78,13 +78,17 @@ class SearchHandlerTest < Test::Unit::TestCase
 
     class NoParameterTest < self
       def test_empty
-        assert_search({}, {})
+        assert_raise(Droonga::Searcher::NoQuery) do
+          search({})
+        end
       end
     end
 
     class QueriesTest < self
       def test_empty
-        assert_search({}, {"queries" => {}})
+        assert_raise(Droonga::Searcher::NoQuery) do
+          search({"queries" => {}})
+        end
       end
     end
 
