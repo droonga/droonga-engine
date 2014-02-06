@@ -57,3 +57,5 @@ if File.exist?(drnbench_dir)
 else
   gem "drnbench", :github => "droonga/drnbench"
 end
+
+gem "grn2drn", :github => "droonga/grn2drn"
