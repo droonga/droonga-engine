@@ -58,4 +58,9 @@ else
   gem "drnbench", :github => "droonga/drnbench"
 end
 
-gem "grn2drn", :github => "droonga/grn2drn"
+grn2drn_dir = File.join(parent_dir, "grn2drn")
+if File.exist?(grn2drn_dir)
+  gem "grn2drn", :path => grn2drn_dir
+else
+  gem "grn2drn", :github => "droonga/grn2drn"
+end
