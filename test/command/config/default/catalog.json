@@ -54,11 +54,5 @@
         }
       }
     }
-  },
-  "collector": {
-    "plugins": ["basic", "search"]
-  },
-  "planner": {
-    "plugins": ["search", "crud", "groonga", "watch"]
   }
 }

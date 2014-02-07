@@ -16,8 +16,6 @@
 require "digest/sha1"
 require "zlib"
 require "droonga/message_processing_error"
-require "droonga/collector_options"
-require "droonga/planner_options"
 
 module Droonga
   module Catalog
@@ -134,14 +132,6 @@ module Droonga
             routes.concat(replicas)
           end
         end
-      end
-
-      def collector_options
-        CollectorOptions.new(@data["collector"])
-      end
-
-      def planner_options
-        PlannerOptions.new(@data["planner"])
       end
 
       private

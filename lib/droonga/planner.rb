@@ -20,11 +20,9 @@ module Droonga
   class Planner
     include LegacyPluggable
 
-    def initialize(dispatcher, options={})
+    def initialize(dispatcher, plugins)
       @dispatcher = dispatcher
-      @plugins = []
-      @options = options
-      load_plugins(@options.plugins)
+      load_plugins(plugins)
     end
 
     private

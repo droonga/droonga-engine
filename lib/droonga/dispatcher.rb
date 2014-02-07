@@ -62,8 +62,10 @@ module Droonga
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @planner = Planner.new(self, Droonga.catalog.planner_options)
-      @collector = Collector.new(Droonga.catalog.collector_options)
+      # TODO: make customizable
+      @planner = Planner.new(self, ["search", "crud", "groonga", "watch"])
+      # TODO: make customizable
+      @collector = Collector.new(["basic", "search"])
     end
 
     def start

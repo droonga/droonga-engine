@@ -20,9 +20,8 @@ module Droonga
   class Collector
     include LegacyPluggable
 
-    def initialize(options)
-      @options = options
-      load_plugins(@options.plugins)
+    def initialize(plugins)
+      load_plugins(plugins)
     end
 
     private
