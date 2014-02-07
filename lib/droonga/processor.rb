@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,7 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler"
+require "droonga/handler_runner"
 
 module Droonga
   class Processor
@@ -27,24 +25,24 @@ module Droonga
     end
 
     def start
-      @handler = Handler.new(@loop, @options)
-      @handler.start
+      @handler_runner = HandlerRunner.new(@loop, @options)
+      @handler_runner.start
     end
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      @handler.shutdown
+      @handler_runner.shutdown
       $log.trace("#{log_tag}: shutdown: done")
     end
 
     def process(message)
       $log.trace("#{log_tag}: process: start")
       command = message["type"]
-      if @handler.processable?(command)
+      if @handler_runner.processable?(command)
         $log.trace("#{log_tag}: process: handlable: #{command}")
-        synchronous = @handler.prefer_synchronous?(command)
+        synchronous = @handler_runner.prefer_synchronous?(command)
         if @n_workers.zero? or synchronous
-          @handler.process(message)
+          @handler_runner.process(message)
         else
           @message_pusher.push(message)
         end

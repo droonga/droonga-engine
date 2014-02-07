@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,14 +14,15 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/event_loop"
-require "droonga/handler"
+require "droonga/handler_runner"
 require "droonga/message_receiver"
 
 module Droonga
   module Worker
     def initialize
       @loop = EventLoop.new
-      @handler = Handler.new(@loop, config.merge(:dispatcher => nil))
+      @handler_runner = HandlerRunner.new(@loop,
+                                          config.merge(:dispatcher => nil))
       receiver_socket = config[:message_receiver]
       @message_receiver = MessageReceiver.new(@loop, receiver_socket) do |message|
         process(message)
@@ -32,10 +31,10 @@ module Droonga
 
     def run
       $log.trace("#{log_tag}: run: start")
-      @handler.start
+      @handler_runner.start
       @message_receiver.start
       @loop.run
-      @handler.shutdown
+      @handler_runner.shutdown
       $log.trace("#{log_tag}: run: done")
     end
 
@@ -49,7 +48,7 @@ module Droonga
     private
     def process(message)
       $log.trace("#{log_tag}: process: start")
-      @handler.process(message)
+      @handler_runner.process(message)
       $log.trace("#{log_tag}: process: done")
     end
 

@@ -22,7 +22,7 @@ require "droonga/legacy_pluggable"
 require "droonga/handler_plugin"
 
 module Droonga
-  class Handler
+  class HandlerRunner
     include LegacyPluggable
 
     attr_reader :context, :name
