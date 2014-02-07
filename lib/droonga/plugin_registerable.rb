@@ -17,14 +17,15 @@
 
 require "droonga/command"
 require "droonga/command_repository"
-require "droonga/plugin_repository"
+require "droonga/legacy_plugin_repository"
 
 module Droonga
   module PluginRegisterable
     class << self
       def extended(plugin_class)
         super
-        plugin_class.class_variable_set(:@@repository, PluginRepository.new)
+        plugin_class.class_variable_set(:@@repository,
+                                        LegacyPluginRepository.new)
       end
     end
 
