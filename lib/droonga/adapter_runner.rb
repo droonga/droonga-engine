@@ -24,7 +24,7 @@ module Droonga
       @dispatcher = dispatcher
       default_plugins = ["error"]
       plugins += (default_plugins - plugins)
-      @adapter_classes = collect_adapter_classes(plugins)
+      @adapter_classes = Adapter.find_sub_classes(plugins)
     end
 
     def shutdown
@@ -92,15 +92,6 @@ module Droonga
     end
 
     private
-    def collect_adapter_classes(plugins)
-      adapter_classes = []
-      plugins.each do |plugin_name|
-        sub_classes = Plugin.registry.find_sub_classes(plugin_name, Adapter)
-        adapter_classes.concat(sub_classes)
-      end
-      adapter_classes
-    end
-
     def log_tag
       "adapter-runner"
     end

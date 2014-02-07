@@ -24,5 +24,14 @@ module Droonga
     def options
       @options ||= {}
     end
+
+    def find_sub_classes(names)
+      target_sub_classes = []
+      names.each do |name|
+        sub_classes = Plugin.registry.find_sub_classes(name, self)
+        target_sub_classes.concat(sub_classes)
+      end
+      target_sub_classes
+    end
   end
 end
