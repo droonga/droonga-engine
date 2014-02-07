@@ -42,6 +42,11 @@ module Droonga
       @components = components
     end
 
+    def distribute
+      planned_components = plan
+      @dispatcher.dispatch_components(planned_components)
+    end
+
     def plan
       @dependency = {}
       @components.each do |component|

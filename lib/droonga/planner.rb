@@ -17,7 +17,6 @@
 
 require "droonga/pluggable"
 require "droonga/planner_plugin"
-require "droonga/distribution_planner"
 
 module Droonga
   class Planner
@@ -28,12 +27,6 @@ module Droonga
       @plugins = []
       @options = options
       load_plugins(@options.plugins)
-    end
-
-    def distribute(components)
-      planner = DistributionPlanner.new(@dispatcher, components)
-      planned_components = planner.plan
-      @dispatcher.dispatch_components(planned_components)
     end
 
     private

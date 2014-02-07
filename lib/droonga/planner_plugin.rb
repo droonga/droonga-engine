@@ -27,10 +27,6 @@ module Droonga
       @planner = planner
     end
 
-    def distribute(messages)
-      @planner.distribute(messages)
-    end
-
     def scatter(message, options={})
       planner = DistributedCommandPlanner.new(message)
       planner.scatter

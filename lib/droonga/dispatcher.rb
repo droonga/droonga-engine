@@ -25,6 +25,7 @@ require "droonga/session"
 require "droonga/replier"
 require "droonga/message_processing_error"
 require "droonga/catalog_observer"
+require "droonga/distribution_planner"
 
 module Droonga
   class Dispatcher
@@ -213,7 +214,8 @@ module Droonga
     def process_input_message(message)
       adapted_message = @adapter_runner.adapt_input(message)
       plan = @planner.process(adapted_message["type"], adapted_message)
-      @planner.distribute(plan)
+      distributor = DistributionPlanner.new(self, plan)
+      distributor.distribute
     rescue Droonga::Pluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end
