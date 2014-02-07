@@ -22,12 +22,6 @@ require "droonga/planner_options"
 module Droonga
   module Catalog
     class Base
-      class UnknownDataset < NotFound
-        def initialize(dataset)
-          super("The dataset #{dataset.inspect} does not exist.")
-        end
-      end
-
       attr_reader :base_path
       def initialize(data, base_path)
         @data = data
@@ -121,10 +115,12 @@ module Droonga
         @data["datasets"] || {}
       end
 
+      def have_dataset?(name)
+        datasets.key?(name)
+      end
+
       def dataset(name)
-        dataset = datasets[name]
-        raise UnknownDataset.new(name) unless dataset
-        dataset
+        datasets[name]
       end
 
       def select_range_and_replicas(partition, args, routes)

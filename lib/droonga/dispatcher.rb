@@ -37,6 +37,12 @@ module Droonga
       end
     end
 
+    class UnknownDataset < NotFound
+      def initialize(dataset)
+        super("The dataset #{dataset.inspect} does not exist.")
+      end
+    end
+
     class UnknownCommand < BadRequest
       def initialize(command, dataset)
         super("The command #{command.inspect} is not available " +
@@ -86,12 +92,13 @@ module Droonga
         process_internal_message(message["body"])
       else
         begin
-          assert_valid_message
+          assert_valid_message(message)
           process_input_message(message)
         rescue MessageProcessingError => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
         rescue => error
+          Logger.error("failed to process input message", error)
           formatted_error = MessageProcessingError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
                 "body"       => formatted_error.response_body)
@@ -216,12 +223,9 @@ module Droonga
     end
 
     def process_input_message(message)
-      adapter_runner = @adapter_runners[message["dataset"]]
-      if adapter_runner
-        adapted_message = adapter_runner.adapt_input(message)
-      else
-        adapted_message = message
-      end
+      dataset = message["dataset"]
+      adapter_runner = @adapter_runners[dataset]
+      adapted_message = adapter_runner.adapt_input(message)
       plan = @planner.process(adapted_message["type"], adapted_message)
       distributor = Distributor.new(self)
       distributor.distribute(plan)
@@ -229,8 +233,14 @@ module Droonga
       raise UnknownCommand.new(error.command, message["dataset"])
     end
 
-    def assert_valid_message
-      raise MissingDatasetParameter.new unless @message.include?("dataset")
+    def assert_valid_message(message)
+      unless message.key?("dataset")
+        raise MissingDatasetParameter.new
+      end
+      dataset = message["dataset"]
+      unless Droonga.catalog.have_dataset?(dataset)
+        raise UnknownDataset.new(dataset)
+      end
     end
 
     def create_adapter_runners
