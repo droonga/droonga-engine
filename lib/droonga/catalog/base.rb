@@ -16,8 +16,6 @@
 require "digest/sha1"
 require "zlib"
 require "droonga/message_processing_error"
-require "droonga/input_adapter_options"
-require "droonga/output_adapter_options"
 require "droonga/collector_options"
 require "droonga/planner_options"
 
@@ -119,8 +117,12 @@ module Droonga
         return continuum[max][1]
       end
 
+      def datasets
+        @data["datasets"] || {}
+      end
+
       def dataset(name)
-        dataset = @data["datasets"][name]
+        dataset = datasets[name]
         raise UnknownDataset.new(name) unless dataset
         dataset
       end
@@ -137,14 +139,6 @@ module Droonga
             routes.concat(replicas)
           end
         end
-      end
-
-      def input_adapter_options
-        InputAdapterOptions.new(@data["input_adapter"])
-      end
-
-      def output_adapter_options
-        OutputAdapterOptions.new(@data["output_adapter"])
       end
 
       def collector_options

@@ -52,9 +52,7 @@ module Droonga
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @adapter_runner = AdapterRunner.new(self,
-                                          Droonga.catalog.input_adapter_options,
-                                          Droonga.catalog.output_adapter_options)
+      @adapter_runners = create_adapter_runners
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
@@ -74,7 +72,9 @@ module Droonga
       @forwarder.shutdown
       @planner.shutdown
       @collector.shutdown
-      @adapter_runner.shutdown
+      @adapter_runners.each_value do |adapter_runner|
+        adapter_runner.shutdown
+      end
       @farm.shutdown
       @loop.stop
       @loop_thread.join
@@ -119,7 +119,11 @@ module Droonga
     #
     # @see Replier#reply
     def reply(message)
-      adapted_message = @adapter_runner.adapt_output(@message.merge(message))
+      adapted_message = @message.merge(message)
+      adapter_runner = @adapter_runners[adapted_message["dataset"]]
+      if adapter_runner
+        adapted_message = adapter_runner.adapt_output(adapted_message)
+      end
       return if adapted_message["replyTo"].nil?
       @replier.reply(adapted_message)
     end
@@ -212,7 +216,12 @@ module Droonga
     end
 
     def process_input_message(message)
-      adapted_message = @adapter_runner.adapt_input(message)
+      adapter_runner = @adapter_runners[message["dataset"]]
+      if adapter_runner
+        adapted_message = adapter_runner.adapt_input(message)
+      else
+        adapted_message = message
+      end
       plan = @planner.process(adapted_message["type"], adapted_message)
       distributor = Distributor.new(self)
       distributor.distribute(plan)
@@ -222,6 +231,14 @@ module Droonga
 
     def assert_valid_message
       raise MissingDatasetParameter.new unless @message.include?("dataset")
+    end
+
+    def create_adapter_runners
+      runners = {}
+      Droonga.catalog.datasets.each do |name, configuration|
+        runners[name] = AdapterRunner.new(self, configuration["plugins"] || [])
+      end
+      runners
     end
 
     def log_tag

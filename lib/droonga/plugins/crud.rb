@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,24 +13,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/input_adapter_options"
+require "droonga/adapter"
 
-class InputAdapterOptionsTest < Test::Unit::TestCase
-  def options(data)
-    Droonga::InputAdapterOptions.new(data)
-  end
+module Droonga
+  module Plugins
+    module CRUD
+      class Adapter < Droonga::Adapter
+        plugin.name = "crud"
+        message.input_pattern  = ["type", :equal, "add"]
+        message.output_pattern = ["body.success", :exist?]
 
-  class PluginsTest < self
-    def plugins(data)
-      options(data).plugins
-    end
-
-    def test_nothing
-      assert_equal([], plugins({}))
-    end
-
-    def test_have_values
-      assert_equal(["groonga"], plugins("plugins" => ["groonga"]))
+        def adapt_output(output_message)
+          success = output_message.body["success"]
+          unless success.nil?
+            output_message.body = output_message.body["success"]
+          end
+        end
+      end
     end
   end
 end

@@ -15,6 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "pathname"
+
 module Droonga
   class PluginLoader
     class << self
@@ -28,6 +30,12 @@ module Droonga
               loader = new(type, name)
               loader.load
             end
+          end
+          Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
+            relative_plugin_path =
+              plugin_path.relative_path_from(Pathname(load_path))
+            require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
+            require require_path
           end
         end
       end

@@ -13,24 +13,33 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/output_adapter_options"
+module Droonga
+  class Adapter
+    class MessageConfiguration
+      def initialize(adapter_class)
+        @adapter_class = adapter_class
+      end
 
-class OutputAdapterOptionsTest < Test::Unit::TestCase
-  def options(data)
-    Droonga::OutputAdapterOptions.new(data)
-  end
+      def input_pattern
+        configuration[:input_pattern]
+      end
 
-  class PluginsTest < self
-    def plugins(data)
-      options(data).plugins
-    end
+      def input_pattern=(pattern)
+        configuration[:input_pattern] = pattern
+      end
 
-    def test_nothing
-      assert_equal([], plugins({}))
-    end
+      def output_pattern
+        configuration[:output_pattern]
+      end
 
-    def test_have_values
-      assert_equal(["groonga"], plugins("plugins" => ["groonga"]))
+      def output_pattern=(pattern)
+        configuration[:output_pattern] = pattern
+      end
+
+      private
+      def configuration
+        @adapter_class.options[:message] ||= {}
+      end
     end
   end
 end

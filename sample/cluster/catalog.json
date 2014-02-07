@@ -11,6 +11,7 @@
   "datasets": {
     "Droonga": {
       "workers": 2,
+      "plugins": ["crud", "groonga"],
       "handler": {
         "plugins": ["search", "groonga", "add"]
       },
@@ -39,12 +40,6 @@
         }
       }
     }
-  },
-  "input_adapter": {
-    "plugins": ["groonga"]
-  },
-  "output_adapter": {
-    "plugins": ["crud", "groonga"]
   },
   "collector": {
     "plugins": ["basic", "search"]

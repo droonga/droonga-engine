@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,21 +13,42 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/output_adapter_plugin"
-
 module Droonga
-  class CRUDOutputAdapter < Droonga::OutputAdapterPlugin
-    repository.register("crud", self)
-
-    command :convert_success,
-            :pattern => ["replyTo.type", :equal, "add.result"]
-    def convert_success(output_message)
-      if output_message.body.include?("success")
-        success = output_message.body["success"]
-        unless success.nil?
-          output_message.body = output_message.body["success"]
-        end
+  class Adapter
+    class << self
+      def adapter_classes
+        @@adapter_classes ||= []
       end
+
+      def inherited(sub_class)
+        super
+        adapter_classes << sub_class
+      end
+
+      def plugin
+        PluginConfiguration.new(self)
+      end
+
+      def message
+        MessageConfiguration.new(self)
+      end
+
+      def id
+        options[:id] || name || object_id.to_s
+      end
+
+      def options
+        @options ||= {}
+      end
+    end
+
+    def adapt_input(input_message)
+    end
+
+    def adapt_output(output_message)
     end
   end
 end
+
+require "droonga/adapter/plugin_configuration"
+require "droonga/adapter/message_configuration"

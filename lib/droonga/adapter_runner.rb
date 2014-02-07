@@ -13,28 +13,98 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/input_adapter"
-require "droonga/output_adapter"
+require "droonga/message_matcher"
+require "droonga/input_message"
+require "droonga/output_message"
+require "droonga/adapter"
 
 module Droonga
   class AdapterRunner
-    def initialize(dispatcher, input_adapter_options, output_adapter_options)
+    def initialize(dispatcher, plugins)
       @dispatcher = dispatcher
-      @input_adapter = InputAdapter.new(self, input_adapter_options)
-      @output_adapter = OutputAdapter.new(self, output_adapter_options)
+      default_plugins = ["error"]
+      plugins += (default_plugins - plugins)
+      @adapter_classes = collect_adapter_classes(plugins)
     end
 
     def shutdown
-      @input_adapter.shutdown
-      @output_adapter.shutdown
     end
 
     def adapt_input(message)
-      @input_adapter.adapt(message)
+      $log.trace("#{log_tag}: adapt_input: start",
+                 :dataset => message["dataset"],
+                 :type => message["type"])
+      adapted_message = message
+      adapted_message["appliedAdapters"] = []
+      @adapter_classes.each do |adapter_class|
+        adapter_class_id = adapter_class.id
+        pattern = adapter_class.message.input_pattern
+        if pattern
+          matcher = MessageMatcher.new(pattern)
+          $log.trace("#{log_tag}: adapt_input: skip: #{adapter_class_id}",
+                     :pattern => pattern)
+          next unless matcher.match?(adapted_message)
+        end
+        $log.trace("#{log_tag}: adapt_input: use: #{adapter_class_id}")
+        input_message = InputMessage.new(adapted_message)
+        adapter = adapter_class.new
+        adapter.adapt_input(input_message)
+        adapted_message = input_message.adapted_message
+        adapted_message["appliedAdapters"] << adapter_class_id
+      end
+      $log.trace("#{log_tag}: adapt_input: done",
+                 :dataset => adapted_message["dataset"],
+                 :type => adapted_message["type"])
+      adapted_message
     end
 
     def adapt_output(message)
-      @output_adapter.adapt(message)
+      $log.trace("#{log_tag}: adapt_output: start",
+                 :dataset => message["dataset"],
+                 :type => message["type"])
+      adapted_message = message
+      applied_adapters = adapted_message["appliedAdapters"]
+      @adapter_classes.reverse_each do |adapter_class|
+        adapter_class_id = adapter_class.id
+        if applied_adapters
+          $log.trace("#{log_tag}: adapt_output: skip: #{adapter_class_id}: " +
+                     "input adapter wasn't applied",
+                     :applied_adapters => applied_adapters)
+          next unless applied_adapters.include?(adapter_class.id)
+        end
+        pattern = adapter_class.message.output_pattern
+        if pattern
+          matcher = MessageMatcher.new(pattern)
+          $log.trace("#{log_tag}: adapt_output: skip: #{adapter_class_id}",
+                     :pattern => pattern)
+          next unless matcher.match?(adapted_message)
+        end
+        $log.trace("#{log_tag}: adapt_output: use: #{adapter_class_id}")
+        output_message = OutputMessage.new(adapted_message)
+        adapter = adapter_class.new
+        adapter.adapt_output(output_message)
+        adapted_message = output_message.adapted_message
+      end
+      $log.trace("#{log_tag}: adapt_output: done",
+                 :dataset => adapted_message["dataset"],
+                 :type => adapted_message["type"])
+      adapted_message
+    end
+
+    private
+    def collect_adapter_classes(plugins)
+      adapter_classes = []
+      plugins.each do |plugin_name|
+        Adapter.adapter_classes.each do |adapter_class|
+          next unless adapter_class.plugin.name == plugin_name
+          adapter_classes << adapter_class
+        end
+      end
+      adapter_classes
+    end
+
+    def log_tag
+      "adapter-runner"
     end
   end
 end

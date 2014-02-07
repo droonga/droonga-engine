@@ -13,6 +13,7 @@
       "handler": {
         "plugins": ["search", "groonga", "add"]
       },
+      "plugins": ["groonga", "crud"],
       "number_of_replicas": 2,
       "number_of_partitions": 2,
       "partition_key": "_key",
@@ -58,12 +59,6 @@
         }
       }
     }
-  },
-  "input_adapter": {
-    "plugins": ["groonga"]
-  },
-  "output_adapter": {
-    "plugins": ["crud", "groonga"]
   },
   "collector": {
     "plugins": ["basic", "search"]

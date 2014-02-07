@@ -13,11 +13,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/base"
+require "droonga/adapter"
 
 module Droonga
-  module Catalog
-    class Version1 < Base
+  module Plugins
+    module Groonga
+      module Generic
+        class Adapter < Droonga::Adapter
+          plugin.name = "groonga"
+
+          groonga_commands = [
+            "table_create",
+            "table_remove",
+            "column_create",
+          ]
+          message.input_pattern  = ["type", :in, groonga_commands]
+          message.output_pattern = ["body.result", :exist?]
+
+          def adapt_output(output_message)
+            output_message.body = output_message.body["result"]
+          end
+        end
+      end
     end
   end
 end

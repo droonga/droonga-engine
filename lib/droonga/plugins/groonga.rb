@@ -13,21 +13,5 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/input_adapter_plugin"
-
-module Droonga
-  class GroongaInputAdapter < Droonga::InputAdapterPlugin
-    repository.register("groonga", self)
-
-    command :select
-    def select(input_message)
-      command = Select.new
-      select_request = input_message.body
-      search_request = command.convert(select_request)
-      input_message.command = "search"
-      input_message.body = search_request
-    end
-  end
-end
-
-require "droonga/plugin/input_adapter/groonga/select"
+require "droonga/plugins/groonga/generic"
+require "droonga/plugins/groonga/select"
