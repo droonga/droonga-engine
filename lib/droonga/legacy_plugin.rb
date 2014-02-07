@@ -18,7 +18,7 @@
 require "droonga/plugin_registerable"
 
 module Droonga
-  class Plugin
+  class LegacyPlugin
     def initialize
     end
 

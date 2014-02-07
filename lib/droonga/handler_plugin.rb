@@ -15,11 +15,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
+require "droonga/legacy_plugin"
 require "droonga/message_processing_error"
 
 module Droonga
-  class HandlerPlugin < Plugin
+  class HandlerPlugin < LegacyPlugin
     extend PluginRegisterable
 
     def initialize(handler)
