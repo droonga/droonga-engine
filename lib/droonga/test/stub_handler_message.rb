@@ -22,7 +22,7 @@ module Droonga
         raw = {
           "body" => {
             "task" => {
-              "component" => {
+              "step" => {
                 "body" => request,
               },
             },

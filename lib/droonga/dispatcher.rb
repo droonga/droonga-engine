@@ -130,9 +130,9 @@ module Droonga
       if session
         session.receive(message["input"], message["value"])
       else
-        components = message["components"]
-        if components
-          session_planner = SessionPlanner.new(self, components)
+        steps = message["steps"]
+        if steps
+          session_planner = SessionPlanner.new(self, steps)
           session = session_planner.create_session(id, @collector)
           @sessions[id] = session
         else
@@ -153,23 +153,23 @@ module Droonga
       end
     end
 
-    def dispatch_components(components)
+    def dispatch_steps(steps)
       id = generate_id
       destinations = {}
-      components.each do |component|
-        dataset = component["dataset"]
+      steps.each do |step|
+        dataset = step["dataset"]
         if dataset
-          routes = Droonga.catalog.get_routes(dataset, component)
-          component["routes"] = routes
+          routes = Droonga.catalog.get_routes(dataset, step)
+          step["routes"] = routes
         else
-          component["routes"] ||= [id]
+          step["routes"] ||= [id]
         end
-        routes = component["routes"]
+        routes = step["routes"]
         routes.each do |route|
           destinations[farm_path(route)] = true
         end
       end
-      dispatch_message = { "id" => id, "components" => components }
+      dispatch_message = { "id" => id, "steps" => steps }
       destinations.each_key do |destination|
         dispatch(dispatch_message, destination)
       end
@@ -178,10 +178,10 @@ module Droonga
     def process_local_message(local_message)
       task = local_message["task"]
       partition_name = task["route"]
-      component = task["component"]
-      command = component["command"]
+      step = task["step"]
+      command = step["command"]
       descendants = {}
-      component["descendants"].each do |name, routes|
+      step["descendants"].each do |name, routes|
         descendants[name] = routes.collect do |route|
           farm_path(route)
         end
@@ -229,28 +229,28 @@ module Droonga
     end
 
     class SessionPlanner
-      attr_reader :components
+      attr_reader :steps
 
-      def initialize(dispatcher, components)
+      def initialize(dispatcher, steps)
         @dispatcher = dispatcher
-        @components = components
+        @steps = steps
       end
 
       def create_session(id, collector)
         resolve_descendants
         tasks = []
         inputs = {}
-        @components.each do |component|
-          component["routes"].each do |route|
+        @steps.each do |step|
+          step["routes"].each do |route|
             next unless @dispatcher.local?(route)
             task = {
               "route" => route,
-              "component" => component,
+              "step" => step,
               "n_of_inputs" => 0,
               "values" => {}
             }
             tasks << task
-            (component["inputs"] || [nil]).each do |input|
+            (step["inputs"] || [nil]).each do |input|
               inputs[input] ||= []
               inputs[input] << task
             end
@@ -261,24 +261,24 @@ module Droonga
 
       def resolve_descendants
         @descendants = {}
-        @components.size.times do |index|
-          component = @components[index]
-          (component["inputs"] || []).each do |input|
+        @steps.size.times do |index|
+          step = @steps[index]
+          (step["inputs"] || []).each do |input|
             @descendants[input] ||= []
             @descendants[input] << index
           end
-          component["n_of_expects"] = 0
+          step["n_of_expects"] = 0
         end
-        @components.each do |component|
+        @steps.each do |step|
           descendants = {}
-          (component["outputs"] || []).each do |output|
+          (step["outputs"] || []).each do |output|
             descendants[output] = []
             @descendants[output].each do |index|
-              @components[index]["n_of_expects"] += component["routes"].size
-              descendants[output].concat(@components[index]["routes"])
+              @steps[index]["n_of_expects"] += step["routes"].size
+              descendants[output].concat(@steps[index]["routes"])
             end
           end
-          component["descendants"] = descendants
+          step["descendants"] = descendants
         end
       end
     end

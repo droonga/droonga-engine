@@ -27,41 +27,41 @@ module Droonga
       end
     end
 
-    class CyclicComponentsError < StandardError
-      attr_reader :components
-      def initialize(components)
-        @components = components
-        super("cyclic components found: <#{components}>")
+    class CyclicStepsError < StandardError
+      attr_reader :steps
+      def initialize(steps)
+        @steps = steps
+        super("cyclic steps found: <#{steps}>")
       end
     end
 
     include TSort
 
-    def initialize(dispatcher, components)
+    def initialize(dispatcher, steps)
       @dispatcher = dispatcher
-      @components = components
+      @steps = steps
     end
 
     def distribute
-      planned_components = plan
-      @dispatcher.dispatch_components(planned_components)
+      planned_steps = plan
+      @dispatcher.dispatch_steps(planned_steps)
     end
 
     def plan
       @dependency = {}
-      @components.each do |component|
-        @dependency[component] = component["inputs"]
-        next unless component["outputs"]
-        component["outputs"].each do |output|
-          @dependency[output] = [component]
+      @steps.each do |step|
+        @dependency[step] = step["inputs"]
+        next unless step["outputs"]
+        step["outputs"].each do |output|
+          @dependency[output] = [step]
         end
       end
-      components = []
+      steps = []
       each_strongly_connected_component do |cs|
-        raise CyclicComponentsError.new(cs) if cs.size > 1
-        components.concat(cs) unless cs.first.is_a? String
+        raise CyclicStepsError.new(cs) if cs.size > 1
+        steps.concat(cs) unless cs.first.is_a? String
       end
-      components
+      steps
     end
 
     private

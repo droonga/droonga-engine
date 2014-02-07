@@ -48,10 +48,10 @@ module Droonga
       end
       tasks.each do |task|
         task["n_of_inputs"] += 1
-        component = task["component"]
-        type = component["type"]
+        step = task["step"]
+        type = step["type"]
         command = "collector_" + type
-        n_of_expects = component["n_of_expects"]
+        n_of_expects = step["n_of_expects"]
         message = {
           "task"=>task,
           "name"=>name,
@@ -61,9 +61,9 @@ module Droonga
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
         result = task["values"]
-        post = component["post"]
+        post = step["post"]
         @dispatcher.reply("body" => result) if post
-        component["descendants"].each do |name, routes|
+        step["descendants"].each do |name, routes|
           message = {
             "id" => @id,
             "input" => name,

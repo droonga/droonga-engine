@@ -308,7 +308,7 @@ class SearchCollectorTest < Test::Unit::TestCase
       request = {
         "task" => {
           "values" => nil,
-          "component" => {
+          "step" => {
             "body" => nil,
             "outputs" => nil,
           },
@@ -346,7 +346,7 @@ class SearchCollectorTest < Test::Unit::TestCase
               ],
             },
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {
@@ -431,7 +431,7 @@ class SearchCollectorTest < Test::Unit::TestCase
               ],
             },
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {
@@ -511,7 +511,7 @@ class SearchCollectorTest < Test::Unit::TestCase
               ],
             },
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {
@@ -595,7 +595,7 @@ class SearchCollectorTest < Test::Unit::TestCase
               ],
             },
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {
@@ -696,7 +696,7 @@ class SearchCollectorTest < Test::Unit::TestCase
               ],
             },
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {

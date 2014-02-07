@@ -59,7 +59,7 @@ class BasicCollectorTest < Test::Unit::TestCase
       request = {
         "task" => {
           "values" => nil,
-          "component" => {
+          "step" => {
             "body" => nil,
             "outputs" => nil,
           },
@@ -81,7 +81,7 @@ class BasicCollectorTest < Test::Unit::TestCase
           "values" => {
             output_name => [0, 1, 2],
           },
-          "component" => {
+          "step" => {
             "body" => {
               input_name => {
                 output_name => {

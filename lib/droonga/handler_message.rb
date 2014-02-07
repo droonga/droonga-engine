@@ -25,8 +25,8 @@ module Droonga
         raise "<task> value isn't object: <#{@raw.inspect}>"
       end
 
-      unless component.is_a?(Hash)
-        raise "<task/component> value isn't object: <#{@raw.inspect}>"
+      unless step.is_a?(Hash)
+        raise "<task/step> value isn't object: <#{@raw.inspect}>"
       end
     end
 
@@ -42,12 +42,12 @@ module Droonga
       @task ||= body["task"]
     end
 
-    def component
-      @component ||= task["component"]
+    def step
+      @step ||= task["step"]
     end
 
     def request
-      @request ||= component["body"]
+      @request ||= step["body"]
     end
 
     def id

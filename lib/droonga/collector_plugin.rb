@@ -21,7 +21,7 @@ module Droonga
   class CollectorPlugin < LegacyPlugin
     extend PluginRegisterable
 
-    attr_reader :task, :input_name, :component, :output_values, :body, :output_names
+    attr_reader :task, :input_name, :step, :output_values, :body, :output_names
     def initialize
       super()
     end
@@ -30,11 +30,11 @@ module Droonga
       return false unless message.is_a? Hash
       @task = message["task"]
       return false unless @task.is_a? Hash
-      @component = @task["component"]
-      return false unless @component.is_a? Hash
+      @step = @task["step"]
+      return false unless @step.is_a? Hash
       @output_values = @task["values"]
-      @body = @component["body"]
-      @output_names = @component["outputs"]
+      @body = @step["body"]
+      @output_names = @step["outputs"]
       @id = message["id"]
       @value = message["value"]
       @input_name = message["name"]
