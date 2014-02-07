@@ -13,11 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
+require "droonga/legacy_plugin"
 
-class PluginTest < Test::Unit::TestCase
+class LegacyPluginTest < Test::Unit::TestCase
   class PluggableTest < self
-    class DummyTypePlugin < Droonga::Plugin
+    class DummyTypePlugin < Droonga::LegacyPlugin
       extend Droonga::PluginRegisterable
     end
 
