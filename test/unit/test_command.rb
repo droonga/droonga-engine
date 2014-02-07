@@ -123,5 +123,23 @@ class CommandTest < Test::Unit::TestCase
                             }))
       end
     end
+
+    class ExistTest < self
+      def test_exist
+        assert_true(match?(["body.result", :exist?],
+                           {
+                             "body" => {
+                               "result" => nil,
+                             },
+                           }))
+      end
+
+      def test_not_exist
+        assert_false(match?(["body.result", :exist?],
+                            {
+                              "body" => nil,
+                            }))
+      end
+    end
   end
 end

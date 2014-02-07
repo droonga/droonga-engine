@@ -27,9 +27,9 @@ module Droonga
     #      * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
     #      * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
     #      * TARGET_PATH = "COMPONENT(.COMPONENT)*"
-    #      * OPERATOR = :equal, :in, :include?
+    #      * OPERATOR = :equal, :in, :include?, :exist?
     #                   (More operators may be added in the future.
-    #                    For example, :exist?, :start_with and so on.)
+    #                    For example, :start_with and so on.)
     #      * ARGUMENTS = OBJECT_DEFINED_IN_JSON*
     #      * LOGICAL_OPERATOR = :or (:add will be added.)
     #
@@ -82,7 +82,7 @@ module Droonga
     NONEXISTENT_PATH = Object.new
     def resolve_path(path, message)
       path.split(".").inject(message) do |result, component|
-        return NONEXISTENT_PATH if result.nil?
+        return NONEXISTENT_PATH unless result.is_a?(Hash)
         result[component]
       end
     end
@@ -100,6 +100,8 @@ module Droonga
         arguments.any? do |argument|
           target.include?(argument)
         end
+      when :exist?
+        target != NONEXISTENT_PATH
       else
         raise ArgumentError, "Unknown operator"
       end
