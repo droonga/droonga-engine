@@ -16,8 +16,7 @@
 require "English"
 require "tsort"
 
-require "droonga/input_adapter"
-require "droonga/output_adapter"
+require "droonga/adapter_runner"
 require "droonga/planner"
 require "droonga/catalog"
 require "droonga/collector"
@@ -52,10 +51,9 @@ module Droonga
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @input_adapter =
-        InputAdapter.new(self, Droonga.catalog.input_adapter_options)
-      @output_adapter =
-        OutputAdapter.new(self, Droonga.catalog.output_adapter_options)
+      @adapter_runner = AdapterRunner.new(self,
+                                          Droonga.catalog.input_adapter_options,
+                                          Droonga.catalog.output_adapter_options)
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
@@ -75,8 +73,7 @@ module Droonga
       @forwarder.shutdown
       @planner.shutdown
       @collector.shutdown
-      @input_adapter.shutdown
-      @output_adapter.shutdown
+      @adapter_runner.shutdown
       @farm.shutdown
       @loop.stop
       @loop_thread.join
@@ -121,7 +118,7 @@ module Droonga
     #
     # @see Replier#reply
     def reply(message)
-      adapted_message = @output_adapter.adapt(@message.merge(message))
+      adapted_message = @adapter_runner.adapt_output(@message.merge(message))
       return if adapted_message["replyTo"].nil?
       @replier.reply(adapted_message)
     end
@@ -214,7 +211,7 @@ module Droonga
     end
 
     def process_input_message(message)
-      adapted_message = @input_adapter.adapt(message)
+      adapted_message = @adapter_runner.adapt_input(message)
       @planner.process(adapted_message["type"], adapted_message)
     rescue Droonga::Pluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
