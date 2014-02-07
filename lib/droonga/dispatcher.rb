@@ -225,7 +225,7 @@ module Droonga
       plan = @planner.process(adapted_message["type"], adapted_message)
       distributor = Distributor.new(self)
       distributor.distribute(plan)
-    rescue Droonga::Pluggable::UnknownPlugin => error
+    rescue Droonga::LegacyPluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end
 
