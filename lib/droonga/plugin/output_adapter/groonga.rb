@@ -32,7 +32,7 @@ module Droonga
       "column_create.result",
     ]
     command :convert_generic_result,
-            :pattern => ["replyTo.type", :in, *groonga_results]
+            :pattern => ["replyTo.type", :in, groonga_results]
     def convert_generic_result(output_message)
       if output_message.body.include?("result")
         output_message.body = output_message.body["result"]

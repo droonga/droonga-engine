@@ -92,7 +92,9 @@ module Droonga
       when :equal
         [target] == arguments
       when :in
-        arguments.include?(target)
+        arguments.any? do |argument|
+          argument.include?(target)
+        end
       when :include?
         return false unless target.respond_to?(:include?)
         arguments.any? do |argument|

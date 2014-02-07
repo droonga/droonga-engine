@@ -82,14 +82,14 @@ class CommandTest < Test::Unit::TestCase
 
     class InTest < self
       def test_exist
-        assert_true(match?(["type", :in, "table_create", "table_remove"],
+        assert_true(match?(["type", :in, ["table_create", "table_remove"]],
                            {
                              "type" => "table_remove"
                            }))
       end
 
       def test_not_exist
-        assert_false(match?(["type", :in, "table_create", "table_remove"],
+        assert_false(match?(["type", :in, ["table_create", "table_remove"]],
                             {
                               "type" => "column_create",
                             }))
