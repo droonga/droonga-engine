@@ -17,22 +17,6 @@ require "droonga/plugin/metadata/plugin"
 
 module Droonga
   module Pluggable
-    class << self
-      def extended(pluggable_class)
-        super
-        pluggable_class.class_variable_set(:@@sub_classes, [])
-      end
-    end
-
-    def sub_classes
-      class_variable_get(:@@sub_classes)
-    end
-
-    def inherited(sub_class)
-      super
-      sub_classes << sub_class
-    end
-
     def plugin
       Plugin::Metadata::Plugin.new(self)
     end

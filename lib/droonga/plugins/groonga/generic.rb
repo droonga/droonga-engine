@@ -20,8 +20,6 @@ module Droonga
     module Groonga
       module Generic
         class Adapter < Droonga::Adapter
-          plugin.name = "groonga"
-
           groonga_commands = [
             "table_create",
             "table_remove",

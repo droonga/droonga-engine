@@ -101,7 +101,6 @@ module Droonga
         end
 
         class Adapter < Droonga::Adapter
-          plugin.name = "groonga"
           message.input_pattern = ["type", :equal, "select"]
 
           def adapt_input(input_message)
