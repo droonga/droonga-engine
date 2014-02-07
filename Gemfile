@@ -27,7 +27,7 @@ if File.exist?(local_rroonga_path)
   gem "groonga-command", :path => local_groonga_command_path
   gem "groonga-command-parser", :path => local_groonga_command_parser_path
 elsif ENV["TRAVIS"] == "true"
-  require_unreleased_gems = false
+  require_unreleased_gems = true
   if require_unreleased_gems
     gem "rroonga", :git => "git://github.com/ranguba/rroonga.git"
     gem "groonga-command",
