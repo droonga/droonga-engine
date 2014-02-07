@@ -134,8 +134,8 @@ module Droonga
       else
         components = message["components"]
         if components
-          planner = Planner.new(self, components)
-          session = planner.create_session(id, @collector)
+          session_planner = SessionPlanner.new(self, components)
+          session = session_planner.create_session(id, @collector)
           @sessions[id] = session
         else
           #todo: take cases receiving result before its query into account
@@ -228,7 +228,7 @@ module Droonga
       "[#{Process.ppid}][#{Process.pid}] dispatcher"
     end
 
-    class Planner
+    class SessionPlanner
       attr_reader :components
 
       def initialize(dispatcher, components)
