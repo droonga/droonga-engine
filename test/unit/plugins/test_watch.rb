@@ -192,7 +192,11 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      process(:subscribe, request)
+      message = Droonga::Test::StubHandlerMessage.new(request, {})
+      subscribe_handler =
+        Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
+                                                      @handler.context)
+      subscribe_handler.handle(message, @messenger)
       assert_equal([SUCCESS_RESULT], @messenger.values)
     end
   end
