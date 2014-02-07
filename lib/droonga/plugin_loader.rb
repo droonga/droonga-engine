@@ -31,6 +31,7 @@ module Droonga
               loader.load
             end
           end
+
           Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
             relative_plugin_path =
               plugin_path.relative_path_from(Pathname(load_path))
@@ -47,6 +48,7 @@ module Droonga
     end
 
     def load
+      return if @type == "metadata"
       require "droonga/plugin/#{@type}/#{@name}"
     end
   end

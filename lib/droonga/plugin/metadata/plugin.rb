@@ -13,27 +13,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/pluggable"
-require "droonga/plugin/metadata/adapter_message"
-
 module Droonga
-  class Adapter
-    extend Pluggable
+  module Plugin
+    module Metadata
+      class Plugin
+        def initialize(plugin_class)
+          @plugin_class = plugin_class
+        end
 
-    class << self
-      def message
-        Plugin::Metadata::AdapterMessage.new(self)
+        def name
+          configuration[:name]
+        end
+
+        def name=(name)
+          configuration[:name] = name
+        end
+
+        private
+        def configuration
+          @plugin_class.options[:plugin] ||= {}
+        end
       end
-
-      def id
-        options[:id] || name || object_id.to_s
-      end
-    end
-
-    def adapt_input(input_message)
-    end
-
-    def adapt_output(output_message)
     end
   end
 end

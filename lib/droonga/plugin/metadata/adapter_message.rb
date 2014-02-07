@@ -14,23 +14,33 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class Adapter
-    class PluginConfiguration
-      def initialize(adapter_class)
-        @adapter_class = adapter_class
-      end
+  module Plugin
+    module Metadata
+      class AdapterMessage
+        def initialize(adapter_class)
+          @adapter_class = adapter_class
+        end
 
-      def name
-        configuration[:name]
-      end
+        def input_pattern
+          configuration[:input_pattern]
+        end
 
-      def name=(name)
-        configuration[:name] = name
-      end
+        def input_pattern=(pattern)
+          configuration[:input_pattern] = pattern
+        end
 
-      private
-      def configuration
-        @adapter_class.options[:plugin] ||= {}
+        def output_pattern
+          configuration[:output_pattern]
+        end
+
+        def output_pattern=(pattern)
+          configuration[:output_pattern] = pattern
+        end
+
+        private
+        def configuration
+          @adapter_class.options[:message] ||= {}
+        end
       end
     end
   end

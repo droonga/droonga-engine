@@ -13,33 +13,32 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/plugin/metadata/plugin"
+
 module Droonga
-  class Adapter
-    class MessageConfiguration
-      def initialize(adapter_class)
-        @adapter_class = adapter_class
+  module Pluggable
+    class << self
+      def extended(pluggable_class)
+        super
+        pluggable_class.class_variable_set(:@@sub_classes, [])
       end
+    end
 
-      def input_pattern
-        configuration[:input_pattern]
-      end
+    def sub_classes
+      class_variable_get(:@@sub_classes)
+    end
 
-      def input_pattern=(pattern)
-        configuration[:input_pattern] = pattern
-      end
+    def inherited(sub_class)
+      super
+      sub_classes << sub_class
+    end
 
-      def output_pattern
-        configuration[:output_pattern]
-      end
+    def plugin
+      Plugin::Metadata::Plugin.new(self)
+    end
 
-      def output_pattern=(pattern)
-        configuration[:output_pattern] = pattern
-      end
-
-      private
-      def configuration
-        @adapter_class.options[:message] ||= {}
-      end
+    def options
+      @options ||= {}
     end
   end
 end
