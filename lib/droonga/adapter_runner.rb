@@ -95,7 +95,7 @@ module Droonga
     def collect_adapter_classes(plugins)
       adapter_classes = []
       plugins.each do |plugin_name|
-        Adapter.adapter_classes.each do |adapter_class|
+        Adapter.sub_classes.each do |adapter_class|
           next unless adapter_class.plugin.name == plugin_name
           adapter_classes << adapter_class
         end

@@ -16,13 +16,13 @@
 module Droonga
   class Adapter
     class << self
-      def adapter_classes
-        @@adapter_classes ||= []
+      def sub_classes
+        @@sub_classes ||= []
       end
 
       def inherited(sub_class)
         super
-        adapter_classes << sub_class
+        sub_classes << sub_class
       end
 
       def plugin
