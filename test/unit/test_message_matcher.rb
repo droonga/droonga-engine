@@ -13,24 +13,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/command"
+require "droonga/message_matcher"
 
-class CommandTest < Test::Unit::TestCase
-  def command(method_name, options={})
-    Droonga::Command.new(method_name, options)
+class MessageMatcherTest < Test::Unit::TestCase
+  def matcher(pattern)
+    Droonga::MessageMatcher.new(pattern)
   end
 
   class ResolvePathTest < self
-    def command
-      super(:method_name)
-    end
-
     def resolve_path(path, message)
-      command.send(:resolve_path, path, message)
+      matcher(nil).send(:resolve_path, path, message)
     end
 
     def test_nonexistent
-      assert_equal(Droonga::Command::NONEXISTENT_PATH,
+      assert_equal(Droonga::MessageMatcher::NONEXISTENT_PATH,
                    resolve_path("nonexistent.path", {}))
     end
 
@@ -56,12 +52,8 @@ class CommandTest < Test::Unit::TestCase
   end
 
   class MatchTest < self
-    def command(pattern)
-      super(:method_name, :pattern => pattern)
-    end
-
     def match?(pattern, message)
-      command(pattern).match?(message)
+      matcher(pattern).match?(message)
     end
 
     class EqualTest < self
