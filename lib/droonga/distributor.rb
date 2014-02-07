@@ -18,7 +18,7 @@
 require "tsort"
 
 module Droonga
-  class DistributionPlanner
+  class Distributor
     class UndefinedInputError < StandardError
       attr_reader :input
       def initialize(input)
@@ -37,19 +37,13 @@ module Droonga
 
     include TSort
 
-    def initialize(dispatcher, steps)
+    def initialize(dispatcher)
       @dispatcher = dispatcher
-      @steps = steps
     end
 
-    def distribute
-      planned_steps = plan
-      @dispatcher.dispatch_steps(planned_steps)
-    end
-
-    def plan
+    def distribute(plan)
       @dependency = {}
-      @steps.each do |step|
+      plan.each do |step|
         @dependency[step] = step["inputs"]
         next unless step["outputs"]
         step["outputs"].each do |output|
@@ -61,7 +55,7 @@ module Droonga
         raise CyclicStepsError.new(cs) if cs.size > 1
         steps.concat(cs) unless cs.first.is_a? String
       end
-      steps
+      @dispatcher.dispatch_steps(steps)
     end
 
     private
