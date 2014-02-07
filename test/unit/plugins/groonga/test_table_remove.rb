@@ -14,9 +14,16 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class TableRemoveTest < GroongaHandlerTest
+  def create_handler
+    Droonga::Plugins::Groonga::TableRemove::Handler.new("droonga",
+                                                        @handler.context)
+  end
+
   def setup
     super
-    process(:table_create, {"name" => "Books"})
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+    end
   end
 
   def test_success

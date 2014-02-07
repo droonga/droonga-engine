@@ -14,6 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class TableCreateTest < GroongaHandlerTest
+  def create_handler
+    Droonga::Plugins::Groonga::TableCreate::Handler.new("droonga",
+                                                        @handler.context)
+  end
+
   def test_success
     process(:table_create, {"name" => "Books"})
     response = @messenger.values.last

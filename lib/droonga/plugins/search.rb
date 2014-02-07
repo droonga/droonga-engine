@@ -14,16 +14,27 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin"
-require "droonga/plugins/groonga/generic_response"
-require "droonga/plugins/groonga/select"
-require "droonga/plugins/groonga/table_create"
-require "droonga/plugins/groonga/table_remove"
-require "droonga/plugins/groonga/column_create"
+require "droonga/searcher"
 
 module Droonga
   module Plugins
-    module Groonga
-      Plugin.registry.register("groonga", self)
+    module Search
+      Plugin.registry.register("search", self)
+
+      class Handler < Droonga::Handler
+        message.type = "search"
+
+        def handle(message, messenger)
+          searcher = Droonga::Searcher.new(@context)
+          values = {}
+          request = message.request
+          raise Droonga::Searcher::NoQuery.new unless request
+          searcher.search(request["queries"]).each do |output, value|
+            values[output] = value
+          end
+          messenger.emit(values)
+        end
+      end
     end
   end
 end

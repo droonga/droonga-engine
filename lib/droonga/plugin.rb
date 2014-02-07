@@ -15,6 +15,7 @@
 
 require "droonga/plugin_registry"
 require "droonga/adapter"
+require "droonga/handler"
 
 module Droonga
   module Plugin

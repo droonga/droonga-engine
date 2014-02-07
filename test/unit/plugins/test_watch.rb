@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/handler/watch"
+require "droonga/plugins/watch"
 
 class WatchHandlerTest < Test::Unit::TestCase
   include WatchHelper
@@ -36,7 +36,6 @@ class WatchHandlerTest < Test::Unit::TestCase
   private
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
-    @plugin = Droonga::WatchHandler.new(@handler)
     @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
@@ -46,11 +45,15 @@ class WatchHandlerTest < Test::Unit::TestCase
 
   def process(command, request, headers={})
     message = Droonga::Test::StubHandlerMessage.new(request, headers)
-    @plugin.send(command, message, @messenger)
+    create_plugin.handle(message, @messenger)
   end
 
   public
   class SubscribeTest < self
+    def create_plugin
+      Droonga::Plugins::Watch::SubscribeHandler.new("droonga", @handler.context)
+    end
+
     def test_subscribe
       request = {
         "route" => "localhost:23003/output",
@@ -111,6 +114,11 @@ class WatchHandlerTest < Test::Unit::TestCase
       setup_subscription
     end
 
+    def create_plugin
+      Droonga::Plugins::Watch::UnsubscribeHandler.new("droonga",
+                                                      @handler.context)
+    end
+
     def test_unsubscribe
       request = {
         "route" => "localhost:23003/output",
@@ -138,6 +146,11 @@ class WatchHandlerTest < Test::Unit::TestCase
     def setup
       super
       setup_subscription
+    end
+
+    def create_plugin
+      Droonga::Plugins::Watch::FeedHandler.new("droonga",
+                                               @handler.context)
     end
 
     def test_feed_match

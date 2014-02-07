@@ -18,15 +18,10 @@ require "groonga"
 require "droonga/forwarder"
 require "droonga/handler_message"
 require "droonga/handler_messenger"
-require "droonga/legacy_pluggable"
-require "droonga/handler_plugin"
+require "droonga/handler"
 
 module Droonga
   class HandlerRunner
-    include LegacyPluggable
-
-    attr_reader :context, :name
-
     def initialize(loop, options={})
       @loop = loop
       @options = options
@@ -43,7 +38,6 @@ module Droonga
 
     def shutdown
       $log.trace("#{log_tag}: shutdown: start")
-      super
       @forwarder.shutdown
       if @database
         @database.close
@@ -54,20 +48,24 @@ module Droonga
     end
 
     def prefer_synchronous?(command)
-      find_plugin(command).prefer_synchronous?(command)
+      find_handler_class(command).action.synchronous?
+    end
+
+    def processable?(command)
+      not find_handler_class(command).nil?
     end
 
     def process(message)
       $log.trace("#{log_tag}: process: start")
       command = message["type"]
-      plugin = find_plugin(command)
-      if plugin.nil?
-        $log.trace("#{log_tag}: process: done: no plugin: <#{command}>")
+      handler_class = find_handler_class(command)
+      if handler_class.nil?
+        $log.trace("#{log_tag}: process: done: no handler: <#{command}>")
         return
       end
-      process_command(plugin, command, message)
+      process_command(handler_class, command, message)
       $log.trace("#{log_tag}: process: done: <#{command}>",
-                 :plugin => plugin.class)
+                 :handler => handler_class)
     end
 
     private
@@ -76,20 +74,27 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
-      load_plugins(@options[:handlers] || [])
+      @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
       @forwarder = Forwarder.new(@loop)
     end
 
-    def instantiate_plugin(name)
-      HandlerPlugin.repository.instantiate(name, self)
+    def find_handler_class(command)
+      @handler_classes.find do |handler_class|
+        handler_class.message.type == command
+      end
     end
 
-    def process_command(plugin, command, raw_message)
+    def process_command(handler_class, command, raw_message)
       handler_message = HandlerMessage.new(raw_message)
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      plugin.process(command, handler_message, messenger)
+      handler = handler_class.new(@name, @context)
+      begin
+        handler.handle(handler_message, messenger)
+      rescue MessageProcessingError => error
+        messenger.error(error.status_code, error.response_body)
+      end
     end
 
     def log_tag

@@ -13,7 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/handler/groonga"
+require "droonga/plugins/groonga"
 
 class GroongaHandlerTest < Test::Unit::TestCase
   include PluginHelper
@@ -31,7 +31,6 @@ class GroongaHandlerTest < Test::Unit::TestCase
   private
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
-    @plugin = Droonga::GroongaHandler.new(@handler)
     @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
@@ -45,7 +44,8 @@ class GroongaHandlerTest < Test::Unit::TestCase
 
   def process(command, request)
     message = Droonga::Test::StubHandlerMessage.new(request)
-    @plugin.send(command, message, @messenger)
+    handler = create_handler
+    handler.handle(message, @messenger)
   end
 
   NORMALIZED_START_TIME = Time.parse("2013-07-11T16:04:28+0900").to_i
@@ -57,12 +57,12 @@ class GroongaHandlerTest < Test::Unit::TestCase
   end
 
   NORMALIZED_HEADER_SUCCESS = [
-    Droonga::GroongaHandler::Status::SUCCESS,
+    Droonga::Plugins::Groonga::Status::SUCCESS,
     NORMALIZED_START_TIME,
     NORMALIZED_ELAPSED_TIME,
   ]
   NORMALIZED_HEADER_INVALID_ARGUMENT = [
-    Droonga::GroongaHandler::Status::INVALID_ARGUMENT,
+    Droonga::Plugins::Groonga::Status::INVALID_ARGUMENT,
     NORMALIZED_START_TIME,
     NORMALIZED_ELAPSED_TIME,
   ]

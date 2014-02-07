@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,23 +13,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/handler_plugin"
-require "droonga/searcher"
-
 module Droonga
-  class SearchHandler < Droonga::HandlerPlugin
-    repository.register("search", self)
+  module Plugin
+    module Metadata
+      class HandlerAction
+        def initialize(handler_class)
+          @handler_class = handler_class
+        end
 
-    command :search
-    def search(message, messenger)
-      searcher = Droonga::Searcher.new(@context)
-      values = {}
-      request = message.request
-      raise Droonga::Searcher::NoQuery.new unless request
-      searcher.search(request["queries"]).each do |output, value|
-        values[output] = value
+        def synchronous?
+          configuration[:synchronous]
+        end
+
+        def synchronous=(boolean)
+          configuration[:synchronous] = boolean
+        end
+
+        private
+        def configuration
+          @handler_class.options[:action] ||= {}
+        end
       end
-      messenger.emit(values)
     end
   end
 end

@@ -14,8 +14,15 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class ColumnCreateTest < GroongaHandlerTest
+  def create_handler
+    Droonga::Plugins::Groonga::ColumnCreate::Handler.new("droonga",
+                                                         @handler.context)
+  end
+
   def test_success
-    process(:table_create, {"name" => "Books"})
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+    end
     process(:column_create,
             {"table" => "Books", "name" => "title", "type" => "ShortText"})
     response = @messenger.values.last
@@ -40,7 +47,9 @@ class ColumnCreateTest < GroongaHandlerTest
   end
 
   def test_name
-    process(:table_create, {"name" => "Books"})
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+    end
     process(:column_create,
             {"table" => "Books", "name" => "title", "type" => "ShortText"})
     assert_equal(<<-SCHEMA, dump)
@@ -50,7 +59,9 @@ column_create Books title COLUMN_SCALAR ShortText
   end
 
   def test_type
-    process(:table_create, {"name" => "Books"})
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+    end
     process(:column_create,
             {"table" => "Books", "name" => "main_text", "type" => "LongText"})
     assert_equal(<<-SCHEMA, dump)
@@ -76,7 +87,9 @@ column_create Books main_text COLUMN_SCALAR LongText
           "type"  => "ShortText",
           "flags" => data[:flags],
         }
-        process(:table_create, {"name" => "Books"})
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.create_table("Books", :type => :hash)
+        end
         process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
@@ -88,7 +101,9 @@ column_create Books title #{data[:flags]} ShortText
     class IndexTest < self
       def setup
         super
-        process(:table_create, {"name" => "Books"})
+        Groonga::Schema.define(:context => @context) do |schema|
+          schema.create_table("Books", :type => :hash)
+        end
         process(:column_create,
                 {"table" => "Books", "name" => "title", "type" => "ShortText"})
       end

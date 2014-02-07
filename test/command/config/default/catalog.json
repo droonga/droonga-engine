@@ -10,10 +10,7 @@
   "datasets": {
     "Droonga": {
       "workers": 2,
-      "handler": {
-        "plugins": ["search", "groonga", "add"]
-      },
-      "plugins": ["groonga", "crud"],
+      "plugins": ["groonga", "crud", "search"],
       "number_of_replicas": 2,
       "number_of_partitions": 2,
       "partition_key": "_key",
@@ -41,9 +38,7 @@
     },
     "Watch": {
       "workers": 2,
-      "handler": {
-        "plugins": ["search", "groonga", "add", "watch"]
-      },
+      "plugins": ["groonga", "watch", "search", "crud"],
       "number_of_replicas": 1,
       "number_of_partitions": 1,
       "partition_key": "_key",

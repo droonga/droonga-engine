@@ -13,7 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/handler/search"
+require "droonga/plugins/search"
 
 class SearchHandlerTest < Test::Unit::TestCase
   def setup
@@ -29,7 +29,7 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
-    @plugin = Droonga::SearchHandler.new(@handler)
+    @plugin = Droonga::Plugins::Search::Handler.new("droonga", @handler.context)
     @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
@@ -41,7 +41,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   private
   def search(request, headers={})
     message = Droonga::Test::StubHandlerMessage.new(request, headers)
-    @plugin.search(message, @messenger)
+    @plugin.handle(message, @messenger)
     results_to_result_set(@messenger.values.first)
   end
 

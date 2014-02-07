@@ -55,22 +55,22 @@ class CatalogTest < Test::Unit::TestCase
       assert_equal({
                      "localhost:23003/test.000" => {
                        :database  => "#{base_path}/000/db",
-                       :handlers  => ["for_dataset"],
+                       :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.001" => {
                        :database  => "#{base_path}/001/db",
-                       :handlers  => ["for_dataset"],
+                       :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.002" => {
                        :database  => "#{base_path}/002/db",
-                       :handlers  => ["for_dataset"],
+                       :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.003" => {
                        :database  => "#{base_path}/003/db",
-                       :handlers  => ["for_dataset"],
+                       :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                    },
@@ -89,7 +89,7 @@ class CatalogTest < Test::Unit::TestCase
       File.dirname(catalog_path)
     end
 
-    class HandlersTest < self
+    class PluginsTest < self
       def setup
         @data = {
           "farms" => {
@@ -119,26 +119,17 @@ class CatalogTest < Test::Unit::TestCase
         "localhost:23041/droonga"
       end
 
-      def handlers(data)
+      def plugins(data)
         catalog = create_catalog(data, base_path)
         catalog.get_partitions(farm_name).collect do |partition, options|
-          options[:handlers]
+          options[:plugins]
         end
       end
 
       def test_plugins
         @data["datasets"]["Droonga"]["plugins"] = ["search", "groonga", "add"]
         assert_equal([["search", "groonga", "add"]],
-                     handlers(@data))
-
-      end
-
-      def test_handler_plugins
-        @data["datasets"]["Droonga"]["handler"] = {
-          "plugins" => ["search", "groonga", "add"],
-        }
-        assert_equal([["search", "groonga", "add"]],
-                     handlers(@data))
+                     plugins(@data))
 
       end
     end

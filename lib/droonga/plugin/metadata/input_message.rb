@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,17 +13,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
-require "droonga/plugins/groonga/generic_response"
-require "droonga/plugins/groonga/select"
-require "droonga/plugins/groonga/table_create"
-require "droonga/plugins/groonga/table_remove"
-require "droonga/plugins/groonga/column_create"
-
 module Droonga
-  module Plugins
-    module Groonga
-      Plugin.registry.register("groonga", self)
+  module Plugin
+    module Metadata
+      class InputMessage
+        def initialize(plugin_class)
+          @plugin_class = plugin_class
+        end
+
+        def type
+          configuration[:type]
+        end
+
+        def type=(type)
+          configuration[:type] = type
+        end
+
+        private
+        def configuration
+          @plugin_class.options[:message] ||= {}
+        end
+      end
     end
   end
 end

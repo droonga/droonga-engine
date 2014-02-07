@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,9 +13,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/handler/add"
+require "droonga/plugins/crud"
 
-class AddHandlerTest < Test::Unit::TestCase
+class CRUDAddHandlerTest < Test::Unit::TestCase
   SUCCESS_RESPONSE_BODY = {
     "success" => true,
   }
@@ -37,7 +37,7 @@ class AddHandlerTest < Test::Unit::TestCase
 
   def setup_handler
     @worker = StubWorker.new
-    @handler = Droonga::AddHandler.new(@worker)
+    @handler = Droonga::Plugins::CRUD::Handler.new("name", @worker.context)
     @messenger = Droonga::Test::StubHandlerMessenger.new
   end
 
@@ -47,7 +47,7 @@ class AddHandlerTest < Test::Unit::TestCase
 
   def process(request)
     message = Droonga::Test::StubHandlerMessage.new(request)
-    @handler.add(message, @messenger)
+    @handler.handle(message, @messenger)
   end
 
   public
@@ -93,7 +93,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Users",
         "values" => {"country" => "japan"},
       }
-      assert_raise(Droonga::AddHandler::MissingPrimaryKeyParameter) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::MissingPrimaryKeyParameter) do
         process(request)
       end
     end
@@ -104,7 +104,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {"age" => "secret"},
       }
-      assert_raise(Droonga::AddHandler::InvalidValue) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::InvalidValue) do
         process(request)
       end
     end
@@ -115,7 +115,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {"birthday" => "today"},
       }
-      assert_raise(Droonga::AddHandler::InvalidValue) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::InvalidValue) do
         process(request)
       end
     end
@@ -126,7 +126,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {"unknown" => "unknown"},
       }
-      assert_raise(Droonga::AddHandler::UnknownColumn) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::UnknownColumn) do
         process(request)
       end
     end
@@ -170,7 +170,7 @@ class AddHandlerTest < Test::Unit::TestCase
       request = {
         "values" => {},
       }
-      assert_raise(Droonga::AddHandler::MissingTableParameter) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::MissingTableParameter) do
         process(request)
       end
     end
@@ -180,7 +180,7 @@ class AddHandlerTest < Test::Unit::TestCase
         "table"  => "Nonexistent",
         "values" => {},
       }
-      assert_raise(Droonga::AddHandler::UnknownTable) do
+      assert_raise(Droonga::Plugins::CRUD::Handler::UnknownTable) do
         process(request)
       end
     end

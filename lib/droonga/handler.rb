@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -15,28 +13,30 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "groonga"
-require "groonga/command/table-remove"
+require "droonga/pluggable"
+require "droonga/plugin/metadata/input_message"
+require "droonga/plugin/metadata/handler_action"
 
 module Droonga
-  class GroongaHandler
-    class TableRemove < Command
-      def process_request(request)
-        command_class = Groonga::Command.find("table_remove")
-        @command = command_class.new("table_remove", request)
+  class Handler
+    extend Pluggable
 
-        name = @command["name"]
-        if name.nil? || @context[name].nil?
-          raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                 :message => "table not found",
-                                 :result => false)
-        end
-
-        Groonga::Schema.define(:context => @context) do |schema|
-          schema.remove_table(name)
-        end
-        true
+    class << self
+      def message
+        Plugin::Metadata::InputMessage.new(self)
       end
+
+      def action
+        Plugin::Metadata::HandlerAction.new(self)
+      end
+    end
+
+    def initialize(name, context)
+      @name = name
+      @context = context
+    end
+
+    def handle(message, messenger)
     end
   end
 end
