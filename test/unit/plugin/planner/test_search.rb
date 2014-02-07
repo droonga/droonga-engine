@@ -56,7 +56,7 @@ class SearchPlannerTest < Test::Unit::TestCase
       },
     }
 
-    @plugin.process("search", envelope)
+    @planner.distribute(@plugin.process("search", envelope))
 
     message = []
 

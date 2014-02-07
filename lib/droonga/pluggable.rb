@@ -42,9 +42,10 @@ module Droonga
       $log.trace("#{log_tag}: process: start: <#{command}>",
                  :plugin => plugin.class)
       raise UnknownPlugin.new(command) if plugin.nil?
-      plugin.process(command, *arguments)
+      result = plugin.process(command, *arguments)
       $log.trace("#{log_tag}: process: done: <#{command}>",
                  :plugin => plugin.class)
+      result
     end
 
     private

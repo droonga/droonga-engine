@@ -212,7 +212,8 @@ module Droonga
 
     def process_input_message(message)
       adapted_message = @adapter_runner.adapt_input(message)
-      @planner.process(adapted_message["type"], adapted_message)
+      plan = @planner.process(adapted_message["type"], adapted_message)
+      @planner.distribute(plan)
     rescue Droonga::Pluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end
