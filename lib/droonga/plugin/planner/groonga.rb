@@ -15,17 +15,40 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-module Droonga
-  module Test
-    class StubDistributor
-      attr_reader :messages
-      def initialize
-        @messages = []
-      end
+require "droonga/planner_plugin"
 
-      def distribute(message)
-        @messages << message
+module Droonga
+  class GroongaPlanner < Droonga::PlannerPlugin
+    repository.register("groonga", self)
+
+    command :table_create
+    def table_create(message)
+      unless message["dataset"]
+        raise "dataset must be set. FIXME: This error should return client."
       end
+      broadcast(message)
+    end
+
+    command :table_remove
+    def table_remove(message)
+      unless message["dataset"]
+        raise "dataset must be set. FIXME: This error should return client."
+      end
+      broadcast(message)
+    end
+
+    command :column_create
+    def column_create(message)
+      broadcast(message)
+    end
+
+    private
+    def broadcast(message)
+      super(message,
+            :write => true,
+            :reduce => {
+              "result" => "or"
+            })
     end
   end
 end

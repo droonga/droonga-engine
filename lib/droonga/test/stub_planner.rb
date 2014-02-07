@@ -15,34 +15,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/pluggable"
-require "droonga/distributor_plugin"
-require "droonga/distribution_planner"
-
 module Droonga
-  class Distributor
-    include Pluggable
+  module Test
+    class StubPlanner
+      attr_reader :messages
+      def initialize
+        @messages = []
+      end
 
-    def initialize(dispatcher, options={})
-      @dispatcher = dispatcher
-      @plugins = []
-      @options = options
-      load_plugins(@options.plugins)
-    end
-
-    def distribute(components)
-      planner = DistributionPlanner.new(@dispatcher, components)
-      planned_components = planner.plan
-      @dispatcher.dispatch_components(planned_components)
-    end
-
-    private
-    def instantiate_plugin(name)
-      DistributorPlugin.repository.instantiate(name, self)
-    end
-
-    def log_tag
-      "[#{Process.pid}] distributor"
+      def distribute(message)
+        @messages << message
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2013 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,32 +15,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/distributor_plugin"
+require "droonga/planner_plugin"
 
 module Droonga
-  class CRUDDistributor < Droonga::DistributorPlugin
-    repository.register("crud", self)
+  class WatchPlanner < Droonga::PlannerPlugin
+    repository.register("watch", self)
 
-    command :add
-    def add(message)
-      scatter(message)
+    command "watch.feed" => :feed
+    def feed(message)
+      broadcast(message)
     end
 
-    command :update
-    def update(message)
-      scatter(message)
+    command "watch.subscribe" => :subscribe
+    def subscribe(message)
+      broadcast(message)
     end
 
-    # TODO: What is this?
-    command :reset
-    def reset(message)
-      scatter(message)
+    command "watch.unsubscribe" => :unsubscribe
+    def unsubscribe(message)
+      broadcast(message)
+    end
+
+    command "watch.sweep" => :sweep
+    def sweep(message)
+      broadcast(message)
     end
 
     private
-    def scatter(message)
+    def broadcast(message)
       super(message,
-            :key => message["body"]["key"] || rand.to_s,
+            :write => true,
             :reduce => {
               "success" => "and"
             })

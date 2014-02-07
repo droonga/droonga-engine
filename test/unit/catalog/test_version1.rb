@@ -294,10 +294,10 @@ class CatalogTest < Test::Unit::TestCase
     end
   end
 
-  class DistributorOptionsTest < self
+  class PlannerOptionsTest < self
     def options(data)
       catalog = create_catalog(minimum_data.merge(data), "base-path")
-      catalog.distributor_options
+      catalog.planner_options
     end
 
     class PluginsTest < self
@@ -309,9 +309,9 @@ class CatalogTest < Test::Unit::TestCase
         assert_equal([], plugins({}))
       end
 
-      def test_distributor
+      def test_planner
         data = {
-          "distributor" => {
+          "planner" => {
             "plugins" => ["search", "crud", "groonga", "watch"],
           }
         }

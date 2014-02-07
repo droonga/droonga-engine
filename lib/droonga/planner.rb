@@ -15,40 +15,34 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/distributor_plugin"
+require "droonga/pluggable"
+require "droonga/planner_plugin"
+require "droonga/distribution_planner"
 
 module Droonga
-  class GroongaDistributor < Droonga::DistributorPlugin
-    repository.register("groonga", self)
+  class Planner
+    include Pluggable
 
-    command :table_create
-    def table_create(message)
-      unless message["dataset"]
-        raise "dataset must be set. FIXME: This error should return client."
-      end
-      broadcast(message)
+    def initialize(dispatcher, options={})
+      @dispatcher = dispatcher
+      @plugins = []
+      @options = options
+      load_plugins(@options.plugins)
     end
 
-    command :table_remove
-    def table_remove(message)
-      unless message["dataset"]
-        raise "dataset must be set. FIXME: This error should return client."
-      end
-      broadcast(message)
-    end
-
-    command :column_create
-    def column_create(message)
-      broadcast(message)
+    def distribute(components)
+      planner = DistributionPlanner.new(@dispatcher, components)
+      planned_components = planner.plan
+      @dispatcher.dispatch_components(planned_components)
     end
 
     private
-    def broadcast(message)
-      super(message,
-            :write => true,
-            :reduce => {
-              "result" => "or"
-            })
+    def instantiate_plugin(name)
+      PlannerPlugin.repository.instantiate(name, self)
+    end
+
+    def log_tag
+      "[#{Process.pid}] planner"
     end
   end
 end

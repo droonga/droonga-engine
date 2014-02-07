@@ -13,11 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/distributor_options"
+require "droonga/planner_options"
 
-class DistributorOptionsTest < Test::Unit::TestCase
+class PlannerOptionsTest < Test::Unit::TestCase
   def options(data)
-    Droonga::DistributorOptions.new(data)
+    Droonga::PlannerOptions.new(data)
   end
 
   class PluginsTest < self

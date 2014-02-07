@@ -19,16 +19,16 @@ require "droonga/plugin"
 require "droonga/distributed_command_planner"
 
 module Droonga
-  class DistributorPlugin < Plugin
+  class PlannerPlugin < Plugin
     extend PluginRegisterable
 
-    def initialize(distributor)
+    def initialize(planner)
       super()
-      @distributor = distributor
+      @planner = planner
     end
 
     def distribute(messages)
-      @distributor.distribute(messages)
+      @planner.distribute(messages)
     end
 
     def scatter(message, options={})

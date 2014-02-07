@@ -18,7 +18,7 @@ require "tsort"
 
 require "droonga/input_adapter"
 require "droonga/output_adapter"
-require "droonga/distributor"
+require "droonga/planner"
 require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
@@ -59,7 +59,7 @@ module Droonga
       @farm = Farm.new(name, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @distributor = Distributor.new(self, Droonga.catalog.distributor_options)
+      @planner = Planner.new(self, Droonga.catalog.planner_options)
       @collector = Collector.new(Droonga.catalog.collector_options)
     end
 
@@ -73,7 +73,7 @@ module Droonga
 
     def shutdown
       @forwarder.shutdown
-      @distributor.shutdown
+      @planner.shutdown
       @collector.shutdown
       @input_adapter.shutdown
       @output_adapter.shutdown
@@ -215,7 +215,7 @@ module Droonga
 
     def process_input_message(message)
       adapted_message = @input_adapter.adapt(message)
-      @distributor.process(adapted_message["type"], adapted_message)
+      @planner.process(adapted_message["type"], adapted_message)
     rescue Droonga::Pluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end

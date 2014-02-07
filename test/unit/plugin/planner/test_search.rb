@@ -13,13 +13,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/distributor/search"
+require "droonga/plugin/planner/search"
 
-class SearchDistributorTest < Test::Unit::TestCase
+class SearchPlannerTest < Test::Unit::TestCase
   def setup
     setup_database
-    @distributor = Droonga::Test::StubDistributor.new
-    @plugin = Droonga::SearchDistributor.new(@distributor)
+    @planner = Droonga::Test::StubPlanner.new
+    @plugin = Droonga::SearchPlanner.new(@planner)
   end
 
   def teardown
@@ -169,6 +169,6 @@ class SearchDistributorTest < Test::Unit::TestCase
     }
     message << searcher
 
-    assert_equal([message], @distributor.messages)
+    assert_equal([message], @planner.messages)
   end
 end

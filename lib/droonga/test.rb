@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/test/stub_distributor"
+require "droonga/test/stub_planner"
 require "droonga/test/stub_handler"
 require "droonga/test/stub_handler_message"
 require "droonga/test/stub_handler_messenger"

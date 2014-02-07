@@ -68,7 +68,7 @@
   "collector": {
     "plugins": ["basic", "search"]
   },
-  "distributor": {
+  "planner": {
     "plugins": ["search", "crud", "groonga", "watch"]
   }
 }

@@ -1,4 +1,6 @@
-# Copyright (C) 2014 Droonga Project
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,14 +15,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-module Droonga
-  class DistributorOptions
-    def initialize(data)
-      @data = data || {}
-    end
+require "droonga/planner_plugin"
+require "droonga/plugin/planner/distributed_search_planner"
 
-    def plugins
-      @data["plugins"] || []
+module Droonga
+  class SearchPlanner < Droonga::PlannerPlugin
+    repository.register("search", self)
+
+    command :search
+    def search(message)
+      planner = DistributedSearchPlanner.new(message)
+      distribute(planner.plan)
     end
   end
 end
