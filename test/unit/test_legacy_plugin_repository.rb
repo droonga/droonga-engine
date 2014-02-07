@@ -13,11 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin_repository"
+require "droonga/legacy_plugin_repository"
 
-class PluginRepositoryTest < Test::Unit::TestCase
+class LegacyPluginRepositoryTest < Test::Unit::TestCase
   def setup
-    @repository = Droonga::PluginRepository.new
+    @repository = Droonga::LegacyPluginRepository.new
   end
 
   class StubPlugin
