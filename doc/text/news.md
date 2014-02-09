@@ -1,5 +1,19 @@
 # News
 
+## 0.9.9: 2014-02-09
+
+### Improvements
+
+  * Supported gathering errors.
+  * Added more error handled cases.
+  * experimental: Added a MeCab filter that filters results from
+    N-gram tokenizer based search by MeCab based tokenized search. It
+    is disabled by default. You need to define
+    `DROONGA_ENABLE_SEARCH_MECAB_FILTER=yes` environment variable when
+    you run fluentd.
+  * Supported developing a plugin. You can custom adaption phase for now.
+    See [tutorial](http://droonga.org/tutorial/plugin-development/) for details.
+
 ## 0.9.0: 2014-01-29
 
 ### Improvements
