@@ -64,13 +64,11 @@ module Droonga
         validate_datasets
 
         @data["datasets"].each do |name, dataset|
-          validate_dataset(dataset, "datasets.#{name}")
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
           total_weight = compute_total_weight(dataset)
           continuum = []
           dataset["ring"].each do |key, value|
-            validate_ring(value, "datasets.ring.#{key}")
             points = number_of_partitions * 160 * value["weight"] / total_weight
             points.times do |point|
               hash = Digest::SHA1.hexdigest("#{key}:#{point}")
@@ -223,6 +221,10 @@ module Droonga
 
         raise MissingRequiredParameter.new("datasets", @path) unless datasets
         validate_parameter_type(datasets, "datasets", Hash)
+
+        datasets.each do |name, dataset|
+          validate_dataset(dataset, "datasets.#{name}")
+        end
       end
 
       def validate_dataset(dataset, name)
@@ -238,6 +240,9 @@ module Droonga
         validate_parameter_type(dataset["ring"],
                                 "#{name}.ring",
                                 Hash)
+        dataset["ring"].each do |key, value|
+          validate_ring(value, "#{name}.ring.#{key}")
+        end
 
         validate_parameter_type(dataset["plugins"],
                                 "#{name}.plugins",
