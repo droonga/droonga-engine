@@ -47,7 +47,7 @@ class CatalogTest < Test::Unit::TestCase
   class PartitionTest < self
     def setup
       data = JSON.parse(File.read(catalog_path))
-      @catalog = create_catalog(data, base_path)
+      @catalog = create_catalog(data, catalog_path)
     end
 
     def test_get_partitions
@@ -120,7 +120,7 @@ class CatalogTest < Test::Unit::TestCase
       end
 
       def plugins(data)
-        catalog = create_catalog(data, base_path)
+        catalog = create_catalog(data, catalog_path)
         catalog.get_partitions(farm_name).collect do |partition, options|
           options[:plugins]
         end
