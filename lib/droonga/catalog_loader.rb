@@ -24,14 +24,17 @@ module Droonga
     end
 
     def load
-      data = File.open(@path) do |file|
-        JSON.parse(file.read)
+      data = nil
+      begin
+        data = File.open(@path) do |file|
+          JSON.parse(file.read)
+        end
+      rescue Errno::ENOENT => error
+        raise Error.new("Missing catalog file #{@path}")
+      rescue JSON::ParserError => error
+        raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
       end
       Catalog::Version1.new(data, @path)
-    rescue Errno::ENOENT => error
-      raise Error.new("Missing catalog file #{@path}")
-    rescue JSON::ParserError => error
-      raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
     end
   end
 end
