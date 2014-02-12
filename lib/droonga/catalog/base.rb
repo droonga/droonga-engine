@@ -19,6 +19,40 @@ require "droonga/message_processing_error"
 
 module Droonga
   module Catalog
+    class ValidationError < Error
+      def initialize(message, path)
+        if path
+          super("Validation error in #{path}: #{message}")
+        else
+          super(message)
+        end
+      end
+    end
+
+    class MissingRequiredParameter < Error
+      def initialize(name, path)
+        super("You must specify \"#{name}\".", path)
+      end
+    end
+
+    class MismatchedParameterType < Error
+      def initialize(name, expected, actual, path)
+        super("\"#{name}\" must be a #{expected}, but a #{actual}.", path)
+      end
+    end
+
+    class NegativeNumber < Error
+      def initialize(name, actual, path)
+        super("\"#{name}\" must be a positive number, but #{actual}.", path)
+      end
+    end
+
+    class SmallerThanOne < Error
+      def initialize(name, actual, path)
+        super("\"#{name}\" must be 1 or larger number, but #{actual}.", path)
+      end
+    end
+
     class Base
       attr_reader :path, :base_path
       def initialize(data, path)
@@ -26,12 +60,16 @@ module Droonga
         @path = path
         @base_path = File.dirname(base_path)
 
+        validate_datasets
+
         @data["datasets"].each do |name, dataset|
+          validate_dataset(dataset, "datasets.#{name}")
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
           total_weight = compute_total_weight(dataset)
           continuum = []
           dataset["ring"].each do |key, value|
+            validate_ring(value, "datasets.ring.#{key}")
             points = number_of_partitions * 160 * value["weight"] / total_weight
             points.times do |point|
               hash = Digest::SHA1.hexdigest("#{key}:#{point}")
@@ -139,6 +177,49 @@ module Droonga
       def compute_total_weight(dataset)
         dataset["ring"].reduce(0) do |result, zone|
           result + zone[1]["weight"]
+        end
+      end
+
+      def validate_parameter_type(value, name, expected)
+        unless datasets.is_a?(expected)
+          raise MismatchedParameterType.new(name,
+                                            expected,
+                                            value.class,
+                                            @path)
+        end
+      end
+
+      def validate_datasets
+        datasets = @data["datasets"]
+
+        raise MissingRequiredParameter.new("datasets", @path) unless datasets
+
+        validate_parameter_type(datasets, "datasets", Hash)
+      end
+
+      def validate_dataset(dataset, name)
+        validate_parameter_type(dataset, name, Hash)
+
+        n_partitions = dataset["number_of_partitions"]
+        validate_parameter_type(n_partitions,
+                                "#{name}.number_of_partitions",
+                                Integer)
+        if n_partitions < 1
+          raise SmallerThanOne.new("#{name}.number_of_partitions", n_partitions, @path)
+        end
+
+        validate_parameter_type(dataset["ring"],
+                                "#{name}.ring",
+                                Hash)
+      end
+
+      def validate_ring(ring, name)
+        validate_parameter_type(ring, name, Hash)
+
+        weight = ring["weight"]
+        validate_parameter_type(weight, "#{name}.weight", Numeric)
+        if weight < 0
+          raise NegativeNumber.new("#{name}.weight", weight, @path)
         end
       end
     end

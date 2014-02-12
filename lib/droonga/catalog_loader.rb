@@ -29,7 +29,7 @@ module Droonga
       end
       Catalog::Version1.new(data, @path)
     rescue JSON::ParserError => error
-      raise InvalidCatalog.new("Syntax error in #{@path}\n#{error.to_s}")
+      raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
     end
   end
 end
