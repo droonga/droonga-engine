@@ -16,13 +16,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/catalog_loader"
-require "droonga/startup_error"
 
 module Droonga
   class << self
     attr_accessor :catalog
   end
 
-  class InvalidCatalog < StartupError
+  class InvalidCatalog < StandardError
   end
 end
