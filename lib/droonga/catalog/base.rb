@@ -291,6 +291,8 @@ module Droonga
         validate_positive_integer_parameter(dataset["workers"],
                                             "#{name}.workers")
         validate_date_range(dataset["date_range"], "#{name}.date_range")
+        validate_partition_key(dataset["partition_key"],
+                               "#{name}.partition_key")
 
         validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
         dataset["ring"].each do |key, value|
@@ -302,6 +304,11 @@ module Droonga
 
       def validate_date_range(value, name)
         return if value == "infinity"
+      end
+
+      def validate_partition_key(value, name)
+        validate_parameter_type(String, value, "name")
+        return if value == "_key"
       end
 
       def validate_ring(ring, name)
