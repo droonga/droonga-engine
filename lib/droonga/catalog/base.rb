@@ -310,13 +310,13 @@ module Droonga
 
       def validate_date_range(value, name)
         return if value == "infinity"
-        raise UnsupportedValue(name, value, @path)
+        raise UnsupportedValue.new(name, value, @path)
       end
 
       def validate_partition_key(value, name)
         validate_parameter_type(String, value, name)
         return if value == "_key"
-        raise UnsupportedValue(name, value, @path)
+        raise UnsupportedValue.new(name, value, @path)
       end
 
       def validate_ring(ring, name)
