@@ -299,11 +299,13 @@ module Droonga
       end
 
       def validate_date_range(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         return if value == "infinity"
         raise UnsupportedValue.new(name, value, @path)
       end
 
       def validate_partition_key(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         validate_parameter_type(String, value, name)
         return if value == "_key"
         raise UnsupportedValue.new(name, value, @path)
