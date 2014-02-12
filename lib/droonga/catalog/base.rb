@@ -27,8 +27,10 @@ module Droonga
         @data = data
         @path = path
         @base_path = File.dirname(path)
+        @errors = MultiplexError.new
 
         validate
+        raise @errors unless @errors.empty?
 
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
@@ -147,11 +149,29 @@ module Droonga
       end
 
       def validate
-        validate_effective_date
-        validate_zones
-        validate_farms
-        validate_datasets
-        validate_database_relations
+        do_validation do
+          validate_effective_date
+        end
+        do_validation do
+          validate_zones
+        end
+        do_validation do
+          validate_farms
+        end
+        do_validation do
+          validate_datasets
+        end
+        do_validation do
+          validate_database_relations
+        end
+      end
+
+      def do_validation(&block)
+        begin
+          yield
+        rescue ValidationError => error
+          @errors.errors << error
+        end
       end
 
       def validate_parameter_type(expected, value, name)
@@ -242,22 +262,36 @@ module Droonga
       def validate_dataset(dataset, name)
         validate_parameter_type(Hash, dataset, name)
 
-        validate_one_or_larger_integer_parameter(dataset["number_of_partitions"],
-                                                 "#{name}.number_of_partitions")
-        validate_one_or_larger_integer_parameter(dataset["number_of_replicas"],
-                                                 "#{name}.number_of_replicas")
-        validate_positive_integer_parameter(dataset["workers"],
-                                            "#{name}.workers")
-        validate_date_range(dataset["date_range"], "#{name}.date_range")
-        validate_partition_key(dataset["partition_key"],
-                               "#{name}.partition_key")
-
-        validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
-        dataset["ring"].each do |key, value|
-          validate_ring(value, "#{name}.ring.#{key}")
+        do_validation do
+          validate_one_or_larger_integer_parameter(dataset["number_of_partitions"],
+                                                   "#{name}.number_of_partitions")
+        end
+        do_validation do
+          validate_one_or_larger_integer_parameter(dataset["number_of_replicas"],
+                                                   "#{name}.number_of_replicas")
+        end
+        do_validation do
+          validate_positive_integer_parameter(dataset["workers"],
+                                              "#{name}.workers")
+        end
+        do_validation do
+          validate_date_range(dataset["date_range"], "#{name}.date_range")
+        end
+        do_validation do
+          validate_partition_key(dataset["partition_key"],
+                                 "#{name}.partition_key")
         end
 
-        validate_parameter_type(Array, dataset["plugins"], "#{name}.plugins")
+        do_validation do
+          validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
+          dataset["ring"].each do |key, value|
+            validate_ring(value, "#{name}.ring.#{key}")
+          end
+        end
+
+        do_validation do
+          validate_parameter_type(Array, dataset["plugins"], "#{name}.plugins")
+        end
       end
 
       def validate_date_range(value, name)
@@ -274,11 +308,15 @@ module Droonga
       def validate_ring(ring, name)
         validate_parameter_type(Hash, ring, name)
 
-        validate_positive_numeric_parameter(ring["weight"], "#{name}.weight")
+        do_validation do
+          validate_positive_numeric_parameter(ring["weight"], "#{name}.weight")
+        end
 
-        validate_parameter_type(Hash, ring["partitions"], "#{name}.partitions")
-        ring["partitions"].each do |key, value|
-          validate_partition(value, "#{name}.partitions.#{key}")
+        do_validation do
+          validate_parameter_type(Hash, ring["partitions"], "#{name}.partitions")
+          ring["partitions"].each do |key, value|
+            validate_partition(value, "#{name}.partitions.#{key}")
+          end
         end
       end
 
@@ -286,7 +324,9 @@ module Droonga
         validate_parameter_type(Array, partition, name)
 
         partition.each_with_index do |value, index|
-          validate_parameter_type(String, value, "#{name}[#{index}]")
+          do_validation do
+            validate_parameter_type(String, value, "#{name}[#{index}]")
+          end
         end
       end
 
@@ -303,14 +343,18 @@ module Droonga
               partitions.each_with_index do |partition, index|
                 name = "datasets.#{dataset_name}.ring.#{ring_key}." +
                          "partitions.#{range}[#{index}]"
-                unless partition =~ valid_farms_matcher
-                  raise UnknownFarm.new(name, partition, @path)
+                do_validation do
+                  unless partition =~ valid_farms_matcher
+                    raise UnknownFarm.new(name, partition, @path)
+                  end
                 end
-                directory_name = $POSTMATCH
-                if directory_name.nil? or directory_name.empty?
-                  message = "\"#{partition}\" has no database name. " +
-                              "You mus specify a database name for \"#{name}\"."
-                  raise ValidationError.new(message, @path)
+                do_validation do
+                  directory_name = $POSTMATCH
+                  if directory_name.nil? or directory_name.empty?
+                    message = "\"#{partition}\" has no database name. " +
+                                "You mus specify a database name for \"#{name}\"."
+                    raise ValidationError.new(message, @path)
+                  end
                 end
               end
             end

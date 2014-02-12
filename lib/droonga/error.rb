@@ -18,4 +18,23 @@
 module Droonga
   class Error < StandardError
   end
+
+  class MultiplexError < Error
+    attr_reader :errors
+
+    def initialize(errors=[])
+      @errors = errors
+      super
+    end
+
+    def message
+      @errors.sort.collect do |error|
+        error.message
+      end.join("\n-----------------------\n")
+    end
+
+    def empty?
+      @errors.empty?
+    end
+  end
 end
