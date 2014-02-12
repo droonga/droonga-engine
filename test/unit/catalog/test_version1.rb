@@ -23,13 +23,13 @@ class CatalogTest < Test::Unit::TestCase
     }
   end
 
-  def create_catalog(data, base_path)
-    Droonga::Catalog::Version1.new(data, base_path)
+  def create_catalog(data, path)
+    Droonga::Catalog::Version1.new(data, path)
   end
 
   class OptionTest < self
     def create_catalog(options)
-      super(minimum_data.merge("options" => options), "base-path")
+      super(minimum_data.merge("options" => options), "path")
     end
 
     def test_nonexistent
