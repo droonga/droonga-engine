@@ -28,9 +28,9 @@ module Droonga
     end
 
     def message
-      @errors.sort.collect do |error|
+      @errors.collect do |error|
         error.message
-      end.join("\n-----------------------\n")
+      end.sort.join("\n-----------------------\n")
     end
 
     def empty?
