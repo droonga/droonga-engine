@@ -60,6 +60,7 @@ module Droonga
         @path = path
         @base_path = File.dirname(path)
 
+        validate_zones
         validate_farms
         validate_datasets
 
@@ -206,6 +207,17 @@ module Droonga
         validate_parameter_type(Integer, value, name)
         if value < 1
           raise SmallerThanOne.new(name, value, @path)
+        end
+      end
+
+      def validate_zones
+        zones = @data["zones"]
+
+        raise MissingRequiredParameter.new("zones", @path) unless zones
+        validate_parameter_type(Array, zones, "zones")
+
+        zones.each_with_index do |value, index|
+          validate_parameter_type(String, value, "zones[#{index}]")
         end
       end
 
