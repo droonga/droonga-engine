@@ -19,6 +19,7 @@ class CatalogTest < Test::Unit::TestCase
   private
   def minimum_data
     {
+      "farms" => {},
       "datasets" => {},
     }
   end
