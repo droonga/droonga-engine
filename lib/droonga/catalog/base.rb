@@ -174,6 +174,10 @@ module Droonga
         end
       end
 
+      def validate_required_parameter(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
+      end
+
       def validate_parameter_type(expected, value, name)
         unless value.is_a?(expected)
           raise MismatchedParameterType.new(name,
@@ -184,7 +188,7 @@ module Droonga
       end
 
       def validate_valid_datetime(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         validate_parameter_type(String, value, name)
         begin
           Time.parse(value)
@@ -194,7 +198,7 @@ module Droonga
       end
 
       def validate_positive_numeric_parameter(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         validate_parameter_type(Numeric, value, name)
         if value < 0
           raise NegativeNumber.new(name, value, @path)
@@ -202,7 +206,7 @@ module Droonga
       end
 
       def validate_positive_integer_parameter(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         validate_parameter_type(Integer, value, name)
         if value < 0
           raise NegativeNumber.new(name, value, @path)
@@ -210,7 +214,7 @@ module Droonga
       end
 
       def validate_one_or_larger_integer_parameter(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         validate_parameter_type(Integer, value, name)
         if value < 1
           raise SmallerThanOne.new(name, value, @path)
@@ -219,14 +223,14 @@ module Droonga
 
       def validate_effective_date
         date = @data["effective_date"]
-        raise MissingRequiredParameter.new("effective_date", @path) unless date
+        validate_required_parameter(date, "effective_date")
         validate_valid_datetime(date, "effective_date")
       end
 
       def validate_zones
         zones = @data["zones"]
 
-        raise MissingRequiredParameter.new("zones", @path) unless zones
+        validate_required_parameter(zones, "zones")
         validate_parameter_type(Array, zones, "zones")
 
         zones.each_with_index do |value, index|
@@ -237,7 +241,7 @@ module Droonga
       def validate_farms
         farms = @data["farms"]
 
-        raise MissingRequiredParameter.new("farms", @path) unless farms
+        validate_required_parameter(farms, "farms")
         validate_parameter_type(Hash, farms, "farms")
 
         farms.each do |key, value|
@@ -248,14 +252,14 @@ module Droonga
       def validate_farm(farm, name)
         validate_parameter_type(Hash, farm, name)
 
-        raise MissingRequiredParameter.new("#{name}.device", @path) unless farm["device"]
+        validate_required_parameter(farm["device"], "#{name}.device")
         validate_parameter_type(String, farm["device"], "#{name}.device")
       end
 
       def validate_datasets
         datasets = @data["datasets"]
 
-        raise MissingRequiredParameter.new("datasets", @path) unless datasets
+        validate_required_parameter(datasets, "datasets")
         validate_parameter_type(Hash, datasets, "datasets")
 
         datasets.each do |name, dataset|
@@ -299,13 +303,13 @@ module Droonga
       end
 
       def validate_date_range(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         return if value == "infinity"
         raise UnsupportedValue.new(name, value, @path)
       end
 
       def validate_partition_key(value, name)
-        raise MissingRequiredParameter.new(name, @path) unless value
+        validate_required_parameter(value, name)
         validate_parameter_type(String, value, name)
         return if value == "_key"
         raise UnsupportedValue.new(name, value, @path)
