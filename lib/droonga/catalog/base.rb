@@ -179,7 +179,7 @@ module Droonga
         end
       end
 
-      def validate_parameter_type(value, name, expected)
+      def validate_parameter_type(expected, value, name)
         unless value.is_a?(expected)
           raise MismatchedParameterType.new(name,
                                             expected,
@@ -189,21 +189,21 @@ module Droonga
       end
 
       def validate_positive_numeric_parameter(value, name)
-        validate_parameter_type(value, name, Numeric)
-        if value < 0
+        validate_parameter_type(Numeric, value, name)
+\        if value < 0
           raise NegativeNumber.new(name, value, @path)
         end
       end
 
       def validate_positive_integer_parameter(value, name)
-        validate_parameter_type(value, name, Integer)
+        validate_parameter_type(Integer, value, name)
         if value < 0
           raise NegativeNumber.new(name, value, @path)
         end
       end
 
       def validate_one_or_larger_integer_parameter(value, name)
-        validate_parameter_type(value, name, Integer)
+        validate_parameter_type(Integer, value, name)
         if value < 1
           raise SmallerThanOne.new(name, value, @path)
         end
@@ -213,7 +213,7 @@ module Droonga
         farms = @data["farms"]
 
         raise MissingRequiredParameter.new("farms", @path) unless farms
-        validate_parameter_type(farms, "farms", Hash)
+        validate_parameter_type(Hash, farms, "farms")
 
         farms.each do |key, value|
           validate_farm(value, "farms.#{key}")
@@ -221,15 +221,15 @@ module Droonga
       end
 
       def validate_farm(farm, name)
-        validate_parameter_type(farm, name, Hash)
-        validate_parameter_type(farm["device"], "#{name}.device", String)
+        validate_parameter_type(Hash, farm, name)
+        validate_parameter_type(String, farm["device"], "#{name}.device")
       end
 
       def validate_datasets
         datasets = @data["datasets"]
 
         raise MissingRequiredParameter.new("datasets", @path) unless datasets
-        validate_parameter_type(datasets, "datasets", Hash)
+        validate_parameter_type(Hash, datasets, "datasets")
 
         datasets.each do |name, dataset|
           validate_dataset(dataset, "datasets.#{name}")
@@ -237,7 +237,7 @@ module Droonga
       end
 
       def validate_dataset(dataset, name)
-        validate_parameter_type(dataset, name, Hash)
+        validate_parameter_type(Hash, dataset, name)
 
         validate_one_or_larger_integer_parameter(dataset["number_of_partitions"],
                                                  "#{name}.number_of_partitions")
@@ -246,36 +246,30 @@ module Droonga
         validate_positive_integer_parameter(dataset["workers"],
                                             "#{name}.workers")
 
-        validate_parameter_type(dataset["ring"],
-                                "#{name}.ring",
-                                Hash)
+        validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
         dataset["ring"].each do |key, value|
           validate_ring(value, "#{name}.ring.#{key}")
         end
 
-        validate_parameter_type(dataset["plugins"],
-                                "#{name}.plugins",
-                                Array)
+        validate_parameter_type(Array, dataset["plugins"], "#{name}.plugins")
       end
 
       def validate_ring(ring, name)
-        validate_parameter_type(ring, name, Hash)
+        validate_parameter_type(Hash, ring, name)
 
         validate_positive_numeric_parameter(ring["weight"], "#{name}.weight")
 
-        validate_parameter_type(ring["partitions"],
-                                "#{name}.partitions",
-                                Hash)
+        validate_parameter_type(Hash, ring["partitions"], "#{name}.partitions")
         ring["partitions"].each do |key, value|
           validate_partition(value, "#{name}.partitions.#{key}")
         end
       end
 
       def validate_partition(partition, name)
-        validate_parameter_type(partition, name, Array)
+        validate_parameter_type(Array, partition, name)
 
         partition.each_with_index do |value, index|
-          validate_parameter_type(value, "#{name}[#{index}]", String)
+          validate_parameter_type(String, value, "#{name}[#{index}]")
         end
       end
     end
