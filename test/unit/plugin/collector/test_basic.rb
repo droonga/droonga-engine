@@ -69,7 +69,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         "name" => data[:mapping],
         "descendants" => nil,
       }
-      @plugin.process("collector_gather", request)
+      @plugin.process("gather", request)
       assert_equal(data[:expected], @outputs.last)
     end
 
@@ -98,7 +98,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_reduce", request)
+      @plugin.process("reduce", request)
       assert_equal([
                      output_name,
                      [0, 1, 2, 3, 4, 5],

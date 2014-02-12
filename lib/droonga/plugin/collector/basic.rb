@@ -23,8 +23,8 @@ module Droonga
 
     UNLIMITED = -1
 
-    command :collector_gather
-    def collector_gather(result)
+    command :gather
+    def gather(result)
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
         output = output["output"]
@@ -32,8 +32,8 @@ module Droonga
       emit(output, result)
     end
 
-    command :collector_reduce
-    def collector_reduce(request)
+    command :reduce
+    def reduce(request)
       body[input_name].each do |output, deal|
         left_value = output_values[output]
         right_value = request

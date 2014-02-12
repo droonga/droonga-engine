@@ -21,8 +21,8 @@ module Droonga
   class SearchCollector < BasicCollector
     repository.register("search", self)
 
-    command :collector_search_gather
-    def collector_search_gather(result)
+    command :search_gather
+    def search_gather(result)
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
         elements = output["elements"]
@@ -71,8 +71,8 @@ module Droonga
       items
     end
 
-    command :collector_search_reduce
-    def collector_search_reduce(request)
+    command :search_reduce
+    def search_reduce(request)
       #XXX This is just a workaround. Errors should be handled by the framework itself.
       if input_name == "errors"
         return collector_reduce(request)

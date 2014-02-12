@@ -49,8 +49,7 @@ module Droonga
       tasks.each do |task|
         task["n_of_inputs"] += 1
         step = task["step"]
-        type = step["type"]
-        command = "collector_" + type
+        command = step["type"]
         n_of_expects = step["n_of_expects"]
         message = {
           "task"=>task,

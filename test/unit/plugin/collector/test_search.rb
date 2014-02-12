@@ -318,7 +318,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => data[:mapping],
         "descendants" => nil,
       }
-      @plugin.process("collector_search_gather", request)
+      @plugin.process("search_gather", request)
       output_name = data[:mapping]
       output_name = output_name["output"] if output_name.is_a?(Hash)
       assert_equal([output_name, data[:expected]], @outputs.last)
@@ -385,7 +385,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_search_reduce", request)
+      @plugin.process("search_reduce", request)
       assert_equal([
                      output_name,
                      {
@@ -470,7 +470,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_search_reduce", request)
+      @plugin.process("search_reduce", request)
       assert_equal([
                      output_name,
                      {
@@ -551,7 +551,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_search_reduce", request)
+      @plugin.process("search_reduce", request)
       assert_equal([
                      output_name,
                      {
@@ -635,7 +635,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_search_reduce", request)
+      @plugin.process("search_reduce", request)
       assert_equal([
                      output_name,
                      {
@@ -749,7 +749,7 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("collector_search_reduce", request)
+      @plugin.process("search_reduce", request)
       assert_equal([
                      output_name,
                      {
