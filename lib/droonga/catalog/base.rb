@@ -68,10 +68,7 @@ module Droonga
         @path = path
         @base_path = File.dirname(path)
 
-        validate_effective_date
-        validate_zones
-        validate_farms
-        validate_datasets
+        validate
 
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
@@ -187,6 +184,13 @@ module Droonga
         dataset["ring"].reduce(0) do |result, zone|
           result + zone[1]["weight"]
         end
+      end
+
+      def validate
+        validate_effective_date
+        validate_zones
+        validate_farms
+        validate_datasets
       end
 
       def validate_parameter_type(expected, value, name)
