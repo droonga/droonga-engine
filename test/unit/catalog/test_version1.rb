@@ -19,6 +19,7 @@ class CatalogTest < Test::Unit::TestCase
   private
   def minimum_data
     {
+      "zones" => [],
       "farms" => {},
       "datasets" => {},
     }
@@ -93,6 +94,7 @@ class CatalogTest < Test::Unit::TestCase
     class PluginsTest < self
       def setup
         @data = {
+          "zones" => [farm_name],
           "farms" => {
             farm_name => {
               "device" => ".",
@@ -162,7 +164,9 @@ class CatalogTest < Test::Unit::TestCase
 
         private
         def total_weight(dataset)
-          catalog = create_catalog({"datasets" => {}, "farms" => {}},
+          catalog = create_catalog({ "zones" => [],
+                                     "farms" => {},
+                                     "datasets" => {} },
                                    "base-path")
           catalog.send(:compute_total_weight, dataset)
         end
