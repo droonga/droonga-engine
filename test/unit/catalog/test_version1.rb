@@ -19,7 +19,7 @@ class CatalogTest < Test::Unit::TestCase
   private
   def minimum_data
     {
-      "effective_date": "2013-09-01T00:00:00Z",
+      "effective_date" => "2013-09-01T00:00:00Z",
       "zones" => [],
       "farms" => {},
       "datasets" => {},
