@@ -61,6 +61,12 @@ module Droonga
       end
     end
 
+    class UnknownFarm < ValidationError
+      def initialize(name, partition, path)
+        super("The partition #{partition} at \"#{name}\" seems to be bound to an unknown farm.", path)
+      end
+    end
+
     class Base
       attr_reader :path, :base_path
       def initialize(data, path)
@@ -191,6 +197,7 @@ module Droonga
         validate_zones
         validate_farms
         validate_datasets
+        validate_database_relations
       end
 
       def validate_parameter_type(expected, value, name)
@@ -313,6 +320,28 @@ module Droonga
 
         partition.each_with_index do |value, index|
           validate_parameter_type(String, value, "#{name}[#{index}]")
+        end
+      end
+
+      def validate_database_relations
+        farm_names = @data["farms"].keys.collect do |name|
+          Regexp.escape(name)
+        end
+        valid_farms_matcher = Regexp.new("^(#{farm_names.join("|")})\.")
+
+        datasets.each do |dataset_name, dataset|
+          ring = dataset["ring"]
+          ring.each do |ring_key, part|
+            part["partitions"].each do |range, partitions|
+              partitions.each_with_index do |partition, index|
+                unless partition =~ valid_farms_matcher
+                  name = "datasets.#{dataset_name}.ring.#{ring_key}." +
+                           "partitions.#{range}[#{index}]"
+                  raise UnknownFarm.new(name, partition, @path)
+                end
+              end
+            end
+          end
         end
       end
     end
