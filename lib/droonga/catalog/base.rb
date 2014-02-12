@@ -191,7 +191,7 @@ module Droonga
 
       def validate_positive_numeric_parameter(value, name)
         validate_parameter_type(Numeric, value, name)
-\        if value < 0
+        if value < 0
           raise NegativeNumber.new(name, value, @path)
         end
       end
