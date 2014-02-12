@@ -181,7 +181,7 @@ module Droonga
       end
 
       def validate_parameter_type(value, name, expected)
-        unless datasets.is_a?(expected)
+        unless value.is_a?(expected)
           raise MismatchedParameterType.new(name,
                                             expected,
                                             value.class,
