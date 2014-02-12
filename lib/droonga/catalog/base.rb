@@ -253,6 +253,21 @@ module Droonga
         validate_parameter_type(ring, name, Hash)
 
         validate_positive_numeric_parameter(ring["weight"], "#{name}.weight")
+
+        validate_parameter_type(ring["partitions"],
+                                "#{name}.partitions",
+                                Hash)
+        ring["partitions"].each do |key, value|
+          validate_ring(value, "#{name}.partitions.#{key}")
+        end
+      end
+
+      def validate_partition(partition, name)
+        validate_parameter_type(partition, name, Array)
+
+        partition.each_with_index do |value, index|
+          validate_parameter_type(value, "#{name}[#{index}]", String)
+        end
       end
     end
   end
