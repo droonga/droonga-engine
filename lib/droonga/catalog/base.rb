@@ -258,7 +258,7 @@ module Droonga
                                 "#{name}.partitions",
                                 Hash)
         ring["partitions"].each do |key, value|
-          validate_ring(value, "#{name}.partitions.#{key}")
+          validate_partition(value, "#{name}.partitions.#{key}")
         end
       end
 
