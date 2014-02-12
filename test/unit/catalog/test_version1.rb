@@ -187,6 +187,10 @@ class CatalogTest < Test::Unit::TestCase
         "localhost:23041/droonga"
       end
 
+      def path
+        "path/to/catalog"
+      end
+
       def valid_farms
         {
           farm_name => {
@@ -203,65 +207,28 @@ class CatalogTest < Test::Unit::TestCase
     end
 
     data(
-      :missing_effective_date => {
+      :missing_root_elements => {
         :catalog => {},
-        :error => Droonga::Catalog::MissingRequiredParameter,
-      },
-      :invalid_effective_date => {
-        :catalog => {
-          "effective_date" => "invalid",
-        },
-        :error => Droonga::Catalog::InvalidDate,
-      },
-      :missing_zones => {
-        :catalog => {
-          "effective_date" => minimum_data["effective_date"],
-        },
-        :error => Droonga::Catalog::MissingRequiredParameter,
-      },
-      :missing_farms => {
-        :catalog => {
-          "effective_date" => minimum_data["effective_date"],
-          "zones" => minimum_data["zones"],
-        },
-        :error => Droonga::Catalog::MissingRequiredParameter,
-      },
-      :array_farms => {
-        :catalog => {
-          "effective_date" => minimum_data["effective_date"],
-          "zones" => minimum_data["zones"],
-          "farms" => [],
-        },
-        :error => Droonga::Catalog::MismatchedParameterType,
-      },
-      :no_device_farm => {
-        :catalog => {
-          "effective_date" => minimum_data["effective_date"],
-          "zones" => minimum_data["zones"],
-          "farms" => {
-            farm_name => {},
-          },
-        },
-        :error => Droonga::Catalog::MissingRequiredParameter,
-      },
-      :missing_datasets => {
-        :catalog => {
-          "effective_date" => minimum_data["effective_date"],
-          "zones" => minimum_data["zones"],
-          "farms" => valid_farms,
-        },
-        :error => Droonga::Catalog::MissingRequiredParameter,
-      },
-      :array_datasets => {
-        :catalog => valid_catalog_base.merge(
-          "datasets" => [],
-        ),
-        :error => Droonga::Catalog::MismatchedParameterType,
+        :errors => [
+          Droonga::Catalog::MissingRequiredParameter.new("effective_date", path),
+          Droonga::Catalog::MissingRequiredParameter.new("zones", path),
+          Droonga::Catalog::MissingRequiredParameter.new("farms", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets", path),
+        ],
       },
     )
     def test_validation(data)
-      assert_raise(data[:error]) do
+      begin
         create_catalog(data[:catalog], "path/to/catalog")
+        assert_nil("must not reach here")
+      rescue Droonga::MultiplexError => errors
+        actual_errors = errors.errors.collect do |error|
+          error.message
+        end.sort
+        expected_errors = data[:errors].collect do |error|
+          error.message
+        end.sort
+        assert_equal(expected_errors, actual_errors)
       end
     end
   end
