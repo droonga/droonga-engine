@@ -20,10 +20,11 @@ require "droonga/message_processing_error"
 module Droonga
   module Catalog
     class Base
-      attr_reader :base_path
-      def initialize(data, base_path)
+      attr_reader :path, :base_path
+      def initialize(data, path)
         @data = data
-        @base_path = base_path
+        @path = path
+        @base_path = File.dirname(base_path)
 
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
