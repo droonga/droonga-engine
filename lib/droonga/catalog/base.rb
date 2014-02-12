@@ -223,6 +223,8 @@ module Droonga
 
       def validate_farm(farm, name)
         validate_parameter_type(Hash, farm, name)
+
+        raise MissingRequiredParameter.new("#{name}.device", @path) unless farm["device"]
         validate_parameter_type(String, farm["device"], "#{name}.device")
       end
 

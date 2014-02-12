@@ -16,14 +16,20 @@
 require "droonga/catalog/version1"
 
 class CatalogTest < Test::Unit::TestCase
+  class << self
+    def minimum_data
+      {
+        "effective_date" => "2013-09-01T00:00:00Z",
+        "zones" => [],
+        "farms" => {},
+        "datasets" => {},
+      }
+    end
+  end
+
   private
   def minimum_data
-    {
-      "effective_date" => "2013-09-01T00:00:00Z",
-      "zones" => [],
-      "farms" => {},
-      "datasets" => {},
-    }
+    self.class.minimum_data
   end
 
   def create_catalog(data, path)
@@ -176,6 +182,20 @@ class CatalogTest < Test::Unit::TestCase
   end
 
   class ValidationTest < self
+    class << self
+      def farm_name
+        "localhost:23041/droonga"
+      end
+
+      def valid_farms
+        {
+          farm_name => {
+            "device" => ".",
+          },
+        }
+      end
+    end
+
     data(
       :missing_effective_date => {
         :catalog => {},
@@ -186,6 +206,29 @@ class CatalogTest < Test::Unit::TestCase
           "effective_date" => "invalid",
         },
         :error => Droonga::Catalog::InvalidDate,
+      },
+      :missing_zones => {
+        :catalog => {
+          "effective_date" => minimum_data["effective_date"],
+        },
+        :error => Droonga::Catalog::MissingRequiredParameter,
+      },
+      :missing_farms => {
+        :catalog => {
+          "effective_date" => minimum_data["effective_date"],
+          "zones" => minimum_data["zones"],
+        },
+        :error => Droonga::Catalog::MissingRequiredParameter,
+      },
+      :no_device_farm => {
+        :catalog => {
+          "effective_date" => minimum_data["effective_date"],
+          "zones" => minimum_data["zones"],
+          "farms" => {
+            farm_name => {},
+          },
+        },
+        :error => Droonga::Catalog::MissingRequiredParameter,
       },
     )
     def test_validation(data)
