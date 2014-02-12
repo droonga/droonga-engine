@@ -194,6 +194,12 @@ class CatalogTest < Test::Unit::TestCase
           },
         }
       end
+
+      def valid_catalog_base
+        minimum_data.merge(
+          "farms" => valid_farms,
+        )
+      end
     end
 
     data(
@@ -220,6 +226,14 @@ class CatalogTest < Test::Unit::TestCase
         },
         :error => Droonga::Catalog::MissingRequiredParameter,
       },
+      :array_farms => {
+        :catalog => {
+          "effective_date" => minimum_data["effective_date"],
+          "zones" => minimum_data["zones"],
+          "farms" => [],
+        },
+        :error => Droonga::Catalog::MismatchedParameterType,
+      },
       :no_device_farm => {
         :catalog => {
           "effective_date" => minimum_data["effective_date"],
@@ -229,6 +243,20 @@ class CatalogTest < Test::Unit::TestCase
           },
         },
         :error => Droonga::Catalog::MissingRequiredParameter,
+      },
+      :missing_datasets => {
+        :catalog => {
+          "effective_date" => minimum_data["effective_date"],
+          "zones" => minimum_data["zones"],
+          "farms" => valid_farms,
+        },
+        :error => Droonga::Catalog::MissingRequiredParameter,
+      },
+      :array_datasets => {
+        :catalog => valid_catalog_base.merge(
+          "datasets" => [],
+        ),
+        :error => Droonga::Catalog::MismatchedParameterType,
       },
     )
     def test_validation(data)
