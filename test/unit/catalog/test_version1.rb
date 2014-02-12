@@ -174,4 +174,24 @@ class CatalogTest < Test::Unit::TestCase
       end
     end
   end
+
+  class ValidationTest < self
+    data(
+      :missing_effective_date => {
+        :catalog => {},
+        :error => Droonga::Catalog::MissingRequiredParameter
+      },
+      :invalid_effective_date => {
+        :catalog => {
+          "effective_date" => "invalid",
+        },
+        :error => Droonga::Catalog::MissingRequiredParameter
+      },
+    )
+    def test_validation(data)
+      assert_raise(data[:error]) do
+        create_catalog(data[:catalog], "path/to/catalog")
+      end
+    end
+  end
 end
