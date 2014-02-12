@@ -158,7 +158,7 @@ class CatalogTest < Test::Unit::TestCase
 
         private
         def total_weight(dataset)
-          catalog = create_catalog({"datasets" => []}, "base-path")
+          catalog = create_catalog({"datasets" => {}}, "base-path")
           catalog.send(:compute_total_weight, dataset)
         end
       end
