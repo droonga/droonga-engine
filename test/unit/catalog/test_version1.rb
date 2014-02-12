@@ -179,13 +179,13 @@ class CatalogTest < Test::Unit::TestCase
     data(
       :missing_effective_date => {
         :catalog => {},
-        :error => Droonga::Catalog::MissingRequiredParameter
+        :error => Droonga::Catalog::MissingRequiredParameter,
       },
       :invalid_effective_date => {
         :catalog => {
           "effective_date" => "invalid",
         },
-        :error => Droonga::Catalog::MissingRequiredParameter
+        :error => Droonga::Catalog::InvalidDate,
       },
     )
     def test_validation(data)
