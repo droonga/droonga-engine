@@ -187,6 +187,14 @@ class CatalogTest < Test::Unit::TestCase
         "localhost:23041/droonga"
       end
 
+      def ring_name
+        "localhost:23041"
+      end
+
+      def range_name
+        "2013-09-01"
+      end
+
       def path
         "path/to/catalog"
       end
@@ -260,6 +268,15 @@ class CatalogTest < Test::Unit::TestCase
             "datasets.Droonga.ring", path),
         ],
       },
+      :invalid_date_parameters => {
+        :catalog => minimum_data.merge(
+          "effective_date" => "invalid",
+        ),
+        :errors => [
+          Droonga::Catalog::InvalidDate.new(
+            "effective_date", "invalid", path),
+        ],
+      },
       :non_integer_numeric_parameters => {
         :catalog => minimum_data.merge(
           "farms" => valid_farms,
@@ -268,6 +285,12 @@ class CatalogTest < Test::Unit::TestCase
               "workers" => 0.1,
               "number_of_replicas" => 0.1,
               "number_of_partitions" => 0.1,
+              "ring" => {
+                ring_name => {
+                  "weight" => 0.1,
+                  "partitions" => {},
+                },
+              },
             ),
           },
         ),
@@ -288,6 +311,12 @@ class CatalogTest < Test::Unit::TestCase
               "workers" => -1,
               "number_of_replicas" => -1,
               "number_of_partitions" => -1,
+              "ring" => {
+                ring_name => {
+                  "weight" => -1,
+                  "partitions" => {},
+                },
+              },
             ),
           },
         ),
@@ -298,6 +327,32 @@ class CatalogTest < Test::Unit::TestCase
             "datasets.Droonga.number_of_replicas", -1, path),
           Droonga::Catalog::SmallerThanOne.new(
             "datasets.Droonga.number_of_partitions", -1, path),
+          Droonga::Catalog::NegativeNumber.new(
+            "datasets.Droonga.ring.#{ring_name}.weight", -1, path),
+        ],
+      },
+      :broken_relations_unknown_farm => {
+        :catalog => minimum_data.merge(
+          "farms" => valid_farms,
+          "datasets" => {
+            "Droonga" => valid_dataset_base.merge(
+              "ring" => {
+                ring_name => {
+                  "weight" => 1,
+                  "partitions" => {
+                    range_name => [
+                      "unknown:0/unknown.000",
+                    ],
+                  },
+                },
+              },
+            ),
+          },
+        ),
+        :errors => [
+          Droonga::Catalog::UnknownFarm.new(
+            "datasets.Droonga.ring.#{ring_name}.partitions.#{range_name}[0]",
+            "unknown:0/unknown.000", path),
         ],
       },
     )
