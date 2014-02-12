@@ -15,6 +15,7 @@
 
 require "digest/sha1"
 require "zlib"
+require "time"
 require "droonga/message_processing_error"
 
 module Droonga
@@ -41,6 +42,13 @@ module Droonga
       end
     end
 
+    class InvalidDate < ValidationError
+      def initialize(name, value, path)
+        super("\"#{name}\" must be a valid datetime. " +
+                "\"#{value}\" cannot be parsed as a datetime.", path)
+      end
+    end
+
     class NegativeNumber < ValidationError
       def initialize(name, actual, path)
         super("\"#{name}\" must be a positive number, but #{actual}.", path)
@@ -60,6 +68,7 @@ module Droonga
         @path = path
         @base_path = File.dirname(path)
 
+        validate_effective_date
         validate_zones
         validate_farms
         validate_datasets
@@ -189,6 +198,15 @@ module Droonga
         end
       end
 
+      def validate_valid_datetime(value, name)
+        validate_parameter_type(String, value, name)
+        begin
+          Time.parse(value)
+        rescue ArgumentError => error
+          raise InvalidDate.new(name, value, @path)
+        end
+      end
+
       def validate_positive_numeric_parameter(value, name)
         validate_parameter_type(Numeric, value, name)
         if value < 0
@@ -208,6 +226,10 @@ module Droonga
         if value < 1
           raise SmallerThanOne.new(name, value, @path)
         end
+      end
+
+      def validate_effective_date
+        validate_valid_datetime(@data["effective_date"], "effective_date")
       end
 
       def validate_zones
