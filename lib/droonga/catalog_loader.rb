@@ -28,6 +28,8 @@ module Droonga
         JSON.parse(file.read)
       end
       Catalog::Version1.new(data, File.dirname(@path))
+    rescue JSON::ParserError => error
+      raise InvalidCatalog.new("Syntax error in #{@path}", error)
     end
   end
 end

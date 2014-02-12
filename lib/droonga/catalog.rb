@@ -21,4 +21,13 @@ module Droonga
   class << self
     attr_accessor :catalog
   end
+
+  class InvalidCatalog < StandardError
+    attr_reader :message, :detail
+
+    def initialize(message, detail=nil)
+      @message = message
+      @detail = detail
+    end
+  end
 end
