@@ -257,6 +257,7 @@ module Droonga
                                                  "#{name}.number_of_replicas")
         validate_positive_integer_parameter(dataset["workers"],
                                             "#{name}.workers")
+        validate_date_range(dataset["date_range"], "#{name}.date_range")
 
         validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
         dataset["ring"].each do |key, value|
@@ -264,6 +265,10 @@ module Droonga
         end
 
         validate_parameter_type(Array, dataset["plugins"], "#{name}.plugins")
+      end
+
+      def validate_date_range(value, name)
+        return if value == "infinity"
       end
 
       def validate_ring(ring, name)
