@@ -100,6 +100,7 @@ class CatalogTest < Test::Unit::TestCase
           "datasets" => {
             "Droonga" => {
               "number_of_partitions" => 1,
+              "number_of_replicas" => 1,
               "ring" => {
                 "localhost:23041" => {
                   "weight" =>  50,
