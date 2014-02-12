@@ -19,6 +19,7 @@ class CatalogTest < Test::Unit::TestCase
   private
   def minimum_data
     {
+      "effective_date": "2013-09-01T00:00:00Z",
       "zones" => [],
       "farms" => {},
       "datasets" => {},
@@ -93,7 +94,7 @@ class CatalogTest < Test::Unit::TestCase
 
     class PluginsTest < self
       def setup
-        @data = {
+        @data = minimum_data.merge({
           "zones" => [farm_name],
           "farms" => {
             farm_name => {
@@ -118,7 +119,7 @@ class CatalogTest < Test::Unit::TestCase
               },
             },
           },
-        }
+        })
       end
 
       def farm_name
@@ -164,9 +165,7 @@ class CatalogTest < Test::Unit::TestCase
 
         private
         def total_weight(dataset)
-          catalog = create_catalog({ "zones" => [],
-                                     "farms" => {},
-                                     "datasets" => {} },
+          catalog = create_catalog(minimum_data,
                                    "base-path")
           catalog.send(:compute_total_weight, dataset)
         end
