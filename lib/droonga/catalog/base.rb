@@ -29,25 +29,25 @@ module Droonga
       end
     end
 
-    class MissingRequiredParameter < Error
+    class MissingRequiredParameter < ValidationError
       def initialize(name, path)
         super("You must specify \"#{name}\".", path)
       end
     end
 
-    class MismatchedParameterType < Error
+    class MismatchedParameterType < ValidationError
       def initialize(name, expected, actual, path)
         super("\"#{name}\" must be a #{expected}, but a #{actual}.", path)
       end
     end
 
-    class NegativeNumber < Error
+    class NegativeNumber < ValidationError
       def initialize(name, actual, path)
         super("\"#{name}\" must be a positive number, but #{actual}.", path)
       end
     end
 
-    class SmallerThanOne < Error
+    class SmallerThanOne < ValidationError
       def initialize(name, actual, path)
         super("\"#{name}\" must be 1 or larger number, but #{actual}.", path)
       end
