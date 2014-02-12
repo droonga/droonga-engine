@@ -223,6 +223,12 @@ module Droonga
           raise SmallerThanOne.new("#{name}.number_of_replicas", n_replicas, @path)
         end
 
+        n_workers = dataset["workers"]
+        validate_parameter_type(n_workers, "#{name}.workers", Integer)
+        if n_workers < 0
+          raise NegativeNumber.new("#{name}.workers", n_workers, @path)
+        end
+
         validate_parameter_type(dataset["ring"],
                                 "#{name}.ring",
                                 Hash)
