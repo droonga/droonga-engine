@@ -214,6 +214,15 @@ module Droonga
 
         raise MissingRequiredParameter.new("farms", @path) unless farms
         validate_parameter_type(farms, "farms", Hash)
+
+        farms.each do |key, value|
+          validate_farm(value, "farms.#{key}")
+        end
+      end
+
+      def validate_farm(farm, name)
+        validate_parameter_type(farm, name, Hash)
+        validate_parameter_type(farm["device"], "#{name}.device", String)
       end
 
       def validate_datasets
