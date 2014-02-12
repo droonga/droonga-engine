@@ -190,6 +190,27 @@ module Droonga
         end
       end
 
+      def validate_positive_numeric_parameter(value, name)
+        validate_parameter_type(value, name, Numeric)
+        if value < 0
+          raise NegativeNumber.new(name, value, @path)
+        end
+      end
+
+      def validate_positive_integer_parameter(value, name)
+        validate_parameter_type(value, name, Integer)
+        if value < 0
+          raise NegativeNumber.new(name, value, @path)
+        end
+      end
+
+      def validate_one_or_larger_integer_parameter(value, name)
+        validate_parameter_type(value, name, Integer)
+        if value < 1
+          raise SmallerThanOne.new(name, value, @path)
+        end
+      end
+
       def validate_farms
         farms = @data["farms"]
 
@@ -207,27 +228,12 @@ module Droonga
       def validate_dataset(dataset, name)
         validate_parameter_type(dataset, name, Hash)
 
-        n_partitions = dataset["number_of_partitions"]
-        validate_parameter_type(n_partitions,
-                                "#{name}.number_of_partitions",
-                                Integer)
-        if n_partitions < 1
-          raise SmallerThanOne.new("#{name}.number_of_partitions", n_partitions, @path)
-        end
-
-        n_replicas = dataset["number_of_replicas"]
-        validate_parameter_type(n_replicas,
-                                "#{name}.number_of_replicas",
-                                Integer)
-        if n_replicas < 1
-          raise SmallerThanOne.new("#{name}.number_of_replicas", n_replicas, @path)
-        end
-
-        n_workers = dataset["workers"]
-        validate_parameter_type(n_workers, "#{name}.workers", Integer)
-        if n_workers < 0
-          raise NegativeNumber.new("#{name}.workers", n_workers, @path)
-        end
+        validate_one_or_larger_integer_parameter(dataset["number_of_partitions"],
+                                                 "#{name}.number_of_partitions")
+        validate_one_or_larger_integer_parameter(dataset["number_of_replicas"],
+                                                 "#{name}.number_of_replicas")
+        validate_positive_integer_parameter(dataset["workers"],
+                                            "#{name}.workers")
 
         validate_parameter_type(dataset["ring"],
                                 "#{name}.ring",
@@ -237,11 +243,7 @@ module Droonga
       def validate_ring(ring, name)
         validate_parameter_type(ring, name, Hash)
 
-        weight = ring["weight"]
-        validate_parameter_type(weight, "#{name}.weight", Numeric)
-        if weight < 0
-          raise NegativeNumber.new("#{name}.weight", weight, @path)
-        end
+        validate_positive_numeric_parameter(ring["weight"], "#{name}.weight")
       end
     end
   end
