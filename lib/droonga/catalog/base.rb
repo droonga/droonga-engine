@@ -298,7 +298,7 @@ module Droonga
         end
 
         do_validation do
-          validate_parameter_type(Array, dataset["plugins"], "#{name}.plugins")
+          validate_plugins(dataset["plugins"], "#{name}.plugins")
         end
       end
 
@@ -338,6 +338,12 @@ module Droonga
             validate_parameter_type(String, value, "#{name}[#{index}]")
           end
         end
+      end
+
+      def validate_plugins(plugins, name)
+        return unless plugins
+        validate_required_parameter(plugins, name)
+        validate_parameter_type(Array, plugins, "#{name}.plugins")
       end
 
       def validate_database_relations

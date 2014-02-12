@@ -216,13 +216,41 @@ class CatalogTest < Test::Unit::TestCase
           Droonga::Catalog::MissingRequiredParameter.new("datasets", path),
         ],
       },
+      :invalid_farms => {
+        :catalog => minimum_data.merge(
+          "farms" => {
+            farm_name => {
+            },
+          },
+        ),
+        :errors => [
+          Droonga::Catalog::MissingRequiredParameter.new("farms.#{farm_name}.device", path),
+        ],
+      },
+      :missing_dataset_parameters => {
+        :catalog => minimum_data.merge(
+          "farms" => valid_farms,
+          "datasets" => {
+            "Droonga" => {
+            },
+          },
+        ),
+        :errors => [
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.workers", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.number_of_replicas", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.number_of_partitions", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.partition_key", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.date_range", path),
+          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.ring", path),
+        ],
+      },
     )
     def test_validation(data)
       begin
         create_catalog(data[:catalog], "path/to/catalog")
         assert_nil("must not reach here")
-      rescue Droonga::MultiplexError => errors
-        actual_errors = errors.errors.collect do |error|
+      rescue Droonga::MultiplexError => actual_errors
+        actual_errors = actual_errors.errors.collect do |error|
           error.message
         end.sort
         expected_errors = data[:errors].collect do |error|
