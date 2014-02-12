@@ -184,6 +184,7 @@ module Droonga
       end
 
       def validate_valid_datetime(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         validate_parameter_type(String, value, name)
         begin
           Time.parse(value)
@@ -193,6 +194,7 @@ module Droonga
       end
 
       def validate_positive_numeric_parameter(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         validate_parameter_type(Numeric, value, name)
         if value < 0
           raise NegativeNumber.new(name, value, @path)
@@ -200,6 +202,7 @@ module Droonga
       end
 
       def validate_positive_integer_parameter(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         validate_parameter_type(Integer, value, name)
         if value < 0
           raise NegativeNumber.new(name, value, @path)
@@ -207,6 +210,7 @@ module Droonga
       end
 
       def validate_one_or_larger_integer_parameter(value, name)
+        raise MissingRequiredParameter.new(name, @path) unless value
         validate_parameter_type(Integer, value, name)
         if value < 1
           raise SmallerThanOne.new(name, value, @path)
