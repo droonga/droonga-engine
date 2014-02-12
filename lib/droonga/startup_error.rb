@@ -17,23 +17,20 @@
 
 module Droonga
   class StartupError < StandardError
+    attr_reader :message, :detail
+
     def initialize(message, detail=nil)
       @message = message
       @detail = detail
     end
 
-    def message
-      detail = self.detail
-      detail = "\n#{detail}" unless detail.empty?
-      "#{self.class.name}\n#{@message}#{detail}"
-    end
-
-    def detail
-      if @detail
-        @detail.to_s
-      else
-        ""
+    def to_s
+      detail = @edatil
+      if detail
+        detail = detail.to_s
+        detail = "\n#{detail.to_s}" unless detail.empty?
       end
+      "#{self.class.name}\n#{@message}#{detail}"
     end
   end
 end
