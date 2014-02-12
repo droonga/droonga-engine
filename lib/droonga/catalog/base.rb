@@ -291,8 +291,10 @@ module Droonga
         end
 
         do_validation do
-          validate_parameter_type(Hash, dataset["ring"], "#{name}.ring")
-          dataset["ring"].each do |key, value|
+          ring = dataset["ring"]
+          validate_required_parameter(ring, "#{name}.ring")
+          validate_parameter_type(Hash, ring, "#{name}.ring")
+          ring.each do |key, value|
             validate_ring(value, "#{name}.ring.#{key}")
           end
         end
