@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,14 +15,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog_loader"
-require "droonga/startup_error"
-
 module Droonga
-  class << self
-    attr_accessor :catalog
-  end
+  class StartupError < StandardError
+    attr_reader :message, :detail
 
-  class InvalidCatalog < StartupError
+    def initialize(message, detail=nil)
+      @message = message
+      @detail = detail
+    end
   end
 end
