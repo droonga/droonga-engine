@@ -297,10 +297,16 @@ module Droonga
           ring.each do |ring_key, part|
             part["partitions"].each do |range, partitions|
               partitions.each_with_index do |partition, index|
+                name = "datasets.#{dataset_name}.ring.#{ring_key}." +
+                         "partitions.#{range}[#{index}]"
                 unless partition =~ valid_farms_matcher
-                  name = "datasets.#{dataset_name}.ring.#{ring_key}." +
-                           "partitions.#{range}[#{index}]"
                   raise UnknownFarm.new(name, partition, @path)
+                end
+                directory_name = $POSTMATCH
+                if directory_name.nil? or directory_name.empty?
+                  message = "\"#{partition}\" has no database name. " +
+                              "You mus specify a database name for \"#{name}\"."
+                  raise ValidationError.new(message, @path)
                 end
               end
             end
