@@ -331,6 +331,8 @@ module Droonga
       end
 
       def validate_database_relations
+        return if unless @data["farms"]
+
         farm_names = @data["farms"].keys.collect do |name|
           Regexp.escape(name)
         end
@@ -338,8 +340,12 @@ module Droonga
 
         datasets.each do |dataset_name, dataset|
           ring = dataset["ring"]
+          next if ring.nil? || !ring.is_a?(Hash)
           ring.each do |ring_key, part|
-            part["partitions"].each do |range, partitions|
+            partitions_set = part["partitions"]
+            next if partitions_set.nil? || !partitions_set.is_a?(Hash)
+            partitions_set.each do |range, partitions|
+              next if !partitions_set.is_a?(Array)
               partitions.each_with_index do |partition, index|
                 name = "datasets.#{dataset_name}.ring.#{ring_key}." +
                          "partitions.#{range}[#{index}]"
