@@ -194,7 +194,9 @@ module Droonga
       end
 
       def validate_effective_date
-        validate_valid_datetime(@data["effective_date"], "effective_date")
+        date = @data["effective_date"]
+        raise MissingRequiredParameter.new("effective_date", @path) unless date
+        validate_valid_datetime(date, "effective_date")
       end
 
       def validate_zones
