@@ -67,6 +67,12 @@ module Droonga
       end
     end
 
+    class UnsupportedValue < ValidationError
+      def initialize(name, value, path)
+        super("\"#{value}\" is not supported for \"#{name}\".", path)
+      end
+    end
+
     class Base
       attr_reader :path, :base_path
       def initialize(data, path)
@@ -304,11 +310,13 @@ module Droonga
 
       def validate_date_range(value, name)
         return if value == "infinity"
+        raise UnsupportedValue(name, value, @path)
       end
 
       def validate_partition_key(value, name)
         validate_parameter_type(String, value, name)
         return if value == "_key"
+        raise UnsupportedValue(name, value, @path)
       end
 
       def validate_ring(ring, name)
