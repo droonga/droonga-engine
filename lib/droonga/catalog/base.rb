@@ -307,7 +307,7 @@ module Droonga
       end
 
       def validate_partition_key(value, name)
-        validate_parameter_type(String, value, "name")
+        validate_parameter_type(String, value, name)
         return if value == "_key"
       end
 
