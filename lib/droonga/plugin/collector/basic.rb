@@ -37,12 +37,12 @@ module Droonga
       body[input_name].each do |output, deal|
         left_value = output_values[output]
         right_value = request
-        value = reduce(deal, left_value, right_value)
+        value = reduce_value(deal, left_value, right_value)
         emit(output, value)
       end
     end
 
-    def reduce(deal, left_value, right_value)
+    def reduce_value(deal, left_value, right_value)
       if left_value.nil? || right_value.nil?
         return right_value || left_value
       end

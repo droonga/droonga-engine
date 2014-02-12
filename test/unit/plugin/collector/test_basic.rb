@@ -107,7 +107,11 @@ class BasicCollectorTest < Test::Unit::TestCase
     end
   end
 
-  class ReduceTest < self
+  class ReduceValueTest < self
+    def reduce_value(deal, left_value, right_value)
+      @plugin.reduce_value(deal, left_value, right_value)
+    end
+
     data(
       :int => {
         :expected => 1.5,
@@ -121,9 +125,9 @@ class BasicCollectorTest < Test::Unit::TestCase
       },
     )
     def test_average(data)
-      reduced = @plugin.reduce({ "type" => "average" },
-                               data[:left],
-                               data[:right])
+      reduced = reduce_value({ "type" => "average" },
+                             data[:left],
+                             data[:right])
       assert_equal(data[:expected], reduced)
     end
 
@@ -150,9 +154,9 @@ class BasicCollectorTest < Test::Unit::TestCase
       },
     )
     def test_and(data)
-      reduced = @plugin.reduce({ "type" => "and" },
-                               data[:left],
-                               data[:right])
+      reduced = reduce_value({ "type" => "and" },
+                             data[:left],
+                             data[:right])
       assert_equal(data[:expected], reduced)
     end
 
@@ -179,9 +183,9 @@ class BasicCollectorTest < Test::Unit::TestCase
       },
     )
     def test_or(data)
-      reduced = @plugin.reduce({ "type" => "or" },
-                               data[:left],
-                               data[:right])
+      reduced = reduce_value({ "type" => "or" },
+                             data[:left],
+                             data[:right])
       assert_equal(data[:expected], reduced)
     end
 
@@ -273,10 +277,10 @@ class BasicCollectorTest < Test::Unit::TestCase
       },
     )
     def test_sum(data)
-      reduced = @plugin.reduce({ "type" => "sum",
-                                 "limit" => data[:limit] || -1 },
-                               data[:left],
-                               data[:right])
+      reduced = reduce_value({ "type" => "sum",
+                               "limit" => data[:limit] || -1 },
+                             data[:left],
+                             data[:right])
       assert_equal(data[:expected], reduced)
     end
 
@@ -357,20 +361,24 @@ class BasicCollectorTest < Test::Unit::TestCase
       },
     )
     def test_sort(data)
-      reduced = @plugin.reduce({ 
-                                 "type" => "sort",
-                                 "operators" => [
-                                   { "column" => 0, "operator" => "<" },
-                                 ],
-                                 "limit" => data[:limit] || -1,
-                               },
-                               data[:left],
-                               data[:right])
+      reduced = reduce_value({
+                               "type" => "sort",
+                               "operators" => [
+                                 { "column" => 0, "operator" => "<" },
+                               ],
+                               "limit" => data[:limit] || -1,
+                             },
+                             data[:left],
+                             data[:right])
       assert_equal(data[:expected], reduced)
     end
   end
 
   class MergeTest < self
+    def reduce_value(deal, left_value, right_value)
+      @plugin.reduce_value(deal, left_value, right_value)
+    end
+
     def test_grouped
       expected = [
         [
@@ -476,16 +484,16 @@ class BasicCollectorTest < Test::Unit::TestCase
         ],
       ]
 
-      reduced = @plugin.reduce({ 
-                                 "type" => "sort",
-                                 "operators" => [
-                                   { "column" => 1, "operator" => "<" },
-                                 ],
-                                 "key_column" => 0,
-                                 "limit" => -1,
-                               },
-                               left,
-                               right)
+      reduced = reduce_value({
+                               "type" => "sort",
+                               "operators" => [
+                                 { "column" => 1, "operator" => "<" },
+                               ],
+                               "key_column" => 0,
+                               "limit" => -1,
+                             },
+                             left,
+                             right)
       assert_equal(expected, reduced)
     end
   end

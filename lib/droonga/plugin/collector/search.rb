@@ -90,7 +90,7 @@ module Droonga
     def reduce_elements(elements, left_values, right_values)
       result = {}
       elements.each do |key, deal|
-        result[key] = reduce(deal, left_values[key], right_values[key])
+        result[key] = reduce_value(deal, left_values[key], right_values[key])
       end
       result
     end
