@@ -215,10 +215,14 @@ class CatalogTest < Test::Unit::TestCase
       :missing_root_elements => {
         :catalog => {},
         :errors => [
-          Droonga::Catalog::MissingRequiredParameter.new("effective_date", path),
-          Droonga::Catalog::MissingRequiredParameter.new("zones", path),
-          Droonga::Catalog::MissingRequiredParameter.new("farms", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "effective_date", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "zones", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "farms", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets", path),
         ],
       },
       :invalid_farms => {
@@ -229,7 +233,8 @@ class CatalogTest < Test::Unit::TestCase
           },
         ),
         :errors => [
-          Droonga::Catalog::MissingRequiredParameter.new("farms.#{farm_name}.device", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "farms.#{farm_name}.device", path),
         ],
       },
       :missing_dataset_parameters => {
@@ -241,12 +246,18 @@ class CatalogTest < Test::Unit::TestCase
           },
         ),
         :errors => [
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.workers", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.number_of_replicas", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.number_of_partitions", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.partition_key", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.date_range", path),
-          Droonga::Catalog::MissingRequiredParameter.new("datasets.Droonga.ring", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.workers", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.number_of_replicas", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.number_of_partitions", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.partition_key", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.date_range", path),
+          Droonga::Catalog::MissingRequiredParameter.new(
+            "datasets.Droonga.ring", path),
         ],
       },
       :non_integer_numeric_parameters => {
@@ -261,9 +272,12 @@ class CatalogTest < Test::Unit::TestCase
           },
         ),
         :errors => [
-          Droonga::Catalog::MismatchedParameterType.new("datasets.Droonga.workers", Integer, Float, path),
-          Droonga::Catalog::MismatchedParameterType.new("datasets.Droonga.number_of_replicas", Integer, Float, path),
-          Droonga::Catalog::MismatchedParameterType.new("datasets.Droonga.number_of_partitions", Integer, Float, path),
+          Droonga::Catalog::MismatchedParameterType.new(
+            "datasets.Droonga.workers", Integer, Float, path),
+          Droonga::Catalog::MismatchedParameterType.new(
+            "datasets.Droonga.number_of_replicas", Integer, Float, path),
+          Droonga::Catalog::MismatchedParameterType.new(
+            "datasets.Droonga.number_of_partitions", Integer, Float, path),
         ],
       },
       :negative_numeric_parameters => {
@@ -278,9 +292,12 @@ class CatalogTest < Test::Unit::TestCase
           },
         ),
         :errors => [
-          Droonga::Catalog::NegativeNumber.new("datasets.Droonga.workers", -1, path),
-          Droonga::Catalog::SmallerThanOne.new("datasets.Droonga.number_of_replicas", -1, path),
-          Droonga::Catalog::SmallerThanOne.new("datasets.Droonga.number_of_partitions", -1, path),
+          Droonga::Catalog::NegativeNumber.new(
+            "datasets.Droonga.workers", -1, path),
+          Droonga::Catalog::SmallerThanOne.new(
+            "datasets.Droonga.number_of_replicas", -1, path),
+          Droonga::Catalog::SmallerThanOne.new(
+            "datasets.Droonga.number_of_partitions", -1, path),
         ],
       },
     )
