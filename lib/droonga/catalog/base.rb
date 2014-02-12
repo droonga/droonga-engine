@@ -58,7 +58,7 @@ module Droonga
       def initialize(data, path)
         @data = data
         @path = path
-        @base_path = File.dirname(base_path)
+        @base_path = File.dirname(path)
 
         validate_datasets
 
