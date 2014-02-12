@@ -19,7 +19,7 @@ class CatalogTest < Test::Unit::TestCase
   private
   def minimum_data
     {
-      "datasets" => [],
+      "datasets" => {},
     }
   end
 
