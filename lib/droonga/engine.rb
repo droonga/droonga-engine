@@ -23,6 +23,9 @@ module Droonga
     def initialize(options={})
       @options = options
       @dispatcher = Dispatcher.new(@options)
+    rescue StartupError => error
+      $log.error(error.message)
+      exit(1)
     end
 
     def start
