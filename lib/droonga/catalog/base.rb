@@ -208,6 +208,14 @@ module Droonga
           raise SmallerThanOne.new("#{name}.number_of_partitions", n_partitions, @path)
         end
 
+        n_replicas = dataset["number_of_replicas"]
+        validate_parameter_type(n_replicas,
+                                "#{name}.number_of_replicas",
+                                Integer)
+        if n_replicas < 1
+          raise SmallerThanOne.new("#{name}.number_of_replicas", n_replicas, @path)
+        end
+
         validate_parameter_type(dataset["ring"],
                                 "#{name}.ring",
                                 Hash)
