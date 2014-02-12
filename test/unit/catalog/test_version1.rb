@@ -103,6 +103,7 @@ class CatalogTest < Test::Unit::TestCase
               "workers" => 1,
               "number_of_partitions" => 1,
               "number_of_replicas" => 1,
+              "plugins" => [],
               "ring" => {
                 "localhost:23041" => {
                   "weight" =>  50,

@@ -238,6 +238,10 @@ module Droonga
         validate_parameter_type(dataset["ring"],
                                 "#{name}.ring",
                                 Hash)
+
+        validate_parameter_type(dataset["plugins"],
+                                "#{name}.plugins",
+                                Array)
       end
 
       def validate_ring(ring, name)
