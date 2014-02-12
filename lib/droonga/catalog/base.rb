@@ -60,6 +60,7 @@ module Droonga
         @path = path
         @base_path = File.dirname(path)
 
+        validate_farms
         validate_datasets
 
         @data["datasets"].each do |name, dataset|
@@ -189,11 +190,17 @@ module Droonga
         end
       end
 
+      def validate_farms
+        farms = @data["farms"]
+
+        raise MissingRequiredParameter.new("farms", @path) unless farms
+        validate_parameter_type(farms, "farms", Hash)
+      end
+
       def validate_datasets
         datasets = @data["datasets"]
 
         raise MissingRequiredParameter.new("datasets", @path) unless datasets
-
         validate_parameter_type(datasets, "datasets", Hash)
       end
 
