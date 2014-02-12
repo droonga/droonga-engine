@@ -75,7 +75,7 @@ module Droonga
     def search_reduce(request)
       #XXX This is just a workaround. Errors should be handled by the framework itself.
       if input_name == "errors"
-        return collector_reduce(request)
+        return reduce(request)
       end
 
       return unless request
