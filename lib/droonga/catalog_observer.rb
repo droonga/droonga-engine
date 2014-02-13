@@ -31,6 +31,7 @@ module Droonga
 
     def start
       @loop = Cool.io::Loop.new
+      attach(@loop)
       @thread = Thread.new do
         @loop.run
       end
