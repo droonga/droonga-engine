@@ -29,6 +29,7 @@ module Fluent
       super
       Droonga::PluginLoader.load_all
       @catalog_observer = Droonga::CatalogObserver.new
+      @catalog_observer.start
       catalog = @catalog_observer.catalog
       @engine = Droonga::Engine.new(catalog, :name => @name)
       @engine.start
@@ -36,6 +37,7 @@ module Fluent
 
     def shutdown
       @engine.shutdown
+      @catalog_observer.stop
       super
     end
 
