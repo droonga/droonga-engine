@@ -350,7 +350,7 @@ class CatalogTest < Test::Unit::TestCase
           },
         ),
         :errors => [
-          Droonga::Catalog::UnknownFarm.new(
+          Droonga::Catalog::UnknownFarmForPartition.new(
             "datasets.Droonga.ring.#{ring_name}.partitions.#{range_name}[0]",
             "unknown:0/unknown.000", path),
         ],
