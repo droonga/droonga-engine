@@ -207,6 +207,10 @@ class CatalogTest < Test::Unit::TestCase
         }
       end
 
+      def valid_zones
+        valid_farms.keys
+      end
+
       def valid_dataset_base
         {
           "workers" => 0,
@@ -239,6 +243,7 @@ class CatalogTest < Test::Unit::TestCase
             farm_name => {
             },
           },
+          "zones" => [farm_name],
         ),
         :errors => [
           Droonga::Catalog::MissingRequiredParameter.new(
@@ -248,6 +253,7 @@ class CatalogTest < Test::Unit::TestCase
       :missing_dataset_parameters => {
         :catalog => minimum_data.merge(
           "farms" => valid_farms,
+          "zones" => valid_zones,
           "datasets" => {
             "Droonga" => {
             },
@@ -280,6 +286,7 @@ class CatalogTest < Test::Unit::TestCase
       :non_integer_numeric_parameters => {
         :catalog => minimum_data.merge(
           "farms" => valid_farms,
+          "zones" => valid_zones,
           "datasets" => {
             "Droonga" => valid_dataset_base.merge(
               "workers" => 0.1,
@@ -306,6 +313,7 @@ class CatalogTest < Test::Unit::TestCase
       :negative_numeric_parameters => {
         :catalog => minimum_data.merge(
           "farms" => valid_farms,
+          "zones" => valid_zones,
           "datasets" => {
             "Droonga" => valid_dataset_base.merge(
               "workers" => -1,
@@ -334,6 +342,7 @@ class CatalogTest < Test::Unit::TestCase
       :broken_relations_unknown_farm => {
         :catalog => minimum_data.merge(
           "farms" => valid_farms,
+          "zones" => valid_zones,
           "datasets" => {
             "Droonga" => valid_dataset_base.merge(
               "ring" => {
