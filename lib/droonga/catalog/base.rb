@@ -257,8 +257,19 @@ module Droonga
         validate_required_parameter(zones, "zones")
         validate_parameter_type(Array, zones, "zones")
 
-        zones.each_with_index do |value, index|
-          validate_parameter_type(String, value, "zones[#{index}]")
+        validate_zone(zones, "zones")
+      end
+
+      def validate_zone(zone, name)
+        case value
+        when String
+          return
+        when Array
+          zone.each_with_index do |sub_zone, index|
+            validate_zone(sub_zone, "#{name}[#{index}]")
+          end
+        else
+          validate_parameter_type([String, Array], value, name)
         end
       end
 
