@@ -264,7 +264,7 @@ module Droonga
       end
 
       def validate_zone(zone, name)
-        case value
+        case zone
         when String
           return
         when Array
@@ -272,7 +272,7 @@ module Droonga
             validate_zone(sub_zone, "#{name}[#{index}]")
           end
         else
-          validate_parameter_type([String, Array], value, name)
+          validate_parameter_type([String, Array], zone, name)
         end
       end
 
