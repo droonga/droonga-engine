@@ -178,13 +178,19 @@ module Droonga
         raise MissingRequiredParameter.new(name, @path) unless value
       end
 
-      def validate_parameter_type(expected, value, name)
-        unless value.is_a?(expected)
-          raise MismatchedParameterType.new(name,
-                                            expected,
-                                            value.class,
-                                            @path)
+      def validate_parameter_type(expected_types, value, name)
+        expected_types = [expected_types] unless expected_types.is_a?(Array)
+
+        if expected_types.any? do |type|
+             value.is_a?(type)
+           end
+          return
         end
+
+        raise MismatchedParameterType.new(name,
+                                          expected,
+                                          value.class,
+                                          @path)
       end
 
       def validate_valid_datetime(value, name)

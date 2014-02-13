@@ -34,8 +34,17 @@ module Droonga
     end
 
     class MismatchedParameterType < ValidationError
-      def initialize(name, expected, actual, path)
-        super("\"#{name}\" must be a #{expected}, but a #{actual}.", path)
+      def initialize(name, expected_types, actual, path)
+        expected_types = [expected_types] unless expected_types.is_a?(Array)
+        message = nil
+        if expected_types.size == 1
+          message = "\"#{name}\" must be #{expected_types.first}, " +
+                      "but #{actual}."
+        else
+          message = "\"#{name}\" must be #{expected_types.join(" or ")}, " +
+                      "but #{actual}."
+        end
+        super(message, path)
       end
     end
 
