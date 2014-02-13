@@ -37,7 +37,9 @@ module Fluent
 
     def shutdown
       @engine.shutdown
-      @catalog_observer.stop
+      if @catalog_observer
+        @catalog_observer.stop
+      end
       super
     end
 
