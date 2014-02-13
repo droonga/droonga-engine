@@ -153,10 +153,10 @@ module Droonga
           validate_effective_date
         end
         do_validation do
-          validate_zones
+          validate_farms
         end
         do_validation do
-          validate_farms
+          validate_zones
         end
         do_validation do
           validate_datasets
@@ -227,17 +227,6 @@ module Droonga
         validate_valid_datetime(date, "effective_date")
       end
 
-      def validate_zones
-        zones = @data["zones"]
-
-        validate_required_parameter(zones, "zones")
-        validate_parameter_type(Array, zones, "zones")
-
-        zones.each_with_index do |value, index|
-          validate_parameter_type(String, value, "zones[#{index}]")
-        end
-      end
-
       def validate_farms
         farms = @data["farms"]
 
@@ -254,6 +243,17 @@ module Droonga
 
         validate_required_parameter(farm["device"], "#{name}.device")
         validate_parameter_type(String, farm["device"], "#{name}.device")
+      end
+
+      def validate_zones
+        zones = @data["zones"]
+
+        validate_required_parameter(zones, "zones")
+        validate_parameter_type(Array, zones, "zones")
+
+        zones.each_with_index do |value, index|
+          validate_parameter_type(String, value, "zones[#{index}]")
+        end
       end
 
       def validate_datasets
