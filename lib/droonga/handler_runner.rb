@@ -74,7 +74,9 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
+      $log.debug("#{self.class.name}: activating plugins: #{@options[:plugins].join(", ")}")
       @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
+      $log.debug("#{self.class.name}: activated:\n#{@handler_classes.join("\n")}")
       @forwarder = Forwarder.new(@loop)
     end
 
