@@ -25,7 +25,9 @@ module Droonga
         loading = nil
         begin
           $LOAD_PATH.each do |load_path|
-            Dir.glob("#{load_path}/droonga/plugin/*") do |type_path|
+            pattern = "#{load_path}/droonga/plugin/*"
+            $log.debug("#{self.name}: finding plugins at #{pattern}")
+            Dir.glob(pattern) do |type_path|
               next unless File.directory?(type_path)
               type = File.basename(type_path)
               Dir.glob("#{type_path}/*.rb") do |path|
