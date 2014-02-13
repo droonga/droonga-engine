@@ -29,6 +29,9 @@ module Fluent
       super
       Droonga::PluginLoader.load_all
       @catalog_observer = Droonga::CatalogObserver.new
+      @catalog_observer.on_reload = lambda do |catalog|
+        $log.info "CATALOG RELOADED"
+      end
       @catalog_observer.start
       catalog = @catalog_observer.catalog
       @engine = Droonga::Engine.new(catalog, :name => @name)

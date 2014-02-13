@@ -23,6 +23,7 @@ module Droonga
     CHECK_INTERVAL = 1
 
     attr_reader :catalog
+    attr_accessor :on_reload
 
     def initialize
       @catalog_path = catalog_path
@@ -54,6 +55,7 @@ module Droonga
     def ensure_latest_catalog_loaded
       if catalog_updated?
         load_catalog!
+        on_reload.call(catalog) if on_reload
       end
     end
 
