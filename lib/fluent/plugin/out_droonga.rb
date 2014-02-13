@@ -17,6 +17,7 @@
 
 require "droonga/engine"
 require "droonga/plugin_loader"
+require "droonga/catalog_loader"
 
 module Fluent
   class DroongaOutput < Output
@@ -27,7 +28,7 @@ module Fluent
     def start
       super
       Droonga::PluginLoader.load_all
-      @engine = Droonga::Engine.new(:name => @name)
+      @engine = Droonga::Engine.new(catalog, :name => @name)
       @engine.start
     end
 
@@ -44,6 +45,11 @@ module Fluent
     end
 
     private
+    def catalog
+      catalog_loader = Droonga::CatalogLoader.new("catalog.json")
+      catalog_loader.load
+    end
+
     def process_event(tag, record)
       $log.trace("out_droonga: tag: <#{tag}>")
       @engine.process(parse_record(tag, record))

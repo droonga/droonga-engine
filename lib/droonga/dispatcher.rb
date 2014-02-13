@@ -18,13 +18,11 @@ require "tsort"
 
 require "droonga/adapter_runner"
 require "droonga/planner"
-require "droonga/catalog"
 require "droonga/collector"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
 require "droonga/message_processing_error"
-require "droonga/catalog_observer"
 require "droonga/distributor"
 
 module Droonga
@@ -50,16 +48,16 @@ module Droonga
       end
     end
 
-    def initialize(options)
+    def initialize(catalog, options)
+      @catalog = catalog
       @options = options
       @name = @options[:name]
       @loop = EventLoop.new
-      @catalog_observer = CatalogObserver.new(@loop)
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
       @adapter_runners = create_adapter_runners
-      @farm = Farm.new(name, @loop, :dispatcher => self)
+      @farm = Farm.new(name, @catalog, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
       # TODO: make customizable
@@ -172,7 +170,7 @@ module Droonga
       steps.each do |step|
         dataset = step["dataset"]
         if dataset
-          routes = Droonga.catalog.get_routes(dataset, step)
+          routes = @catalog.get_routes(dataset, step)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
@@ -240,14 +238,14 @@ module Droonga
         raise MissingDatasetParameter.new
       end
       dataset = message["dataset"]
-      unless Droonga.catalog.have_dataset?(dataset)
+      unless @catalog.have_dataset?(dataset)
         raise UnknownDataset.new(dataset)
       end
     end
 
     def create_adapter_runners
       runners = {}
-      Droonga.catalog.datasets.each do |name, configuration|
+      @catalog.datasets.each do |name, configuration|
         runners[name] = AdapterRunner.new(self, configuration["plugins"] || [])
       end
       runners

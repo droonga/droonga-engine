@@ -20,9 +20,10 @@ require "droonga/dispatcher"
 
 module Droonga
   class Engine
-    def initialize(options={})
+    def initialize(catalog, options={})
+      @catalog = catalog
       @options = options
-      @dispatcher = Dispatcher.new(@options)
+      @dispatcher = Dispatcher.new(@catalog, @options)
     end
 
     def start
