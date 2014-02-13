@@ -191,7 +191,7 @@ module Droonga
         end
 
         raise MismatchedParameterType.new(name,
-                                          expected,
+                                          expected_types,
                                           value.class,
                                           @path)
       end
