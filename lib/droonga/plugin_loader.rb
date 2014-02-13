@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -36,6 +36,7 @@ module Droonga
             relative_plugin_path =
               plugin_path.relative_path_from(Pathname(load_path))
             require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
+            $log.info("#{self.name}: loading: #{require_path}")
             require require_path
           end
         end
@@ -49,7 +50,9 @@ module Droonga
 
     def load
       return if @type == "metadata"
-      require "droonga/plugin/#{@type}/#{@name}"
+      path = "droonga/plugin/#{@type}/#{@name}"
+      $log.info("#{self.class.name}: loading: #{path}")
+      require path
     end
   end
 end
