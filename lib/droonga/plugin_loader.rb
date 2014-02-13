@@ -24,28 +24,28 @@ module Droonga
         loaded = []
         loading = nil
         begin
-        $LOAD_PATH.each do |load_path|
-          Dir.glob("#{load_path}/droonga/plugin/*") do |type_path|
-            next unless File.directory?(type_path)
-            type = File.basename(type_path)
-            Dir.glob("#{type_path}/*.rb") do |path|
-              loading = path
-              name = File.basename(path, ".rb")
-              loader = new(type, name)
-              loader.load
-              loaded << path
+          $LOAD_PATH.each do |load_path|
+            Dir.glob("#{load_path}/droonga/plugin/*") do |type_path|
+              next unless File.directory?(type_path)
+              type = File.basename(type_path)
+              Dir.glob("#{type_path}/*.rb") do |path|
+                loading = path
+                name = File.basename(path, ".rb")
+                loader = new(type, name)
+                loader.load
+                loaded << path
+              end
+            end
+
+            Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
+              loading = plugin_path
+              relative_plugin_path =
+                plugin_path.relative_path_from(Pathname(load_path))
+              require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
+              require require_path
+              loaded << plugin_path
             end
           end
-
-          Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
-            loading = plugin_path
-            relative_plugin_path =
-              plugin_path.relative_path_from(Pathname(load_path))
-            require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
-            require require_path
-            loaded << plugin_path
-          end
-        end
         rescue StandardError, SyntaxError => error
           $log.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
           $log.error("#{self.name}: failed to load: #{loading}")
