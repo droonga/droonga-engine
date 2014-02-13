@@ -24,7 +24,9 @@ module Droonga
       @dispatcher = dispatcher
       default_plugins = ["error"]
       plugins += (default_plugins - plugins)
+      $log.debug("#{self.class.name}: activating plugins: #{plugins.join(", ")}")
       @adapter_classes = Adapter.find_sub_classes(plugins)
+      $log.debug("#{self.class.name}: activated:\n#{@adapter_classes.join("\n")}")
     end
 
     def shutdown
