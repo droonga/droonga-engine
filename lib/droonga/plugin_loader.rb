@@ -26,6 +26,7 @@ module Droonga
             next unless File.directory?(type_path)
             type = File.basename(type_path)
             Dir.glob("#{type_path}/*.rb") do |path|
+              $log.info("#{self.name}: loading: #{path}")
               name = File.basename(path, ".rb")
               loader = new(type, name)
               loader.load
@@ -33,10 +34,10 @@ module Droonga
           end
 
           Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
+            $log.info("#{self.name}: loading: #{plugin_path}")
             relative_plugin_path =
               plugin_path.relative_path_from(Pathname(load_path))
             require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
-            $log.info("#{self.name}: loading: #{require_path}")
             require require_path
           end
         end
@@ -50,9 +51,7 @@ module Droonga
 
     def load
       return if @type == "metadata"
-      path = "droonga/plugin/#{@type}/#{@name}"
-      $log.info("#{self.class.name}: loading: #{path}")
-      require path
+      require "droonga/plugin/#{@type}/#{@name}"
     end
   end
 end
