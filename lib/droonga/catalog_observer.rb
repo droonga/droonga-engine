@@ -34,7 +34,11 @@ module Droonga
       @loop = Cool.io::Loop.new
       attach(@loop)
       @thread = Thread.new do
-        @loop.run
+        begin
+          @loop.run
+        rescue => error
+          $log.error "error in catalog observing thread", :error => error
+        end
       end
     end
 
@@ -54,8 +58,12 @@ module Droonga
 
     def ensure_latest_catalog_loaded
       if catalog_updated?
-        load_catalog!
-        on_reload.call(catalog) if on_reload
+        begin
+          load_catalog!
+          on_reload.call(catalog) if on_reload
+        rescue Droonga::Error => error
+          $log.warn "failed to reload catalog", :path => @catalog_path, :error => error
+        end
       end
     end
 
@@ -71,8 +79,9 @@ module Droonga
     def load_catalog!
       loader = CatalogLoader.new(@catalog_path)
       @catalog = loader.load
-      @catalog_mtime = File.mtime(@catalog_path)
       $log.info "catalog loaded", path: @catalog_path, mtime: @catalog_mtime
+    ensure
+      @catalog_mtime = File.mtime(@catalog_path)
     end
   end
 end
