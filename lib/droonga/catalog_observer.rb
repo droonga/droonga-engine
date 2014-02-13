@@ -79,7 +79,7 @@ module Droonga
     def load_catalog!
       loader = CatalogLoader.new(@catalog_path)
       @catalog = loader.load
-      $log.info "catalog loaded", path: @catalog_path, mtime: @catalog_mtime
+      $log.info "catalog loaded", :path => @catalog_path, :mtime => @catalog_mtime
     ensure
       @catalog_mtime = File.mtime(@catalog_path)
     end
