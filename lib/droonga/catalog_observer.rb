@@ -15,15 +15,33 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/catalog_loader"
+
 module Droonga
   class CatalogObserver
     DEFAULT_CATALOG_PATH = "catalog.json"
     CHECK_INTERVAL = 1
 
-    def initialize(loop)
-      @catalog_path = catalog_path
-      load_catalog
+    attr_reader :catalog
 
+    def initialize
+      @catalog_path = catalog_path
+      load_catalog!
+    end
+
+    def start
+      @loop = Cool.io::Loop.new
+      @thread = Thread.new do
+        @loop.run
+      end
+    end
+
+    def stop
+      @loop.stop
+      @thread.join
+    end
+
+    def attach(loop)
       watcher = Cool.io::TimerWatcher.new(CHECK_INTERVAL, true)
       observer = self
       watcher.on_timer do
@@ -34,7 +52,7 @@ module Droonga
 
     def ensure_latest_catalog_loaded
       if catalog_updated?
-        load_catalog
+        load_catalog!
       end
     end
 
@@ -47,9 +65,9 @@ module Droonga
       File.mtime(catalog_path) > @catalog_mtime
     end
 
-    def load_catalog
+    def load_catalog!
       loader = CatalogLoader.new(@catalog_path)
-      Droonga.catalog = loader.load
+      @catalog = loader.load
       @catalog_mtime = File.mtime(@catalog_path)
       $log.info "catalog loaded", path: @catalog_path, mtime: @catalog_mtime
     end
