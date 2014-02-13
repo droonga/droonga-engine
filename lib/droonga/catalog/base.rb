@@ -162,6 +162,9 @@ module Droonga
           validate_datasets
         end
         do_validation do
+          validate_zone_relations
+        end
+        do_validation do
           validate_database_relations
         end
       end
@@ -365,6 +368,29 @@ module Droonga
         validate_parameter_type(Array, plugins, "#{name}.plugins")
       end
 
+      def validate_zone_relations
+        return unless @data["zones"].is_a?(Array)
+        return unless @data["farms"].is_a?(Hash)
+
+        farms = @data["farms"]
+        zones = @data["zones"]
+
+        all_farms = farms.keys
+        all_zones = zones.flatten
+
+        all_farms.each do |farm|
+          unless all_zones.include?(farm)
+            raise FarmNotZoned.new(farm, zones, @path)
+          end
+        end
+
+        all_zones.each do |zone|
+          unless all_farms.include?(zone)
+            raise UnknownFarmInZones.new(farm, zones, @path)
+          end
+        end
+      end
+
       def validate_database_relations
         return unless @data["farms"]
 
@@ -386,7 +412,7 @@ module Droonga
                          "partitions.#{range}[#{index}]"
                 do_validation do
                   unless partition =~ valid_farms_matcher
-                    raise UnknownFarm.new(name, partition, @path)
+                    raise UnknownFarmForPartition.new(name, partition, @path)
                   end
                   do_validation do
                     directory_name = $POSTMATCH

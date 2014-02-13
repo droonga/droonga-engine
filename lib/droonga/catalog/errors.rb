@@ -67,7 +67,19 @@ module Droonga
       end
     end
 
-    class UnknownFarm < ValidationError
+    class FarmNotZoned < ValidationError
+      def initialize(name, zones, path)
+        super("The farm \"#{name}\" does not appear in zones: #{zones}", path)
+      end
+    end
+
+    class UnknownFarmInZones < ValidationError
+      def initialize(name, zones, path)
+        super("Unknown farm \"#{name}\" appears in zones: #{zones}", path)
+      end
+    end
+
+    class UnknownFarmForPartition < ValidationError
       def initialize(name, partition, path)
         super("The partition #{partition} at \"#{name}\" seems to be bound to an unknown farm.", path)
       end
