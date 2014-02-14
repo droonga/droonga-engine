@@ -24,9 +24,10 @@ module Droonga
 
     def initialize(errors=[])
       @errors = errors
-      message = @errors.collect do |error|
+      error_messages = @errors.collect do |error|
         error.message
-      end.sort.join("\n-----------------------\n")
+      end
+      message = error_messages.sort.join("\n-----------------------\n")
       super(message)
     end
 
