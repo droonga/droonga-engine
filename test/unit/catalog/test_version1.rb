@@ -366,17 +366,8 @@ class CatalogTest < Test::Unit::TestCase
       },
     )
     def test_validation(data)
-      begin
+      assert_raise(Droonga::MultiplexError.new(data[:errors])) do
         create_catalog(data[:catalog], "path/to/catalog")
-        assert_nil("must not reach here")
-      rescue Droonga::MultiplexError => actual_errors
-        actual_errors = actual_errors.errors.collect do |error|
-          error.message
-        end.sort
-        expected_errors = data[:errors].collect do |error|
-          error.message
-        end.sort
-        assert_equal(expected_errors, actual_errors)
       end
     end
   end
