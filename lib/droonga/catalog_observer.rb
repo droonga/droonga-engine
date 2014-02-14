@@ -37,7 +37,7 @@ module Droonga
         begin
           @loop.run
         rescue => error
-          $log.error "error in catalog observing thread", :error => error
+          $log.error("error in catalog observing thread", :error => error)
         end
       end
     end
@@ -62,7 +62,7 @@ module Droonga
           load_catalog!
           on_reload.call(catalog) if on_reload
         rescue Droonga::Error => error
-          $log.warn "failed to reload catalog", :path => @catalog_path, :error => error
+          $log.warn("failed to reload catalog", :path => @catalog_path, :error => error)
         end
       end
     end
@@ -79,7 +79,7 @@ module Droonga
     def load_catalog!
       loader = CatalogLoader.new(@catalog_path)
       @catalog = loader.load
-      $log.info "catalog loaded", :path => @catalog_path, :mtime => @catalog_mtime
+      $log.info("catalog loaded", :path => @catalog_path, :mtime => @catalog_mtime)
     ensure
       @catalog_mtime = File.mtime(@catalog_path)
     end

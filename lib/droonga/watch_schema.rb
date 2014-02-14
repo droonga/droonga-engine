@@ -25,12 +25,12 @@ module Droonga
 
     def ensure_created
       if @context["Keyword"]
-        $log.trace "#{log_tag} skip table creation"
+        $log.trace("#{log_tag} skip table creation")
         return
       end
-      $log.trace "#{log_tag} ensure_tables: start"
+      $log.trace("#{log_tag} ensure_tables: start")
       ensure_tables
-      $log.trace "#{log_tag} ensure_tables: done"
+      $log.trace("#{log_tag} ensure_tables: done")
     end
 
     private

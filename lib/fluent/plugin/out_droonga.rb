@@ -31,7 +31,7 @@ module Fluent
       @catalog_observer = Droonga::CatalogObserver.new
       @catalog_observer.on_reload = lambda do |catalog|
         graceful_engine_restart(catalog)
-        $log.info "engine restarted"
+        $log.info("engine restarted")
       end
       @catalog_observer.start
       catalog = @catalog_observer.catalog
@@ -60,15 +60,15 @@ module Fluent
     end
 
     def graceful_engine_restart(catalog)
-      $log.trace "out_droonga: start: graceful_engine_restart"
+      $log.trace("out_droonga: start: graceful_engine_restart")
       old_engine = @engine
-      $log.trace "out_droonga: creating new engine"
+      $log.trace("out_droonga: creating new engine")
       new_engine = create_engine(catalog)
       new_engine.start
       @engine = new_engine
-      $log.trace "out_droonga: shutdown old engine"
+      $log.trace("out_droonga: shutdown old engine")
       old_engine.shutdown
-      $log.trace "out_droonga: done: graceful_engine_restart"
+      $log.trace("out_droonga: done: graceful_engine_restart")
     end
 
     def process_event(tag, record)
