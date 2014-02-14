@@ -60,7 +60,7 @@ module Droonga
 
     def ensure_unifiable!
       @queries.each do |name, query|
-        if unifiable?(name) && query["output"]
+        if unifiable?(name) and query["output"]
           query["output"]["unifiable"] = true
         end
       end
@@ -80,7 +80,7 @@ module Droonga
       # Skip reducing phase for a result with no output.
       if output.nil? or
            output["elements"].nil? or
-           (!output["elements"].include?("count") &&
+           (!output["elements"].include?("count") and
             !output["elements"].include?("records"))
         return
       end
@@ -111,7 +111,7 @@ module Droonga
         # So we have to override the format and restore it on the gathering
         # phase.
         @records_format = @output["format"] || "simple"
-        if @output["format"] && @output["format"] != "simple"
+        if @output["format"] and @output["format"] != "simple"
           @output["format"] = "simple"
         end
 
@@ -157,10 +157,10 @@ module Droonga
           updated_output_limit = final_offset + final_limit
         end
 
-        if updated_sort_limit && updated_sort_limit != @query["sortBy"]["limit"]
+        if updated_sort_limit and updated_sort_limit != @query["sortBy"]["limit"]
           @query["sortBy"]["limit"] = updated_sort_limit
         end
-        if updated_output_limit && @output["limit"] && updated_output_limit != @output["limit"]
+        if updated_output_limit and @output["limit"] and updated_output_limit != @output["limit"]
           @output["limit"] = updated_output_limit
         end
       end
@@ -198,7 +198,7 @@ module Droonga
       end
 
       def calculate_output_offset!
-        @output["offset"] = 0 if have_records? && @output["offset"]
+        @output["offset"] = 0 if have_records? and @output["offset"]
       end
 
       def final_offset
@@ -206,7 +206,7 @@ module Droonga
       end
 
       def final_limit
-        if @original_sort_limit == UNLIMITED && @original_output_limit == UNLIMITED
+        if @original_sort_limit == UNLIMITED and @original_output_limit == UNLIMITED
           UNLIMITED
         else
           if @original_sort_limit == UNLIMITED
@@ -295,7 +295,7 @@ module Droonga
       def update_output_attributes!
         @output["attributes"] = array_style_attributes
         @output["attributes"] += sort_attribute_names
-        if unifiable? && !source_column_names.include?("_key")
+        if unifiable? and !source_column_names.include?("_key")
           @output["attributes"] << "_key"
         end
       end
@@ -376,7 +376,7 @@ module Droonga
           "type"      => "sort",
           "operators" => operators,
         }
-        if unifiable? && !key_column_index.nil?
+        if unifiable? and !key_column_index.nil?
           reducer["key_column"] = key_column_index
         end
 

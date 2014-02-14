@@ -51,7 +51,7 @@ module Droonga
 
       case deal["type"]
       when "and"
-        reduced_value = left_value && right_value
+        reduced_value = left_value and right_value
       when "or"
         reduced_value = left_value || right_value
       when "sum"
@@ -73,7 +73,7 @@ module Droonga
     end
 
     def apply_output_range(items, output)
-      if items && items.is_a?(Array)
+      if items and items.is_a?(Array)
         offset = output["offset"] || 0
         unless offset.zero?
           items = items[offset..-1] || []
@@ -90,7 +90,7 @@ module Droonga
     def sum(x, y)
       return x || y if x.nil? or y.nil?
 
-      if x.is_a?(Hash) && y.is_a?(Hash)
+      if x.is_a?(Hash) and y.is_a?(Hash)
         x.merge(y)
       else
         x + y

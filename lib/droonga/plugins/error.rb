@@ -25,7 +25,7 @@ module Droonga
 
         def adapt_output(output_message)
           errors = output_message.body["errors"]
-          if errors && !errors.empty?
+          if errors and !errors.empty?
             output_message.errors = errors
 
             status_codes = []

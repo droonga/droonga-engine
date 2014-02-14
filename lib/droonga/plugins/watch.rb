@@ -51,7 +51,11 @@ module Droonga
           subscriber = request["subscriber"]
           condition = request["condition"]
           route = request["route"] || message["from"]
-          query = condition && condition.to_json
+          if condition
+            query = condition.to_json
+          else
+            query = nilondition
+          end
           [subscriber, condition, query, route]
         end
       end

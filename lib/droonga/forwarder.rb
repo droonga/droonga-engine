@@ -50,7 +50,8 @@ module Droonga
     private
     def output(receiver, message, command, arguments)
       $log.trace("#{log_tag}: output: start")
-      unless receiver.is_a?(String) && command.is_a?(String)
+      # TODO: IMPROVE ME: Should not use "unless" and "and". It is confused.
+      unless receiver.is_a?(String) and command.is_a?(String)
         $log.trace("#{log_tag}: output: abort: invalid argument",
                    :receiver => receiver,
                    :command  => command)

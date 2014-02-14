@@ -45,7 +45,7 @@ module Droonga
       return unless params
       params.each do |name, reducer|
         gatherer = nil
-        if reducer.is_a?(Hash) && reducer[:gather]
+        if reducer.is_a?(Hash) and reducer[:gather]
           gatherer = reducer[:gather]
           reducer = reducer[:reduce]
         end

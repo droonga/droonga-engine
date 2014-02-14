@@ -26,7 +26,7 @@ module Droonga
       output = body ? body[input_name] : input_name
       if output.is_a?(Hash)
         elements = output["elements"]
-        if elements && elements.is_a?(Hash)
+        if elements and elements.is_a?(Hash)
           # because "count" mapper requires all records,
           # I have to apply it at first, before "limit" and "offset" are applied.
           count_mapper = elements["count"]
@@ -39,7 +39,7 @@ module Droonga
           end
 
           records_mapper = elements["records"]
-          if records_mapper && result["records"]
+          if records_mapper and result["records"]
             if records_mapper["no_output"]
               result.delete("records")
             else

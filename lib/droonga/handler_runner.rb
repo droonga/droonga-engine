@@ -70,7 +70,7 @@ module Droonga
 
     private
     def prepare
-      if @database_name && !@database_name.empty?
+      if @database_name and !@database_name.empty?
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
