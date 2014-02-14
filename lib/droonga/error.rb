@@ -24,13 +24,10 @@ module Droonga
 
     def initialize(errors=[])
       @errors = errors
-      super
-    end
-
-    def message
-      @errors.collect do |error|
+      message = @errors.collect do |error|
         error.message
       end.sort.join("\n-----------------------\n")
+      super(message)
     end
 
     def empty?
