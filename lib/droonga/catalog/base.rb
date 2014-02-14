@@ -27,10 +27,10 @@ module Droonga
         @data = data
         @path = path
         @base_path = File.dirname(path)
-        @errors = MultiplexError.new
+        @errors = []
 
         validate
-        raise @errors unless @errors.empty?
+        raise MultiplexError.new(@errors) unless @errors.empty?
 
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
@@ -173,7 +173,7 @@ module Droonga
         begin
           yield
         rescue ValidationError => error
-          @errors.errors << error
+          @errors << error
         end
       end
 

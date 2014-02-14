@@ -30,9 +30,5 @@ module Droonga
       message = error_messages.sort.join("\n-----------------------\n")
       super(message)
     end
-
-    def empty?
-      @errors.empty?
-    end
   end
 end
