@@ -60,6 +60,10 @@ module OutputStub
       @engine = Engine.new(@response)
     end
 
+    def shutdown
+      @engine.shutdown
+    end
+
     def create_logger(tag, options)
       Logger.new(tag, options)
     end
