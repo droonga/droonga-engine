@@ -43,7 +43,7 @@ module Droonga
     end
 
     def reduce_value(deal, left_value, right_value)
-      if left_value.nil? || right_value.nil?
+      if left_value.nil? or right_value.nil?
         return right_value || left_value
       end
 

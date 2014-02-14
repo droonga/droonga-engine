@@ -401,10 +401,10 @@ module Droonga
 
         datasets.each do |dataset_name, dataset|
           ring = dataset["ring"]
-          next if ring.nil? || !ring.is_a?(Hash)
+          next if ring.nil? or !ring.is_a?(Hash)
           ring.each do |ring_key, part|
             partitions_set = part["partitions"]
-            next if partitions_set.nil? || !partitions_set.is_a?(Hash)
+            next if partitions_set.nil? or !partitions_set.is_a?(Hash)
             partitions_set.each do |range, partitions|
               next unless partitions.is_a?(Array)
               partitions.each_with_index do |partition, index|

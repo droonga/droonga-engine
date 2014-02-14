@@ -28,7 +28,7 @@ module Droonga
             @command = command_class.new("column_create", request)
 
             table_name = @command["table"]
-            if table_name.nil? || @context[table_name].nil?
+            if table_name.nil? or @context[table_name].nil?
               message = "table doesn't exist: <#{table_name.to_s}>"
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                      :message => message,

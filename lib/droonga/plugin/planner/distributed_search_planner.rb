@@ -31,7 +31,7 @@ module Droonga
     end
 
     def plan
-      raise Searcher::NoQuery.new if @queries.nil? || @queries.empty?
+      raise Searcher::NoQuery.new if @queries.nil? or @queries.empty?
 
       Searcher::QuerySorter.validate_dependencies(@queries)
 

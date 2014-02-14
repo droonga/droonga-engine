@@ -28,7 +28,7 @@ module Droonga
             @command = command_class.new("table_remove", request)
 
             name = @command["name"]
-            if name.nil? || @context[name].nil?
+            if name.nil? or @context[name].nil?
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                      :message => "table not found",
                                      :result => false)

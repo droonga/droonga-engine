@@ -70,7 +70,7 @@ module Droonga
     private
     def process_queries(queries)
       $log.trace("#{log_tag}: process_queries: start")
-      if queries.nil? || queries.empty?
+      if queries.nil? or queries.empty?
         raise NoQuery.new
       end
       $log.trace("#{log_tag}: process_queries: sort: start")

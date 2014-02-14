@@ -78,7 +78,7 @@ module Fluent
 
     def parse_record(tag, record)
       prefix, type, *arguments = tag.split(/\./)
-      if type.nil? || type.empty? || type == "message"
+      if type.nil? or type.empty? or type == "message"
         message = record
       else
         message = {
