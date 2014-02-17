@@ -99,7 +99,7 @@ module Droonga
         rescue MessageProcessingError => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
-        rescue => error
+        rescue StandardError, LoadError, SyntaxError => error
           Logger.error("failed to process input message", error)
           formatted_error = MessageProcessingError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
