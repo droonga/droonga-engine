@@ -21,7 +21,8 @@ module Droonga
   #   * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
   #   * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
   #   * TARGET_PATH = "COMPONENT(.COMPONENT)*"
-  #   * OPERATOR = :equal, :in, :include?, :exist?, :start_with
+  #   * OPERATOR = :equal, :in, :include, :exist, :start_with
+  #                (:include? and :exist? are deprecated. Use no "?" version.)
   #                (More operators may be added in the future.
   #                 For example, :end_with and so on.)
   #   * ARGUMENTS = OBJECT_DEFINED_IN_JSON*
@@ -86,12 +87,12 @@ module Droonga
         arguments.any? do |argument|
           argument.include?(target)
         end
-      when :include?
+      when :include, :include?
         return false unless target.respond_to?(:include?)
         arguments.any? do |argument|
           target.include?(argument)
         end
-      when :exist?
+      when :exist, :exist?
         target != NONEXISTENT_PATH
       when :start_with
         return false unless target.respond_to?(:start_with?)

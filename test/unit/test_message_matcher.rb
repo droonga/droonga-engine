@@ -90,35 +90,42 @@ class MessageMatcherTest < Test::Unit::TestCase
 
     class IncludeTest < self
       def test_exist
-        assert_true(match?(["originalTypes", :include?, "select"],
+        assert_true(match?(["originalTypes", :include, "select"],
                            {
                              "originalTypes" => ["search", "select"],
                            }))
       end
 
       def test_not_exist
-        assert_false(match?(["originalTypes", :include?, "select"],
+        assert_false(match?(["originalTypes", :include, "select"],
                             {
                               "originalTypes" => ["load"],
                             }))
       end
 
       def test_no_key
-        assert_false(match?(["originalTypes", :include?, "select"],
+        assert_false(match?(["originalTypes", :include, "select"],
                             {}))
       end
 
       def test_not_enumerable
-        assert_false(match?(["originalTypes", :include?, "select"],
+        assert_false(match?(["originalTypes", :include, "select"],
                             {
                               "originalTypes" => 29,
                             }))
+      end
+
+      def test_backward_compatibility
+        assert_true(match?(["originalTypes", :include?, "select"],
+                           {
+                             "originalTypes" => ["search", "select"],
+                           }))
       end
     end
 
     class ExistTest < self
       def test_exist
-        assert_true(match?(["body.result", :exist?],
+        assert_true(match?(["body.result", :exist],
                            {
                              "body" => {
                                "result" => nil,
@@ -127,10 +134,19 @@ class MessageMatcherTest < Test::Unit::TestCase
       end
 
       def test_not_exist
-        assert_false(match?(["body.result", :exist?],
+        assert_false(match?(["body.result", :exist],
                             {
                               "body" => nil,
                             }))
+      end
+
+      def test_backward_compatibility
+        assert_true(match?(["body.result", :exist?],
+                           {
+                             "body" => {
+                               "result" => nil,
+                             },
+                           }))
       end
     end
 
