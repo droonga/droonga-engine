@@ -36,7 +36,7 @@ module Droonga
       end
 
       class Planner < Droonga::Planner
-        message.type = "add"
+        message.pattern = ["type", :equal, "add"]
 
         def plan(message)
           scatter(message,

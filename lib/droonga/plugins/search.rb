@@ -23,7 +23,7 @@ module Droonga
       Plugin.registry.register("search", self)
 
       class Planner < Droonga::Planner
-        message.type = "search"
+        message.pattern = ["type", :equal, "search"]
 
         def plan(message)
           planner = DistributedSearchPlanner.new(message)

@@ -22,29 +22,16 @@ module Droonga
         end
 
         def pattern
-          configuration[:pattern] || fallback_pattern
+          configuration[:pattern]
         end
 
         def pattern=(pattern)
           configuration[:pattern] = pattern
         end
 
-        def type
-          configuration[:type]
-        end
-
-        def type=(type)
-          configuration[:type] = type
-        end
-
         private
         def configuration
           @plugin_class.options[:message] ||= {}
-        end
-
-        def fallback_pattern
-          return nil if type.nil?
-          ["type", :equal, type]
         end
       end
     end
