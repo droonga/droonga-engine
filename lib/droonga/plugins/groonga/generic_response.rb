@@ -26,7 +26,7 @@ module Droonga
             "column_create",
           ]
           message.input_pattern  = ["type", :in, groonga_commands]
-          message.output_pattern = ["body.result", :exist?]
+          message.output_pattern = ["body.result", :exist]
 
           def adapt_output(output_message)
             output_message.body = output_message.body["result"]

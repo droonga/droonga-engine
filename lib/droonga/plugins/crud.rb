@@ -25,7 +25,7 @@ module Droonga
 
       class Adapter < Droonga::Adapter
         message.input_pattern  = ["type", :equal, "add"]
-        message.output_pattern = ["body.success", :exist?]
+        message.output_pattern = ["body.success", :exist]
 
         def adapt_output(output_message)
           success = output_message.body["success"]
