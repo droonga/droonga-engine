@@ -50,6 +50,6 @@ module Droonga
   end
 
   class NotFound < MessageProcessingError
-    STATUS_CODE = STATUS_NOT_FOUND_REQUEST
+    STATUS_CODE = STATUS_NOT_FOUND
   end
 end
