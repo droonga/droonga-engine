@@ -17,6 +17,12 @@ module Droonga
   class PluginRegistry
     include Enumerable
 
+    class UnknownPlugin < Error
+      def initialize(name, klass)
+        super("Unknown plugin \"#{name}\" is specified for #{klass}.")
+      end
+    end
+
     def initialize
       @plugins = {}
     end
@@ -39,7 +45,9 @@ module Droonga
 
     def find_sub_classes(name, klass)
       plugin_module = self[name]
-      return [] if plugin_module.nil?
+      if plugin_module.nil?
+        raise UnknownPlugin.new(name, self.class)
+      end
       sub_classes = []
       collect_sub_classes_recursive(plugin_module, klass, sub_classes)
       sub_classes
