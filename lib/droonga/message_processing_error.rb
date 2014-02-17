@@ -14,10 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/error"
+require "droonga/status_code"
 
 module Droonga
   class MessageProcessingError < Error
-    STATUS_CODE = 500
+    STATUS_CODE = STATUS_INTERNAL_ERROR
 
     attr_reader :message, :detail
 
@@ -45,10 +46,10 @@ module Droonga
   end
 
   class BadRequest < MessageProcessingError
-    STATUS_CODE = 400
+    STATUS_CODE = STATUS_BAD_REQUEST
   end
 
   class NotFound < MessageProcessingError
-    STATUS_CODE = 404
+    STATUS_CODE = STATUS_NOT_FOUND_REQUEST
   end
 end
