@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,27 +13,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/command_repository"
+module Droonga
+  module Plugin
+    module Metadata
+      class CollectorMessage
+        def initialize(plugin_class)
+          @plugin_class = plugin_class
+        end
 
-class CommandRepositoryTest < Test::Unit::TestCase
-  def setup
-    @repository = Droonga::CommandRepository.new
-  end
+        def pattern
+          configuration[:pattern]
+        end
 
-  class FindTest < self
-    def setup
-      super
-      @command = Droonga::Command.new(:select,
-                                      :pattern => ["type", :equal, "select"])
-      @repository.register(@command)
-    end
+        def pattern=(pattern)
+          configuration[:pattern] = pattern
+        end
 
-    def test_match
-      assert_equal(@command, @repository.find({ "type" => "select" }))
-    end
-
-    def test_not_match
-      assert_nil(@repository.find({ "type" => "search" }))
+        private
+        def configuration
+          @plugin_class.options[:message] ||= {}
+        end
+      end
     end
   end
 end

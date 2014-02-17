@@ -13,24 +13,24 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/legacy_pluggable"
-require "droonga/collector_plugin"
+require "droonga/pluggable"
+require "droonga/plugin/metadata/collector_message"
 
 module Droonga
   class Collector
-    include LegacyPluggable
+    extend Pluggable
 
-    def initialize(plugins)
-      load_plugins(plugins)
+    class << self
+      def message
+        Plugin::Metadata::CollectorMessage.new(self)
+      end
     end
 
-    private
-    def instantiate_plugin(name)
-      CollectorPlugin.repository.instantiate(name)
+    def initialize
     end
 
-    def log_tag
-      "collector"
+    def collect(message)
+      raise NotImplemented, "#{self.class.name}\##{__method__} must implement."
     end
   end
 end

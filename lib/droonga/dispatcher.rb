@@ -18,7 +18,7 @@ require "tsort"
 
 require "droonga/adapter_runner"
 require "droonga/planner_runner"
-require "droonga/collector"
+require "droonga/collector_runner"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
@@ -56,13 +56,12 @@ module Droonga
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @adapter_runners = create_runners(AdapterRunner)
+      @adapter_runners = create_adapter_runners
       @farm = Farm.new(name, @catalog, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @planner_runners = create_runners(PlannerRunner)
-      # TODO: make customizable
-      @collector = Collector.new(["basic", "search"])
+      @planner_runners = create_planner_runners
+      @collector_runners = create_collector_runners
     end
 
     def start
@@ -78,7 +77,9 @@ module Droonga
       @planner_runners.each_value do |planner_runner|
         planner_runner.shutdown
       end
-      @collector.shutdown
+      @collector_runners.each_value do |collector_runner|
+        collector_runner.shutdown
+      end
       @adapter_runners.each_value do |adapter_runner|
         adapter_runner.shutdown
       end
@@ -145,7 +146,9 @@ module Droonga
         steps = message["steps"]
         if steps
           session_planner = SessionPlanner.new(self, steps)
-          session = session_planner.create_session(id, @collector)
+          dataset = message["dataset"] || @message["dataset"]
+          collector_runner = @collector_runners[dataset]
+          session = session_planner.create_session(id, collector_runner)
           @sessions[id] = session
         else
           #todo: take cases receiving result before its query into account
@@ -235,8 +238,6 @@ module Droonga
       target_message = error.message
       raise UnknownCommand.new(target_message["type"],
                                target_message["dataset"])
-    rescue Droonga::LegacyPluggable::UnknownPlugin => error
-      raise UnknownCommand.new(error.command, message["dataset"])
     end
 
     def assert_valid_message(message)
@@ -249,12 +250,30 @@ module Droonga
       end
     end
 
-    def create_runners(runner_class)
+    def create_runners
       runners = {}
       @catalog.datasets.each do |name, configuration|
-        runners[name] = runner_class.new(self, configuration["plugins"] || [])
+        runners[name] = yield(configuration)
       end
       runners
+    end
+
+    def create_adapter_runners
+      create_runners do |configuration|
+        AdapterRunner.new(self, configuration["plugins"] || [])
+      end
+    end
+
+    def create_planner_runners
+      create_runners do |configuration|
+        PlannerRunner.new(self, configuration["plugins"] || [])
+      end
+    end
+
+    def create_collector_runners
+      create_runners do |configuration|
+        CollectorRunner.new(configuration["plugins"] || [])
+      end
     end
 
     def log_tag
@@ -269,7 +288,7 @@ module Droonga
         @steps = steps
       end
 
-      def create_session(id, collector)
+      def create_session(id, collector_runner)
         resolve_descendants
         tasks = []
         inputs = {}
@@ -289,7 +308,7 @@ module Droonga
             end
           end
         end
-        Session.new(id, @dispatcher, collector, tasks, inputs)
+        Session.new(id, @dispatcher, collector_runner, tasks, inputs)
       end
 
       def resolve_descendants

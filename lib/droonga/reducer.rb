@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,78 +13,66 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/collector_plugin"
-
 module Droonga
-  class BasicCollector < Droonga::CollectorPlugin
-    repository.register("basic", self)
+  class Reducer
+    class << self
+      # TODO: This is right location?
+      def apply_range(items, range)
+        if items and items.is_a?(Array)
+          offset = range["offset"] || 0
+          unless offset.zero?
+            items = items[offset..-1] || []
+          end
 
+          limit = range["limit"] || 0
+          unless limit == UNLIMITED
+            items = items[0...limit]
+          end
+        end
+        items
+      end
+    end
+
+    # XXX: We has ULIMITED defined
+    # lib/droonga/plugins/search/distributed_search_planner.rb. We
+    # should unify it.
     UNLIMITED = -1
 
-    command :gather
-    def gather(result)
-      output = body ? body[input_name] : input_name
-      if output.is_a?(Hash)
-        output = output["output"]
-      end
-      emit(output, result)
+    def initialize(deal)
+      @deal = deal # TODO: deal is good name?
     end
 
-    command :reduce
-    def reduce(request)
-      body[input_name].each do |output, deal|
-        left_value = output_values[output]
-        right_value = request
-        value = reduce_value(deal, left_value, right_value)
-        emit(output, value)
-      end
-    end
-
-    def reduce_value(deal, left_value, right_value)
+    def reduce(left_value, right_value)
       if left_value.nil? or right_value.nil?
         return right_value || left_value
       end
 
       reduced_value = nil
 
-      case deal["type"]
+      case @deal["type"]
       when "and"
         reduced_value = (left_value and right_value)
       when "or"
         reduced_value = (left_value or right_value)
       when "sum"
         reduced_value = sum(left_value, right_value)
-        reduced_value = apply_output_range(reduced_value,
-                                           "limit" => deal["limit"])
+        reduced_value = self.class.apply_range(reduced_value,
+                                               "limit" => @deal["limit"])
       when "average"
         reduced_value = (left_value.to_f + right_value.to_f) / 2
       when "sort"
         reduced_value = merge(left_value,
                               right_value,
-                              :operators => deal["operators"],
-                              :key_column => deal["key_column"])
-        reduced_value = apply_output_range(reduced_value,
-                                           "limit" => deal["limit"])
+                              :operators => @deal["operators"],
+                              :key_column => @deal["key_column"])
+        reduced_value = self.class.apply_range(reduced_value,
+                                               "limit" => @deal["limit"])
       end
 
       reduced_value
     end
 
-    def apply_output_range(items, output)
-      if items and items.is_a?(Array)
-        offset = output["offset"] || 0
-        unless offset.zero?
-          items = items[offset..-1] || []
-        end
-
-        limit = output["limit"] || 0
-        unless limit == UNLIMITED
-          items = items[0...limit]
-        end
-      end
-      items
-    end
-
+    private
     def sum(x, y)
       return x || y if x.nil? or y.nil?
 

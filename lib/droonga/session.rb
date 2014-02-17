@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,10 +15,10 @@
 
 module Droonga
   class Session
-    def initialize(id, dispatcher, collector, tasks, inputs)
+    def initialize(id, dispatcher, collector_runner, tasks, inputs)
       @id = id
       @dispatcher = dispatcher
-      @collector = collector
+      @collector_runner = collector_runner
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
@@ -56,7 +56,7 @@ module Droonga
           "name"=>name,
           "value"=>value
         }
-        @collector.process(command, message)
+        @collector_runner.collect(message)
         return if task["n_of_inputs"] < n_of_expects
         #the task is done
         result = task["values"]

@@ -45,6 +45,96 @@ module Droonga
           messenger.emit(values)
         end
       end
+
+      class GatherCollector < Droonga::Collector
+        message.pattern = ["task.step.type", :equal, "search_gather"]
+
+        def collect(message)
+          output = message.input || message.name
+          if output.is_a?(Hash)
+            elements = output["elements"]
+            if elements and elements.is_a?(Hash)
+              # because "count" mapper requires all records,
+              # I have to apply it at first, before "limit" and "offset" are applied.
+              body = message.body
+              value = message.value
+              count_mapper = elements["count"]
+              if count_mapper
+                if count_mapper["no_output"]
+                  value.delete("count")
+                else
+                  value["count"] = value[count_mapper["target"]].size
+                end
+              end
+
+              records_mapper = elements["records"]
+              if records_mapper and value["records"]
+                if records_mapper["no_output"]
+                  value.delete("records")
+                else
+                  value["records"] = Reducer.apply_range(value["records"],
+                                                         records_mapper)
+                  value["records"] = apply_output_attributes_and_format(value["records"], records_mapper)
+                end
+              end
+            end
+            output_name = output["output"]
+          else
+            output_name = output
+          end
+          message.values[output_name] = message.value
+        end
+
+        private
+        def apply_output_attributes_and_format(items, output)
+          attributes = output["attributes"] || []
+          if output["format"] == "complex"
+            items.collect! do |item|
+              complex_item = {}
+              attributes.each_with_index do |label, index|
+                complex_item[label] = item[index]
+              end
+              complex_item
+            end
+          else
+            items.collect! do |item|
+              item[0...attributes.size]
+            end
+          end
+          items
+        end
+      end
+
+      class ReduceCollector < Droonga::Collector
+        message.pattern = ["task.step.type", :equal, "search_reduce"]
+
+        def collect(message)
+          #XXX This is just a workaround. Errors should be handled by the framework itself.
+          if message.name == "errors"
+            basic_reduce_collector = Basic::ReduceCollector.new
+            return basic_reduce_collector.collect(message)
+          end
+
+          message.input.each do |output_name, elements|
+            old_value = message.values[output_name]
+            if old_value
+              value = reduce_elements(elements, old_value, message.value)
+            else
+              value = message.value
+            end
+            message.values[output_name] = value
+          end
+        end
+
+        def reduce_elements(elements, left_values, right_values)
+          result = {}
+          elements.each do |key, deal|
+            reducer = Reducer.new(deal)
+            result[key] = reducer.reduce(left_values[key], right_values[key])
+          end
+          result
+        end
+      end
     end
   end
 end

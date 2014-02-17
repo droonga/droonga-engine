@@ -13,16 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/collector/search"
+require "droonga/plugins/search"
 
 class SearchCollectorTest < Test::Unit::TestCase
   def setup
     setup_database
-    @plugin = Droonga::SearchCollector.new
-    @outputs = []
-    stub(@plugin).emit do |name, value|
-      @outputs << [name, value]
-    end
   end
 
   def teardown
@@ -32,6 +27,22 @@ class SearchCollectorTest < Test::Unit::TestCase
   private
   def create_record(*columns)
     columns
+  end
+
+  def run_collector(collector, message)
+    collector_message = Droonga::CollectorMessage.new(message)
+    collector.collect(collector_message)
+    collector_message.values
+  end
+
+  def gather(message)
+    collector = Droonga::Plugins::Search::GatherCollector.new
+    run_collector(collector, message)
+  end
+
+  def reduce(message)
+    collector = Droonga::Plugins::Search::ReduceCollector.new
+    run_collector(collector, message)
   end
 
   class << self
@@ -307,7 +318,7 @@ class SearchCollectorTest < Test::Unit::TestCase
     def test_gather(data)
       request = {
         "task" => {
-          "values" => nil,
+          "values" => {},
           "step" => {
             "body" => nil,
             "outputs" => nil,
@@ -318,10 +329,10 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => data[:mapping],
         "descendants" => nil,
       }
-      @plugin.process("search_gather", request)
       output_name = data[:mapping]
       output_name = output_name["output"] if output_name.is_a?(Hash)
-      assert_equal([output_name, data[:expected]], @outputs.last)
+      assert_equal({ output_name =>  data[:expected] },
+                   gather(request))
     end
   end
 
@@ -385,10 +396,8 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("search_reduce", request)
-      assert_equal([
-                     output_name,
-                     {
+      assert_equal({
+                     output_name => {
                        "numeric_value" => 3,
                        "numeric_key_records" => [
                          create_record(1),
@@ -407,8 +416,8 @@ class SearchCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                   ],
-                   @outputs.last)
+                   },
+                   reduce(request))
     end
 
     def test_sum_with_limit
@@ -470,10 +479,8 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("search_reduce", request)
-      assert_equal([
-                     output_name,
-                     {
+      assert_equal({
+                     output_name => {
                        "numeric_value" => 3,
                        "numeric_key_records" => [
                          create_record(1),
@@ -488,8 +495,8 @@ class SearchCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                   ],
-                   @outputs.last)
+                   },
+                   reduce(request))
     end
 
     def test_sort
@@ -551,10 +558,8 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("search_reduce", request)
-      assert_equal([
-                     output_name,
-                     {
+      assert_equal({
+                     output_name => {
                        "numeric_key_records" => [
                          create_record(1),
                          create_record(2),
@@ -572,8 +577,8 @@ class SearchCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                   ],
-                   @outputs.last)
+                   },
+                   reduce(request))
     end
 
     def test_sort_with_limit
@@ -635,10 +640,8 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("search_reduce", request)
-      assert_equal([
-                     output_name,
-                     {
+      assert_equal({
+                     output_name => {
                        "numeric_key_records" => [
                          create_record(1),
                          create_record(2),
@@ -652,8 +655,8 @@ class SearchCollectorTest < Test::Unit::TestCase
                          create_record("f"),
                        ],
                      },
-                   ],
-                   @outputs.last)
+                   },
+                   reduce(request))
     end
   end
 
@@ -749,10 +752,8 @@ class SearchCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("search_reduce", request)
-      assert_equal([
-                     output_name,
-                     {
+      assert_equal({
+                     output_name => {
                        "records" => [
                          [
                            "group3",
@@ -798,8 +799,8 @@ class SearchCollectorTest < Test::Unit::TestCase
                          ],
                        ],
                      },
-                   ],
-                   @outputs.last)
+                   },
+                   reduce(request))
     end
   end
 end

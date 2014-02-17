@@ -13,16 +13,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin/collector/basic"
+require "droonga/plugins/basic"
 
 class BasicCollectorTest < Test::Unit::TestCase
   def setup
     setup_database
-    @plugin = Droonga::BasicCollector.new
-    @outputs = []
-    stub(@plugin).emit do |name, value|
-      @outputs << [name, value]
-    end
   end
 
   def teardown
@@ -34,6 +29,22 @@ class BasicCollectorTest < Test::Unit::TestCase
     columns
   end
 
+  def run_collector(collector, message)
+    collector_message = Droonga::CollectorMessage.new(message)
+    collector.collect(collector_message)
+    collector_message.values
+  end
+
+  def gather(message)
+    collector = Droonga::Plugins::Basic::GatherCollector.new
+    run_collector(collector, message)
+  end
+
+  def reduce(message)
+    collector = Droonga::Plugins::Basic::ReduceCollector.new
+    run_collector(collector, message)
+  end
+
   class << self
     def create_record(*columns)
       columns
@@ -43,12 +54,12 @@ class BasicCollectorTest < Test::Unit::TestCase
   class IOTest < self
     data(
       :simple_mapping => {
-        :expected => ["output_name", "result"],
+        :expected => { "output_name" => "result" },
         :source => "result",
         :mapping => "output_name",
       },
       :complex_mapping => {
-        :expected => ["output_name", "result"],
+        :expected => { "output_name" => "result" },
         :source => "result",
         :mapping => {
           "output" => "output_name",
@@ -58,7 +69,7 @@ class BasicCollectorTest < Test::Unit::TestCase
     def test_gather(data)
       request = {
         "task" => {
-          "values" => nil,
+          "values" => {},
           "step" => {
             "body" => nil,
             "outputs" => nil,
@@ -69,8 +80,7 @@ class BasicCollectorTest < Test::Unit::TestCase
         "name" => data[:mapping],
         "descendants" => nil,
       }
-      @plugin.process("gather", request)
-      assert_equal(data[:expected], @outputs.last)
+      assert_equal(data[:expected], gather(request))
     end
 
     def test_reduce
@@ -98,18 +108,16 @@ class BasicCollectorTest < Test::Unit::TestCase
         "name" => input_name,
         "descendants" => nil,
       }
-      @plugin.process("reduce", request)
-      assert_equal([
-                     output_name,
-                     [0, 1, 2, 3, 4, 5],
-                   ],
-                   @outputs.last)
+      assert_equal({ output_name => [0, 1, 2, 3, 4, 5] },
+                   reduce(request))
     end
   end
 
-  class ReduceValueTest < self
+  # TODO: Split file
+  class ReducerTest < self
     def reduce_value(deal, left_value, right_value)
-      @plugin.reduce_value(deal, left_value, right_value)
+      reducer = Droonga::Reducer.new(deal)
+      reducer.reduce(left_value, right_value)
     end
 
     data(
@@ -374,9 +382,11 @@ class BasicCollectorTest < Test::Unit::TestCase
     end
   end
 
+  # TODO: Split file
   class MergeTest < self
     def reduce_value(deal, left_value, right_value)
-      @plugin.reduce_value(deal, left_value, right_value)
+      reducer = Droonga::Reducer.new(deal)
+      reducer.reduce(left_value, right_value)
     end
 
     def test_grouped

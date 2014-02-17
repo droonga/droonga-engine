@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,41 +14,58 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  class LegacyPluginRepository
-    include Enumerable
-
-    def initialize
-      @plugins = {}
+  class CollectorMessage
+    attr_reader :raw
+    def initialize(raw)
+      @raw = raw
     end
 
-    def each(&block)
-      @plugins.each(&block)
+    def valid?
+      task and step and values
     end
 
-    def register(name, klass)
-      @plugins[name] = klass
+    def [](key)
+      @raw[key]
     end
 
-    def [](name)
-      @plugins[name]
+    def task
+      @raw["task"]
     end
 
-    def clear
-      @plugins.clear
+    def step
+      task["step"]
     end
 
-    def instantiate(name, *args, &block)
-      plugin_class = self[name]
-      if plugin_class.nil?
-        # TODO: use the original error
-        raise ArgumentError, "unknown plugin: <#{name}>"
+    def type
+      step["type"]
+    end
+
+    def values
+      task["values"]
+    end
+
+    def body
+      step["body"]
+    end
+
+    def input
+      if body
+        body[name]
+      else
+        nil
       end
-      begin
-        plugin_class.new(*args, &block)
-      rescue
-        p [plugin_class, plugin_class.method(:new), plugin_class.method(:new).arity, args.size]
-        raise
-      end
+    end
+
+    def outputs
+      step["outputs"]
+    end
+
+    def name
+      @raw["name"]
+    end
+
+    def value
+      @raw["value"]
     end
   end
 end
