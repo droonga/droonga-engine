@@ -26,7 +26,7 @@ module Droonga
       destination = message["replyTo"]
       reply_message = {
         "inReplyTo"  => message["id"],
-        "statusCode" => message["statusCode"] || STATUS_OK,
+        "statusCode" => message["statusCode"] || StatusCode::OK,
         "type"       => destination["type"],
         "body"       => message["body"],
       }

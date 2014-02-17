@@ -16,8 +16,10 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  STATUS_OK             = 200
-  STATUS_BAD_REQUEST    = 400
-  STATUS_NOT_FOUND      = 404
-  STATUS_INTERNAL_ERROR = 500
+  module StatusCode
+    OK             = 200
+    BAD_REQUEST    = 400
+    NOT_FOUND      = 404
+    INTERNAL_ERROR = 500
+  end
 end
