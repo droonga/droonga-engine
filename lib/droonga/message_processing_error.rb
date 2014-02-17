@@ -20,11 +20,11 @@ module Droonga
   class MessageProcessingError < Error
     STATUS_CODE = StatusCode::INTERNAL_ERROR
 
-    attr_reader :message, :detail
+    attr_reader :detail
 
     def initialize(message, detail=nil)
-      @message = message
       @detail = detail
+      super(message)
     end
 
     def name
@@ -38,7 +38,7 @@ module Droonga
     def response_body
       body = {
         "name"    => name,
-        "message" => @message,
+        "message" => message,
       }
       body["detail"] = @detail unless @detail.nil?
       body
