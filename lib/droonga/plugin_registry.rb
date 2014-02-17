@@ -46,7 +46,7 @@ module Droonga
     def find_sub_classes(name, klass)
       plugin_module = self[name]
       if plugin_module.nil?
-        raise UnknownPlugin.new(name, self.class)
+        raise UnknownPlugin.new(name, klass)
       end
       sub_classes = []
       collect_sub_classes_recursive(plugin_module, klass, sub_classes)
