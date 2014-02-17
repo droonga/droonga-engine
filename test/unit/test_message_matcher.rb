@@ -114,13 +114,6 @@ class MessageMatcherTest < Test::Unit::TestCase
                               "originalTypes" => 29,
                             }))
       end
-
-      def test_backward_compatibility
-        assert_true(match?(["originalTypes", :include?, "select"],
-                           {
-                             "originalTypes" => ["search", "select"],
-                           }))
-      end
     end
 
     class ExistTest < self
@@ -138,15 +131,6 @@ class MessageMatcherTest < Test::Unit::TestCase
                             {
                               "body" => nil,
                             }))
-      end
-
-      def test_backward_compatibility
-        assert_true(match?(["body.result", :exist?],
-                           {
-                             "body" => {
-                               "result" => nil,
-                             },
-                           }))
       end
     end
 
