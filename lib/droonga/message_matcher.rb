@@ -99,7 +99,7 @@ module Droonga
           target.start_with?(argument)
         end
       else
-        raise ArgumentError, "Unknown operator"
+        raise ArgumentError, "Unknown operator: <#{operator}>"
       end
     end
   end
