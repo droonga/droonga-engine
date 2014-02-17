@@ -101,7 +101,7 @@ module Droonga
         end
 
         class Adapter < Droonga::Adapter
-          message.input_pattern = ["type", :equal, "select"]
+          input_message.pattern = ["type", :equal, "select"]
 
           def adapt_input(input_message)
             converter = RequestConverter.new

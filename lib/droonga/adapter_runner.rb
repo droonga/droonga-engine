@@ -40,7 +40,7 @@ module Droonga
       adapted_message["appliedAdapters"] = []
       @adapter_classes.each do |adapter_class|
         adapter_class_id = adapter_class.id
-        pattern = adapter_class.message.input_pattern
+        pattern = adapter_class.input_message.pattern
         if pattern
           matcher = MessageMatcher.new(pattern)
           $log.trace("#{log_tag}: adapt_input: skip: #{adapter_class_id}",
@@ -74,7 +74,7 @@ module Droonga
                      :applied_adapters => applied_adapters)
           next unless applied_adapters.include?(adapter_class.id)
         end
-        pattern = adapter_class.message.output_pattern
+        pattern = adapter_class.output_message.pattern
         if pattern
           matcher = MessageMatcher.new(pattern)
           $log.trace("#{log_tag}: adapt_output: skip: #{adapter_class_id}",

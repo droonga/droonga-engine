@@ -16,30 +16,22 @@
 module Droonga
   module Plugin
     module Metadata
-      class AdapterMessage
+      class AdapterOutputMessage
         def initialize(adapter_class)
           @adapter_class = adapter_class
         end
 
-        def input_pattern
-          configuration[:input_pattern]
+        def pattern
+          configuration[:pattern]
         end
 
-        def input_pattern=(pattern)
-          configuration[:input_pattern] = pattern
-        end
-
-        def output_pattern
-          configuration[:output_pattern]
-        end
-
-        def output_pattern=(pattern)
-          configuration[:output_pattern] = pattern
+        def pattern=(pattern)
+          configuration[:pattern] = pattern
         end
 
         private
         def configuration
-          @adapter_class.options[:message] ||= {}
+          @adapter_class.options[:output_message] ||= {}
         end
       end
     end

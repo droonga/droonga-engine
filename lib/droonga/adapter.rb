@@ -14,15 +14,20 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/pluggable"
-require "droonga/plugin/metadata/adapter_message"
+require "droonga/plugin/metadata/adapter_input_message"
+require "droonga/plugin/metadata/adapter_output_message"
 
 module Droonga
   class Adapter
     extend Pluggable
 
     class << self
-      def message
-        Plugin::Metadata::AdapterMessage.new(self)
+      def input_message
+        Plugin::Metadata::AdapterInputMessage.new(self)
+      end
+
+      def output_message
+        Plugin::Metadata::AdapterOutputMessage.new(self)
       end
 
       def id

@@ -21,7 +21,7 @@ module Droonga
       Plugin.registry.register("error", self)
 
       class Adapter < Droonga::Adapter
-        message.output_pattern = ["body.errors", :exist]
+        output_message.pattern = ["body.errors", :exist]
 
         def adapt_output(output_message)
           errors = output_message.body["errors"]

@@ -24,8 +24,8 @@ module Droonga
       Plugin.registry.register("crud", self)
 
       class Adapter < Droonga::Adapter
-        message.input_pattern  = ["type", :equal, "add"]
-        message.output_pattern = ["body.success", :exist]
+        input_message.pattern  = ["type", :equal, "add"]
+        output_message.pattern = ["body.success", :exist]
 
         def adapt_output(output_message)
           success = output_message.body["success"]

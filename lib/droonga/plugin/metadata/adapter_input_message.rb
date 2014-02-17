@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,24 +13,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin"
-
 module Droonga
-  module Plugins
-    module Groonga
-      module Generic
-        class Adapter < Droonga::Adapter
-          groonga_commands = [
-            "table_create",
-            "table_remove",
-            "column_create",
-          ]
-          input_message.pattern  = ["type", :in, groonga_commands]
-          output_message.pattern = ["body.result", :exist]
+  module Plugin
+    module Metadata
+      class AdapterInputMessage
+        def initialize(adapter_class)
+          @adapter_class = adapter_class
+        end
 
-          def adapt_output(output_message)
-            output_message.body = output_message.body["result"]
-          end
+        def pattern
+          configuration[:pattern]
+        end
+
+        def pattern=(pattern)
+          configuration[:pattern] = pattern
+        end
+
+        private
+        def configuration
+          @adapter_class.options[:input_message] ||= {}
         end
       end
     end
