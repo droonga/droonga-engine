@@ -55,7 +55,7 @@ module Droonga
     end
 
     def log_tag
-      "adapter-runner"
+      "planner-runner"
     end
   end
 end
