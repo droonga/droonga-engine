@@ -64,21 +64,25 @@ class CatalogTest < Test::Unit::TestCase
       assert_equal({
                      "localhost:23003/test.000" => {
                        :database  => "#{base_path}/000/db",
+                       :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.001" => {
                        :database  => "#{base_path}/001/db",
+                       :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.002" => {
                        :database  => "#{base_path}/002/db",
+                       :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.003" => {
                        :database  => "#{base_path}/003/db",
+                       :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
