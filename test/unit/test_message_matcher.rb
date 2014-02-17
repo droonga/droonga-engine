@@ -133,5 +133,28 @@ class MessageMatcherTest < Test::Unit::TestCase
                             }))
       end
     end
+
+    class StartWithTest < self
+      def test_start_with
+        assert_true(match?(["type", :start_with, "watch."],
+                           {
+                             "type" => "watch.subscribe",
+                           }))
+      end
+
+      def test_not_start_with
+        assert_false(match?(["type", :start_with, "watch."],
+                            {
+                              "type" => "table_create",
+                            }))
+      end
+
+      def test_nil_value
+        assert_false(match?(["type", :start_with, "watch."],
+                            {
+                              "type" => nil,
+                            }))
+      end
+    end
   end
 end
