@@ -26,6 +26,7 @@ module Droonga
       @loop = loop
       @options = options
       @name = options[:name]
+      @dataset_name = options[:dataset]
       @database_name = options[:database]
       prepare
     end
@@ -74,7 +75,7 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
-      $log.debug("#{self.class.name}: activating plugins for #{@database_name}: " +
+      $log.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                    "#{@options[:plugins].join(", ")}")
       @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
       $log.debug("#{self.class.name}: activated:\n#{@handler_classes.join("\n")}")

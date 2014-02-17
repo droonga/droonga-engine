@@ -57,7 +57,7 @@ module Droonga
         device = @data["farms"][name]["device"]
         pattern = Regexp.new("^#{name}\.")
         results = {}
-        @data["datasets"].each do |key, dataset|
+        @data["datasets"].each do |dataset_name, dataset|
           workers = dataset["workers"]
           plugins = dataset["plugins"]
           dataset["ring"].each do |key, part|
@@ -67,6 +67,7 @@ module Droonga
                   path = File.join([device, $POSTMATCH, "db"])
                   path = File.expand_path(path, base_path)
                   options = {
+                    :dataset => dataset_name,
                     :database => path,
                     :n_workers => workers,
                     :plugins => plugins
