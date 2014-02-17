@@ -15,6 +15,7 @@
 
 require "droonga/plugin"
 require "droonga/plugins/groonga/generic_response"
+require "droonga/plugins/groonga/schema_planer"
 require "droonga/plugins/groonga/select"
 require "droonga/plugins/groonga/table_create"
 require "droonga/plugins/groonga/table_remove"

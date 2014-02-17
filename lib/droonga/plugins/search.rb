@@ -15,11 +15,21 @@
 
 require "droonga/plugin"
 require "droonga/searcher"
+require "droonga/plugins/search/distributed_search_planner"
 
 module Droonga
   module Plugins
     module Search
       Plugin.registry.register("search", self)
+
+      class Planner < Droonga::Planner
+        message.type = "search"
+
+        def plan(message)
+          planner = DistributedSearchPlanner.new(message)
+          planner.plan
+        end
+      end
 
       class Handler < Droonga::Handler
         message.type = "search"

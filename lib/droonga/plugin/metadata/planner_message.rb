@@ -13,16 +13,39 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugin_registry"
-require "droonga/adapter"
-require "droonga/planner"
-require "droonga/handler"
-
 module Droonga
   module Plugin
-    class << self
-      def registry
-        @@registry ||= PluginRegistry.new
+    module Metadata
+      class PlannerMessage
+        def initialize(plugin_class)
+          @plugin_class = plugin_class
+        end
+
+        def pattern
+          configuration[:pattern] || fallback_pattern
+        end
+
+        def pattern=(pattern)
+          configuration[:pattern] = pattern
+        end
+
+        def type
+          configuration[:type]
+        end
+
+        def type=(type)
+          configuration[:type] = type
+        end
+
+        private
+        def configuration
+          @plugin_class.options[:message] ||= {}
+        end
+
+        def fallback_pattern
+          return nil if type.nil?
+          ["type", :equal, type]
+        end
       end
     end
   end

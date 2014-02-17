@@ -13,25 +13,42 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/legacy_pluggable"
-require "droonga/planner_plugin"
+require "droonga/pluggable"
+require "droonga/plugin/metadata/planner_message"
+require "droonga/distributed_command_planner"
 
 module Droonga
   class Planner
-    include LegacyPluggable
+    extend Pluggable
 
-    def initialize(dispatcher, plugins)
+    class << self
+      def message
+        Plugin::Metadata::PlannerMessage.new(self)
+      end
+    end
+
+    def initialize(dispatcher)
       @dispatcher = dispatcher
-      load_plugins(plugins)
+    end
+
+    def plan(message)
+      raise NotImplemented, "#{self.class.name}\##{__method__} must implement."
     end
 
     private
-    def instantiate_plugin(name)
-      PlannerPlugin.repository.instantiate(name, self)
+    def scatter(message, options={})
+      planner = DistributedCommandPlanner.new(message)
+      planner.scatter
+      planner.key = options[:key]
+      planner.reduce(options[:reduce])
+      planner.plan
     end
 
-    def log_tag
-      "[#{Process.pid}] planner"
+    def broadcast(message, options={})
+      planner = DistributedCommandPlanner.new(message)
+      planner.broadcast(:write => options[:write])
+      planner.reduce(options[:reduce])
+      planner.plan
     end
   end
 end

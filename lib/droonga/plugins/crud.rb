@@ -35,6 +35,18 @@ module Droonga
         end
       end
 
+      class Planner < Droonga::Planner
+        message.type = "add"
+
+        def plan(message)
+          scatter(message,
+                  :key => message["body"]["key"] || rand.to_s,
+                  :reduce => {
+                    "success" => "and"
+                  })
+        end
+      end
+
       class Handler < Droonga::Handler
         message.type = "add"
 

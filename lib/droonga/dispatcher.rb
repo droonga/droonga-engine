@@ -17,7 +17,7 @@ require "English"
 require "tsort"
 
 require "droonga/adapter_runner"
-require "droonga/planner"
+require "droonga/planner_runner"
 require "droonga/collector"
 require "droonga/farm"
 require "droonga/session"
@@ -56,12 +56,11 @@ module Droonga
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
-      @adapter_runners = create_adapter_runners
+      @adapter_runners = create_runners(AdapterRunner)
       @farm = Farm.new(name, @catalog, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      # TODO: make customizable
-      @planner = Planner.new(self, ["search", "crud", "groonga", "watch"])
+      @planner_runners = create_runners(PlannerRunner)
       # TODO: make customizable
       @collector = Collector.new(["basic", "search"])
     end
@@ -76,7 +75,9 @@ module Droonga
 
     def shutdown
       @forwarder.shutdown
-      @planner.shutdown
+      @planner_runners.each_value do |planner_runner|
+        planner_runner.shutdown
+      end
       @collector.shutdown
       @adapter_runners.each_value do |adapter_runner|
         adapter_runner.shutdown
@@ -226,9 +227,14 @@ module Droonga
       dataset = message["dataset"]
       adapter_runner = @adapter_runners[dataset]
       adapted_message = adapter_runner.adapt_input(message)
-      plan = @planner.process(adapted_message["type"], adapted_message)
+      planner_runner = @planner_runners[dataset]
+      plan = planner_runner.plan(adapted_message)
       distributor = Distributor.new(self)
       distributor.distribute(plan)
+    rescue Droonga::UnsupportedMessageError => error
+      target_message = error.message
+      raise UnknownCommand.new(target_message["type"],
+                               target_message["dataset"])
     rescue Droonga::LegacyPluggable::UnknownPlugin => error
       raise UnknownCommand.new(error.command, message["dataset"])
     end
@@ -243,10 +249,10 @@ module Droonga
       end
     end
 
-    def create_adapter_runners
+    def create_runners(runner_class)
       runners = {}
       @catalog.datasets.each do |name, configuration|
-        runners[name] = AdapterRunner.new(self, configuration["plugins"] || [])
+        runners[name] = runner_class.new(self, configuration["plugins"] || [])
       end
       runners
     end

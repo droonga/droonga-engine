@@ -31,4 +31,14 @@ module Droonga
       super(message)
     end
   end
+
+  # TODO: Move to common file for runners
+  class UnsupportedMessageError < Error
+    attr_reader :phase, :message
+    def initialize(phase, message)
+      @phase = phase
+      @message = message
+      super("[#{@phase}] Unsupported message: #{@message.inspect}")
+    end
+  end
 end

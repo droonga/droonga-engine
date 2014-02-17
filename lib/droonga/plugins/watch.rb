@@ -23,6 +23,18 @@ module Droonga
     module Watch
       Plugin.registry.register("watch", self)
 
+      class Planner < Droonga::Planner
+        message.pattern = ["type", :start_with, "watch."]
+
+        def plan(message)
+          broadcast(message,
+                    :write => true,
+                    :reduce => {
+                      "success" => "and"
+                    })
+        end
+      end
+
       module SchemaCreatable
         private
         def ensure_schema_created
