@@ -99,7 +99,7 @@ module Droonga
           @data["normalizer"]
         end
 
-        def flags
+        def type_flag
           case type
           when "Array"
             "TABLE_NO_KEY"
@@ -112,6 +112,10 @@ module Droonga
           else
             # TODO raise appropriate error
           end
+        end
+
+        def flags
+          type_flag
         end
 
         def to_table_create_body
