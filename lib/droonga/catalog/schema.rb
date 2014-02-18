@@ -32,6 +32,10 @@ module Droonga
         def with_position
           @data["withPosition"]
         end
+
+        def sources
+          @data["sources"]
+        end
       end
 
       class Column
@@ -54,10 +58,6 @@ module Droonga
 
         def value_type
           @data["valueType"]
-        end
-
-        def sources
-          @data["sources"]
         end
 
         private
