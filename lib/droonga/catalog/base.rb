@@ -16,13 +16,14 @@
 require "digest/sha1"
 require "zlib"
 require "time"
+require "droonga/catalog/schema"
 require "droonga/message_processing_error"
 require "droonga/catalog/errors"
 
 module Droonga
   module Catalog
     class Base
-      attr_reader :path, :base_path
+      attr_reader :path, :base_path, :schema
       def initialize(data, path)
         @data = data
         @path = path
@@ -47,6 +48,7 @@ module Droonga
           dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
         end
         @options = @data["options"] || {}
+        @schema = Droonga::Catalog::Schema.new(@data["schema"])
       end
 
       def option(name)
