@@ -48,6 +48,18 @@ module Droonga
             data == other.data
         end
 
+        def type
+          @data["type"]
+        end
+
+        def value_type
+          @data["valueType"]
+        end
+
+        def sources
+          @data["sources"]
+        end
+
         private
         def index_options_data
           @data["index_options"] || {}
