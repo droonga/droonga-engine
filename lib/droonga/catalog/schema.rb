@@ -70,7 +70,7 @@ module Droonga
             "COLUMN_SCALAR"
           when "Vector"
             "COLUMN_VECTOR"
-          when "Scalar"
+          when "Index"
             "COLUMN_INDEX"
           else
             # TODO raise appropriate error
