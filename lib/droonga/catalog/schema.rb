@@ -16,11 +16,55 @@
 module Droonga
   module Catalog
     class Schema
-      def initialize(data)
-        @data = data
+      class Columns
+        attr_reader :name
+        def initialize(name, data)
+          @name = name
+          @data = data
+        end
+
+        def ==(other)
+          self.class == other.class and
+            name == other.name
+          # TODO should consider @data
+        end
       end
 
-      # TODO provide useful methods
+      class Table
+        attr_reader :name, :columns
+        def initialize(name, data)
+          @name = name
+          @data = data
+
+          @columns = columns_data.map do |column_name, column_data|
+            Column.new(column_name, column_data)
+          end
+        end
+
+        def ==(other)
+          self.class == other.class and
+            name == other.name and
+            columns == other.columns
+        end
+
+        private
+        def columns_data
+          @data["columns"] || []
+        end
+      end
+
+      attr_reader :tables
+      def initialize(data)
+        @data = data || []
+        @tables = @data.map do |table_name, table_data|
+          Table.new(table_name, table_data)
+        end
+      end
+
+      def ==(other)
+        self.class == other.class and
+          tables == other.tables
+      end
     end
   end
 end
