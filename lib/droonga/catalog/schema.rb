@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "tsort"
+
 module Droonga
   module Catalog
     class Schema
@@ -96,9 +98,10 @@ module Droonga
         def initialize(name, data)
           @name = name
           @data = data
+          @columns = {}
 
-          @columns = columns_data.map do |column_name, column_data|
-            Column.new(column_name, column_data)
+          columns_data.each do |column_name, column_data|
+            @columns[column_name] = Column.new(column_name, column_data)
           end
         end
 
@@ -167,23 +170,52 @@ module Droonga
         end
       end
 
+      class ColumnCreateSorter
+        include TSort
+
+        def initialize(tables)
+          @tables = tables
+        end
+
+        def all_columns
+          @tables.values.map {|table| table.columns.values}.flatten
+        end
+
+        def tsort_each_node(&block)
+          all_columns.each(&block)
+        end
+
+        def tsort_each_child(column, &block)
+          dependent_column_names = column.index_options.sources || []
+          reference_table = @tables[column.value_type]
+          dependent_columns = dependent_column_names.map do |column_name|
+            reference_table.columns[column_name]
+          end
+          dependent_columns.each(&block)
+        end
+      end
+
       attr_reader :tables
       def initialize(data)
         @data = data || []
-        @tables = @data.map do |table_name, table_data|
-          Table.new(table_name, table_data)
+        @tables = {}
+        @data.each do |table_name, table_data|
+          @tables[table_name] = Table.new(table_name, table_data)
         end
       end
 
       def to_commands
-        commands = tables.map do |table|
+        commands = tables.map do |name, table|
           {
             "type" => "table_create",
             "body" => table.to_table_create_body
           }
         end
 
+        sorter = ColumnCreateSorter.new(tables)
+        sorter.tsort
         # TODO append topologically sorted column_create commands
+        # TODO handle TSort::Cyclic
 
         commands
       end
