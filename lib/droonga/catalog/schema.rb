@@ -87,7 +87,7 @@ module Droonga
 
         private
         def index_options_data
-          @data["index_options"] || {}
+          @data["indexOptions"] || {}
         end
       end
 
