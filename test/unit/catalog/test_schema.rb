@@ -151,5 +151,25 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    }).value_type)
       end
     end
+
+    class ColumnIndexOptionsTest < self
+      def create_options(data)
+        Droonga::Catalog::Schema::ColumnIndexOptions.new(data)
+      end
+
+      def test_section
+        assert_equal(true,
+                     create_options({
+                                      "section" => true
+                                    }).section)
+      end
+
+      def test_weight
+        assert_equal(true,
+                     create_options({
+                                      "weight" => true
+                                    }).weight)
+      end
+    end
   end
 end
