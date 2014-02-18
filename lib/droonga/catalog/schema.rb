@@ -99,6 +99,39 @@ module Droonga
           @data["normalizer"]
         end
 
+        def flags
+          case type
+          when "Array"
+            "TABLE_NO_KEY"
+          when "Hash"
+            "TABLE_HASH_KEY"
+          when "PatriciaTrie"
+            "TABLE_PAT_KEY"
+          when "DoubleArrayTrie"
+            "TABLE_DAT_KEY"
+          else
+            # TODO raise appropriate error
+          end
+        end
+
+        def to_table_create_body
+          body = {
+            "name"     => name,
+            "key_type" => key_type,
+            "flags"    => flags
+          }
+
+          if tokenizer
+            body["default_tokenizer"] = tokenizer
+          end
+
+          if normalizer
+            body["normalizer"] = normalizer
+          end
+
+          body
+        end
+
         private
         def columns_data
           @data["columns"] || []
@@ -111,6 +144,19 @@ module Droonga
         @tables = @data.map do |table_name, table_data|
           Table.new(table_name, table_data)
         end
+      end
+
+      def to_commands
+        commands = tables.map do |table|
+          {
+            "type" => "table_create",
+            "body" => table.to_table_create_body
+          }
+        end
+
+        # TODO append topologically sorted column_create commands
+
+        commands
       end
 
       def ==(other)

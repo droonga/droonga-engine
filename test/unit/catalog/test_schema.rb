@@ -24,20 +24,51 @@ class CatalogSchemaTest < Test::Unit::TestCase
   class SchemaTest < self
     def test_schema_not_specified
       assert_equal([],
-                   create_schema(nil).tables)
+                   create_schema(nil).to_commands)
     end
 
     def test_no_table
       assert_equal([],
-                   create_schema({}).tables)
+                   create_schema({}).to_commands)
     end
 
-    def test_tables
-      assert_equal(
-        [Droonga::Catalog::Schema::Table.new('table1', {})],
-        create_schema(
-          "table1" => {
-        }).tables
+    def test_hash_table
+      assert_equal([
+                     "type" => "table_create",
+                     "body" => {
+                       "name"     => "table_name",
+                       "key_type" => "ShortText",
+                       "flags"    => "TABLE_HASH_KEY"
+                     }
+                   ],
+                   create_schema(
+                     "table_name" => {
+                       "type"    => "Hash",
+                       "keyType" => "ShortText"
+                     }
+                   ).to_commands
+      )
+    end
+
+    def test_patricia_trie_table
+      assert_equal([
+                     "type" => "table_create",
+                     "body" => {
+                       "name"              => "table_name",
+                       "key_type"          => "ShortText",
+                       "flags"             => "TABLE_PAT_KEY",
+                       "normalizer"        => "NormalizerAuto",
+                       "default_tokenizer" => "TokenBigram"
+                     }
+                   ],
+                   create_schema(
+                     "table_name" => {
+                       "type"       => "PatriciaTrie",
+                       "keyType"    => "ShortText",
+                       "normalizer" => "NormalizerAuto",
+                       "tokenizer"  => "TokenBigram"
+                     }
+                   ).to_commands
       )
     end
 
