@@ -158,6 +158,17 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                      "valueType" => "ShortText"
                                    }).value_type)
       end
+
+      def test_flags_with_column_index_options
+        assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
+                     create_column("column_name",
+                                   {
+                                     "type" => "Scalar",
+                                     "indexOptions" => {
+                                       "section" => true
+                                     }
+                                   }).flags)
+      end
     end
 
     class ColumnIndexOptionsTest < self
@@ -184,6 +195,13 @@ class CatalogSchemaTest < Test::Unit::TestCase
                      create_options({
                                       "position" => true
                                     }).position)
+      end
+
+      def test_flags
+        assert_equal(["WITH_SECTION"],
+                     create_options({
+                                      "section" => true
+                                    }).flags)
       end
     end
   end
