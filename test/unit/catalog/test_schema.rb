@@ -143,6 +143,14 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    }).type)
       end
 
+      def test_flags
+        assert_equal("COLUMN_SCALAR",
+                     create_column("column_name",
+                                   {
+                                     "type" => "Scalar"
+                                   }).flags)
+      end
+
       def test_value_type
         assert_equal("ShortText",
                      create_column("column_name",

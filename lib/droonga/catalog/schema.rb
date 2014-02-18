@@ -56,6 +56,23 @@ module Droonga
           @data["type"]
         end
 
+        def type_flag
+          case type
+          when "Scalar"
+            "COLUMN_SCALAR"
+          when "Vector"
+            "COLUMN_VECTOR"
+          when "Scalar"
+            "COLUMN_INDEX"
+          else
+            # TODO raise appropriate error
+          end
+        end
+
+        def flags
+          type_flag # TODO merge flags from ColumnIndexOptions
+        end
+
         def value_type
           @data["valueType"]
         end
