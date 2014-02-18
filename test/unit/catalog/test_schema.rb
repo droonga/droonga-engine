@@ -32,46 +32,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
                    create_schema({}).to_commands)
     end
 
-    def test_hash_table
-      assert_equal([
-                     "type" => "table_create",
-                     "body" => {
-                       "name"     => "table_name",
-                       "key_type" => "ShortText",
-                       "flags"    => "TABLE_HASH_KEY"
-                     }
-                   ],
-                   create_schema(
-                     "table_name" => {
-                       "type"    => "Hash",
-                       "keyType" => "ShortText"
-                     }
-                   ).to_commands
-      )
-    end
-
-    def test_patricia_trie_table
-      assert_equal([
-                     "type" => "table_create",
-                     "body" => {
-                       "name"              => "table_name",
-                       "key_type"          => "ShortText",
-                       "flags"             => "TABLE_PAT_KEY",
-                       "normalizer"        => "NormalizerAuto",
-                       "default_tokenizer" => "TokenBigram"
-                     }
-                   ],
-                   create_schema(
-                     "table_name" => {
-                       "type"       => "PatriciaTrie",
-                       "keyType"    => "ShortText",
-                       "normalizer" => "NormalizerAuto",
-                       "tokenizer"  => "TokenBigram"
-                     }
-                   ).to_commands
-      )
-    end
-
 =begin
     def test_integration
       assert_equal([
@@ -221,6 +181,24 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   {
                                     "normalizer" => "NormalizerAuto"
                                   }).normalizer)
+      end
+
+      def test_to_table_create_body
+        assert_equal({
+                       "name"              => "table_name",
+                       "key_type"          => "ShortText",
+                       "flags"             => "TABLE_PAT_KEY",
+                       "normalizer"        => "NormalizerAuto",
+                       "default_tokenizer" => "TokenBigram"
+                     },
+                     create_table("table_name",
+                                  {
+                                    "type"       => "PatriciaTrie",
+                                    "keyType"    => "ShortText",
+                                    "normalizer" => "NormalizerAuto",
+                                    "tokenizer"  => "TokenBigram"
+                                  }).to_table_create_body)
+
       end
     end
 
