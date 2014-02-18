@@ -18,7 +18,7 @@ require "droonga/status_code"
 
 module Droonga
   class MessageProcessingError < Error
-    STATUS_CODE = StatusCode::INTERNAL_ERROR
+    STATUS_CODE = StatusCode::INTERNAL_SERVER_ERROR
 
     attr_reader :detail
 
