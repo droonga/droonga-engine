@@ -36,6 +36,14 @@ module Droonga
         def sources
           @data["sources"]
         end
+
+        def flags
+          flags = []
+          flags << "WITH_SECTION"  if section
+          flags << "WITH_WEIGHT"   if weight
+          flags << "WITH_POSITION" if position
+          flags
+        end
       end
 
       class Column
@@ -70,7 +78,7 @@ module Droonga
         end
 
         def flags
-          [type_flag] # TODO merge flags from ColumnIndexOptions
+          [type_flag] + index_options.flags
         end
 
         def value_type
