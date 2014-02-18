@@ -40,5 +40,49 @@ class CatalogSchemaTest < Test::Unit::TestCase
         }).tables
       )
     end
+
+    class TableTest < self
+      def create_table(name, data)
+        Droonga::Catalog::Schema::Table.new(name, data)
+      end
+
+      def test_name
+        assert_equal("table_name",
+                     create_table("table_name",
+                                  {}).name)
+      end
+
+      def test_type
+        assert_equal("Hash",
+                     create_table("table_name",
+                                  {
+                                    "type" => "Hash"
+                                  }).type)
+      end
+
+      def test_key_type
+        assert_equal("ShortText",
+                     create_table("table_name",
+                                  {
+                                    "keyType" => "ShortText"
+                                  }).key_type)
+      end
+
+      def test_tokenizer
+        assert_equal("TokenBigram",
+                     create_table("table_name",
+                                  {
+                                    "tokenizer" => "TokenBigram"
+                                  }).tokenizer)
+      end
+
+      def test_normalizer
+        assert_equal("NormalizerAuto",
+                     create_table("table_name",
+                                  {
+                                    "normalizer" => "NormalizerAuto"
+                                  }).normalizer)
+      end
+    end
   end
 end

@@ -47,6 +47,22 @@ module Droonga
             columns == other.columns
         end
 
+        def type
+          @data["type"]
+        end
+
+        def key_type
+          @data["keyType"]
+        end
+
+        def tokenizer
+          @data["tokenizer"]
+        end
+
+        def normalizer
+          @data["normalizer"]
+        end
+
         private
         def columns_data
           @data["columns"] || []
