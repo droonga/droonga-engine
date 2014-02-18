@@ -178,6 +178,13 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                       "weight" => true
                                     }).weight)
       end
+
+      def test_position
+        assert_equal(true,
+                     create_options({
+                                      "position" => true
+                                    }).position)
+      end
     end
   end
 end
