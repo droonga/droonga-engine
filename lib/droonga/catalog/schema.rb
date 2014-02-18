@@ -16,7 +16,7 @@
 module Droonga
   module Catalog
     class Schema
-      class Columns
+      class Column
         attr_reader :name
         def initialize(name, data)
           @name = name
