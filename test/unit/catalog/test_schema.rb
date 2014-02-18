@@ -123,5 +123,33 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   }).normalizer)
       end
     end
+
+    class ColumnTest < self
+      def create_column(name, data)
+        Droonga::Catalog::Schema::Column.new(name, data)
+      end
+
+      def test_name
+        assert_equal("column_name",
+                     create_column("column_name",
+                                   {}).name)
+      end
+
+      def test_type
+        assert_equal("Scalar",
+                     create_column("column_name",
+                                   {
+                                     "type" => "Scalar"
+                                   }).type)
+      end
+
+      def test_value_type
+        assert_equal("ShortText",
+                     create_column("column_name",
+                                   {
+                                     "valueType" => "ShortText"
+                                   }).value_type)
+      end
+    end
   end
 end
