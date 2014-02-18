@@ -17,7 +17,7 @@ module Droonga
   module Catalog
     class Schema
       class Column
-        attr_reader :name
+        attr_reader :name, :data
         def initialize(name, data)
           @name = name
           @data = data
@@ -25,13 +25,13 @@ module Droonga
 
         def ==(other)
           self.class == other.class and
-            name == other.name
-          # TODO should consider @data
+            name == other.name and
+            data == other.data
         end
       end
 
       class Table
-        attr_reader :name, :columns
+        attr_reader :name, :columns, :data
         def initialize(name, data)
           @name = name
           @data = data
@@ -44,7 +44,7 @@ module Droonga
         def ==(other)
           self.class == other.class and
             name == other.name and
-            columns == other.columns
+            data == other.data
         end
 
         def type
