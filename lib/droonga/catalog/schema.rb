@@ -16,17 +16,41 @@
 module Droonga
   module Catalog
     class Schema
+      class ColumnIndexOptions
+        def initialize(data)
+          @data = data
+        end
+
+        def with_section
+          @data["withSection"]
+        end
+
+        def with_weight
+          @data["withWeight"]
+        end
+
+        def with_position
+          @data["withPosition"]
+        end
+      end
+
       class Column
-        attr_reader :name, :data
+        attr_reader :name, :data, :index_options
         def initialize(name, data)
           @name = name
           @data = data
+          @index_options = ColumnIndexOptions.new(index_options_data)
         end
 
         def ==(other)
           self.class == other.class and
             name == other.name and
             data == other.data
+        end
+
+        private
+        def index_options_data
+          @data["index_options"] || {}
         end
       end
 
