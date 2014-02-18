@@ -92,7 +92,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
       end
 
       def test_flags
-        assert_equal("TABLE_HASH_KEY",
+        assert_equal(["TABLE_HASH_KEY"],
                      create_table("table_name",
                                   {
                                     "type" => "Hash"
@@ -144,7 +144,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
       end
 
       def test_flags
-        assert_equal("COLUMN_SCALAR",
+        assert_equal(["COLUMN_SCALAR"],
                      create_column("column_name",
                                    {
                                      "type" => "Scalar"

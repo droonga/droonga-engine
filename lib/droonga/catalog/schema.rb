@@ -70,7 +70,7 @@ module Droonga
         end
 
         def flags
-          type_flag # TODO merge flags from ColumnIndexOptions
+          [type_flag] # TODO merge flags from ColumnIndexOptions
         end
 
         def value_type
@@ -132,14 +132,14 @@ module Droonga
         end
 
         def flags
-          type_flag
+          [type_flag]
         end
 
         def to_table_create_body
           body = {
             "name"     => name,
             "key_type" => key_type,
-            "flags"    => flags
+            "flags"    => flags.join("|")
           }
 
           if tokenizer
