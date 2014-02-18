@@ -18,13 +18,13 @@ module Droonga
   #
   # It provides the small language. Here is the pattern syntax.
   #
-  #   * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENTS*]
+  #   * PATTERN = [TARGET_PATH, OPERATOR, ARGUMENT*]
   #   * PATTERN = [PATTERN, LOGICAL_OPERATOR, PATTERN]
   #   * TARGET_PATH = "COMPONENT(.COMPONENT)*"
   #   * OPERATOR = :equal, :in, :include, :exist, :start_with
   #                (More operators may be added in the future.
   #                 For example, :end_with and so on.)
-  #   * ARGUMENTS = OBJECT_DEFINED_IN_JSON*
+  #   * ARGUMENT = OBJECT_DEFINED_IN_JSON
   #   * LOGICAL_OPERATOR = :or (:add will be added.)
   #
   # For example:
