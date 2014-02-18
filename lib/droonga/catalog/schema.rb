@@ -21,16 +21,16 @@ module Droonga
           @data = data
         end
 
-        def with_section
-          @data["withSection"]
+        def section
+          @data["section"]
         end
 
-        def with_weight
-          @data["withWeight"]
+        def weight
+          @data["weight"]
         end
 
-        def with_position
-          @data["withPosition"]
+        def position
+          @data["position"]
         end
 
         def sources
