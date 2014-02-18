@@ -49,8 +49,9 @@ module Droonga
       end
 
       class Column
-        attr_reader :name, :data, :index_options
-        def initialize(name, data)
+        attr_reader :table, :name, :data, :index_options
+        def initialize(table, name, data)
+          @table = table
           @name = name
           @data = data
           @index_options = ColumnIndexOptions.new(index_options_data)
@@ -87,6 +88,20 @@ module Droonga
           @data["valueType"]
         end
 
+        def to_column_create_body
+          body = {
+            "name"  => name,
+            "table" => table,
+            "flags" => flags.join("|"),
+          }
+          sources = index_options.sources
+          if sources
+            body["source"] = sources.join(",")
+          end
+
+          body
+        end
+
         private
         def index_options_data
           @data["indexOptions"] || {}
@@ -101,7 +116,7 @@ module Droonga
           @columns = {}
 
           columns_data.each do |column_name, column_data|
-            @columns[column_name] = Column.new(column_name, column_data)
+            @columns[column_name] = Column.new(name, column_name, column_data)
           end
         end
 
@@ -205,17 +220,25 @@ module Droonga
       end
 
       def to_commands
-        commands = tables.map do |name, table|
-          {
+        commands = []
+
+        tables.each do |name, table|
+          commands << {
             "type" => "table_create",
             "body" => table.to_table_create_body
           }
         end
 
         sorter = ColumnCreateSorter.new(tables)
-        sorter.tsort
-        # TODO append topologically sorted column_create commands
+        columns = sorter.tsort
         # TODO handle TSort::Cyclic
+
+        columns.each do |column|
+          commands << {
+            "type" => "column_create",
+            "body" => column.to_column_create_body
+          }
+        end
 
         commands
       end
