@@ -247,6 +247,20 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                      }
                                    }).flags)
       end
+
+      def test_to_column_create_body
+        assert_equal({
+                       "name" => "column_name",
+                       "flags" => "COLUMN_SCALAR",
+                       "table" => "table_name"
+                     },
+                     create_column("column_name",
+                                  {
+                                    "type"      => "Scalar",
+                                    "valueType" => "ShortText"
+                                  }).to_column_create_body)
+
+      end
     end
 
     class ColumnIndexOptionsTest < self
