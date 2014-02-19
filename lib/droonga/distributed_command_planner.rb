@@ -127,7 +127,7 @@ module Droonga
     def fixed_processor
       @processor["outputs"] = @outputs
       if @processor["type"] == "scatter"
-        raise ErrorMessage::InternalServerError.new("missing key") unless @key
+        raise ErrorMessages::InternalServerError.new("missing key") unless @key
         @processor["key"] = @key
       end
       @processor

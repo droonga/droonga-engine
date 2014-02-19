@@ -22,26 +22,26 @@ require "droonga/collector_runner"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
-require "droonga/error_message"
+require "droonga/error_messages"
 require "droonga/distributor"
 
 module Droonga
   class Dispatcher
     attr_reader :name
 
-    class MissingDatasetParameter < ErrorMessage::BadRequest
+    class MissingDatasetParameter < ErrorMessages::BadRequest
       def initialize
         super("\"dataset\" must be specified.")
       end
     end
 
-    class UnknownDataset < ErrorMessage::NotFound
+    class UnknownDataset < ErrorMessages::NotFound
       def initialize(dataset)
         super("The dataset #{dataset.inspect} does not exist.")
       end
     end
 
-    class UnknownCommand < ErrorMessage::BadRequest
+    class UnknownCommand < ErrorMessages::BadRequest
       def initialize(command, dataset)
         super("The command #{command.inspect} is not available " +
                 "for the dataset #{dataset.inspect}.")
@@ -96,12 +96,12 @@ module Droonga
         begin
           assert_valid_message(message)
           process_input_message(message)
-        rescue ErrorMessage::Error => error
+        rescue ErrorMessages::Error => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
         rescue StandardError, LoadError, SyntaxError => error
           Logger.error("failed to process input message", error)
-          formatted_error = ErrorMessage::InternalServerError.new("Unknown internal error")
+          formatted_error = ErrorMessages::InternalServerError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
                 "body"       => formatted_error.response_body)
           raise error

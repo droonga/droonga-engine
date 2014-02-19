@@ -32,6 +32,35 @@ module Droonga
     end
   end
 
+  # the base class for any error which can be described as a Droonga message
+  class ErrorMessage < Error
+    STATUS_CODE = nil
+
+    attr_reader :detail
+
+    def initialize(message, detail=nil)
+      @detail = detail
+      super(message)
+    end
+
+    def name
+      self.class.name.split("::").last
+    end
+
+    def status_code
+      self.class::STATUS_CODE
+    end
+
+    def response_body
+      body = {
+        "name"    => name,
+        "message" => message,
+      }
+      body["detail"] = @detail unless @detail.nil?
+      body
+    end
+  end
+
   # TODO: Move to common file for runners
   class UnsupportedMessageError < Error
     attr_reader :phase, :message

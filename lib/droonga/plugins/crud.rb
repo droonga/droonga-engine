@@ -16,7 +16,7 @@
 require "groonga"
 
 require "droonga/plugin"
-require "droonga/error_message"
+require "droonga/error_messages"
 
 module Droonga
   module Plugins
@@ -50,33 +50,33 @@ module Droonga
       class Handler < Droonga::Handler
         message.type = "add"
 
-        class MissingTableParameter < ErrorMessage::BadRequest
+        class MissingTableParameter < ErrorMessages::BadRequest
           def initialize
             super("\"table\" must be specified.")
           end
         end
 
-        class MissingPrimaryKeyParameter < ErrorMessage::BadRequest
+        class MissingPrimaryKeyParameter < ErrorMessages::BadRequest
           def initialize(table_name)
             super("\"key\" must be specified. " +
                     "The table #{table_name.inspect} requires a primary key for a new record.")
           end
         end
 
-        class UnknownTable < ErrorMessage::NotFound
+        class UnknownTable < ErrorMessages::NotFound
           def initialize(table_name)
             super("The table #{table_name.inspect} does not exist in the dataset.")
           end
         end
 
-        class InvalidValue < ErrorMessage::BadRequest
+        class InvalidValue < ErrorMessages::BadRequest
           def initialize(column, value, request)
             super("The column #{column.inspect} cannot store the value #{value.inspect}.",
                   request)
           end
         end
 
-        class UnknownColumn < ErrorMessage::NotFound
+        class UnknownColumn < ErrorMessages::NotFound
           def initialize(column, table, request)
             super("The column #{column.inspect} does not exist in the table #{table.inspect}.",
                   request)

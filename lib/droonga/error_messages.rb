@@ -17,44 +17,16 @@ require "droonga/error"
 require "droonga/status_code"
 
 module Droonga
-  module ErrorMessage
-    class Error < Droonga::Error
-      STATUS_CODE = nil
-
-      attr_reader :detail
-
-      def initialize(message, detail=nil)
-        @detail = detail
-        super(message)
-      end
-
-      def name
-        self.class.name.split("::").last
-      end
-
-      def status_code
-        self.class::STATUS_CODE
-      end
-
-      def response_body
-        body = {
-          "name"    => name,
-          "message" => message,
-        }
-        body["detail"] = @detail unless @detail.nil?
-        body
-      end
-    end
-
-    class InternalServerError < Error
+  module ErrorMessages
+    class InternalServerError < ErrorMessage
       STATUS_CODE = StatusCode::INTERNAL_SERVER_ERROR
     end
 
-    class BadRequest < Error
+    class BadRequest < ErrorMessage
       STATUS_CODE = StatusCode::BAD_REQUEST
     end
 
-    class NotFound < Error
+    class NotFound < ErrorMessage
       STATUS_CODE = StatusCode::NOT_FOUND
     end
   end

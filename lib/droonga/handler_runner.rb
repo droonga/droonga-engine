@@ -96,7 +96,7 @@ module Droonga
       handler = handler_class.new(@name, @context)
       begin
         handler.handle(handler_message, messenger)
-      rescue ErrorMessage::Error => error
+      rescue ErrorMessage => error
         messenger.error(error.status_code, error.response_body)
       end
     end

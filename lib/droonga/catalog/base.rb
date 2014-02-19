@@ -16,7 +16,7 @@
 require "digest/sha1"
 require "zlib"
 require "time"
-require "droonga/error_message"
+require "droonga/error_messages"
 require "droonga/catalog/errors"
 
 module Droonga
