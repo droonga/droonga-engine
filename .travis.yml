@@ -5,6 +5,6 @@ rvm:
   - 1.9.3
   - 2.0.0
   - 2.1.0
-  - ruby-head
+#  - ruby-head
 before_install:
   - curl https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
