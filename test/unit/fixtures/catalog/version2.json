@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "effectiveDate": "2013-09-01T00:00:00Z",
+  "zones": ["localhost:23003/test"],
+  "farms": {
+    "localhost:23003/test": {
+      "device": ".",
+      "capacity": 10
+    }
+  },
+  "datasets": {
+    "Test": {
+      "workers": 0,
+      "plugins": ["for_dataset"],
+      "number_of_replicas": 2,
+      "number_of_partitions": 2,
+      "partition_key": "_key",
+      "date_range": "infinity",
+      "ring": {
+        "localhost:23041": {
+          "weight": 50,
+          "partitions": {
+            "2013-09-01": [
+              "localhost:23003/test.000",
+              "localhost:23003/test.001"
+            ]
+          }
+        },
+        "localhost:23042": {
+          "weight": 50,
+          "partitions": {
+            "2013-09-01": [
+              "localhost:23003/test.002",
+              "localhost:23003/test.003"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
