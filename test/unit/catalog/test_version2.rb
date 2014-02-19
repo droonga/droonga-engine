@@ -13,9 +13,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/version1"
+require "droonga/catalog/version2"
 
-class CatalogTestVersion1 < Test::Unit::TestCase
+class CatalogTestVersion2 < Test::Unit::TestCase
   class << self
     def minimum_data
       {
@@ -33,7 +33,7 @@ class CatalogTestVersion1 < Test::Unit::TestCase
   end
 
   def create_catalog(data, path)
-    Droonga::Catalog::Version1.new(data, path)
+    Droonga::Catalog::Version2.new(data, path)
   end
 
   class OptionTest < self

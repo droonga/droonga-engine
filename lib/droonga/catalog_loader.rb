@@ -43,6 +43,8 @@ module Droonga
       case version
       when 1
         Catalog::Version1.new(data, @path)
+      when 2
+        Catalog::Version2.new(data, @path)
       when nil
         raise Error.new("Catalog version must be specified in #{@path}")
       else
