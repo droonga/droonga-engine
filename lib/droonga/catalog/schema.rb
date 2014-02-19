@@ -193,7 +193,7 @@ module Droonga
         end
 
         def all_columns
-          @tables.values.map {|table| table.columns.values}.flatten
+          @tables.values.collect {|table| table.columns.values}.flatten
         end
 
         def tsort_each_node(&block)
@@ -203,7 +203,7 @@ module Droonga
         def tsort_each_child(column, &block)
           dependent_column_names = column.index_options.sources || []
           reference_table = @tables[column.value_type]
-          dependent_columns = dependent_column_names.map do |column_name|
+          dependent_columns = dependent_column_names.collect do |column_name|
             reference_table.columns[column_name]
           end
           dependent_columns.each(&block)
