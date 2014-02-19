@@ -19,7 +19,7 @@ class CatalogTestVersion2 < Test::Unit::TestCase
   class << self
     def minimum_data
       {
-        "effective_date" => "2013-09-01T00:00:00Z",
+        "effectiveDate" => "2013-09-01T00:00:00Z",
         "zones" => [],
         "farms" => {},
         "datasets" => {},
@@ -232,7 +232,7 @@ class CatalogTestVersion2 < Test::Unit::TestCase
         :catalog => {},
         :errors => [
           Droonga::Catalog::MissingRequiredParameter.new(
-            "effective_date", path),
+            "effectiveDate", path),
           Droonga::Catalog::MissingRequiredParameter.new(
             "zones", path),
           Droonga::Catalog::MissingRequiredParameter.new(
@@ -280,11 +280,11 @@ class CatalogTestVersion2 < Test::Unit::TestCase
       },
       :invalid_date_parameters => {
         :catalog => minimum_data.merge(
-          "effective_date" => "invalid",
+          "effectiveDate" => "invalid",
         ),
         :errors => [
           Droonga::Catalog::InvalidDate.new(
-            "effective_date", "invalid", path),
+            "effectiveDate", "invalid", path),
         ],
       },
       :non_integer_numeric_parameters => {

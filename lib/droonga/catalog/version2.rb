@@ -18,6 +18,11 @@ require "droonga/catalog/base"
 module Droonga
   module Catalog
     class Version2 < Base
+      def validate_effective_date
+        date = @data["effectiveDate"]
+        validate_required_parameter(date, "effectiveDate")
+        validate_valid_datetime(date, "effectiveDate")
+      end
     end
   end
 end
