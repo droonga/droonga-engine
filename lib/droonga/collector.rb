@@ -15,10 +15,12 @@
 
 require "droonga/pluggable"
 require "droonga/plugin/metadata/collector_message"
+require "droonga/error_messages"
 
 module Droonga
   class Collector
     extend Pluggable
+    include ErrorMessages
 
     class << self
       def message

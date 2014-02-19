@@ -16,10 +16,12 @@
 require "droonga/pluggable"
 require "droonga/plugin/metadata/input_message"
 require "droonga/plugin/metadata/handler_action"
+require "droonga/error_messages"
 
 module Droonga
   class Handler
     extend Pluggable
+    include ErrorMessages
 
     class << self
       def message

@@ -16,10 +16,12 @@
 require "droonga/pluggable"
 require "droonga/plugin/metadata/planner_message"
 require "droonga/distributed_command_planner"
+require "droonga/error_messages"
 
 module Droonga
   class Planner
     extend Pluggable
+    include ErrorMessages
 
     class << self
       def message
