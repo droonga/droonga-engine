@@ -50,33 +50,33 @@ module Droonga
       class Handler < Droonga::Handler
         message.type = "add"
 
-        class MissingTableParameter < BadRequest
+        class MissingTableParameter < ErrorMessage::BadRequest
           def initialize
             super("\"table\" must be specified.")
           end
         end
 
-        class MissingPrimaryKeyParameter < BadRequest
+        class MissingPrimaryKeyParameter < ErrorMessage::BadRequest
           def initialize(table_name)
             super("\"key\" must be specified. " +
                     "The table #{table_name.inspect} requires a primary key for a new record.")
           end
         end
 
-        class UnknownTable < NotFound
+        class UnknownTable < ErrorMessage::NotFound
           def initialize(table_name)
             super("The table #{table_name.inspect} does not exist in the dataset.")
           end
         end
 
-        class InvalidValue < BadRequest
+        class InvalidValue < ErrorMessage::BadRequest
           def initialize(column, value, request)
             super("The column #{column.inspect} cannot store the value #{value.inspect}.",
                   request)
           end
         end
 
-        class UnknownColumn < NotFound
+        class UnknownColumn < ErrorMessage::NotFound
           def initialize(column, table, request)
             super("The column #{column.inspect} does not exist in the table #{table.inspect}.",
                   request)

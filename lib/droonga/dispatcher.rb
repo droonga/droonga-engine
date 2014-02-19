@@ -29,19 +29,19 @@ module Droonga
   class Dispatcher
     attr_reader :name
 
-    class MissingDatasetParameter < BadRequest
+    class MissingDatasetParameter < ErrorMessage::BadRequest
       def initialize
         super("\"dataset\" must be specified.")
       end
     end
 
-    class UnknownDataset < NotFound
+    class UnknownDataset < ErrorMessage::NotFound
       def initialize(dataset)
         super("The dataset #{dataset.inspect} does not exist.")
       end
     end
 
-    class UnknownCommand < BadRequest
+    class UnknownCommand < ErrorMessage::BadRequest
       def initialize(command, dataset)
         super("The command #{command.inspect} is not available " +
                 "for the dataset #{dataset.inspect}.")

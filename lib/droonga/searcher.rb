@@ -24,13 +24,13 @@ require "droonga/error_message"
 
 module Droonga
   class Searcher
-    class NoQuery < BadRequest
+    class NoQuery < ErrorMessage::BadRequest
       def initialize
         super("You must specify one or more query.")
       end
     end
 
-    class MissingSourceParameter < BadRequest
+    class MissingSourceParameter < ErrorMessage::BadRequest
       def initialize(query, queries)
         super("The query #{query.inspect} has no source. " +
                 "Query must have a valid source.",
@@ -38,7 +38,7 @@ module Droonga
       end
     end
 
-    class UnknownSource < NotFound
+    class UnknownSource < ErrorMessage::NotFound
       def initialize(source, queries)
         super("The source #{source.inspect} does not exist. " +
                 "It must be a name of an existing table or another query.",
@@ -46,7 +46,7 @@ module Droonga
       end
     end
 
-    class CyclicSource < BadRequest
+    class CyclicSource < ErrorMessage::BadRequest
       def initialize(queries)
         super("There is cyclic reference of sources.",
               queries)
