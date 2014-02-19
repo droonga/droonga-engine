@@ -95,7 +95,7 @@ class CatalogTestVersion2 < Test::Unit::TestCase
     end
 
     def catalog_path
-      @catalog_path ||= fixture_path("catalog/version1.json")
+      @catalog_path ||= fixture_path("catalog/version2.json")
     end
 
     def base_path
