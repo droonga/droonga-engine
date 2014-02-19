@@ -96,7 +96,7 @@ module Droonga
         begin
           assert_valid_message(message)
           process_input_message(message)
-        rescue ErrorMessages::Error => error
+        rescue ErrorMessage => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
         rescue StandardError, LoadError, SyntaxError => error
