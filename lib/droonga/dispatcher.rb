@@ -22,7 +22,7 @@ require "droonga/collector_runner"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
-require "droonga/message_processing_error"
+require "droonga/error_message"
 require "droonga/distributor"
 
 module Droonga
@@ -96,12 +96,12 @@ module Droonga
         begin
           assert_valid_message(message)
           process_input_message(message)
-        rescue MessageProcessingError => error
+        rescue ErrorMessage::Error => error
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
         rescue StandardError, LoadError, SyntaxError => error
           Logger.error("failed to process input message", error)
-          formatted_error = MessageProcessingError.new("Unknown internal error")
+          formatted_error = ErrorMessage::InternalServerError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
                 "body"       => formatted_error.response_body)
           raise error

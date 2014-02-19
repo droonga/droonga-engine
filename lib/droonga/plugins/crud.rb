@@ -16,7 +16,7 @@
 require "groonga"
 
 require "droonga/plugin"
-require "droonga/message_processing_error"
+require "droonga/error_message"
 
 module Droonga
   module Plugins

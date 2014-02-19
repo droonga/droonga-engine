@@ -36,7 +36,7 @@ module Droonga
             if status_codes.size == 1
               output_message.status_code = status_codes.first
             else
-              output_message.status_code = MessageProcessingError::STATUS_CODE
+              output_message.status_code = ErrorMessage::InternalServerError::STATUS_CODE
             end
 
             output_message.body = errors.values.first["body"]

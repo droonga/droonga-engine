@@ -20,7 +20,7 @@ require "tsort"
 require "groonga"
 
 require "droonga/time_formatter"
-require "droonga/message_processing_error"
+require "droonga/error_message"
 
 module Droonga
   class Searcher
