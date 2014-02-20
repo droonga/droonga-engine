@@ -7,7 +7,7 @@
     "type": "add.result",
     "body": {
       "name": "UnknownDataset",
-      "message": "The dataset \"Unknown\" does not exist."
+      "message": "Unknown dataset: <Unknown>"
     }
   }
 ]
