@@ -22,6 +22,14 @@ require "droonga/handler"
 
 module Droonga
   class HandlerRunner
+    class ConflictForSameCommand < Error
+      def initialize(types, dataset_name)
+        message = "Conflicting handlers for same command type are detected " +
+                    "for the dataset \"#{dataset_name}\": #{types.inspect}"
+        super(message)
+      end
+    end
+
     def initialize(loop, options={})
       @loop = loop
       @options = options
@@ -78,6 +86,7 @@ module Droonga
       $log.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                    "#{@options[:plugins].join(", ")}")
       @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
+      validate_uniqueness
       $log.debug("#{self.class.name}: activated:\n#{@handler_classes.join("\n")}")
       @forwarder = Forwarder.new(@loop)
     end
@@ -85,6 +94,21 @@ module Droonga
     def find_handler_class(command)
       @handler_classes.find do |handler_class|
         handler_class.message.type == command
+      end
+    end
+
+    def validate_uniqueness
+      types = {}
+      @handler_classes.each do |handler_class|
+        type = handler_class.message.type
+        types[type] ||= []
+        types[type] << handler_class
+      end
+      types.each do |type, handler_classes|
+        types.delete(type) if handler_classes.size > 1
+      end
+      if types.size > 0
+        raise ConflictForSameCommand.new(types, @dataset_name)
       end
     end
 
