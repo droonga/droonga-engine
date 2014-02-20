@@ -20,7 +20,7 @@ module Droonga
     class ValidationError < Error
       def initialize(message, path)
         if path
-          super("Validation error in #{path}: #{message}")
+          super("[Validation Error <#{path}>]#{message}")
         else
           super(message)
         end
@@ -29,7 +29,7 @@ module Droonga
 
     class MissingRequiredParameter < ValidationError
       def initialize(name, path)
-        super("You must specify \"#{name}\".", path)
+        super("[#{name}] A required parameter is missing.", path)
       end
     end
 
@@ -38,11 +38,12 @@ module Droonga
         expected_types = [expected_types] unless expected_types.is_a?(Array)
         message = nil
         if expected_types.size == 1
-          message = "\"#{name}\" must be #{expected_types.first}, " +
-                      "but #{actual}."
+          message = "[#{name}] Mismatched parameter type: " +
+                      "expected=<#{expected_types.first}>, actual=<#{actual}>"
         else
-          message = "\"#{name}\" must be #{expected_types.join(" or ")}, " +
-                      "but #{actual}."
+          message = "[#{name}] Mismatched parameter type: " +
+                      "expected=<#{expected_types.join(" or ")}>, " +
+                      "actual=<#{actual}>"
         end
         super(message, path)
       end
@@ -50,44 +51,43 @@ module Droonga
 
     class InvalidDate < ValidationError
       def initialize(name, value, path)
-        super("\"#{name}\" must be a valid datetime. " +
-                "\"#{value}\" cannot be parsed as a datetime.", path)
+        super("[#{name}] Invalid date string: <#{value}>", path)
       end
     end
 
     class NegativeNumber < ValidationError
       def initialize(name, actual, path)
-        super("\"#{name}\" must be a positive number, but #{actual}.", path)
+        super("[#{name}] A positive number is expected, but <#{actual}>", path)
       end
     end
 
     class SmallerThanOne < ValidationError
       def initialize(name, actual, path)
-        super("\"#{name}\" must be 1 or larger number, but #{actual}.", path)
+        super("[#{name}] A number 1 or larger is expected, but <#{actual}>", path)
       end
     end
 
     class FarmNotZoned < ValidationError
       def initialize(name, zones, path)
-        super("The farm \"#{name}\" does not appear in zones: #{zones}", path)
+        super("The farm does not appear in zones: <#{name}>, zones=<#{zones}>", path)
       end
     end
 
     class UnknownFarmInZones < ValidationError
       def initialize(name, zones, path)
-        super("Unknown farm \"#{name}\" appears in zones: #{zones}", path)
+        super("The farm is unknown: <#{name}>, zones=<#{zones}>", path)
       end
     end
 
     class UnknownFarmForPartition < ValidationError
       def initialize(name, partition, path)
-        super("The partition #{partition} at \"#{name}\" seems to be bound to an unknown farm.", path)
+        super("The farm is unknown: <{#name}>, partition=<#{partition}>", path)
       end
     end
 
     class UnsupportedValue < ValidationError
       def initialize(name, value, path)
-        super("\"#{value}\" is not supported for \"#{name}\".", path)
+        super("[#{name}] Not supported value: <#{value}>", path)
       end
     end
   end
