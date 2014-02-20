@@ -37,17 +37,17 @@ module Droonga
 
     def process(message)
       $log.trace("#{log_tag}: process: start")
-      command = message["type"]
-      if @handler_runner.processable?(command)
-        $log.trace("#{log_tag}: process: handlable: #{command}")
-        synchronous = @handler_runner.prefer_synchronous?(command)
+      type = message["type"]
+      if @handler_runner.processable?(type)
+        $log.trace("#{log_tag}: process: handlable: #{type}")
+        synchronous = @handler_runner.prefer_synchronous?(type)
         if @n_workers.zero? or synchronous
           @handler_runner.process(message)
         else
           @message_pusher.push(message)
         end
       else
-        $log.trace("#{log_tag}: process: ignore #{command}")
+        $log.trace("#{log_tag}: process: ignore #{type}")
       end
       $log.trace("#{log_tag}: process: done")
     end

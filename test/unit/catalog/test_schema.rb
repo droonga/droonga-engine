@@ -24,12 +24,12 @@ class CatalogSchemaTest < Test::Unit::TestCase
   class SchemaTest < self
     def test_schema_not_specified
       assert_equal([],
-                   create_schema(nil).to_commands)
+                   create_schema(nil).to_messages)
     end
 
     def test_no_table
       assert_equal([],
-                   create_schema({}).to_commands)
+                   create_schema({}).to_messages)
     end
 
 =begin
@@ -68,7 +68,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
                          "flags"    => "TABLE_HASH_KEY"
                        }
                      }
-                     # TODO add column_create commands
+                     # TODO add column_create messages
                    ],
                    create_schema(
                      "Keyword" => {
@@ -128,7 +128,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
                          },
                        }
                      }
-                   ).to_commands)
+                   ).to_messages)
     end
 =end
 

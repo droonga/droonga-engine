@@ -219,11 +219,11 @@ module Droonga
         end
       end
 
-      def to_commands
-        commands = []
+      def to_messages
+        messages = []
 
         tables.each do |name, table|
-          commands << {
+          messages << {
             "type" => "table_create",
             "body" => table.to_table_create_body
           }
@@ -234,13 +234,13 @@ module Droonga
         # TODO handle TSort::Cyclic
 
         columns.each do |column|
-          commands << {
+          messages << {
             "type" => "column_create",
             "body" => column.to_column_create_body
           }
         end
 
-        commands
+        messages
       end
 
       def ==(other)

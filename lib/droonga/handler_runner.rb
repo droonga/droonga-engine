@@ -27,24 +27,16 @@ module Droonga
 
     class MissingMessageType < HandlerError
       def initialize(handler_classes, dataset_name)
-        message = nil
-        if handler_classes.size == 1
-          message = "The handler class #{handler_classes.first.inspect} for " +
-                      "the dataset \"#{dataset_name}\" has no message type. " +
-                      "You must specify \"message.type\" for the handler class."
-        else
-          message = "Handler classes #{handler_classes.inspect} for the " +
-                      "dataset \"#{dataset_name}\" have no message type. " +
-                      "You must specify \"message.type\" for handler classes."
-        end
+        message = "[#{dataset_name}] \"message.type\" is not specified for " +
+                    "handler class(es): <#{handler_classes.inspect}>"
         super(message)
       end
     end
 
     class ConflictForSameType < HandlerError
       def initialize(types, dataset_name)
-        message = "Conflicting handlers for same message type are detected " +
-                    "for the dataset \"#{dataset_name}\": #{types.inspect}"
+        message = "[#{dataset_name}] There are conflicting handlers for " +
+                    "same message type: <#{types.inspect}>"
         super(message)
       end
     end
@@ -75,24 +67,24 @@ module Droonga
       $log.trace("#{log_tag}: shutdown: done")
     end
 
-    def prefer_synchronous?(command)
-      find_handler_class(command).action.synchronous?
+    def prefer_synchronous?(type)
+      find_handler_class(type).action.synchronous?
     end
 
-    def processable?(command)
-      not find_handler_class(command).nil?
+    def processable?(type)
+      not find_handler_class(type).nil?
     end
 
     def process(message)
       $log.trace("#{log_tag}: process: start")
-      command = message["type"]
-      handler_class = find_handler_class(command)
+      type = message["type"]
+      handler_class = find_handler_class(type)
       if handler_class.nil?
-        $log.trace("#{log_tag}: process: done: no handler: <#{command}>")
+        $log.trace("#{log_tag}: process: done: no handler: <#{type}>")
         return
       end
-      process_command(handler_class, command, message)
-      $log.trace("#{log_tag}: process: done: <#{command}>",
+      process_type(handler_class, type, message)
+      $log.trace("#{log_tag}: process: done: <#{type}>",
                  :handler => handler_class)
     end
 
@@ -110,9 +102,9 @@ module Droonga
       @forwarder = Forwarder.new(@loop)
     end
 
-    def find_handler_class(command)
+    def find_handler_class(type)
       @handler_classes.find do |handler_class|
-        handler_class.message.type == command
+        handler_class.message.type == type
       end
     end
 
@@ -142,7 +134,7 @@ module Droonga
       end
     end
 
-    def process_command(handler_class, command, raw_message)
+    def process_type(handler_class, type, raw_message)
       handler_message = HandlerMessage.new(raw_message)
       handler_message.validate
 

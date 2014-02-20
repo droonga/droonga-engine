@@ -36,16 +36,16 @@ module Droonga
       @raw_message["body"] = body
     end
 
-    def command
+    def type
       @raw_message["type"]
     end
 
-    def command=(command)
-      original_command = @raw_message["type"]
-      return if original_command == command
+    def type=(type)
+      original_type = @raw_message["type"]
+      return if original_type == type
       @raw_message["originalTypes"] ||= []
-      @raw_message["originalTypes"] << original_command
-      @raw_message["type"] = command
+      @raw_message["originalTypes"] << original_type
+      @raw_message["type"] = type
     end
   end
 end

@@ -41,9 +41,9 @@ module Droonga
       end
     end
 
-    class UnknownCommand < ErrorMessages::BadRequest
-      def initialize(command, dataset)
-        super("[#{dataset}] Handler not found for the type: <#{command}>")
+    class UnknownType < ErrorMessages::BadRequest
+      def initialize(type, dataset)
+        super("[#{dataset}] Handler not found for the type: <#{type}>")
       end
     end
 
