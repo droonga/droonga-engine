@@ -22,9 +22,28 @@ require "droonga/handler"
 
 module Droonga
   class HandlerRunner
-    class ConflictForSameCommand < Error
+    class HandlerError < Error
+    end
+
+    class MissingMessageType < HandlerError
+      def initialize(handler_classes, dataset_name)
+        message = nil
+        if handler_classes.size == 1
+          message = "The handler class #{handler_classes.first.inspect} for " +
+                      "the dataset \"#{dataset_name}\" has no message type. " +
+                      "You must specify \"message.type\" for the handler class."
+        else
+          message = "Handler classes #{handler_classes.inspect} for the " +
+                      "dataset \"#{dataset_name}\" have no message type. " +
+                      "You must specify \"message.type\" for handler classes."
+        end
+        super(message)
+      end
+    end
+
+    class ConflictForSameType < HandlerError
       def initialize(types, dataset_name)
-        message = "Conflicting handlers for same command type are detected " +
+        message = "Conflicting handlers for same message type are detected " +
                     "for the dataset \"#{dataset_name}\": #{types.inspect}"
         super(message)
       end
@@ -86,7 +105,7 @@ module Droonga
       $log.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                    "#{@options[:plugins].join(", ")}")
       @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
-      validate_uniqueness
+      validate_handler_classes
       $log.debug("#{self.class.name}: activated:\n#{@handler_classes.join("\n")}")
       @forwarder = Forwarder.new(@loop)
     end
@@ -97,18 +116,29 @@ module Droonga
       end
     end
 
-    def validate_uniqueness
+    def validate_handler_classes
       types = {}
+      missing_type_handlers = []
+
       @handler_classes.each do |handler_class|
         type = handler_class.message.type
+        if type.nil? or type.empty?
+          missing_type_handlers << handler_class
+          next
+        end
         types[type] ||= []
         types[type] << handler_class
       end
+
+      if missing_type_handlers.size > 0
+        raise MissingMessageType.new(missing_type_handlers, @dataset_name)
+      end
+
       types.each do |type, handler_classes|
         types.delete(type) if handler_classes.size == 1
       end
       if types.size > 0
-        raise ConflictForSameCommand.new(types, @dataset_name)
+        raise ConflictForSameType.new(types, @dataset_name)
       end
     end
 
