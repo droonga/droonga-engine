@@ -19,7 +19,7 @@ module Droonga
 
     class UnknownPlugin < Error
       def initialize(name, klass)
-        super("Unknown plugin \"#{name}\" is specified for #{klass}.")
+        super("[#{klass}] Plugin not found: <#{name}>")
       end
     end
 

@@ -31,20 +31,19 @@ module Droonga
 
     class MissingDatasetParameter < ErrorMessages::BadRequest
       def initialize
-        super("\"dataset\" must be specified.")
+        super("Missing required parameter: <dataset>")
       end
     end
 
     class UnknownDataset < ErrorMessages::NotFound
       def initialize(dataset)
-        super("The dataset #{dataset.inspect} does not exist.")
+        super("Unknown dataset: <#{dataset}>")
       end
     end
 
     class UnknownCommand < ErrorMessages::BadRequest
       def initialize(command, dataset)
-        super("The command #{command.inspect} is not available " +
-                "for the dataset #{dataset.inspect}.")
+        super("[#{dataset}] Handler not found for the type: <#{command}>")
       end
     end
 

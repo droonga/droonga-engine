@@ -32,7 +32,7 @@ module Droonga
 
     class MissingSourceParameter < ErrorMessages::BadRequest
       def initialize(query, queries)
-        super("The query #{query.inspect} has no source. " +
+        super("[#{query}] No source is specified. " +
                 "Query must have a valid source.",
               queries)
       end
@@ -40,7 +40,7 @@ module Droonga
 
     class UnknownSource < ErrorMessages::NotFound
       def initialize(source, queries)
-        super("The source #{source.inspect} does not exist. " +
+        super("Source not found: <#{source}> " +
                 "It must be a name of an existing table or another query.",
               queries)
       end
