@@ -17,6 +17,19 @@ module Droonga
   module Plugin
     module Metadata
       class InputMessage
+        class NotStringMessageType < Error
+          def initialize(type)
+            super("You must specify a string as a message type. " +
+                    "#{type.inspect} is not a string.")
+          end
+        end
+
+        class BlankMessageType < Error
+          def initialize
+            super("You must specify a non-empty string as a message type.")
+          end
+        end
+
         def initialize(plugin_class)
           @plugin_class = plugin_class
         end
@@ -26,6 +39,8 @@ module Droonga
         end
 
         def type=(type)
+          raise NotStringMessageType.new(type) unless type.is_a?(String)
+          raise BlankMessageType.new if type.empty?
           configuration[:type] = type
         end
 
