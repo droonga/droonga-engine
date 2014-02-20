@@ -105,7 +105,7 @@ module Droonga
         types[type] << handler_class
       end
       types.each do |type, handler_classes|
-        types.delete(type) if handler_classes.size > 1
+        types.delete(type) if handler_classes.size == 1
       end
       if types.size > 0
         raise ConflictForSameCommand.new(types, @dataset_name)
