@@ -7,7 +7,7 @@
     "type": "search.result",
     "body": {
       "name": "MissingSourceParameter",
-      "message": "The query \"no-source\" has no source. Query must have a valid source.",
+      "message": "[no-source] No source is specified. Query must have a valid source.",
       "detail": {
         "no-source": {
         }

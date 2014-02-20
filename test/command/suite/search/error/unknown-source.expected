@@ -7,7 +7,7 @@
     "type": "search.result",
     "body": {
       "name": "UnknownSource",
-      "message": "The source \"unknown\" does not exist. It must be a name of an existing table or another query.",
+      "message": "Source not found: <unknown> It must be a name of an existing table or another query.",
       "detail": {
         "unknown-source": {
           "source": "unknown"
@@ -19,7 +19,7 @@
         "statusCode": 404,
         "body": {
           "name": "UnknownSource",
-          "message": "The source \"unknown\" does not exist. It must be a name of an existing table or another query.",
+          "message": "Source not found: <unknown> It must be a name of an existing table or another query.",
           "detail": {
             "unknown-source": {
               "source": "unknown"
@@ -31,7 +31,7 @@
         "statusCode": 404,
         "body": {
           "name": "UnknownSource",
-          "message": "The source \"unknown\" does not exist. It must be a name of an existing table or another query.",
+          "message": "Source not found: <unknown> It must be a name of an existing table or another query.",
           "detail": {
             "unknown-source": {
               "source": "unknown"
