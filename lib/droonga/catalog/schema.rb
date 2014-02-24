@@ -152,6 +152,7 @@ module Droonga
             "TABLE_PAT_KEY"
           when "DoubleArrayTrie"
             "TABLE_DAT_KEY"
+          # TODO default is Hash
           else
             # TODO raise appropriate error
           end
