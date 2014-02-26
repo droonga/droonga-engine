@@ -173,6 +173,14 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   }).key_type)
       end
 
+      def test_key_type_groonga
+        assert_equal("Int64",
+                     create_table("table_name",
+                                  {
+                                    "keyType" => "Integer"
+                                  }).key_type_groonga)
+      end
+
       def test_tokenizer
         assert_equal("TokenBigram",
                      create_table("table_name",

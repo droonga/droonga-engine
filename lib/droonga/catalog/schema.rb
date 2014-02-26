@@ -134,6 +134,17 @@ module Droonga
           @data["keyType"]
         end
 
+        def key_type_groonga
+          case key_type
+          when "Integer"
+            "Int64"
+          when "Float", "Time", "ShortText", "TokyoGeoPoint", "WGS84GeoPoint"
+            key_type
+          else
+            # TODO raise appropriate error
+          end
+        end
+
         def tokenizer
           @data["tokenizer"]
         end
@@ -164,7 +175,7 @@ module Droonga
         def to_table_create_body
           body = {
             "name"     => name,
-            "key_type" => key_type,
+            "key_type" => key_type_groonga,
             "flags"    => flags.join("|")
           }
 
