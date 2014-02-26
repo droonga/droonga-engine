@@ -19,10 +19,9 @@ class CatalogTestVersion2 < Test::Unit::TestCase
   class << self
     def minimum_data
       {
-        "effectiveDate" => "2013-09-01T00:00:00Z",
-        "zones" => [],
-        "farms" => {},
-        "datasets" => {},
+        "effectiveDate" => "2014-02-28T00:00:00Z",
+        "datasets" => {
+        },
       }
     end
   end
@@ -36,58 +35,35 @@ class CatalogTestVersion2 < Test::Unit::TestCase
     Droonga::Catalog::Version2.new(data, path)
   end
 
-  class OptionTest < self
-    def create_catalog(options)
-      super(minimum_data.merge("options" => options), "path")
-    end
-
-    def test_nonexistent
-      catalog = create_catalog({})
-      assert_nil(catalog.option("nonexistent"))
-    end
-
-    def test_existent
-      catalog = create_catalog("plugins" => ["crud", "groonga"])
-      assert_equal(["crud", "groonga"],
-                   catalog.option("plugins"))
-    end
-  end
-
-  class PartitionTest < self
+  class SliceTest < self
     def setup
       data = JSON.parse(File.read(catalog_path))
       @catalog = create_catalog(data, catalog_path)
     end
 
-    def test_get_partitions
-      partitions = @catalog.get_partitions("localhost:23003/test")
+    def test_slices
+      slices = @catalog.slices("localhost:23003/test")
       assert_equal({
                      "localhost:23003/test.000" => {
                        :database  => "#{base_path}/000/db",
                        :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
+                       :plugins   => ["plugin1", "plugin2", "plugin3"],
+                       :n_workers => 4,
                      },
                      "localhost:23003/test.001" => {
                        :database  => "#{base_path}/001/db",
                        :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
+                       :plugins   => ["plugin1", "plugin2", "plugin3"],
+                       :n_workers => 4,
                      },
                      "localhost:23003/test.002" => {
                        :database  => "#{base_path}/002/db",
                        :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
-                     },
-                     "localhost:23003/test.003" => {
-                       :database  => "#{base_path}/003/db",
-                       :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
+                       :plugins   => ["plugin1", "plugin2", "plugin3"],
+                       :n_workers => 4,
                      },
                    },
-                   partitions)
+                   slices)
     end
 
     def fixture_path(base_path)
@@ -104,34 +80,26 @@ class CatalogTestVersion2 < Test::Unit::TestCase
 
     class PluginsTest < self
       def setup
-        @data = minimum_data.merge({
-          "zones" => [farm_name],
-          "farms" => {
-            farm_name => {
-              "device" => ".",
-            },
-          },
+        custom_data = {
           "datasets" => {
             "Droonga" => {
-              "workers" => 1,
-              "number_of_partitions" => 1,
-              "number_of_replicas" => 1,
-              "date_range" => "infinity",
-              "partition_key" => "_key",
-              "plugins" => [],
-              "ring" => {
-                "localhost:23041" => {
-                  "weight" =>  50,
-                  "partitions" => {
-                    "2014-02-09" => [
-                      "#{farm_name}.000",
-                    ],
-                  },
+              "nWorkers" => 1,
+              "replicas" => [
+                {
+                  "slices" => [
+                    {
+                      "volume" => {
+                        "address" => "#{farm_name}.000",
+                      },
+                    },
+                  ],
                 },
-              },
+              ],
             },
           },
-        })
+
+        }
+        @data = minimum_data.merge(custom_data)
       end
 
       def farm_name
@@ -140,7 +108,7 @@ class CatalogTestVersion2 < Test::Unit::TestCase
 
       def plugins(data)
         catalog = create_catalog(data, catalog_path)
-        catalog.get_partitions(farm_name).collect do |partition, options|
+        catalog.slices(farm_name).collect do |volum_address, options|
           options[:plugins]
         end
       end
@@ -155,31 +123,31 @@ class CatalogTestVersion2 < Test::Unit::TestCase
   end
 
   class DataSetTest < self
-    class RingTest < self
+    class ReplicaTest < self
       class TotalWeightTest < self
-        def test_three_zones
-          dataset = {
-            "ring" => {
-              "zone1" => {
+        def test_three_slices
+          replica = {
+            "slices" => [
+              {
                 "weight" => 10,
               },
-              "zone2" => {
+              {
                 "weight" => 20,
               },
-              "zone3" => {
+              {
                 "weight" => 30,
               },
-            }
+            ],
           }
           assert_equal(10 + 20 + 30,
-                       total_weight(dataset))
+                       total_weight(replica))
         end
 
         private
-        def total_weight(dataset)
+        def total_weight(replica)
           catalog = create_catalog(minimum_data,
                                    "base-path")
-          catalog.send(:compute_total_weight, dataset)
+          catalog.send(:compute_total_weight, replica)
         end
       end
     end

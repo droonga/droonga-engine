@@ -16,6 +16,7 @@
 require "json"
 
 require "droonga/catalog/version1"
+require "droonga/catalog/version2"
 
 module Droonga
   class CatalogLoader
