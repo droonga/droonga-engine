@@ -110,6 +110,7 @@ module Droonga
             "name"  => name,
             "table" => table,
             "flags" => flags.join("|"),
+            "type"  => value_type_groonga
           }
           sources = index_options.sources
           if sources

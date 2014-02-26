@@ -280,7 +280,8 @@ class CatalogSchemaTest < Test::Unit::TestCase
         assert_equal({
                        "name" => "column_name",
                        "flags" => "COLUMN_SCALAR",
-                       "table" => "table_name"
+                       "table" => "table_name",
+                       "type" => "ShortText"
                      },
                      create_column("column_name",
                                   {
