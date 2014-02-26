@@ -18,6 +18,11 @@ require "droonga/catalog/base"
 module Droonga
   module Catalog
     class Version2 < Base
+      def initialize(data, path)
+        super
+        prepare_data
+      end
+
       def get_partitions(name)
         slices(name)
       end
