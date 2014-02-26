@@ -257,6 +257,14 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    }).value_type)
       end
 
+      def test_value_type_groonga
+        assert_equal("Int64",
+                     create_column("column_name",
+                                   {
+                                     "valueType" => "Integer"
+                                   }).value_type_groonga)
+      end
+
       def test_flags_with_column_index_options
         assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
                      create_column("column_name",

@@ -88,6 +88,23 @@ module Droonga
           @data["valueType"]
         end
 
+        def value_type_groonga
+          case value_type
+          when "Integer"
+            "Int64"
+          when "Bool",
+               "Float",
+               "Time",
+               "ShortText",
+               "Text",
+               "TokyoGeoPoint",
+               "WGS84GeoPoint"
+            value_type
+          else
+            # TODO raise appropriate error
+          end
+        end
+
         def to_column_create_body
           body = {
             "name"  => name,
@@ -213,7 +230,7 @@ module Droonga
 
         def tsort_each_child(column, &block)
           dependent_column_names = column.index_options.sources || []
-          reference_table = @tables[column.value_type]
+          reference_table = @tables[column.value_type_groonga]
           dependent_columns = dependent_column_names.collect do |column_name|
             reference_table.columns[column_name]
           end
