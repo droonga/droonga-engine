@@ -235,6 +235,12 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    }).type)
       end
 
+      def test_type_default
+        assert_equal("Scalar",
+                     create_column("column_name",
+                                   {}).type)
+      end
+
       def test_flags
         assert_equal(["COLUMN_SCALAR"],
                      create_column("column_name",

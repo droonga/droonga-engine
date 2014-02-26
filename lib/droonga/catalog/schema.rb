@@ -64,7 +64,7 @@ module Droonga
         end
 
         def type
-          @data["type"]
+          @data["type"] || "Scalar"
         end
 
         def type_flag
