@@ -89,19 +89,10 @@ module Droonga
         end
 
         def value_type_groonga
-          case value_type
-          when "Integer"
+          if value_type == "Integer"
             "Int64"
-          when "Bool",
-               "Float",
-               "Time",
-               "ShortText",
-               "Text",
-               "TokyoGeoPoint",
-               "WGS84GeoPoint"
-            value_type
           else
-            # TODO raise appropriate error
+            value_type
           end
         end
 
