@@ -29,19 +29,35 @@ Packnga::DocumentTask.new(spec) do |task|
   task.translate_languages = ["ja"]
 end
 
+def run_command_test(*options)
+  ruby(File.join(File.dirname(__FILE__), "test", "command", "run-test.rb",),
+       *options)
+end
+
 namespace :test do
   desc "Run unit test"
   task :unit do
     ruby(File.join(File.dirname(__FILE__), "test", "unit", "run-test.rb"))
   end
 
-  desc "Run command test"
-  task :command do
-    ruby(File.join(File.dirname(__FILE__), "test", "command", "run-test.rb"))
+  namespace :command do
+    desc "Run command test: default"
+    task :default do
+      run_command_test
+    end
+
+    desc "Run command test: version1"
+    task :version1 do
+      run_command_test("--config", "version1")
+    end
   end
 end
 
 desc "Run test"
-task :test => ["test:unit", "test:command"]
+task :test => [
+  "test:unit",
+  "test:command:default",
+  "test:command:version1",
+]
 
 task :default => :test
