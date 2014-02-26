@@ -107,7 +107,7 @@ module Droonga
             converter = RequestConverter.new
             select_request = input_message.body
             search_request = converter.convert(select_request)
-            input_message.command = "search"
+            input_message.type = "search"
             input_message.body = search_request
           end
 
