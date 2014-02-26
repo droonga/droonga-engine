@@ -36,23 +36,6 @@ class CatalogTestVersion1 < Test::Unit::TestCase
     Droonga::Catalog::Version1.new(data, path)
   end
 
-  class OptionTest < self
-    def create_catalog(options)
-      super(minimum_data.merge("options" => options), "path")
-    end
-
-    def test_nonexistent
-      catalog = create_catalog({})
-      assert_nil(catalog.option("nonexistent"))
-    end
-
-    def test_existent
-      catalog = create_catalog("plugins" => ["crud", "groonga"])
-      assert_equal(["crud", "groonga"],
-                   catalog.option("plugins"))
-    end
-  end
-
   class PartitionTest < self
     def setup
       data = JSON.parse(File.read(catalog_path))
