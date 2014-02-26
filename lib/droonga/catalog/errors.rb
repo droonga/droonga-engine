@@ -80,8 +80,8 @@ module Droonga
     end
 
     class UnknownFarmForPartition < ValidationError
-      def initialize(name, partition, path)
-        super("The farm is unknown: <{#name}>, partition=<#{partition}>", path)
+      def initialize(name, slice, path)
+        super("The farm is unknown: <{#name}>, slice=<#{slice}>", path)
       end
     end
 

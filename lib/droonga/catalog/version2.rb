@@ -23,10 +23,6 @@ module Droonga
         prepare_data
       end
 
-      def get_partitions(name)
-        slices(name)
-      end
-
       def slices(name)
         device = "."
         pattern = Regexp.new("^#{name}\.")
@@ -88,10 +84,10 @@ module Droonga
             total_weight = compute_total_weight(replica)
             continuum = []
             slices = replica["slices"]
-            n_partitions = slices.size
+            n_slices = slices.size
             slices.each do |slice|
               weight = slice["weight"] || default_weight
-              points = n_partitions * 160 * weight / total_weight
+              points = n_slices * 160 * weight / total_weight
               points.times do |point|
                 hash = Digest::SHA1.hexdigest("#{name}:#{point}")
                 continuum << [hash[0..7].to_i(16), slice]

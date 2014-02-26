@@ -24,7 +24,7 @@ require "droonga/message_pusher"
 require "droonga/processor"
 
 module Droonga
-  class Partition
+  class Slice
     def initialize(loop, options={})
       @options = options
       @n_workers = @options[:n_workers] || 0
@@ -43,17 +43,17 @@ module Droonga
     end
 
     def shutdown
-      $log.trace("partition: shutdown: start")
+      $log.trace("slice: shutdown: start")
       shutdown_supervisor if @supervisor
       @message_pusher.shutdown
       @processor.shutdown
-      $log.trace("partition: shutdown: done")
+      $log.trace("slice: shutdown: done")
     end
 
     def process(message)
-      $log.trace("partition: process: start")
+      $log.trace("slice: process: start")
       @processor.process(message)
-      $log.trace("partition: process: done")
+      $log.trace("slice: process: done")
     end
 
     private

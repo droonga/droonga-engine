@@ -191,7 +191,7 @@ module Droonga
 
     def process_local_message(local_message)
       task = local_message["task"]
-      partition_name = task["route"]
+      slice_name = task["route"]
       step = task["step"]
       command = step["command"]
       descendants = {}
@@ -203,7 +203,7 @@ module Droonga
       local_message["descendants"] = descendants
       farm_message = @message.merge("body" => local_message,
                                     "type" => command)
-      @farm.process(partition_name, farm_message)
+      @farm.process(slice_name, farm_message)
     end
 
     def local?(route)

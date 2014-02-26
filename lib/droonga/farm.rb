@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/partition"
+require "droonga/slice"
 
 module Droonga
   class Farm
@@ -24,29 +24,29 @@ module Droonga
       @catalog = catalog
       @loop = loop
       @options = options
-      @partitions = {}
-      partitions = @catalog.get_partitions(name)
-      partitions.each do |partition_name, partition_options|
-        partition = Droonga::Partition.new(@loop,
-                                           @options.merge(partition_options))
-        @partitions[partition_name] = partition
+      @slices = {}
+      slices = @catalog.slices(name)
+      slices.each do |slice_name, slice_options|
+        slice = Droonga::Slice.new(@loop,
+                                   @options.merge(slice_options))
+        @slices[slice_name] = slice
       end
     end
 
     def start
-      @partitions.each_value do |partition|
-        partition.start
+      @slices.each_value do |slice|
+        slice.start
       end
     end
 
     def shutdown
-      @partitions.each_value do |partition|
-        partition.shutdown
+      @slices.each_value do |slice|
+        slice.shutdown
       end
     end
 
-    def process(partition_name, message)
-      @partitions[partition_name].process(message)
+    def process(slice_name, message)
+      @slices[slice_name].process(message)
     end
   end
 end

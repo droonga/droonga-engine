@@ -28,6 +28,10 @@ module Droonga
         prepare_data
       end
 
+      def slices(name)
+        get_partitions(name)
+      end
+
       def get_partitions(name)
         device = @data["farms"][name]["device"]
         pattern = Regexp.new("^#{name}\.")
