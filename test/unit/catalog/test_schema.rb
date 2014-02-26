@@ -278,10 +278,10 @@ class CatalogSchemaTest < Test::Unit::TestCase
 
       def test_to_column_create_body
         assert_equal({
-                       "name" => "column_name",
+                       "name"  => "column_name",
                        "flags" => "COLUMN_SCALAR",
                        "table" => "table_name",
-                       "type" => "ShortText"
+                       "type"  => "ShortText"
                      },
                      create_column("column_name",
                                   {
