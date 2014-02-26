@@ -32,21 +32,7 @@ module Droonga
         validate
         raise MultiplexError.new(@errors) unless @errors.empty?
 
-        @data["datasets"].each do |name, dataset|
-          number_of_partitions = dataset["number_of_partitions"]
-          next if number_of_partitions < 2
-          total_weight = compute_total_weight(dataset)
-          continuum = []
-          dataset["ring"].each do |key, value|
-            points = number_of_partitions * 160 * value["weight"] / total_weight
-            points.times do |point|
-              hash = Digest::SHA1.hexdigest("#{key}:#{point}")
-              continuum << [hash[0..7].to_i(16), key]
-            end
-          end
-          dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
-        end
-        @options = @data["options"] || {}
+        prepare_data
       end
 
       def option(name)
@@ -143,6 +129,24 @@ module Droonga
       end
 
       private
+      def prepare_data
+        @data["datasets"].each do |name, dataset|
+          number_of_partitions = dataset["number_of_partitions"]
+          next if number_of_partitions < 2
+          total_weight = compute_total_weight(dataset)
+          continuum = []
+          dataset["ring"].each do |key, value|
+            points = number_of_partitions * 160 * value["weight"] / total_weight
+            points.times do |point|
+              hash = Digest::SHA1.hexdigest("#{key}:#{point}")
+              continuum << [hash[0..7].to_i(16), key]
+            end
+          end
+          dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
+        end
+        @options = @data["options"] || {}
+      end
+
       def compute_total_weight(dataset)
         dataset["ring"].reduce(0) do |result, zone|
           result + zone[1]["weight"]
