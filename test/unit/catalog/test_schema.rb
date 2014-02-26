@@ -143,6 +143,12 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   {}).name)
       end
 
+      def test_type_default
+        assert_equal("Hash",
+                     create_table("table_name",
+                                  {}).type)
+      end
+
       def test_type
         assert_equal("Hash",
                      create_table("table_name",

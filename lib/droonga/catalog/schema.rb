@@ -127,7 +127,7 @@ module Droonga
         end
 
         def type
-          @data["type"]
+          @data["type"] || "Hash"
         end
 
         def key_type
@@ -152,7 +152,6 @@ module Droonga
             "TABLE_PAT_KEY"
           when "DoubleArrayTrie"
             "TABLE_DAT_KEY"
-          # TODO default is Hash
           else
             # TODO raise appropriate error
           end
