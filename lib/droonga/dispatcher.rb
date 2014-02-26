@@ -235,8 +235,7 @@ module Droonga
       distributor.distribute(plan)
     rescue Droonga::UnsupportedMessageError => error
       target_message = error.message
-      raise UnknownCommand.new(target_message["type"],
-                               target_message["dataset"])
+      raise UnknownType.new(target_message["type"], target_message["dataset"])
     end
 
     def assert_valid_message(message)
