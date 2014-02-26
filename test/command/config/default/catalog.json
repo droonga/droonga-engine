@@ -3,7 +3,7 @@
   "effectiveDate": "2014-02-28T00:00:00Z",
   "datasets": {
     "Droonga": {
-      "nWorkers": 3,
+      "nWorkers": 4,
       "plugins": ["groonga", "crud", "search"],
       "replicas": [
         {
@@ -63,7 +63,7 @@
       ]
     },
     "Watch": {
-      "nWorkers": 3,
+      "nWorkers": 4,
       "plugins": ["groonga", "watch", "search", "crud"],
       "replicas": [
         {
