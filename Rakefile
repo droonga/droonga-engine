@@ -1,6 +1,6 @@
 # -*- ruby -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -60,4 +60,5 @@ task :test => [
   "test:command:version1",
 ]
 
-task :default => :test
+test_task = ENV["DEFAULT_TEST_TASK"] || "test"
+task :default => test_task
