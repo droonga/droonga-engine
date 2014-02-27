@@ -31,5 +31,16 @@ class CatalogDatasetTest < Test::Unit::TestCase
                                  )["nWorkers"]
                   )
     end
+
+    def test_schema
+      assert_equal(Droonga::Catalog::Schema.new("dataset_name", {}),
+                   create_dataset("dataset_name",
+                                  {
+                                    "schema" => {
+                                    }
+                                  }
+                                 ).schema
+                  )
+    end
   end
 end

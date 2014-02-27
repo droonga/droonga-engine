@@ -19,6 +19,7 @@ module Droonga
       def initialize(name, data)
         @name = name
         @data = data
+        @schema = nil
       end
 
       # provided for compatibility
@@ -29,6 +30,10 @@ module Droonga
       # provided for compatibility
       def []=(key, value)
         @data[key] = value
+      end
+
+      def schema
+        @schema ||= Droonga::Catalog::Schema.new(@name, @data["schema"])
       end
     end
   end
