@@ -17,25 +17,26 @@ require "droonga/catalog/schema"
 
 class CatalogSchemaTest < Test::Unit::TestCase
   private
-  def create_schema(data)
-    Droonga::Catalog::Schema.new(data)
+  def create_schema(dataset_name, data)
+    Droonga::Catalog::Schema.new(dataset_name, data)
   end
 
   class SchemaTest < self
     def test_schema_not_specified
       assert_equal([],
-                   create_schema(nil).to_messages)
+                   create_schema("dataset_name", nil).to_messages)
     end
 
     def test_no_table
       assert_equal([],
-                   create_schema({}).to_messages)
+                   create_schema("dataset_name", {}).to_messages)
     end
 
     def test_key_index
       assert_equal([
                      {
                        "type" => "table_create",
+                       "dataset" => "dataset_name",
                        "body" => {
                          "name"       => "Term",
                          "key_type"   => "ShortText",
@@ -45,6 +46,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
                      },
                      {
                        "type" => "table_create",
+                       "dataset" => "dataset_name",
                        "body" => {
                          "name"       => "Store",
                          "key_type"   => "ShortText",
@@ -53,6 +55,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
                      },
                      {
                        "type" => "column_create",
+                       "dataset" => "dataset_name",
                        "body" => {
                          "name"       => "stores__key",
                          "table"      => "Term",
@@ -63,6 +66,7 @@ class CatalogSchemaTest < Test::Unit::TestCase
                      }
                    ],
                    create_schema(
+                     "dataset_name",
                      "Term" => {
                        "type"       => "PatriciaTrie",
                        "keyType"    => "ShortText",

@@ -279,10 +279,9 @@ module Droonga
 
     def ensure_schema
       @catalog.datasets.each do |name, dataset|
-        schema = Droonga::Catalog::Schema.new(dataset["schema"])
+        schema = Droonga::Catalog::Schema.new(name, dataset["schema"])
         messages = schema.to_messages
         messages.each do |message|
-          message["dataset"] = name
           process_message(message)
         end
       end

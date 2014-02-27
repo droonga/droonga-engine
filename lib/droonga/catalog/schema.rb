@@ -233,7 +233,8 @@ module Droonga
       end
 
       attr_reader :tables
-      def initialize(data)
+      def initialize(dataset_name, data)
+        @dataset_name = dataset_name
         @data = data || []
         @tables = {}
         @data.each do |table_name, table_data|
@@ -247,6 +248,7 @@ module Droonga
         tables.each do |name, table|
           messages << {
             "type" => "table_create",
+            "dataset" => @dataset_name,
             "body" => table.to_table_create_body
           }
         end
@@ -258,6 +260,7 @@ module Droonga
         columns.each do |column|
           messages << {
             "type" => "column_create",
+            "dataset" => @dataset_name,
             "body" => column.to_column_create_body
           }
         end
