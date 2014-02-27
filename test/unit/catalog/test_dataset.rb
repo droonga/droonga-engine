@@ -23,24 +23,21 @@ class CatalogDatasetTest < Test::Unit::TestCase
 
   class DatasetTest < self
     def test_value
-      assert_equal(2,
-                   create_dataset("dataset_name",
-                                  {
-                                    "nWorkers" => 2
-                                  }
-                                 )["nWorkers"]
-                  )
+      data = {
+        "nWorkers" => 2
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_equal(2, dataset["nWorkers"])
     end
 
     def test_schema
+      data = {
+        "schema" => {
+        }
+      }
+      dataset = create_dataset("dataset_name", data)
       assert_equal(Droonga::Catalog::Schema.new("dataset_name", {}),
-                   create_dataset("dataset_name",
-                                  {
-                                    "schema" => {
-                                    }
-                                  }
-                                 ).schema
-                  )
+                   dataset.schema)
     end
   end
 end
