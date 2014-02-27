@@ -24,12 +24,12 @@
           "slices": [
             {
               "volume": {
-                "address": "localhost:23003/droonga.002"
+                "address": "localhost:23003/droonga.010"
               }
             },
             {
               "volume": {
-                "address": "localhost:23003/droonga.003"
+                "address": "localhost:23003/droonga.011"
               }
             }
           ]
