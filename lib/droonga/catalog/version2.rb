@@ -72,10 +72,6 @@ module Droonga
         routes
       end
 
-      def get_datasets
-        @data["datasets"]
-      end
-
       private
       def validate
         # TODO: Implement me.
