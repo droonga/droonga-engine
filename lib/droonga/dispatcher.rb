@@ -24,6 +24,7 @@ require "droonga/session"
 require "droonga/replier"
 require "droonga/error_messages"
 require "droonga/distributor"
+require "droonga/catalog/schema"
 
 module Droonga
   class Dispatcher
@@ -69,6 +70,8 @@ module Droonga
       @loop_thread = Thread.new do
         @loop.run
       end
+
+      ensure_schema
     end
 
     def shutdown
@@ -271,6 +274,17 @@ module Droonga
     def create_collector_runners
       create_runners do |configuration|
         CollectorRunner.new(configuration["plugins"] || [])
+      end
+    end
+
+    def ensure_schema
+      @catalog.datasets.each do |name, dataset|
+        schema = Droonga::Catalog::Schema.new(dataset["schema"])
+        messages = schema.to_messages
+        messages.each do |message|
+          message["dataset"] = name
+          process_message(message)
+        end
       end
     end
 
