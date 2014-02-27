@@ -22,8 +22,7 @@
           "partitions": {
             "2013-09-01": [
               "localhost:23003/droonga.000",
-              "localhost:23003/droonga.001",
-              "localhost:23003/droonga.002"
+              "localhost:23003/droonga.001"
             ]
           }
         },
@@ -32,8 +31,16 @@
           "partitions": {
             "2013-09-01": [
               "localhost:23003/droonga.010",
-              "localhost:23003/droonga.011",
-              "localhost:23003/droonga.012"
+              "localhost:23003/droonga.011"
+            ]
+          }
+        },
+        "localhost:23043": {
+          "weight": 50,
+          "partitions": {
+            "2013-09-01": [
+              "localhost:23003/droonga.020",
+              "localhost:23003/droonga.021"
             ]
           }
         }
