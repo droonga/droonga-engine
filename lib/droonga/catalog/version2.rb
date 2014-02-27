@@ -24,12 +24,15 @@ module Droonga
         prepare_data
       end
 
+      def datasets
+        @datasets
+      end
+
       def slices(name)
         device = "."
         pattern = Regexp.new("^#{name}\.")
         results = {}
-        @data["datasets"].each do |dataset_name, dataset_data|
-          dataset = Dataset.new(dataset_name, dataset_data)
+        @datasets.each do |dataset_name, dataset|
           n_workers = dataset["nWorkers"]
           plugins = dataset["plugins"]
           dataset["replicas"].each do |replica|
@@ -80,6 +83,7 @@ module Droonga
       end
 
       def prepare_data
+        @datasets = {}
         @data["datasets"].each do |name, dataset|
           replicas = dataset["replicas"]
           replicas.each do |replica|
@@ -99,6 +103,7 @@ module Droonga
               a[0] - b[0]
             end
           end
+          @datasets[name] = Dataset.new(name, dataset)
         end
       end
 

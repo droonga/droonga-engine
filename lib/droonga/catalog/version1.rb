@@ -29,6 +29,10 @@ module Droonga
         prepare_data
       end
 
+      def datasets
+        @datasets
+      end
+
       def slices(name)
         get_partitions(name)
       end
@@ -113,6 +117,7 @@ module Droonga
 
       private
       def prepare_data
+        @datasets = {}
         @data["datasets"].each do |name, dataset|
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
@@ -126,6 +131,7 @@ module Droonga
             end
           end
           dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
+          @datasets[name] = Dataset.new(name, dataset)
         end
         @options = @data["options"] || {}
       end
@@ -387,7 +393,7 @@ module Droonga
         end
         valid_farms_matcher = Regexp.new("^(#{farm_names.join("|")})\.")
 
-        datasets.each do |dataset_name, dataset|
+        @data["datasets"].each do |dataset_name, dataset|
           ring = dataset["ring"]
           next if ring.nil? or !ring.is_a?(Hash)
           ring.each do |ring_key, part|

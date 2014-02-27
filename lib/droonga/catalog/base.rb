@@ -29,10 +29,6 @@ module Droonga
         @base_path = File.dirname(path)
       end
 
-      def datasets
-        @data["datasets"] || {}
-      end
-
       def have_dataset?(name)
         datasets.key?(name)
       end
