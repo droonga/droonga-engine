@@ -222,7 +222,7 @@ module Droonga
 
         def tsort_each_child(column, &block)
           dependent_column_names = column.index_options.sources || []
-          dependent_column_names = dependent_column_names - ["_key"] # _key always exists after the table created
+          dependent_column_names -= ["_key"] # _key always exists after the table created
           reference_table = @tables[column.value_type_groonga]
           # TODO when _key specified, check to ensure reference_table is not Array
           dependent_columns = dependent_column_names.collect do |column_name|
