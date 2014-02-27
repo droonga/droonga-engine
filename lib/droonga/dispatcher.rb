@@ -24,7 +24,6 @@ require "droonga/session"
 require "droonga/replier"
 require "droonga/error_messages"
 require "droonga/distributor"
-require "droonga/catalog/schema"
 
 module Droonga
   class Dispatcher
@@ -279,7 +278,7 @@ module Droonga
 
     def ensure_schema
       @catalog.datasets.each do |name, dataset|
-        schema = Droonga::Catalog::Schema.new(name, dataset["schema"])
+        schema = dataset.schema
         messages = schema.to_messages
         messages.each do |message|
           process_message(message)
