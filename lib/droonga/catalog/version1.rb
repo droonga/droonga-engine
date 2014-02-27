@@ -14,6 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/catalog/base"
+require "droonga/catalog/dataset"
 
 module Droonga
   module Catalog
@@ -36,7 +37,8 @@ module Droonga
         device = @data["farms"][name]["device"]
         pattern = Regexp.new("^#{name}\.")
         results = {}
-        @data["datasets"].each do |dataset_name, dataset|
+        @data["datasets"].each do |dataset_name, dataset_data|
+          dataset = Dataset.new(dataset_name, dataset_data)
           workers = dataset["workers"]
           plugins = dataset["plugins"]
           dataset["ring"].each do |key, part|
