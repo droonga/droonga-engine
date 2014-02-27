@@ -58,6 +58,7 @@ module Droonga
 
     private
     def ensure_database
+      enforce_umask
       database_path = @options[:database]
       return if File.exist?(database_path)
       FileUtils.mkdir_p(File.dirname(database_path))
@@ -68,6 +69,10 @@ module Droonga
       ensure
         context.close
       end
+    end
+
+    def enforce_umask
+      File.umask(022)
     end
 
     def start_supervisor
