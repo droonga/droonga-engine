@@ -13,49 +13,48 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/message_matcher"
-require "droonga/planner"
+require "droonga/plugin"
+require "droonga/single_step"
 
 module Droonga
-  class PlannerRunner
-    def initialize(dispatcher, plugins)
-      @dispatcher = dispatcher
-      @planner_classes = Planner.find_sub_classes(plugins)
+  class StepRunner
+    def initialize(plugins)
+      @definitions = {}
+      plugins.each do |name|
+        plugin = Plugin.registry[name]
+        plugin.single_step_definitions.each do |definition|
+          @definitions[definition.name] = definition
+        end
+      end
     end
 
     def shutdown
     end
 
     def plan(message)
+      type = message["type"]
       $log.trace("#{log_tag}: plan: start",
                  :dataset => message["dataset"],
-                 :type => message["type"])
-      planner_class = find_planner_class(message)
-      if planner_class.nil?
+                 :type => type)
+      definition = find(type)
+      if definition.nil?
         raise UnsupportedMessageError.new(:planner, message)
       end
-      planner = planner_class.new(@dispatcher)
-      plan = planner.plan(message)
+      step = SingleStep.new(definition)
+      plan = step.plan(message)
       $log.trace("#{log_tag}: plan: done",
-                 :steps => plan.collect {|step| step["type"]})
+                 :dataset => message["dataset"],
+                 :type => type)
       plan
     end
 
-    private
-    def find_planner_class(message)
-      @planner_classes.find do |planner_class|
-        pattern = planner_class.message.pattern
-        if pattern
-          matcher = MessageMatcher.new(pattern)
-          matcher.match?(message)
-        else
-          false
-        end
-      end
+    def find(type)
+      @definitions[type]
     end
 
+    private
     def log_tag
-      "planner-runner"
+      "step-runner"
     end
   end
 end

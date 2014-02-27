@@ -14,22 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  module Plugins
-    module Groonga
-      class SchemaPlaner < Droonga::Planner
-        schema_commands = [
-          "table_create",
-          "table_remove",
-          "column_create",
-        ]
-        message.pattern = ["type", :in, schema_commands]
-
-        def plan(message)
-          broadcast(message,
-                    :write => true,
-                    :reduce => {
-                      "result" => "or"
-                    })
+  module Collectors
+    class And
+      class << self
+        def operator
+          "and"
         end
       end
     end

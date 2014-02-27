@@ -14,24 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  module Plugin
-    module Metadata
-      class PlannerMessage
-        def initialize(plugin_class)
-          @plugin_class = plugin_class
-        end
-
-        def pattern
-          configuration[:pattern]
-        end
-
-        def pattern=(pattern)
-          configuration[:pattern] = pattern
-        end
-
-        private
-        def configuration
-          @plugin_class.options[:message] ||= {}
+  module Collectors
+    class Add
+      class << self
+        def operator
+          "or"
         end
       end
     end

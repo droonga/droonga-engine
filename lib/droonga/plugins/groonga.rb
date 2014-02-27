@@ -14,17 +14,19 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin"
+
+module Droonga
+  module Plugins
+    module Groonga
+      extend Plugin
+      register("groonga")
+    end
+  end
+end
+
 require "droonga/plugins/groonga/generic_response"
-require "droonga/plugins/groonga/schema_planer"
 require "droonga/plugins/groonga/select"
 require "droonga/plugins/groonga/table_create"
 require "droonga/plugins/groonga/table_remove"
 require "droonga/plugins/groonga/column_create"
 
-module Droonga
-  module Plugins
-    module Groonga
-      Plugin.registry.register("groonga", self)
-    end
-  end
-end

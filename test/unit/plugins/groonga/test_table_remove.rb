@@ -16,7 +16,8 @@
 class TableRemoveTest < GroongaHandlerTest
   def create_handler
     Droonga::Plugins::Groonga::TableRemove::Handler.new("droonga",
-                                                        @handler.context)
+                                                        @handler.context,
+                                                        @messenger)
   end
 
   def setup
@@ -27,8 +28,7 @@ class TableRemoveTest < GroongaHandlerTest
   end
 
   def test_success
-    process(:table_remove, {"name" => "Books"})
-    response = @messenger.values.last
+    response = process(:table_remove, {"name" => "Books"})
     assert_valid_output(response)
     response = response["result"]
     assert_equal(
@@ -40,8 +40,7 @@ class TableRemoveTest < GroongaHandlerTest
   end
 
   def test_failure
-    process(:table_remove, {})
-    response = @messenger.values.last
+    response = process(:table_remove, {})
     assert_valid_output(response)
     response = response["result"]
     assert_equal(

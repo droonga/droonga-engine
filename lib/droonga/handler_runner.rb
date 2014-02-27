@@ -18,29 +18,10 @@ require "groonga"
 require "droonga/forwarder"
 require "droonga/handler_message"
 require "droonga/handler_messenger"
-require "droonga/handler"
+require "droonga/step_runner"
 
 module Droonga
   class HandlerRunner
-    class HandlerError < Error
-    end
-
-    class MissingMessageType < HandlerError
-      def initialize(handler_classes, dataset_name)
-        message = "[#{dataset_name}] \"message.type\" is not specified for " +
-                    "handler class(es): <#{handler_classes.inspect}>"
-        super(message)
-      end
-    end
-
-    class ConflictForSameType < HandlerError
-      def initialize(types, dataset_name)
-        message = "[#{dataset_name}] There are conflicting handlers for " +
-                    "same message type: <#{types.inspect}>"
-        super(message)
-      end
-    end
-
     def initialize(loop, options={})
       @loop = loop
       @options = options
@@ -96,42 +77,14 @@ module Droonga
       end
       $log.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                    "#{@options[:plugins].join(", ")}")
-      @handler_classes = Handler.find_sub_classes(@options[:plugins] || [])
-      validate_handler_classes
-      $log.debug("#{self.class.name}: activated:\n#{@handler_classes.join("\n")}")
+      @step_runner = StepRunner.new(@options[:plugins] || [])
       @forwarder = Forwarder.new(@loop)
     end
 
     def find_handler_class(type)
-      @handler_classes.find do |handler_class|
-        handler_class.message.type == type
-      end
-    end
-
-    def validate_handler_classes
-      types = {}
-      missing_type_handlers = []
-
-      @handler_classes.each do |handler_class|
-        type = handler_class.message.type
-        if type.nil? or type.empty?
-          missing_type_handlers << handler_class
-          next
-        end
-        types[type] ||= []
-        types[type] << handler_class
-      end
-
-      if missing_type_handlers.size > 0
-        raise MissingMessageType.new(missing_type_handlers, @dataset_name)
-      end
-
-      types.each do |type, handler_classes|
-        types.delete(type) if handler_classes.size == 1
-      end
-      if types.size > 0
-        raise ConflictForSameType.new(types, @dataset_name)
-      end
+      step_definition = @step_runner.find(type)
+      return nil if step_definition.nil?
+      step_definition.handler_class
     end
 
     def process_type(handler_class, type, raw_message)
@@ -139,9 +92,10 @@ module Droonga
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      handler = handler_class.new(@name, @context)
+      handler = handler_class.new(@name, @context, messenger)
       begin
-        handler.handle(handler_message, messenger)
+        result = handler.handle(handler_message)
+        messenger.emit(result) unless result.nil?
       rescue ErrorMessage => error
         messenger.error(error.status_code, error.response_body)
       end

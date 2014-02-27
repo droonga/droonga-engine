@@ -19,7 +19,7 @@ class SearchPlannerTest < Test::Unit::TestCase
   def setup
     setup_database
     @planner = Droonga::Test::StubPlanner.new
-    @plugin = Droonga::Plugins::Search::Planner.new(@planner)
+    @plugin = Droonga::Plugins::Search::Planner.new
   end
 
   def teardown

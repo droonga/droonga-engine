@@ -37,8 +37,10 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
 
   def setup_handler
     @worker = StubWorker.new
-    @handler = Droonga::Plugins::CRUD::Handler.new("name", @worker.context)
     @messenger = Droonga::Test::StubHandlerMessenger.new
+    @handler = Droonga::Plugins::CRUD::Handler.new("name",
+                                                   @worker.context,
+                                                   @messenger)
   end
 
   def teardown_handler
@@ -47,7 +49,7 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
 
   def process(request)
     message = Droonga::Test::StubHandlerMessage.new(request)
-    @handler.handle(message, @messenger)
+    @handler.handle(message)
   end
 
   public
@@ -70,8 +72,8 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {},
       }
-      process(request)
-      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
+      response = process(request)
+      assert_equal(SUCCESS_RESPONSE_BODY, response)
       table = @worker.context["Users"]
       assert_equal(["mori"], table.collect(&:key))
     end
@@ -82,8 +84,8 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
         "key"    => "mori",
         "values" => {"country" => "japan"},
       }
-      process(request)
-      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
+      response = process(request)
+      assert_equal(SUCCESS_RESPONSE_BODY, response)
       table = @worker.context["Users"]
       assert_equal(["japan"], table.collect(&:country))
     end
@@ -147,8 +149,8 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {},
       }
-      process(request)
-      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
+      response = process(request)
+      assert_equal(SUCCESS_RESPONSE_BODY, response)
       table = @worker.context["Books"]
       assert_equal([nil], table.collect(&:title))
     end
@@ -158,8 +160,8 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
         "table"  => "Books",
         "values" => {"title" => "CSS"},
       }
-      process(request)
-      assert_equal([SUCCESS_RESPONSE_BODY], @messenger.values)
+      response = process(request)
+      assert_equal(SUCCESS_RESPONSE_BODY, response)
       table = @worker.context["Books"]
       assert_equal(["CSS"], table.collect(&:title))
     end

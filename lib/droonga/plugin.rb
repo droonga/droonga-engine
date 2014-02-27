@@ -14,9 +14,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/plugin_registry"
+require "droonga/single_step_definition"
 require "droonga/adapter"
 require "droonga/planner"
 require "droonga/handler"
+require "droonga/collectors"
 
 module Droonga
   module Plugin
@@ -24,6 +26,18 @@ module Droonga
       def registry
         @@registry ||= PluginRegistry.new
       end
+    end
+
+    def register(name)
+      Plugin.registry.register(name, self)
+    end
+
+    def define_single_step(&block)
+      single_step_definitions << SingleStepDefinition.new(self, &block)
+    end
+
+    def single_step_definitions
+      @single_step_definitions ||= []
     end
   end
 end

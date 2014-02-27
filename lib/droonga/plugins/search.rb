@@ -20,11 +20,10 @@ require "droonga/plugins/search/distributed_search_planner"
 module Droonga
   module Plugins
     module Search
-      Plugin.registry.register("search", self)
+      extend Plugin
+      register("search")
 
       class Planner < Droonga::Planner
-        message.pattern = ["type", :equal, "search"]
-
         def plan(message)
           planner = DistributedSearchPlanner.new(message)
           planner.plan
@@ -32,9 +31,7 @@ module Droonga
       end
 
       class Handler < Droonga::Handler
-        message.type = "search"
-
-        def handle(message, messenger)
+        def handle(message)
           searcher = Droonga::Searcher.new(@context)
           values = {}
           request = message.request
@@ -42,7 +39,7 @@ module Droonga
           searcher.search(request["queries"]).each do |output, value|
             values[output] = value
           end
-          messenger.emit(values)
+          values
         end
       end
 
@@ -133,6 +130,11 @@ module Droonga
           end
           result
         end
+      end
+
+      define_single_step do |step|
+        step.name = "search"
+        step.handler = Handler
       end
     end
   end

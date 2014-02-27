@@ -18,7 +18,8 @@ require "droonga/plugin"
 module Droonga
   module Plugins
     module Error
-      Plugin.registry.register("error", self)
+      extend Plugin
+      register("error")
 
       class Adapter < Droonga::Adapter
         output_message.pattern = ["body.errors", :exist]

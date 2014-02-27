@@ -13,34 +13,42 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/pluggable"
-require "droonga/plugin/metadata/input_message"
-require "droonga/plugin/metadata/handler_action"
-require "droonga/error_messages"
-
 module Droonga
-  class Handler
-    extend Pluggable
-    include ErrorMessages
-
-    class << self
-      def message
-        Plugin::Metadata::InputMessage.new(self)
-      end
-
-      def action
-        Plugin::Metadata::HandlerAction.new(self)
-      end
+  class SingleStepDefinition
+    attr_accessor :name
+    attr_accessor :handler
+    attr_accessor :collector
+    attr_writer :write
+    attr_accessor :inputs
+    attr_accessor :output
+    def initialize(plugin_module)
+      @plugin_module = plugin_module
+      @name = nil
+      @handler = nil
+      @collector = nil
+      @write = false
+      @inputs = []
+      @output = {}
+      yield(self)
     end
 
-    attr_reader :messenger
-    def initialize(name, context, messenger)
-      @name = name
-      @context = context
-      @messenger = messenger
+    def write?
+      @write
     end
 
-    def handle(message)
+    def handler_class
+      resolve_class(@handler)
+    end
+
+    def collector_class
+      resolve_class(@collector)
+    end
+
+    private
+    def resolve_class(target)
+      return nil if target.nil?
+      return target if target.is_a?(Class)
+      @plugin_module.const_get(target)
     end
   end
 end

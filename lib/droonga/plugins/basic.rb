@@ -19,7 +19,8 @@ require "droonga/reducer"
 module Droonga
   module Plugins
     module Basic
-      Plugin.registry.register("basic", self)
+      extend Plugin
+      register("basic")
 
       class GatherCollector < Droonga::Collector
         message.pattern = ["task.step.type", :equal, "gather"]

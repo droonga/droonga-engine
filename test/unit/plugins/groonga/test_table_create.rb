@@ -16,12 +16,12 @@
 class TableCreateTest < GroongaHandlerTest
   def create_handler
     Droonga::Plugins::Groonga::TableCreate::Handler.new("droonga",
-                                                        @handler.context)
+                                                        @handler.context,
+                                                        @messenger)
   end
 
   def test_success
-    process(:table_create, {"name" => "Books"})
-    response = @messenger.values.last
+    response = process(:table_create, {"name" => "Books"})
     assert_valid_output(response)
     response = response["result"]
     assert_equal(
@@ -31,8 +31,7 @@ class TableCreateTest < GroongaHandlerTest
   end
 
   def test_failure
-    process(:table_create, {})
-    response = @messenger.values.last
+    response = process(:table_create, {})
     assert_valid_output(response)
     response = response["result"]
     assert_equal(

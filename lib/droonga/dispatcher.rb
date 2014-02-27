@@ -17,8 +17,8 @@ require "English"
 require "tsort"
 
 require "droonga/adapter_runner"
-require "droonga/planner_runner"
 require "droonga/collector_runner"
+require "droonga/step_runner"
 require "droonga/farm"
 require "droonga/session"
 require "droonga/replier"
@@ -59,8 +59,8 @@ module Droonga
       @farm = Farm.new(name, @catalog, @loop, :dispatcher => self)
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @planner_runners = create_planner_runners
       @collector_runners = create_collector_runners
+      @step_runners = create_step_runners
     end
 
     def start
@@ -75,9 +75,6 @@ module Droonga
 
     def shutdown
       @forwarder.shutdown
-      @planner_runners.each_value do |planner_runner|
-        planner_runner.shutdown
-      end
       @collector_runners.each_value do |collector_runner|
         collector_runner.shutdown
       end
@@ -231,8 +228,8 @@ module Droonga
       dataset = message["dataset"]
       adapter_runner = @adapter_runners[dataset]
       adapted_message = adapter_runner.adapt_input(message)
-      planner_runner = @planner_runners[dataset]
-      plan = planner_runner.plan(adapted_message)
+      step_runner = @step_runners[dataset]
+      plan = step_runner.plan(message)
       distributor = Distributor.new(self)
       distributor.distribute(plan)
     rescue Droonga::UnsupportedMessageError => error
@@ -264,15 +261,15 @@ module Droonga
       end
     end
 
-    def create_planner_runners
-      create_runners do |configuration|
-        PlannerRunner.new(self, configuration["plugins"] || [])
-      end
-    end
-
     def create_collector_runners
       create_runners do |configuration|
         CollectorRunner.new(configuration["plugins"] || [])
+      end
+    end
+
+    def create_step_runners
+      create_runners do |configuration|
+        StepRunner.new(configuration["plugins"] || [])
       end
     end
 

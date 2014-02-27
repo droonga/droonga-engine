@@ -16,16 +16,20 @@
 class ColumnCreateTest < GroongaHandlerTest
   def create_handler
     Droonga::Plugins::Groonga::ColumnCreate::Handler.new("droonga",
-                                                         @handler.context)
+                                                         @handler.context,
+                                                         @messages)
   end
 
   def test_success
     Groonga::Schema.define(:context => @context) do |schema|
       schema.create_table("Books", :type => :hash)
     end
-    process(:column_create,
-            {"table" => "Books", "name" => "title", "type" => "ShortText"})
-    response = @messenger.values.last
+    message = {
+      "table" => "Books",
+      "name"  => "title",
+      "type"  => "ShortText",
+    }
+    response = process(:column_create, message)
     assert_valid_output(response)
     response = response["result"]
     assert_equal(
@@ -35,9 +39,12 @@ class ColumnCreateTest < GroongaHandlerTest
   end
 
   def test_unknown_table
-    process(:column_create,
-            {"table" => "Unknown", "name" => "title", "type" => "ShortText"})
-    response = @messenger.values.last
+    message = {
+      "table" => "Unknown",
+      "name"  => "title",
+      "type"  => "ShortText",
+    }
+    response = process(:column_create, message)
     assert_valid_output(response)
     response = response["result"]
     assert_equal(

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,13 +45,15 @@ class WatchHandlerTest < Test::Unit::TestCase
 
   def process(command, request, headers={})
     message = Droonga::Test::StubHandlerMessage.new(request, headers)
-    create_plugin.handle(message, @messenger)
+    create_plugin.handle(message)
   end
 
   public
   class SubscribeTest < self
     def create_plugin
-      Droonga::Plugins::Watch::SubscribeHandler.new("droonga", @handler.context)
+      Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
+                                                    @handler.context,
+                                                    @messenger)
     end
 
     def test_subscribe
@@ -60,8 +62,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      process(:subscribe, request)
-      assert_equal([SUCCESS_RESULT], @messenger.values)
+      response = process(:subscribe, request)
+      assert_equal(SUCCESS_RESULT, response)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -74,8 +76,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      process(:subscribe, request, "from" => "localhost:23004/output")
-      assert_equal([SUCCESS_RESULT], @messenger.values)
+      response = process(:subscribe, request, "from" => "localhost:23004/output")
+      assert_equal(SUCCESS_RESULT, response)
 
       assert_equal(
         ["localhost:23004/output"],
@@ -89,8 +91,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "subscriber" => "localhost",
         "route" => "localhost:23003/output"
       }
-      process(:subscribe, request, "from" => "localhost:23004/output")
-      assert_equal([SUCCESS_RESULT], @messenger.values)
+      response = process(:subscribe, request, "from" => "localhost:23004/output")
+      assert_equal(SUCCESS_RESULT, response)
 
       assert_equal(
         ["localhost:23003/output"],
@@ -116,7 +118,8 @@ class WatchHandlerTest < Test::Unit::TestCase
 
     def create_plugin
       Droonga::Plugins::Watch::UnsubscribeHandler.new("droonga",
-                                                      @handler.context)
+                                                      @handler.context,
+                                                      @messenger)
     end
 
     def test_unsubscribe
@@ -125,8 +128,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      process(:unsubscribe, request)
-      assert_equal([SUCCESS_RESULT], @messenger.values)
+      response = process(:unsubscribe, request)
+      assert_equal(SUCCESS_RESULT, response)
     end
 
     private
@@ -136,9 +139,8 @@ class WatchHandlerTest < Test::Unit::TestCase
         "condition" => "たいやき",
         "subscriber" => "localhost"
       }
-      process(:subscribe, request)
-      assert_equal([SUCCESS_RESULT], @messenger.values)
-      @messenger.values.clear
+      response = process(:subscribe, request)
+      assert_equal(SUCCESS_RESULT, response)
     end
   end
 
@@ -150,7 +152,8 @@ class WatchHandlerTest < Test::Unit::TestCase
 
     def create_plugin
       Droonga::Plugins::Watch::FeedHandler.new("droonga",
-                                               @handler.context)
+                                               @handler.context,
+                                               @messenger)
     end
 
     def test_feed_match
@@ -181,8 +184,7 @@ class WatchHandlerTest < Test::Unit::TestCase
           "text" => "たこやきおいしいです"
         }
       }
-      process(:feed, request)
-      assert_equal([], @messenger.messages)
+      assert_nil(process(:feed, request))
     end
 
     private
@@ -195,9 +197,10 @@ class WatchHandlerTest < Test::Unit::TestCase
       message = Droonga::Test::StubHandlerMessage.new(request, {})
       subscribe_handler =
         Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
-                                                      @handler.context)
-      subscribe_handler.handle(message, @messenger)
-      assert_equal([SUCCESS_RESULT], @messenger.values)
+                                                      @handler.context,
+                                                      @messenger)
+      response = subscribe_handler.handle(message)
+      assert_equal(SUCCESS_RESULT, response)
     end
   end
 end

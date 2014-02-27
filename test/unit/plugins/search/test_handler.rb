@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -29,8 +29,10 @@ class SearchHandlerTest < Test::Unit::TestCase
 
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
-    @plugin = Droonga::Plugins::Search::Handler.new("droonga", @handler.context)
     @messenger = Droonga::Test::StubHandlerMessenger.new
+    @plugin = Droonga::Plugins::Search::Handler.new("droonga",
+                                                    @handler.context,
+                                                    @messenger)
   end
 
   def teardown_plugin
@@ -41,8 +43,7 @@ class SearchHandlerTest < Test::Unit::TestCase
   private
   def search(request, headers={})
     message = Droonga::Test::StubHandlerMessage.new(request, headers)
-    @plugin.handle(message, @messenger)
-    results_to_result_set(@messenger.values.first)
+    results_to_result_set(@plugin.handle(message))
   end
 
   def results_to_result_set(results)
@@ -51,7 +52,7 @@ class SearchHandlerTest < Test::Unit::TestCase
       result_set[name] = normalize_result(result)
     end
     result_set
-  end
+   end
 
   def normalize_result(result)
     result["startTime"] = start_time if result["startTime"]

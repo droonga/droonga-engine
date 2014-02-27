@@ -91,14 +91,19 @@ module Droonga
         end
 
         class Handler < Droonga::Handler
-          message.type = "table_create"
           action.synchronous = true
 
-          def handle(message, messenger)
+          def handle(message)
             command = Command.new(@context)
-            outputs = command.execute(message.request)
-            messenger.emit(outputs)
+            command.execute(message.request)
           end
+        end
+
+        Groonga.define_single_step do |step|
+          step.name = "table_create"
+          step.write = true
+          step.handler = Handler
+          step.collector = Collectors::Add
         end
       end
     end

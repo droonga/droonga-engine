@@ -21,19 +21,8 @@ require "droonga/watch_schema"
 module Droonga
   module Plugins
     module Watch
-      Plugin.registry.register("watch", self)
-
-      class Planner < Droonga::Planner
-        message.pattern = ["type", :start_with, "watch."]
-
-        def plan(message)
-          broadcast(message,
-                    :write => true,
-                    :reduce => {
-                      "success" => "and"
-                    })
-        end
-      end
+      extend Plugin
+      register("watch")
 
       module SchemaCreatable
         private
@@ -76,14 +65,12 @@ module Droonga
         include SchemaCreatable
         include MessageParsable
 
-        message.type = "watch.subscribe"
-
         def initialize(*args)
           super
           ensure_schema_created # TODO: REMOVE ME
         end
 
-        def handle(message, messenger)
+        def handle(message)
           subscriber, condition, query, route = parse_message(message)
           normalized_request = {
             :subscriber => subscriber,
@@ -93,25 +80,32 @@ module Droonga
           }
           watcher = Watcher.new(@context)
           watcher.subscribe(normalized_request)
-          outputs = {
+          {
             "success" => true,
           }
-          messenger.emit(outputs)
         end
+      end
+
+      define_single_step do |step|
+        step.name = "watch.subscribe"
+        step.output = {
+          :aggregate => "success"
+        }
+        step.write = true
+        step.handler = SubscribeHandler
+        step.collector = Collectors::And
       end
 
       class UnsubscribeHandler < Droonga::Handler
         include SchemaCreatable
         include MessageParsable
 
-        message.type = "watch.unsubscribe"
-
         def initialize(*args)
           super
           ensure_schema_created # TODO: REMOVE ME
         end
 
-        def handle(message, messenger)
+        def handle(message)
           subscriber, condition, query, route = parse_message(message)
           normalized_request = {
             :subscriber => subscriber,
@@ -120,24 +114,31 @@ module Droonga
           }
           watcher = Watcher.new(@context)
           watcher.unsubscribe(normalized_request)
-          outputs = {
+          {
             "success" => true,
           }
-          messenger.emit(outputs)
         end
+      end
+
+      define_single_step do |step|
+        step.name = "watch.unsubscribe"
+        step.output = {
+          :aggregate => "success"
+        }
+        step.write = true
+        step.handler = UnsubscribeHandler
+        step.collector = Collectors::And
       end
 
       class FeedHandler < Droonga::Handler
         include SchemaCreatable
-
-        message.type = "watch.feed"
 
         def initialize(*args)
           super
           ensure_schema_created # TODO: REMOVE ME
         end
 
-        def handle(message, messenger)
+        def handle(message)
           request = message.request
           watcher = Watcher.new(@context)
           watcher.feed(:targets => request["targets"]) do |route, subscribers|
@@ -149,7 +150,14 @@ module Droonga
             messenger.forward(published_message,
                               "to" => route, "type" => "watch.publish")
           end
+          nil
         end
+      end
+
+      define_single_step do |step|
+        step.name = "watch.feed"
+        step.write = true
+        step.handler = FeedHandler
       end
 
       class SweepHandler < Droonga::Handler
@@ -162,10 +170,17 @@ module Droonga
           ensure_schema_created # TODO: REMOVE ME
         end
 
-        def sweep(message, messenger)
+        def handle(message)
           sweeper = Sweeper.new(@context)
           sweeper.sweep_expired_subscribers
+          nil
         end
+      end
+
+      define_single_step do |step|
+        step.name = "watch.sweep"
+        step.write = true
+        step.handler = SweepHandler
       end
     end
   end

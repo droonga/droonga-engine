@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ class GroongaHandlerTest < Test::Unit::TestCase
   def process(command, request)
     message = Droonga::Test::StubHandlerMessage.new(request)
     handler = create_handler
-    handler.handle(message, @messenger)
+    handler.handle(message)
   end
 
   NORMALIZED_START_TIME = Time.parse("2013-07-11T16:04:28+0900").to_i

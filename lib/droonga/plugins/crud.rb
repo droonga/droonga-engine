@@ -21,35 +21,36 @@ require "droonga/error_messages"
 module Droonga
   module Plugins
     module CRUD
-      Plugin.registry.register("crud", self)
+      extend Plugin
+      register("crud")
 
       class Adapter < Droonga::Adapter
         input_message.pattern  = ["type", :equal, "add"]
         output_message.pattern = ["body.success", :exist]
 
+        def adapt_input(input_message)
+          request = input_message.body
+          key = request["key"] || rand.to_s
+          values = request["values"] || {}
+          request["filter"] = values.merge("key" => key)
+        end
+
         def adapt_output(output_message)
-          success = output_message.body["success"]
-          unless success.nil?
+          if output_message.errors
+            detail = output_message.body["detail"]
+            return if detail.nil?
+            detail.delete("filter")
+            output_message.errors.each do |path, error|
+              error["body"]["detail"].delete("filter")
+            end
+          else
+            output_message.body.delete("filter")
             output_message.body = output_message.body["success"]
           end
         end
       end
 
-      class Planner < Droonga::Planner
-        message.pattern = ["type", :equal, "add"]
-
-        def plan(message)
-          scatter(message,
-                  :key => message["body"]["key"] || rand.to_s,
-                  :reduce => {
-                    "success" => "and"
-                  })
-        end
-      end
-
       class Handler < Droonga::Handler
-        message.type = "add"
-
         class MissingTableParameter < BadRequest
           def initialize
             super("\"table\" must be specified.")
@@ -83,12 +84,11 @@ module Droonga
           end
         end
 
-        def handle(message, messenger)
+        def handle(message)
           succeeded = process_add(message.request)
-          outputs = {
+          {
             "success" => succeeded,
           }
-          messenger.emit(outputs)
         end
 
         private
@@ -130,6 +130,22 @@ module Droonga
             end
           end
         end
+      end
+
+      define_single_step do |step|
+        step.name = "add"
+        step.inputs = {
+          "table" => {
+            :type => :table,
+            :filter => "filter",
+          },
+        }
+        step.output = {
+          :aggregate => "success",
+        }
+        step.write = true
+        step.handler = Handler
+        step.collector = Collectors::And
       end
     end
   end
