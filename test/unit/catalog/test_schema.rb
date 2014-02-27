@@ -32,6 +32,59 @@ class CatalogSchemaTest < Test::Unit::TestCase
                    create_schema({}).to_messages)
     end
 
+    def test_key_index
+      assert_equal([
+                     {
+                       "type" => "table_create",
+                       "body" => {
+                         "name"       => "Term",
+                         "key_type"   => "ShortText",
+                         "flags"      => "TABLE_PAT_KEY",
+                         "normalizer" => "NormalizerAuto",
+                       }
+                     },
+                     {
+                       "type" => "table_create",
+                       "body" => {
+                         "name"       => "Store",
+                         "key_type"   => "ShortText",
+                         "flags"      => "TABLE_HASH_KEY",
+                       }
+                     },
+                     {
+                       "type" => "column_create",
+                       "body" => {
+                         "name"       => "stores__key",
+                         "table"      => "Term",
+                         "type"       => "Store",
+                         "flags"      => "COLUMN_INDEX",
+                         "source"     => "_key"
+                       }
+                     }
+                   ],
+                   create_schema(
+                     "Term" => {
+                       "type"       => "PatriciaTrie",
+                       "keyType"    => "ShortText",
+                       "normalizer" => "NormalizerAuto",
+                       "columns" => {
+                         "stores__key" => {
+                           "type"      => "Index",
+                           "valueType" => "Store",
+                           "indexOptions" => {
+                             "sources" => [
+                               "_key"
+                             ]
+                           }
+                         }
+                       }
+                     },
+                     "Store" => {
+                       "keyType" => "ShortText"
+                     }
+                   ).to_messages)
+    end
+
 =begin
     def test_integration
       assert_equal([
