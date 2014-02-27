@@ -5,6 +5,8 @@
     "Droonga": {
       "nWorkers": 2,
       "plugins": ["groonga", "search", "crud"],
+      "schema": {
+      },
       "replicas": [
         {
           "slices": [
