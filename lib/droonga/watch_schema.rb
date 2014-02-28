@@ -17,7 +17,7 @@
 
 require "groonga"
 
-require "droonga/logger"
+require "droonga/loggable"
 
 module Droonga
   class WatchSchema
