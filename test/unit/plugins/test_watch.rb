@@ -20,7 +20,7 @@ require "droonga/plugins/watch"
 class WatchHandlerTest < Test::Unit::TestCase
   include WatchHelper
 
-  SUCCESS_RESULT = { "success" => true }
+  SUCCESS_RESULT = true
 
   def setup
     setup_database

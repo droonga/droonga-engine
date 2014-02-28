@@ -16,9 +16,7 @@
 require "droonga/plugins/crud"
 
 class CRUDAddHandlerTest < Test::Unit::TestCase
-  SUCCESS_RESPONSE_BODY = {
-    "success" => true,
-  }
+  SUCCESS_RESPONSE_BODY = true
 
   def setup
     setup_database

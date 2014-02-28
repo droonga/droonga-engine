@@ -30,8 +30,6 @@ class ColumnCreateTest < GroongaHandlerTest
       "type"  => "ShortText",
     }
     response = process(:column_create, message)
-    assert_valid_output(response)
-    response = response["result"]
     assert_equal(
       [NORMALIZED_HEADER_SUCCESS, true],
       [normalize_header(response.first), response.last]
@@ -45,8 +43,6 @@ class ColumnCreateTest < GroongaHandlerTest
       "type"  => "ShortText",
     }
     response = process(:column_create, message)
-    assert_valid_output(response)
-    response = response["result"]
     assert_equal(
       [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
       [normalize_header(response.first), response.last]

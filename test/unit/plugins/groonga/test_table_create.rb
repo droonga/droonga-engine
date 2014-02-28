@@ -22,8 +22,6 @@ class TableCreateTest < GroongaHandlerTest
 
   def test_success
     response = process(:table_create, {"name" => "Books"})
-    assert_valid_output(response)
-    response = response["result"]
     assert_equal(
       [NORMALIZED_HEADER_SUCCESS, true],
       [normalize_header(response.first), response.last]
@@ -32,8 +30,6 @@ class TableCreateTest < GroongaHandlerTest
 
   def test_failure
     response = process(:table_create, {})
-    assert_valid_output(response)
-    response = response["result"]
     assert_equal(
       [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
       [normalize_header(response.first), response.last]
