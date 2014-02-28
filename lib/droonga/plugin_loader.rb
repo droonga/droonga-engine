@@ -21,37 +21,45 @@ require "droonga/loggable"
 
 module Droonga
   class PluginLoader
-    extend Loggable
+    include Loggable
 
     class << self
       def load_all
-        loaded = []
-        loading = nil
-        begin
-          $LOAD_PATH.each do |load_path|
-            Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
-              loading = plugin_path
-              name = Pathname(plugin_path).basename(".rb").to_s
-              loader = new(name)
-              loader.load
-              loaded << plugin_path
-            end
-          end
-        rescue StandardError, SyntaxError => error
-          logger.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
-          logger.error("#{self.name}: failed to load: #{loading}")
-          raise error
-        end
-        logger.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
+        loader = new
+        loader.load_all
       end
     end
 
-    def initialize(name)
-      @name = name
+    def initialize
     end
 
-    def load
-      require "droonga/plugins/#{@name}"
+    def load(name)
+      require "droonga/plugins/#{name}"
+    end
+
+    def load_all
+      loaded = []
+      loading = nil
+      begin
+        $LOAD_PATH.each do |load_path|
+          Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
+            loading = plugin_path
+            name = Pathname(plugin_path).basename(".rb").to_s
+            load(name)
+            loaded << plugin_path
+          end
+        end
+      rescue StandardError, SyntaxError => error
+        logger.info("loaded plugins:\n#{loaded.join("\n")}")
+        logger.error("failed to load: #{loading}")
+        raise error
+      end
+      logger.info("loaded plugins:\n#{loaded.join("\n")}")
+    end
+
+    private
+    def log_tag
+      "plugin-loader"
     end
   end
 end
