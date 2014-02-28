@@ -119,6 +119,7 @@ module Droonga
       def prepare_data
         @datasets = {}
         @data["datasets"].each do |name, dataset|
+          @datasets[name] = Dataset.new(name, dataset)
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
           total_weight = compute_total_weight(dataset)
@@ -131,7 +132,6 @@ module Droonga
             end
           end
           dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
-          @datasets[name] = Dataset.new(name, dataset)
         end
         @options = @data["options"] || {}
       end
