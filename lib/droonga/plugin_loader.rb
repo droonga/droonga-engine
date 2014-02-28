@@ -34,27 +34,25 @@ module Droonga
     end
 
     def load(name)
-      require "droonga/plugins/#{name}"
+      logger.debug("loading...: <#{name}>")
+      path = "droonga/plugins/#{name}"
+      begin
+        require path
+      rescue StandardError, SyntaxError => error
+        logger.exception("failed to load: <#{path}>", error)
+        raise
+      end
     end
 
     def load_all
-      loaded = []
-      loading = nil
-      begin
-        $LOAD_PATH.each do |load_path|
-          Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
-            loading = plugin_path
-            name = Pathname(plugin_path).basename(".rb").to_s
-            load(name)
-            loaded << plugin_path
-          end
+      $LOAD_PATH.each do |load_path|
+        search_pattern = "#{load_path}/droonga/plugins/*.rb"
+        logger.debug("searching...: <#{search_pattern}>")
+        Pathname.glob(search_pattern) do |plugin_path|
+          name = Pathname(plugin_path).basename(".rb").to_s
+          load(name)
         end
-      rescue StandardError, SyntaxError => error
-        logger.info("loaded plugins:\n#{loaded.join("\n")}")
-        logger.error("failed to load: #{loading}")
-        raise error
       end
-      logger.info("loaded plugins:\n#{loaded.join("\n")}")
     end
 
     private
