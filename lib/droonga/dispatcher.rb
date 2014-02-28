@@ -101,7 +101,7 @@ module Droonga
           reply("statusCode" => error.status_code,
                 "body"       => error.response_body)
         rescue StandardError, LoadError, SyntaxError => error
-          Logger.error("failed to process input message", error)
+          logger.exception("failed to process input message", error)
           formatted_error = ErrorMessages::InternalServerError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
                 "body"       => formatted_error.response_body)
