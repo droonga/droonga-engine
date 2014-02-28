@@ -13,6 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/collectors/add"
-require "droonga/collectors/and"
-require "droonga/collectors/sum"
+module Droonga
+  module Collectors
+    class Sum
+      class << self
+        def operator
+          "sum"
+        end
+      end
+    end
+  end
+end
