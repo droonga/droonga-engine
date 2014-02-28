@@ -16,6 +16,7 @@
 require "English"
 require "tsort"
 
+require "droonga/loggable"
 require "droonga/adapter_runner"
 require "droonga/collector_runner"
 require "droonga/step_runner"
@@ -27,6 +28,8 @@ require "droonga/distributor"
 
 module Droonga
   class Dispatcher
+    include Loggable
+
     attr_reader :name
 
     class MissingDatasetParameter < ErrorMessages::BadRequest
@@ -108,9 +111,9 @@ module Droonga
     end
 
     def forward(message, destination)
-      $log.trace("#{log_tag}: forward start")
+      logger.trace("forward start")
       @forwarder.forward(message, destination)
-      $log.trace("#{log_tag}: forward done")
+      logger.trace("forward done")
     end
 
     # Replies response to replyTo.

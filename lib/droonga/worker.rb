@@ -30,26 +30,26 @@ module Droonga
     end
 
     def run
-      $log.trace("#{log_tag}: run: start")
+      Droonga.logger.trace("#{log_tag}: run: start")
       @handler_runner.start
       @message_receiver.start
       @loop.run
       @handler_runner.shutdown
-      $log.trace("#{log_tag}: run: done")
+      Droonga.logger.trace("#{log_tag}: run: done")
     end
 
     def stop
-      $log.trace("#{log_tag}: stop: start")
+      Droonga.logger.trace("#{log_tag}: stop: start")
       @message_receiver.shutdown
       @loop.stop
-      $log.trace("#{log_tag}: stop: done")
+      Droonga.logger.trace("#{log_tag}: stop: done")
     end
 
     private
     def process(message)
-      $log.trace("#{log_tag}: process: start")
+      Droonga.logger.trace("#{log_tag}: process: start")
       @handler_runner.process(message)
-      $log.trace("#{log_tag}: process: done")
+      Droonga.logger.trace("#{log_tag}: process: done")
     end
 
     def log_tag

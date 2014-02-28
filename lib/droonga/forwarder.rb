@@ -15,46 +15,49 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/fluent_message_sender"
 
 module Droonga
   class Forwarder
+    include Loggable
+
     def initialize(loop)
       @loop = loop
       @senders = {}
     end
 
     def start
-      $log.trace("#{log_tag}: start: start")
-      $log.trace("#{log_tag}: start: done")
+      logger.trace("start: start")
+      logger.trace("start: done")
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       @senders.each_value do |sender|
         sender.shutdown
       end
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def forward(message, destination)
-      $log.trace("#{log_tag}: forward: start")
+      logger.trace("forward: start")
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
       output(receiver, message, command, arguments)
-      $log.trace("#{log_tag}: forward: done")
+      logger.trace("forward: done")
     end
 
     private
     def output(receiver, message, command, arguments)
-      $log.trace("#{log_tag}: output: start")
+      logger.trace("output: start")
       # TODO: IMPROVE ME: Should not use "unless" and "and". It is confused.
       unless receiver.is_a?(String) and command.is_a?(String)
-        $log.trace("#{log_tag}: output: abort: invalid argument",
-                   :receiver => receiver,
-                   :command  => command)
+        logger.trace("output: abort: invalid argument",
+                     :receiver => receiver,
+                     :command  => command)
         return
       end
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
@@ -66,10 +69,10 @@ module Droonga
       params = $4
       sender = find_sender(host, port, params)
       unless sender
-        $log.trace("#{log_tag}: output: abort: no sender",
-                   :host   => host,
-                   :port   => port,
-                   :params => params)
+        logger.trace("output: abort: no sender",
+                     :host   => host,
+                     :port   => port,
+                     :params => params)
         return
       end
       override_message = {
@@ -79,10 +82,10 @@ module Droonga
       message = message.merge(override_message)
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
-      $log.trace("#{log_tag}: output: post: start: #{log_info}")
+      logger.trace("output: post: start: #{log_info}")
       sender.send(output_tag, message)
-      $log.trace("#{log_tag}: output: post: done: #{log_info}")
-      $log.trace("#{log_tag}: output: done")
+      logger.trace("output: post: done: #{log_info}")
+      logger.trace("output: done")
     end
 
     def find_sender(host, port, params)

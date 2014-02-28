@@ -15,10 +15,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/catalog_loader"
 
 module Droonga
   class CatalogObserver
+    include Loggable
+
     DEFAULT_CATALOG_PATH = "catalog.json"
     CHECK_INTERVAL = 1
 
@@ -37,7 +40,7 @@ module Droonga
         begin
           @loop.run
         rescue => error
-          $log.error("error in catalog observing thread", :error => error)
+          logger.exception("error in catalog observing thread", error)
         end
       end
     end
@@ -62,7 +65,7 @@ module Droonga
           load_catalog!
           on_reload.call(catalog) if on_reload
         rescue Droonga::Error => error
-          $log.warn("failed to reload catalog", :path => @catalog_path, :error => error)
+          logger.warn("reload: fail", :path => @catalog_path, :error => error)
         end
       end
     end
@@ -79,9 +82,14 @@ module Droonga
     def load_catalog!
       loader = CatalogLoader.new(@catalog_path)
       @catalog = loader.load
-      $log.info("catalog loaded", :path => @catalog_path, :mtime => @catalog_mtime)
+      logger.info("loaded", :path => @catalog_path, :mtime => @catalog_mtime)
     ensure
       @catalog_mtime = File.mtime(@catalog_path)
+    end
+
+    private
+    def log_tag
+      "catalog-observer"
     end
   end
 end

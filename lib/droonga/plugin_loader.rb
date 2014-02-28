@@ -17,8 +17,12 @@
 
 require "pathname"
 
+require "droonga/loggable"
+
 module Droonga
   class PluginLoader
+    extend Loggable
+
     class << self
       def load_all
         loaded = []
@@ -34,11 +38,11 @@ module Droonga
             end
           end
         rescue StandardError, SyntaxError => error
-          $log.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
-          $log.error("#{self.name}: failed to load: #{loading}")
+          logger.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
+          logger.error("#{self.name}: failed to load: #{loading}")
           raise error
         end
-        $log.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
+        logger.info("#{self.name}: loaded plugins:\n#{loaded.join("\n")}")
       end
     end
 

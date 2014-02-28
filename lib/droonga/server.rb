@@ -15,22 +15,24 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/logger"
+
 module Droonga
   module Server
     def before_run
-      $log.trace("#{log_tag}: before_run: start")
-      $log.trace("#{log_tag}: before_run: done")
+      Droonga.logger.trace("#{log_tag}: before_run: start")
+      Droonga.logger.trace("#{log_tag}: before_run: done")
     end
 
     def after_run
-      $log.trace("#{log_tag}: after_run: start")
-      $log.trace("#{log_tag}: after_run: done")
+      Droonga.logger.trace("#{log_tag}: after_run: start")
+      Droonga.logger.trace("#{log_tag}: after_run: done")
     end
 
     def stop(stop_graceful)
-      $log.trace("#{log_tag}: stop: start")
+      Droonga.logger.trace("#{log_tag}: stop: start")
       super(stop_graceful)
-      $log.trace("#{log_tag}: stop: done")
+      Droonga.logger.trace("#{log_tag}: stop: done")
     end
 
     private

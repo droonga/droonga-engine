@@ -17,20 +17,24 @@
 
 require "groonga"
 
+require "droonga/logger"
+
 module Droonga
   class WatchSchema
+    include Loggable
+
     def initialize(context)
       @context = context
     end
 
     def ensure_created
       if @context["Keyword"]
-        $log.trace("#{log_tag} skip table creation")
+        logger.trace("skip table creation")
         return
       end
-      $log.trace("#{log_tag} ensure_tables: start")
+      logger.trace("ensure_tables: start")
       ensure_tables
-      $log.trace("#{log_tag} ensure_tables: done")
+      logger.trace("ensure_tables: done")
     end
 
     private

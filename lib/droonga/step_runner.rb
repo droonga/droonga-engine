@@ -13,11 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/plugin"
 require "droonga/single_step"
 
 module Droonga
   class StepRunner
+    include Loggable
+
     def initialize(plugins)
       @definitions = {}
       plugins.each do |name|
@@ -33,18 +36,18 @@ module Droonga
 
     def plan(message)
       type = message["type"]
-      $log.trace("#{log_tag}: plan: start",
-                 :dataset => message["dataset"],
-                 :type => type)
+      logger.trace("plan: start",
+                   :dataset => message["dataset"],
+                   :type => type)
       definition = find(type)
       if definition.nil?
         raise UnsupportedMessageError.new(:planner, message)
       end
       step = SingleStep.new(definition)
       plan = step.plan(message)
-      $log.trace("#{log_tag}: plan: done",
-                 :dataset => message["dataset"],
-                 :type => type)
+      logger.trace("plan: done",
+                   :dataset => message["dataset"],
+                   :type => type)
       plan
     end
 

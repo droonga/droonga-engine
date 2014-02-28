@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,6 +15,7 @@
 
 require "serverengine"
 
+require "droonga/loggable"
 require "droonga/server"
 require "droonga/worker"
 require "droonga/event_loop"
@@ -25,6 +24,8 @@ require "droonga/processor"
 
 module Droonga
   class Slice
+    include Loggable
+
     def initialize(loop, options={})
       @options = options
       @n_workers = @options[:n_workers] || 0
@@ -43,17 +44,17 @@ module Droonga
     end
 
     def shutdown
-      $log.trace("slice: shutdown: start")
+      logger.trace("shutdown: start")
       shutdown_supervisor if @supervisor
       @message_pusher.shutdown
       @processor.shutdown
-      $log.trace("slice: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def process(message)
-      $log.trace("slice: process: start")
+      logger.trace("process: start")
       @processor.process(message)
-      $log.trace("slice: process: done")
+      logger.trace("process: done")
     end
 
     private
@@ -80,7 +81,7 @@ module Droonga
         force_options = {
           :worker_type   => "process",
           :workers       => @options[:n_workers],
-          :log_level     => $log.level,
+          :log_level     => logger.level,
           :server_process_name => "Server[#{@options[:database]}] #$0",
           :worker_process_name => "Worker[#{@options[:database]}] #$0",
           :message_receiver => @message_pusher.raw_receiver,
@@ -93,11 +94,16 @@ module Droonga
     end
 
     def shutdown_supervisor
-      $log.trace("supervisor: shutdown: start")
+      logger.trace("supervisor: shutdown: start")
       @supervisor.stop(true)
-      $log.trace("supervisor: shutdown: stopped")
+      logger.trace("supervisor: shutdown: stopped")
       @supervisor_thread.join
-      $log.trace("supervisor: shutdown: done")
+      logger.trace("supervisor: shutdown: done")
+    end
+
+    private
+    def log_tag
+      "slice"
     end
   end
 end

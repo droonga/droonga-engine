@@ -17,8 +17,12 @@
 
 require "msgpack"
 
+require "droonga/logger"
+
 module Droonga
   class MessagePusher
+    include Loggable
+
     attr_reader :raw_receiver
     def initialize(loop)
       @loop = loop
@@ -32,15 +36,15 @@ module Droonga
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       socket_path = @raw_receiver.path
       @raw_receiver.close
       FileUtils.rm_f(socket_path)
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def push(message)
-      $log.trace("#{log_tag}: push: start")
+      logger.trace("push: start")
       packed_message = message.to_msgpack
       path = @raw_receiver.path
       sender = Coolio::UNIXSocket.connect(path)
@@ -49,7 +53,7 @@ module Droonga
         close
       end
       @loop.attach(sender)
-      $log.trace("#{log_tag}: push: done")
+      logger.trace("push: done")
     end
 
     private

@@ -13,16 +13,19 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/status_code"
 
 module Droonga
   class Replier
+    include Loggable
+
     def initialize(forwarder)
       @forwarder = forwarder
     end
 
     def reply(message)
-      $log.trace("#{log_tag}: reply: start")
+      logger.trace("reply: start")
       destination = message["replyTo"]
       reply_message = {
         "inReplyTo"  => message["id"],
@@ -35,7 +38,7 @@ module Droonga
         reply_message["errors"] = errors unless errors.empty?
       end
       @forwarder.forward(reply_message, destination)
-      $log.trace("#{log_tag}: reply: done")
+      logger.trace("reply: done")
     end
 
     private

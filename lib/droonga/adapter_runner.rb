@@ -13,6 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/message_matcher"
 require "droonga/input_message"
 require "droonga/output_message"
@@ -20,22 +21,24 @@ require "droonga/adapter"
 
 module Droonga
   class AdapterRunner
+    include Loggable
+
     def initialize(dispatcher, plugins)
       @dispatcher = dispatcher
       default_plugins = ["error"]
       plugins += (default_plugins - plugins)
-      $log.debug("#{self.class.name}: activating plugins: #{plugins.join(", ")}")
+      logger.debug("activating plugins: #{plugins.join(", ")}")
       @adapter_classes = Adapter.find_sub_classes(plugins)
-      $log.debug("#{self.class.name}: activated:\n#{@adapter_classes.join("\n")}")
+      logger.debug("activated:\n#{@adapter_classes.join("\n")}")
     end
 
     def shutdown
     end
 
     def adapt_input(message)
-      $log.trace("#{log_tag}: adapt_input: start",
-                 :dataset => message["dataset"],
-                 :type => message["type"])
+      logger.trace("adapt_input: start",
+                   :dataset => message["dataset"],
+                   :type => message["type"])
       adapted_message = message
       adapted_message["appliedAdapters"] = []
       @adapter_classes.each do |adapter_class|
@@ -43,53 +46,53 @@ module Droonga
         pattern = adapter_class.input_message.pattern
         if pattern
           matcher = MessageMatcher.new(pattern)
-          $log.trace("#{log_tag}: adapt_input: skip: #{adapter_class_id}",
-                     :pattern => pattern)
+          logger.trace("adapt_input: skip: #{adapter_class_id}",
+                       :pattern => pattern)
           next unless matcher.match?(adapted_message)
         end
-        $log.trace("#{log_tag}: adapt_input: use: #{adapter_class_id}")
+        logger.trace("adapt_input: use: #{adapter_class_id}")
         input_message = InputMessage.new(adapted_message)
         adapter = adapter_class.new
         adapter.adapt_input(input_message)
         adapted_message = input_message.adapted_message
         adapted_message["appliedAdapters"] << adapter_class_id
       end
-      $log.trace("#{log_tag}: adapt_input: done",
-                 :dataset => adapted_message["dataset"],
-                 :type => adapted_message["type"])
+      logger.trace("adapt_input: done",
+                   :dataset => adapted_message["dataset"],
+                   :type => adapted_message["type"])
       adapted_message
     end
 
     def adapt_output(message)
-      $log.trace("#{log_tag}: adapt_output: start",
-                 :dataset => message["dataset"],
-                 :type => message["type"])
+      logger.trace("adapt_output: start",
+                   :dataset => message["dataset"],
+                   :type => message["type"])
       adapted_message = message
       applied_adapters = adapted_message["appliedAdapters"]
       @adapter_classes.reverse_each do |adapter_class|
         adapter_class_id = adapter_class.id
         if applied_adapters
-          $log.trace("#{log_tag}: adapt_output: skip: #{adapter_class_id}: " +
-                     "input adapter wasn't applied",
-                     :applied_adapters => applied_adapters)
+          logger.trace("adapt_output: skip: #{adapter_class_id}: " +
+                         "input adapter wasn't applied",
+                       :applied_adapters => applied_adapters)
           next unless applied_adapters.include?(adapter_class.id)
         end
         pattern = adapter_class.output_message.pattern
         if pattern
           matcher = MessageMatcher.new(pattern)
-          $log.trace("#{log_tag}: adapt_output: skip: #{adapter_class_id}",
-                     :pattern => pattern)
+          logger.trace("adapt_output: skip: #{adapter_class_id}",
+                       :pattern => pattern)
           next unless matcher.match?(adapted_message)
         end
-        $log.trace("#{log_tag}: adapt_output: use: #{adapter_class_id}")
+        logger.trace("adapt_output: use: #{adapter_class_id}")
         output_message = OutputMessage.new(adapted_message)
         adapter = adapter_class.new
         adapter.adapt_output(output_message)
         adapted_message = output_message.adapted_message
       end
-      $log.trace("#{log_tag}: adapt_output: done",
-                 :dataset => adapted_message["dataset"],
-                 :type => adapted_message["type"])
+      logger.trace("adapt_output: done",
+                   :dataset => adapted_message["dataset"],
+                   :type => adapted_message["type"])
       adapted_message
     end
 

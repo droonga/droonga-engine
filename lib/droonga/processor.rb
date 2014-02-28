@@ -13,10 +13,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/handler_runner"
 
 module Droonga
   class Processor
+    include Loggable
+
     def initialize(loop, message_pusher, options={})
       @loop = loop
       @message_pusher = message_pusher
@@ -30,16 +33,16 @@ module Droonga
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       @handler_runner.shutdown
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def process(message)
-      $log.trace("#{log_tag}: process: start")
+      logger.trace("process: start")
       type = message["type"]
       if @handler_runner.processable?(type)
-        $log.trace("#{log_tag}: process: handlable: #{type}")
+        logger.trace("process: handlable: #{type}")
         synchronous = @handler_runner.prefer_synchronous?(type)
         if @n_workers.zero? or synchronous
           @handler_runner.process(message)
@@ -47,9 +50,9 @@ module Droonga
           @message_pusher.push(message)
         end
       else
-        $log.trace("#{log_tag}: process: ignore #{type}")
+        logger.trace("process: ignore #{type}")
       end
-      $log.trace("#{log_tag}: process: done")
+      logger.trace("process: done")
     end
 
     private

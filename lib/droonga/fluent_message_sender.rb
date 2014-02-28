@@ -16,10 +16,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "cool.io"
+
+require "droonga/loggable"
 require "droonga/message_pack_packer"
 
 module Droonga
   class FluentMessageSender
+    include Loggable
+
     def initialize(loop, host, port)
       @loop = loop
       @host = host
@@ -27,39 +31,39 @@ module Droonga
     end
 
     def start
-      $log.trace("#{log_tag}: start: start")
+      logger.trace("start: start")
       connect
-      $log.trace("#{log_tag}: start: done")
+      logger.trace("start: done")
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       @socket.close unless @socket.closed?
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def send(tag, data)
-      $log.trace("#{log_tag}: send: start")
+      logger.trace("send: start")
       connect if @socket.closed?
       fluent_message = [tag, Time.now.to_i, data]
       packed_fluent_message = MessagePackPacker.pack(fluent_message)
       @socket.write(packed_fluent_message)
       @loop.break_current_loop
-      $log.trace("#{log_tag}: send: done")
+      logger.trace("send: done")
     end
 
     private
     def connect
-      $log.trace("#{log_tag}: connect: start")
+      logger.trace("connect: start")
 
       log_write_complete = lambda do
-        $log.trace("#{log_tag}: write completed")
+        logger.trace("write completed")
       end
       log_connect = lambda do
-        $log.trace("#{log_tag}: connected to #{@host}:#{@port}")
+        logger.trace("connected to #{@host}:#{@port}")
       end
       log_failed = lambda do
-        $log.error("#{log_tag}: failed to connect to #{@host}:#{@port}")
+        logger.error("failed to connect to #{@host}:#{@port}")
       end
 
       @socket = Coolio::TCPSocket.connect(@host, @port)
@@ -74,7 +78,7 @@ module Droonga
       end
       @loop.attach(@socket)
 
-      $log.trace("#{log_tag}: connect: done")
+      logger.trace("connect: done")
     end
 
     def log_tag

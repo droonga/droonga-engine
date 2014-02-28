@@ -13,12 +13,15 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/loggable"
 require "droonga/message_matcher"
 require "droonga/collector"
 require "droonga/collector_message"
 
 module Droonga
   class CollectorRunner
+    include Loggable
+
     def initialize(plugins)
       default_plugins = ["basic"]
       plugins += (default_plugins - plugins)
@@ -30,15 +33,15 @@ module Droonga
 
     def collect(message)
       collector_message = CollectorMessage.new(message)
-      $log.trace("#{log_tag}: collect: start",
-                 :type => collector_message.type)
+      logger.trace("collect: start",
+                   :type => collector_message.type)
       collector_class = find_collector_class(message)
       if collector_class.nil?
         raise UnsupportedMessageError.new(:collector, message)
       end
       collector = collector_class.new
       collector.collect(collector_message)
-      $log.trace("#{log_tag}: collector: done")
+      logger.trace("collector: done")
     end
 
     private

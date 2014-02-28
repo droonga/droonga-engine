@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,8 +15,12 @@
 
 require "msgpack"
 
+require "droonga/loggable"
+
 module Droonga
   class MessageReceiver
+    include Loggable
+
     def initialize(loop, receiver, &callback)
       @loop = loop
       @receiver = Coolio::Server.new(receiver, Coolio::Socket) do |connection|
@@ -28,26 +30,26 @@ module Droonga
     end
 
     def start
-      $log.trace("#{log_tag}: start: start")
+      logger.trace("start: start")
       @loop.attach(@receiver)
-      $log.trace("#{log_tag}: start: done")
+      logger.trace("start: done")
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       @receiver.close
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     private
     def setup_receive_handler(connection)
       unpacker = MessagePack::Unpacker.new
       on_read = lambda do |data|
-        $log.trace("#{log_tag}: on_read: start")
+        logger.trace("on_read: start")
         unpacker.feed_each(data) do |message|
           @callback.call(message)
         end
-        $log.trace("#{log_tag}: on_read: done")
+        logger.trace("on_read: done")
       end
       connection.on_read do |data|
         on_read.call(data)

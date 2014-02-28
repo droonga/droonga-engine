@@ -15,6 +15,7 @@
 
 require "groonga"
 
+require "droonga/loggable"
 require "droonga/forwarder"
 require "droonga/handler_message"
 require "droonga/handler_messenger"
@@ -22,6 +23,8 @@ require "droonga/step_runner"
 
 module Droonga
   class HandlerRunner
+    include Loggable
+
     def initialize(loop, options={})
       @loop = loop
       @options = options
@@ -32,20 +35,20 @@ module Droonga
     end
 
     def start
-      $log.trace("#{log_tag}: start: start")
+      logger.trace("start: start")
       @forwarder.start
-      $log.trace("#{log_tag}: start: done")
+      logger.trace("start: done")
     end
 
     def shutdown
-      $log.trace("#{log_tag}: shutdown: start")
+      logger.trace("shutdown: start")
       @forwarder.shutdown
       if @database
         @database.close
         @context.close
         @database = @context = nil
       end
-      $log.trace("#{log_tag}: shutdown: done")
+      logger.trace("shutdown: done")
     end
 
     def prefer_synchronous?(type)
@@ -57,16 +60,16 @@ module Droonga
     end
 
     def process(message)
-      $log.trace("#{log_tag}: process: start")
+      logger.trace("process: start")
       type = message["type"]
       handler_class = find_handler_class(type)
       if handler_class.nil?
-        $log.trace("#{log_tag}: process: done: no handler: <#{type}>")
+        logger.trace("process: done: no handler: <#{type}>")
         return
       end
       process_type(handler_class, type, message)
-      $log.trace("#{log_tag}: process: done: <#{type}>",
-                 :handler => handler_class)
+      logger.trace("process: done: <#{type}>",
+                   :handler => handler_class)
     end
 
     private
@@ -75,8 +78,8 @@ module Droonga
         @context = Groonga::Context.new
         @database = @context.open_database(@database_name)
       end
-      $log.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
-                   "#{@options[:plugins].join(", ")}")
+      logger.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
+                     "#{@options[:plugins].join(", ")}")
       @step_runner = StepRunner.new(@options[:plugins] || [])
       @forwarder = Forwarder.new(@loop)
     end

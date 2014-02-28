@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -19,11 +17,14 @@ require "English"
 require "tsort"
 require "groonga"
 
+require "droonga/loggable"
 require "droonga/time_formatter"
 require "droonga/error_messages"
 
 module Droonga
   class Searcher
+    include Loggable
+
     class NoQuery < ErrorMessages::BadRequest
       def initialize
         super("You must specify one or more query.")
@@ -59,40 +60,40 @@ module Droonga
 
     def search(queries)
       outputs = nil
-      $log.trace("#{log_tag}: search: start", :queries => queries)
+      logger.trace("search: start", :queries => queries)
       @context.push_memory_pool do
         outputs = process_queries(queries)
       end
-      $log.trace("#{log_tag}: search: done")
+      logger.trace("search: done")
       return outputs
     end
 
     private
     def process_queries(queries)
-      $log.trace("#{log_tag}: process_queries: start")
+      logger.trace("process_queries: start")
       if queries.nil? or queries.empty?
         raise NoQuery.new
       end
-      $log.trace("#{log_tag}: process_queries: sort: start")
+      logger.trace("process_queries: sort: start")
       sorted_queries = QuerySorter.sort(queries)
-      $log.trace("#{log_tag}: process_queries: sort: done")
+      logger.trace("process_queries: sort: done")
       outputs = {}
       results = {}
       sorted_queries.each do |name|
         if queries[name]
-          $log.trace("#{log_tag}: process_queries: search: start",
-                     :name => name)
+          logger.trace("process_queries: search: start",
+                       :name => name)
           search_request = SearchRequest.new(@context, queries[name], results)
           search_result = QuerySearcher.search(search_request)
           results[name] = search_result.records
-          $log.trace("#{log_tag}: process_queries: search: done",
-                     :name => name)
+          logger.trace("process_queries: search: done",
+                       :name => name)
           if search_request.need_output?
-            $log.trace("#{log_tag}: process_queries: format: start",
-                       :name => name)
+            logger.trace("process_queries: format: start",
+                         :name => name)
             outputs[name] = ResultFormatter.format(search_request, search_result)
-            $log.trace("#{log_tag}: process_queries: format: done",
-                       :name => name)
+            logger.trace("process_queries: format: done",
+                         :name => name)
           end
         elsif @context[name]
           results[name] = @context[name]
@@ -100,7 +101,7 @@ module Droonga
           raise UnknownSource.new(name, queries)
         end
       end
-      $log.trace("#{log_tag}: process_queries: done")
+      logger.trace("process_queries: done")
       return outputs
     end
 
@@ -192,6 +193,8 @@ module Droonga
     end
 
     class QuerySearcher
+      include Loggable
+
       OPERATOR_CONVERSION_TABLE = {
         "||" => Groonga::Operator::OR,
         "&&" => Groonga::Operator::AND,
@@ -292,7 +295,7 @@ module Droonga
       end
 
       def search_query!
-        $log.trace("#{log_tag}: search_query: start")
+        logger.trace("search_query: start")
 
         @result.start_time = Time.now
 
@@ -309,7 +312,7 @@ module Droonga
         sort_by = @request.query["sortBy"]
         apply_sort_by!(sort_by) if sort_by
 
-        $log.trace("#{log_tag}: search_query: done")
+        logger.trace("search_query: done")
         @result.records = @records
         @result.end_time = Time.now
       end
@@ -318,16 +321,16 @@ module Droonga
         expression = Groonga::Expression.new(context: @request.context)
         expression.define_variable(:domain => @records)
         parse_condition(@records, expression, condition)
-        $log.trace("#{log_tag}: search_query: select: start",
-                   :condition => condition)
+        logger.trace("search_query: select: start",
+                     :condition => condition)
         @records = @records.select(expression)
-        $log.trace("#{log_tag}: search_query: select: done")
+        logger.trace("search_query: select: done")
         @result.condition = expression
       end
 
       def apply_group_by!(group_by)
-        $log.trace("#{log_tag}: search_query: group: start",
-                   :by => group_by)
+        logger.trace("search_query: group: start",
+                     :by => group_by)
         case group_by
         when String
           @records = @records.group(group_by)
@@ -338,13 +341,13 @@ module Droonga
         else
           raise '"groupBy" parameter must be a Hash or a String'
         end
-        $log.trace("#{log_tag}: search_query: group: done",
-                   :by => group_by)
+        logger.trace("search_query: group: done",
+                     :by => group_by)
       end
 
       def apply_sort_by!(sort_by)
-        $log.trace("#{log_tag}: search_query: sort: start",
-                   :by => sort_by)
+        logger.trace("search_query: sort: start",
+                     :by => sort_by)
         case sort_by
         when Array
           keys = parse_order_keys(sort_by)
@@ -358,8 +361,8 @@ module Droonga
           raise '"sortBy" parameter must be a Hash or an Array'
         end
         @records = @records.sort(keys, :offset => offset, :limit => limit)
-        $log.trace("#{log_tag}: search_query: sort: done",
-                   :by => sort_by)
+        logger.trace("search_query: sort: done",
+                     :by => sort_by)
       end
 
       def log_tag
