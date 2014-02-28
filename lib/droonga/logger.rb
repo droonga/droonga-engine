@@ -58,7 +58,7 @@ module Droonga
       log(:error,
           "#{message}: #{exception.message}(#{exception.class})",
           data)
-      log(:error_backtrace, exception.backtrace)
+      @output.error_backtrace(exception.backtrace)
     end
 
     private
