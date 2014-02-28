@@ -50,6 +50,10 @@ module Droonga
       log(:info, message, data)
     end
 
+    def warn(message, data={})
+      log(:warn, message, data)
+    end
+
     def error(message, data={})
       log(:error, message, data)
     end
