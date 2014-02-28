@@ -25,26 +25,11 @@ module Droonga
         loading = nil
         begin
           $LOAD_PATH.each do |load_path|
-            pattern = "#{load_path}/droonga/plugin/*"
-            $log.debug("#{self.name}: finding plugins at #{pattern}")
-            Dir.glob(pattern) do |type_path|
-              next unless File.directory?(type_path)
-              type = File.basename(type_path)
-              Dir.glob("#{type_path}/*.rb") do |path|
-                loading = path
-                name = File.basename(path, ".rb")
-                loader = new(type, name)
-                loader.load
-                loaded << path
-              end
-            end
-
             Pathname.glob("#{load_path}/droonga/plugins/*.rb") do |plugin_path|
               loading = plugin_path
-              relative_plugin_path =
-                plugin_path.relative_path_from(Pathname(load_path))
-              require_path = relative_plugin_path.to_s.gsub(/\.rb\z/, "")
-              require require_path
+              name = Pathname(plugin_path).basename(".rb").to_s
+              loader = new(name)
+              loader.load
               loaded << plugin_path
             end
           end
@@ -57,14 +42,12 @@ module Droonga
       end
     end
 
-    def initialize(type, name)
-      @type = type
+    def initialize(name)
       @name = name
     end
 
     def load
-      return if @type == "metadata"
-      require "droonga/plugin/#{@type}/#{@name}"
+      require "droonga/plugins/#{@name}"
     end
   end
 end
