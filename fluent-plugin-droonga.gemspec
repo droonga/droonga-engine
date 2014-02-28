@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.version       = "0.9.9"
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
-  gem.description   = "Droonga(distributed Groonga) plugin for Fluent event collector"
+  gem.description   = "Droonga (distributed Groonga) plugin for Fluent event collector"
   gem.summary       = gem.description
   gem.homepage      = "https://github.com/droonga/fluent-plugin-droonga"
   gem.files         = `git ls-files`.split($/)
