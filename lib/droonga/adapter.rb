@@ -14,6 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/pluggable"
+require "droonga/loggable"
 require "droonga/plugin/metadata/adapter_input_message"
 require "droonga/plugin/metadata/adapter_output_message"
 require "droonga/error_messages"
@@ -21,6 +22,7 @@ require "droonga/error_messages"
 module Droonga
   class Adapter
     extend Pluggable
+    include Loggable
     include ErrorMessages
 
     class << self
