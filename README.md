@@ -1,18 +1,17 @@
 # Fluent::Plugin::Droonga
 
-TODO: Write a gem description
+## What's "Droonga"?
 
-## What's "droonga"?
-
-Droonga is a distributed fulltext search engine, named from "distributed-groonga".
-This package provides droonga plugin for Fluent event collector.
+Droonga is a scalable data processing engine, named from "Distributed
+Groonga". Droonga can execute distributed fulltext search.
 
 ## Usage
 
-TODO: Write usage.
+See [droonga.org](http://droonga.org/). You can find overview, install
+manual, reference manual and tutorial at the site.
 
 ## Copyright
 
-* Copyright (c) 2013 Droonga Project
+* Copyright (c) 2013-2014 Droonga Project
 * License
   * GNU Lesser General Public License version 2.1
