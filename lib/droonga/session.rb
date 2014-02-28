@@ -64,7 +64,9 @@ module Droonga
         if post
           # XXX: It is just a workaround.
           # Remove me when super step is introduced.
-          if command == "search_gather"
+          if result["errors"]
+            reply_body = result
+          elsif command == "search_gather"
             reply_body = result
           else
             reply_body = result["result"]
