@@ -109,6 +109,12 @@ module Droonga
         end
       rescue ErrorMessage => error
         messenger.error(error.status_code, error.response_body)
+      rescue => error
+        logger.exception("failed to handle message", error)
+        internal_server_error =
+          ErrorMessages::InternalServerError.new("Unknown internal error")
+        messenger.error(internal_server_error.status_code,
+                        internal_server_error.response_body)
       end
     end
 
