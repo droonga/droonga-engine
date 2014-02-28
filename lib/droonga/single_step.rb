@@ -35,7 +35,7 @@ module Droonga
       options[:write] = @definition.write?
       collector_class = @definition.collector_class
       if collector_class
-        reduce_key = @definition.output[:aggregate] || "result"
+        reduce_key = "result"
         options[:reduce] = {
           reduce_key => collector_class.operator,
         }

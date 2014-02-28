@@ -80,17 +80,12 @@ module Droonga
           }
           watcher = Watcher.new(@context)
           watcher.subscribe(normalized_request)
-          {
-            "success" => true,
-          }
+          true
         end
       end
 
       define_single_step do |step|
         step.name = "watch.subscribe"
-        step.output = {
-          :aggregate => "success"
-        }
         step.write = true
         step.handler = SubscribeHandler
         step.collector = Collectors::And
@@ -114,17 +109,12 @@ module Droonga
           }
           watcher = Watcher.new(@context)
           watcher.unsubscribe(normalized_request)
-          {
-            "success" => true,
-          }
+          true
         end
       end
 
       define_single_step do |step|
         step.name = "watch.unsubscribe"
-        step.output = {
-          :aggregate => "success"
-        }
         step.write = true
         step.handler = UnsubscribeHandler
         step.collector = Collectors::And

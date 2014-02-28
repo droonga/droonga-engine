@@ -5,8 +5,6 @@
     "inReplyTo": "request-id",
     "statusCode": 200,
     "type": "watch.unsubscribe.result",
-    "body": {
-      "success": true
-    }
+    "body": true
   }
 ]

@@ -61,7 +61,16 @@ module Droonga
         #the task is done
         result = task["values"]
         post = step["post"]
-        @dispatcher.reply("body" => result) if post
+        if post
+          # XXX: It is just a workaround.
+          # Remove me when super step is introduced.
+          if command == "search_gather"
+            reply_body = result
+          else
+            reply_body = result["result"]
+          end
+          @dispatcher.reply("body" => reply_body)
+        end
         step["descendants"].each do |name, routes|
           message = {
             "id" => @id,

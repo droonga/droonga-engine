@@ -98,7 +98,15 @@ module Droonga
       handler = handler_class.new(@name, @context, messenger)
       begin
         result = handler.handle(handler_message)
-        messenger.emit(result) unless result.nil?
+        unless result.nil?
+          # XXX: It is just a workaround.
+          # Remove me when super step is introduced.
+          if handler.is_a?(Droonga::Plugins::Search::Handler)
+            messenger.emit(result)
+          else
+            messenger.emit("result" => result)
+          end
+        end
       rescue ErrorMessage => error
         messenger.error(error.status_code, error.response_body)
       end

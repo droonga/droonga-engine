@@ -45,7 +45,6 @@ module Droonga
             end
           else
             output_message.body.delete("filter")
-            output_message.body = output_message.body["success"]
           end
         end
       end
@@ -85,10 +84,7 @@ module Droonga
         end
 
         def handle(message)
-          succeeded = process_add(message.request)
-          {
-            "success" => succeeded,
-          }
+          process_add(message.request)
         end
 
         private
@@ -139,9 +135,6 @@ module Droonga
             :type => :table,
             :filter => "filter",
           },
-        }
-        step.output = {
-          :aggregate => "success",
         }
         step.write = true
         step.handler = Handler

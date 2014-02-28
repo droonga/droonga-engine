@@ -41,9 +41,9 @@ module Droonga
         def execute(request)
           @start_time = Time.now.to_f
           result = process_request(request)
-          format(header(Status::SUCCESS), result)
+          [header(Status::SUCCESS), result]
         rescue CommandError => error
-          format(header(error.status, error.message), error.result)
+          [header(error.status, error.message), error.result]
         end
 
         private
@@ -52,12 +52,6 @@ module Droonga
           header = [return_code, @start_time, elapsed_time]
           header.push(error_message) unless error_message.empty?
           header
-        end
-
-        def format(header, body)
-          {
-            "result" => [header, body],
-          }
         end
       end
     end
