@@ -1,5 +1,31 @@
 # News
 
+## 1.0.0: 2014-02-28
+
+### Improvements
+
+  * Updated catalog.json specification to
+    [version2](http://droonga.org/reference/catalog/version2/).
+    [version1](http://droonga.org/reference/catalog/version1/) is
+    still usable. But It is deprecated.
+  * Supported log API in plugin.
+  * Supported auto catalog.json reload.
+  * Changed adapter API:
+
+    Old:
+
+        message.input_pattern  = []
+        message.output_pattern = []
+
+    New:
+
+        input_message.pattern  = []
+        output_message.pattern = []
+
+  * Supported developing a plugin for handling phase.
+    See [tutorial](http://droonga.org/tutorial/plugin-development/handler/)
+    for details.
+
 ## 0.9.9: 2014-02-09
 
 ### Improvements
