@@ -54,7 +54,7 @@ module Droonga
           step.name = "table_remove"
           step.write = true
           step.handler = Handler
-          step.collector = Collectors::Add
+          step.collector = Collectors::Or
         end
       end
     end

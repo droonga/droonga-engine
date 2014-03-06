@@ -15,7 +15,7 @@
 
 module Droonga
   module Collectors
-    class Add
+    class Or
       class << self
         def operator
           "or"

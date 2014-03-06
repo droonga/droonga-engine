@@ -120,7 +120,7 @@ module Droonga
           step.name = "column_create"
           step.write = true
           step.handler = Handler
-          step.collector = Collectors::Add
+          step.collector = Collectors::Or
         end
       end
     end
