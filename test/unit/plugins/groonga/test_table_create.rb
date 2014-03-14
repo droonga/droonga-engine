@@ -139,7 +139,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
       }
       process(:table_create, request)
       assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY|KEY_NORMALIZE --key_type ShortText
+table_create Books TABLE_HASH_KEY --key_type ShortText --normalizer NormalizerAuto
       SCHEMA
     end
   end
