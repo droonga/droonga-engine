@@ -241,6 +241,17 @@ class CatalogSchemaTest < Test::Unit::TestCase
                        flags(data))
         end
 
+        def test_weight_options
+          data = {
+            "type" => "Vector",
+            "vectorOptions" => {
+              "weight" => true
+            }
+          }
+          assert_equal(["COLUMN_VECTOR", "WITH_WEIGHT"],
+                       flags(data))
+        end
+
         def test_index_options
           data = {
             "type" => "Index",

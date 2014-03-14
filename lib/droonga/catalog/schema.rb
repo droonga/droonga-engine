@@ -65,11 +65,12 @@ module Droonga
       end
 
       class Column
-        attr_reader :table, :name, :data, :index_options
+        attr_reader :table, :name, :data, :vector_options, :index_options
         def initialize(table, name, data)
           @table = table
           @name = name
           @data = data
+          @vector_options = ColumnVectorOptions.new(vector_options_data)
           @index_options = ColumnIndexOptions.new(index_options_data)
         end
 
@@ -97,7 +98,7 @@ module Droonga
         end
 
         def flags
-          [type_flag] + index_options.flags
+          [type_flag] + vector_options.flags + index_options.flags
         end
 
         def value_type
@@ -128,6 +129,10 @@ module Droonga
         end
 
         private
+        def vector_options_data
+          @data["vectorOptions"] || {}
+        end
+
         def index_options_data
           @data["indexOptions"] || {}
         end
