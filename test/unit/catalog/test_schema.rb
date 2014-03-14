@@ -229,23 +229,27 @@ class CatalogSchemaTest < Test::Unit::TestCase
       end
 
       class FlagsTest < self
+        def flags(data)
+          create_column("column_name", data).flags
+        end
+
         def test_type
+          data = {
+            "type" => "Scalar"
+          }
           assert_equal(["COLUMN_SCALAR"],
-                       create_column("column_name",
-                                     {
-                                       "type" => "Scalar"
-                                     }).flags)
+                       flags(data))
         end
 
         def test_type_and_index_options
+          data = {
+            "type" => "Scalar",
+            "indexOptions" => {
+              "section" => true
+            }
+          }
           assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
-                       create_column("column_name",
-                                     {
-                                       "type" => "Scalar",
-                                       "indexOptions" => {
-                                         "section" => true
-                                       }
-                                     }).flags)
+                       flags(data))
         end
       end
     end
