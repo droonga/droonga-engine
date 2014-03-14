@@ -241,10 +241,10 @@ class CatalogSchemaTest < Test::Unit::TestCase
                        "type"  => "ShortText"
                      },
                      create_column("column_name",
-                                  {
-                                    "type"      => "Scalar",
-                                    "valueType" => "ShortText"
-                                  }).to_column_create_body)
+                                   {
+                                     "type"      => "Scalar",
+                                     "valueType" => "ShortText"
+                                   }).to_column_create_body)
       end
     end
 
