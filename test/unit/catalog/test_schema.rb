@@ -198,14 +198,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    {}).type)
       end
 
-      def test_flags
-        assert_equal(["COLUMN_SCALAR"],
-                     create_column("column_name",
-                                   {
-                                     "type" => "Scalar"
-                                   }).flags)
-      end
-
       def test_value_type
         assert_equal("ShortText",
                      create_column("column_name",
@@ -222,17 +214,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    }).value_type_groonga)
       end
 
-      def test_flags_with_column_index_options
-        assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
-                     create_column("column_name",
-                                   {
-                                     "type" => "Scalar",
-                                     "indexOptions" => {
-                                       "section" => true
-                                     }
-                                   }).flags)
-      end
-
       def test_to_column_create_body
         assert_equal({
                        "name"  => "column_name",
@@ -245,6 +226,27 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                      "type"      => "Scalar",
                                      "valueType" => "ShortText"
                                    }).to_column_create_body)
+      end
+
+      class FlagsTest < self
+        def test_type
+          assert_equal(["COLUMN_SCALAR"],
+                       create_column("column_name",
+                                     {
+                                       "type" => "Scalar"
+                                     }).flags)
+        end
+
+        def test_type_and_index_options
+          assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
+                       create_column("column_name",
+                                     {
+                                       "type" => "Scalar",
+                                       "indexOptions" => {
+                                         "section" => true
+                                       }
+                                     }).flags)
+        end
       end
     end
 
