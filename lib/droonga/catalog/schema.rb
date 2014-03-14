@@ -18,6 +18,22 @@ require "tsort"
 module Droonga
   module Catalog
     class Schema
+      class ColumnVectorOptions
+        def initialize(data)
+          @data = data
+        end
+
+        def weight
+          @data["weight"]
+        end
+
+        def flags
+          flags = []
+          flags << "WITH_WEIGHT" if weight
+          flags
+        end
+      end
+
       class ColumnIndexOptions
         def initialize(data)
           @data = data
