@@ -241,14 +241,14 @@ class CatalogSchemaTest < Test::Unit::TestCase
                        flags(data))
         end
 
-        def test_type_and_index_options
+        def test_index_options
           data = {
-            "type" => "Scalar",
+            "type" => "Index",
             "indexOptions" => {
               "section" => true
             }
           }
-          assert_equal(["COLUMN_SCALAR", "WITH_SECTION"],
+          assert_equal(["COLUMN_INDEX", "WITH_SECTION"],
                        flags(data))
         end
       end
