@@ -28,6 +28,7 @@ module Droonga
       @loop = loop
       @host = host
       @port = port
+      @connected = false
     end
 
     def start
@@ -44,7 +45,7 @@ module Droonga
 
     def send(tag, data)
       logger.trace("send: start")
-      connect if @socket.closed?
+      connect unless @connected
       fluent_message = [tag, Time.now.to_i, data]
       packed_fluent_message = MessagePackPacker.pack(fluent_message)
       @socket.write(packed_fluent_message)
@@ -61,11 +62,16 @@ module Droonga
       end
       log_connect = lambda do
         logger.trace("connected to #{@host}:#{@port}")
+        @connected = true
       end
       log_failed = lambda do
         logger.error("failed to connect to #{@host}:#{@port}")
       end
+      on_close = lambda do
+        @connected = false
+      end
 
+      @connected = false
       @socket = Coolio::TCPSocket.connect(@host, @port)
       @socket.on_write_complete do
         log_write_complete.call
@@ -75,6 +81,9 @@ module Droonga
       end
       @socket.on_connect_failed do
         log_failed.call
+      end
+      @socket.on_close do
+        on_close.call
       end
       @loop.attach(@socket)
 
