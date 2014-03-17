@@ -21,7 +21,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
     Droonga::Catalog::Dataset.new(dataset_name, data)
   end
 
-  class DatasetTest < self
+  class NWorkersTest < self
     def test_value
       data = {
         "nWorkers" => 2
