@@ -143,7 +143,7 @@ module Droonga
         hash = Zlib.crc32(key)
         min = 0
         max = continuum.size - 1
-        while (min < max) do
+        while (min < max)
           index = (min + max) / 2
           value, key = continuum[index]
           return key if value == hash
