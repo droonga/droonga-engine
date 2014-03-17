@@ -100,8 +100,8 @@ module Droonga
         unified = unified_reducers[type]
         if unified
           unified["body"] = unified["body"].merge(reducer["body"])
-          unified["inputs"] = unified["inputs"] + reducer["inputs"]
-          unified["outputs"] = unified["outputs"] + reducer["outputs"]
+          unified["inputs"] += reducer["inputs"]
+          unified["outputs"] += reducer["outputs"]
         else
           unified_reducers[type] = reducer.dup
         end
@@ -116,7 +116,7 @@ module Droonga
         unified = unified_gatherers[type]
         if unified
           unified["body"] = unified["body"].merge(gatherer["body"])
-          unified["inputs"] = unified["inputs"] + gatherer["inputs"]
+          unified["inputs"] += gatherer["inputs"]
         else
           unified_gatherers[type] = gatherer.dup
         end
