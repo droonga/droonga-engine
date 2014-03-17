@@ -252,27 +252,27 @@ module Droonga
 
     def create_runners
       runners = {}
-      @catalog.datasets.each do |name, configuration|
-        runners[name] = yield(configuration)
+      @catalog.datasets.each do |name, dataset|
+        runners[name] = yield(dataset)
       end
       runners
     end
 
     def create_adapter_runners
-      create_runners do |configuration|
-        AdapterRunner.new(self, configuration["plugins"] || [])
+      create_runners do |dataset|
+        AdapterRunner.new(self, dataset["plugins"] || [])
       end
     end
 
     def create_collector_runners
-      create_runners do |configuration|
-        CollectorRunner.new(configuration["plugins"] || [])
+      create_runners do |dataset|
+        CollectorRunner.new(dataset["plugins"] || [])
       end
     end
 
     def create_step_runners
-      create_runners do |configuration|
-        StepRunner.new(configuration["plugins"] || [])
+      create_runners do |dataset|
+        StepRunner.new(dataset["plugins"] || [])
       end
     end
 
