@@ -29,8 +29,10 @@ class CatalogDatasetTest < Test::Unit::TestCase
       dataset = create_dataset("dataset_name", data)
       assert_equal(2, dataset["nWorkers"])
     end
+  end
 
-    def test_schema
+  class SchemaTest < self
+    def test_empty
       data = {
         "schema" => {
         }
