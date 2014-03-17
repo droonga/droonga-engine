@@ -260,19 +260,19 @@ module Droonga
 
     def create_adapter_runners
       create_runners do |dataset|
-        AdapterRunner.new(self, dataset["plugins"] || [])
+        AdapterRunner.new(self, dataset.plugins)
       end
     end
 
     def create_collector_runners
       create_runners do |dataset|
-        CollectorRunner.new(dataset["plugins"] || [])
+        CollectorRunner.new(dataset.plugins)
       end
     end
 
     def create_step_runners
       create_runners do |dataset|
-        StepRunner.new(dataset["plugins"] || [])
+        StepRunner.new(dataset.plugins)
       end
     end
 

@@ -42,4 +42,21 @@ class CatalogDatasetTest < Test::Unit::TestCase
                    dataset.schema)
     end
   end
+
+  class PluginsTest < self
+    def test_nonexistent
+      data = {
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_equal([], dataset.plugins)
+    end
+
+    def test_multiple
+      data = {
+        "plugins" => ["groonga", "crud"],
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_equal(["groonga", "crud"], dataset.plugins)
+    end
+  end
 end

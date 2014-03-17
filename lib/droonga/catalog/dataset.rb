@@ -37,6 +37,10 @@ module Droonga
       def schema
         @schema ||= Droonga::Catalog::Schema.new(@name, @data["schema"])
       end
+
+      def plugins
+        @data["plugins"] || []
+      end
     end
   end
 end
