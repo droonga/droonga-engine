@@ -103,7 +103,7 @@ module Droonga
           unified["inputs"] = unified["inputs"] + reducer["inputs"]
           unified["outputs"] = unified["outputs"] + reducer["outputs"]
         else
-          unified_reducers[type] = Marshal.load(Marshal.dump(reducer))
+          unified_reducers[type] = reducer.dup
         end
       end
       unified_reducers.values
@@ -118,7 +118,7 @@ module Droonga
           unified["body"] = unified["body"].merge(gatherer["body"])
           unified["inputs"] = unified["inputs"] + gatherer["inputs"]
         else
-          unified_gatherers[type] = Marshal.load(Marshal.dump(gatherer))
+          unified_gatherers[type] = gatherer.dup
         end
       end
       unified_gatherers.values
