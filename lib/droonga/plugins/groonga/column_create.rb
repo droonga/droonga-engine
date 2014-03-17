@@ -69,6 +69,9 @@ module Droonga
               options[:type] = :scalar
             elsif @command.column_vector?
               options[:type] = :vector
+              if @command.with_weight?
+                options[:with_weight] = true
+              end
             end
             options
           end
