@@ -32,7 +32,7 @@ module Droonga
           request = input_message.body
           key = request["key"] || rand.to_s
           values = request["values"] || {}
-          request["filter"] = values.merge("key" => key)
+          request["filter"] = values.merge("_key" => key)
         end
 
         def adapt_output(output_message)

@@ -55,12 +55,12 @@ module Droonga
       end
     end
 
-    def scatter(options={})
+    def scatter(record, options={})
       @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset || @source_message["dataset"],
         "body"    => options[:body] || @source_message["body"],
-        "key"     => nil,
+        "record"  => record,
         "type"    => "scatter",
         "outputs" => [],
         "replica" => "all",
@@ -126,10 +126,6 @@ module Droonga
 
     def fixed_processor
       @processor["outputs"] = @outputs
-      if @processor["type"] == "scatter"
-        raise ErrorMessages::InternalServerError.new("missing key") unless @key
-        @processor["key"] = @key
-      end
       @processor
     end
 

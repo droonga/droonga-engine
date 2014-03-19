@@ -75,7 +75,7 @@ module Droonga
             select_range_and_replicas(partition, args, routes)
           end
         when "scatter"
-          name = get_partition(dataset, args["key"])
+          name = get_partition(dataset, args["record"]["_key"])
           partition = dataset["ring"][name]
           select_range_and_replicas(partition, args, routes)
         end

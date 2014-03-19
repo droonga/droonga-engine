@@ -70,7 +70,9 @@ module Droonga
         when "scatter"
           replicas = select_replicas(dataset["replicas"], args["replica"])
           replicas.each do |replica|
-            slice = select_slice(replica, args["key"])
+            dimension = replica["dimension"] || "_key"
+            key = args["key"] || args["record"][dimension]
+            slice = select_slice(replica, key)
             routes << slice["volume"]["address"]
           end
         end

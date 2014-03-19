@@ -30,10 +30,9 @@ module Droonga
     end
 
     private
-    def scatter(message, options={})
+    def scatter(message, record, options={})
       planner = DistributedCommandPlanner.new(message)
-      planner.scatter
-      planner.key = options[:key]
+      planner.scatter(record)
       planner.reduce(options[:reduce])
       planner.plan
     end
