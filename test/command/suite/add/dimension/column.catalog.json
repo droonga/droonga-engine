@@ -1,0 +1,27 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Products": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "category": {
+              "type": "Scalar",
+              "valueType": "ShortText"
+            }
+          }
+        }
+      },
+      "replicas": [
+        {
+          "dimension": "category"
+        },
+        {
+          "dimension": "category"
+        }
+      ]
+    }
+  }
+}
+

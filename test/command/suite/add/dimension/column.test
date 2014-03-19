@@ -1,0 +1,50 @@
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Products",
+    "key": "Groonga",
+    "values": {
+      "category": "groonga"
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Products",
+    "key": "Rroonga",
+    "values": {
+      "category": "groonga"
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Products",
+    "key": "Ruby",
+    "values": {
+      "category": "ruby"
+    }
+  }
+}
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "products": {
+        "source": "Products",
+        "sortBy": ["_key"],
+        "output": {
+          "elements": ["records"],
+          "attributes": ["_key", "category"],
+          "limit": -1
+        }
+      }
+    }
+  }
+}

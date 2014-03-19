@@ -1,0 +1,57 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "add.result",
+    "body": true
+  }
+]
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "add.result",
+    "body": true
+  }
+]
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "add.result",
+    "body": true
+  }
+]
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "search.result",
+    "body": {
+      "products": {
+        "records": [
+          [
+            "Groonga",
+            "groonga"
+          ],
+          [
+            "Rroonga",
+            "groonga"
+          ],
+          [
+            "Ruby",
+            "ruby"
+          ]
+        ]
+      }
+    }
+  }
+]
