@@ -21,7 +21,8 @@ module Droonga
   class StepRunner
     include Loggable
 
-    def initialize(plugins)
+    def initialize(dataset, plugins)
+      @dataset = dataset
       @definitions = {}
       plugins.each do |name|
         plugin = Plugin.registry[name]
@@ -43,7 +44,7 @@ module Droonga
       if definition.nil?
         raise UnsupportedMessageError.new(:planner, message)
       end
-      step = SingleStep.new(definition)
+      step = SingleStep.new(@dataset, definition)
       plan = step.plan(message)
       logger.trace("plan: done",
                    :dataset => message["dataset"],

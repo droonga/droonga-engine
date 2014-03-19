@@ -18,7 +18,8 @@ require "droonga/collectors"
 
 module Droonga
   class SingleStep
-    def initialize(definition)
+    def initialize(dataset, definition)
+      @dataset = dataset
       @definition = definition
     end
 
@@ -40,14 +41,28 @@ module Droonga
           reduce_key => collector_class.operator,
         }
       end
-      inputs = @definition.inputs
-      if inputs.empty?
-        planner.send(:broadcast, message, options)
-      else
-        input = inputs.values.first
-        options[:key] = message["body"][input[:filter]]["key"]
+
+      body = message["body"]
+      fact_input = find_fact_input(@definition.inputs, @dataset.fact, body)
+      if fact_input
+        options[:key] = body[fact_input[:filter]]["key"]
         planner.send(:scatter, message, options)
+      else
+        planner.send(:broadcast, message, options)
       end
+    end
+
+    def find_fact_input(inputs, fact, body)
+      inputs.each do |key, input|
+        if input[:type] == :table
+          # for backward compatibility. We can remove the following code
+          # when all our catalog.json specify "fact" parameter.
+          return input if fact.nil?
+
+          return input if body[key] == fact
+        end
+      end
+      nil
     end
   end
 end

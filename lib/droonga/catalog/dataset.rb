@@ -41,6 +41,10 @@ module Droonga
       def plugins
         @data["plugins"] || []
       end
+
+      def fact
+        @data["fact"]
+      end
     end
   end
 end

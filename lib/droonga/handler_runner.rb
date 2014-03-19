@@ -80,7 +80,7 @@ module Droonga
       end
       logger.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                      "#{@options[:plugins].join(", ")}")
-      @step_runner = StepRunner.new(@options[:plugins] || [])
+      @step_runner = StepRunner.new(nil, @options[:plugins] || [])
       @forwarder = Forwarder.new(@loop)
     end
 

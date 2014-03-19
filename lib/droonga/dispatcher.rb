@@ -272,7 +272,7 @@ module Droonga
 
     def create_step_runners
       create_runners do |dataset|
-        StepRunner.new(dataset.plugins)
+        StepRunner.new(dataset, dataset.plugins)
       end
     end
 

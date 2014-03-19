@@ -59,4 +59,21 @@ class CatalogDatasetTest < Test::Unit::TestCase
       assert_equal(["groonga", "crud"], dataset.plugins)
     end
   end
+
+  class FactTest < self
+    def test_nonexistent
+      data = {
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_nil(dataset.fact)
+    end
+
+    def test_existent
+      data = {
+        "fact" => "Users",
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_equal("Users", dataset.fact)
+    end
+  end
 end
