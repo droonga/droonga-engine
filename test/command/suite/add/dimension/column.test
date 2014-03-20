@@ -1,3 +1,4 @@
+#@require-catalog-version 2
 {
   "type": "add",
   "dataset": "Droonga",
