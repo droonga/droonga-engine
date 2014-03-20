@@ -1,0 +1,33 @@
+{
+  "datasets": {
+    "Droonga": {
+      "fact": "Comments",
+      "schema": {
+        "Threads": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "name": {
+              "type": "Scalar",
+              "valueType": "ShortText"
+            }
+          }
+        },
+        "Comments": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "thread": {
+              "type": "Scalar",
+              "valueType": "Threads"
+            },
+            "content": {
+              "type": "Scalar",
+              "valueType": "Text"
+            }
+          }
+        }
+      }
+    }
+  }
+}

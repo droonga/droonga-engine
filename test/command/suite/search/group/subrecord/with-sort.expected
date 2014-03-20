@@ -1,0 +1,34 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 200,
+    "type": "search.result",
+    "body": {
+      "comments": {
+        "count": 2,
+        "records": [
+          [
+            "groonga",
+            1,
+            [
+              [
+                "Groonga is great!"
+              ]
+            ]
+          ],
+          [
+            "ruby",
+            1,
+            [
+              [
+                "Hi! I'm a new Rubyist!"
+              ]
+            ]
+          ]
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,80 @@
+# -*- js -*-
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Threads",
+    "key": "ruby",
+    "values": {
+      "name": "Ruby"
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Threads",
+    "key": "groonga",
+    "values": {
+      "name": "Groonga"
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Comments",
+    "key": "1",
+    "values": {
+      "thread": "ruby",
+      "content": "Hi! I'm a new Rubyist!"
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Comments",
+    "key": "2",
+    "values": {
+      "thread": "groonga",
+      "content": "Groonga is great!"
+    }
+  }
+}
+#@enable-logging
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "comments": {
+        "source": "Comments",
+        "groupBy": {
+          "key": "thread",
+          "maxNSubRecords": 10
+        },
+        "sortBy": ["_key"],
+        "output": {
+          "elements": ["count", "records"],
+          "limit": -1,
+          "attributes": [
+            "_key",
+            "_nsubrecs",
+            {
+              "label": "items",
+              "source": "_subrecs",
+              "attributes": [
+                "content"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

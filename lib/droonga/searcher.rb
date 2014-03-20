@@ -449,7 +449,12 @@ module Droonga
     module RecordsFormattable
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
-          record.sub_records.collect do |sub_record|
+          if record.table.is_a?(Groonga::Array)
+            target_record = record.value
+          else
+            target_record = record
+          end
+          target_record.sub_records.collect do |sub_record|
             sub_attributes = attribute[:attributes]
             format_record(sub_attributes, sub_record)
           end
