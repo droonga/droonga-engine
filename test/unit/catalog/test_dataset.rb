@@ -51,7 +51,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
   end
 
   class PluginsTest < self
-    def test_nonexistent
+    def test_default
       data = {
       }
       dataset = create_dataset(data)
@@ -68,14 +68,14 @@ class CatalogDatasetTest < Test::Unit::TestCase
   end
 
   class FactTest < self
-    def test_nonexistent
+    def test_default
       data = {
       }
       dataset = create_dataset(data)
       assert_nil(dataset.fact)
     end
 
-    def test_existent
+    def test_specified
       data = {
         "fact" => "Users",
       }
