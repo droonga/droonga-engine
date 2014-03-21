@@ -13,16 +13,22 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/collection_volume"
+require "droonga/catalog/dataset"
 
 class CatalogSingleVolumeTest < Test::Unit::TestCase
   def create_collection_volume(data)
-    Droonga::Catalog::CollectionVolume.new(data)
+    minimum_dataset_data = {
+      "replicas" => {
+      },
+    }
+    dataset = Droonga::Catalog::Dataset.new("DatasetName", minimum_dataset_data)
+    Droonga::Catalog::CollectionVolume.new(dataset, data)
   end
 
   class DimensionTest < self
     def test_default
       data = {
+        "slices" => [],
       }
       volume = create_collection_volume(data)
       assert_equal("_key", volume.dimension)
@@ -31,6 +37,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
     def test_specified
       data = {
         "dimension" => "group",
+        "slices" => [],
       }
       volume = create_collection_volume(data)
       assert_equal("group", volume.dimension)
@@ -40,6 +47,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
   class SlicerTest < self
     def test_default
       data = {
+        "slices" => [],
       }
       volume = create_collection_volume(data)
       assert_equal("hash", volume.slicer)
@@ -61,6 +69,35 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       }
       volume = create_collection_volume(data)
       assert_equal([], volume.slices)
+    end
+  end
+
+  class RatioOrderSlicerTest < self
+    class TotalWeightTest < self
+      def test_three_slices
+        data = {
+          "slicer" => "hash",
+          "slices" => [
+            {
+              "weight" => 10,
+            },
+            {
+              "weight" => 20,
+            },
+            {
+              "weight" => 30,
+            },
+          ],
+        }
+        assert_equal(10 + 20 + 30,
+                     total_weight(data))
+      end
+
+      private
+      def total_weight(data)
+        volume = create_collection_volume(data)
+        volume.send(:compute_total_weight)
+      end
     end
   end
 end

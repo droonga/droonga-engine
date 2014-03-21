@@ -18,7 +18,8 @@ require "droonga/catalog/volume"
 module Droonga
   module Catalog
     class Slice
-      def initialize(data)
+      def initialize(dataset, data)
+        @dataset = dataset
         @data = data
       end
 
@@ -35,7 +36,7 @@ module Droonga
       end
 
       def volume
-        @volume ||= Volume.create(@data["volume"])
+        @volume ||= Volume.create(@dataset, @data["volume"])
       end
     end
   end

@@ -64,7 +64,7 @@ module Droonga
         when "broadcast"
           volumes = dataset.replicas.select(args["replica"].to_sym)
           volumes.each do |volume|
-            slices = select_slices(volume)
+            slices = volume.select_slices
             slices.each do |slice|
               routes << slice.volume.address
             end
@@ -72,10 +72,8 @@ module Droonga
         when "scatter"
           volumes = dataset.replicas.select(args["replica"].to_sym)
           volumes.each do |volume|
-            dimension = volume.dimension
-            key = args["key"] || args["record"][dimension]
-            slice = select_slice(volume, key)
-            routes << slice["volume"]["address"]
+            slice = volume.choose_slice(args["record"])
+            routes << slice.volume.address
           end
         end
         routes
@@ -90,64 +88,8 @@ module Droonga
       def prepare_data
         @datasets = {}
         @data["datasets"].each do |name, dataset|
-          replicas = dataset["replicas"]
-          replicas.each do |replica|
-            total_weight = compute_total_weight(replica)
-            continuum = []
-            slices = replica["slices"]
-            n_slices = slices.size
-            slices.each do |slice|
-              weight = slice["weight"] || default_weight
-              points = n_slices * 160 * weight / total_weight
-              points.times do |point|
-                hash = Digest::SHA1.hexdigest("#{name}:#{point}")
-                continuum << [hash[0..7].to_i(16), slice]
-              end
-            end
-            replica["continuum"] = continuum.sort do |a, b|
-              a[0] - b[0]
-            end
-          end
           @datasets[name] = Dataset.new(name, dataset)
         end
-      end
-
-      def default_weight
-        1
-      end
-
-      def compute_total_weight(replica)
-        slices = replica["slices"]
-        slices.reduce(0) do |result, slice|
-          result + (slice["weight"] || default_weight)
-        end
-      end
-
-      def select_slices(volume, range=0..-1)
-        sorted_slices = volume.slices.sort_by do |slice|
-          slice.label
-        end
-        sorted_slices[range]
-      end
-
-      def select_slice(volume, key)
-        continuum = volume["continuum"]
-        return volume.slices.first unless continuum
-
-        hash = Zlib.crc32(key)
-        min = 0
-        max = continuum.size - 1
-        while (min < max)
-          index = (min + max) / 2
-          value, key = continuum[index]
-          return key if value == hash
-          if value > hash
-            max = index
-          else
-            min = index + 1
-          end
-        end
-        continuum[max][1]
       end
     end
   end

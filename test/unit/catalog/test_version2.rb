@@ -121,35 +121,4 @@ class CatalogVersion2Test < Test::Unit::TestCase
       end
     end
   end
-
-  class DataSetTest < self
-    class ReplicaTest < self
-      class TotalWeightTest < self
-        def test_three_slices
-          replica = {
-            "slices" => [
-              {
-                "weight" => 10,
-              },
-              {
-                "weight" => 20,
-              },
-              {
-                "weight" => 30,
-              },
-            ],
-          }
-          assert_equal(10 + 20 + 30,
-                       total_weight(replica))
-        end
-
-        private
-        def total_weight(replica)
-          catalog = create_catalog(minimum_data,
-                                   "base-path")
-          catalog.send(:compute_total_weight, replica)
-        end
-      end
-    end
-  end
 end

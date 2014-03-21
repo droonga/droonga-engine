@@ -61,7 +61,7 @@ module Droonga
       private
       def create_volumes(raw_volumes)
         raw_volumes.collect do |raw_volume|
-          Volume.create(raw_volume)
+          Volume.create(self, raw_volume)
         end
       end
     end

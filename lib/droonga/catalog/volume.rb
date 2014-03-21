@@ -20,11 +20,11 @@ module Droonga
   module Catalog
     module Volume
       class << self
-        def create(raw_volume)
+        def create(dataset, raw_volume)
           if raw_volume.key?("address")
             SingleVolume.new(raw_volume)
           else
-            CollectionVolume.new(raw_volume)
+            CollectionVolume.new(dataset, raw_volume)
           end
         end
       end

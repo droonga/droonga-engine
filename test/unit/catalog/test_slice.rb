@@ -13,12 +13,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/slice"
+require "droonga/catalog/dataset"
 
 class CatalogSliceTest < Test::Unit::TestCase
   private
   def create_slice(data)
-    Droonga::Catalog::Slice.new(data)
+    minimum_dataset_data = {
+      "replicas" => {
+      },
+    }
+    dataset = Droonga::Catalog::Dataset.new("DatasetName", minimum_dataset_data)
+    Droonga::Catalog::Slice.new(dataset, data)
   end
 
   class WeightTest < self
