@@ -66,7 +66,7 @@ module Droonga
           volumes.each do |volume|
             slices = select_slices(volume)
             slices.each do |slice|
-              routes << slice["volume"]["address"]
+              routes << slice.volume.address
             end
           end
         when "scatter"
