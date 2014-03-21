@@ -15,7 +15,7 @@
 
 require "droonga/catalog/version1"
 
-class CatalogTestVersion1 < Test::Unit::TestCase
+class CatalogVersion1Test < Test::Unit::TestCase
   class << self
     def minimum_data
       {
