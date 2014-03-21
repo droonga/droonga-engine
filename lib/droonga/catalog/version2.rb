@@ -37,8 +37,8 @@ module Droonga
         @datasets.each do |dataset_name, dataset|
           n_workers = dataset.n_workers
           plugins = dataset.plugins
-          dataset.replicas.each do |replica|
-            replica["slices"].each do |slice|
+          dataset.replicas.each do |volume|
+            volume.slices.each do |slice|
               volume_address = slice["volume"]["address"]
               if pattern =~ volume_address
                 path = File.join([device, $POSTMATCH, "db"])
