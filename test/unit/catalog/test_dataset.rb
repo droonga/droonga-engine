@@ -17,15 +17,15 @@ require "droonga/catalog/dataset"
 
 class CatalogDatasetTest < Test::Unit::TestCase
   private
-  def create_dataset(dataset_name, data)
-    Droonga::Catalog::Dataset.new(dataset_name, data)
+  def create_dataset(data)
+    Droonga::Catalog::Dataset.new("DatasetName", data)
   end
 
   class NWorkersTest < self
     def test_default
       data = {
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal(0, dataset.n_workers)
     end
 
@@ -33,7 +33,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
       data = {
         "nWorkers" => 2
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal(2, dataset.n_workers)
     end
   end
@@ -44,7 +44,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
         "schema" => {
         }
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal(Droonga::Catalog::Schema.new("dataset_name", {}),
                    dataset.schema)
     end
@@ -54,7 +54,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
     def test_nonexistent
       data = {
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal([], dataset.plugins)
     end
 
@@ -62,7 +62,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
       data = {
         "plugins" => ["groonga", "crud"],
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal(["groonga", "crud"], dataset.plugins)
     end
   end
@@ -71,7 +71,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
     def test_nonexistent
       data = {
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_nil(dataset.fact)
     end
 
@@ -79,7 +79,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
       data = {
         "fact" => "Users",
       }
-      dataset = create_dataset("dataset_name", data)
+      dataset = create_dataset(data)
       assert_equal("Users", dataset.fact)
     end
   end
