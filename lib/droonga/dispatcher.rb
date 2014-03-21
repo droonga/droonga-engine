@@ -135,7 +135,7 @@ module Droonga
         adapted_message = adapter_runner.adapt_output(adapted_message)
       end
       if adapted_message["replyTo"].nil?
-        status_code = adapted_message["statusCode"]
+        status_code = adapted_message["statusCode"] || 200
         if status_code != 200
           dataset = adapted_message["dataset"]
           body = adapted_message["body"] || {}
