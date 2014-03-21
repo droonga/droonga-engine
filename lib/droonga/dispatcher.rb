@@ -134,8 +134,19 @@ module Droonga
       if adapter_runner
         adapted_message = adapter_runner.adapt_output(adapted_message)
       end
-      return if adapted_message["replyTo"].nil?
-      @replier.reply(adapted_message)
+      if adapted_message["replyTo"].nil?
+        status_code = adapted_message["statusCode"]
+        if status_code != 200
+          dataset = adapted_message["dataset"]
+          body = adapted_message["body"] || {}
+          name = body["name"] || "Unknown"
+          message = body["message"] || "unknown error"
+          logger.error("orphan error: " +
+                         "<#{dataset}>[#{name}](#{status_code}): #{message}")
+        end
+      else
+        @replier.reply(adapted_message)
+      end
     end
 
     def process_internal_message(message)
