@@ -19,19 +19,10 @@ require "coolio"
 
 module Droonga
   class EventLoop
-    def initialize
-      @loop = Coolio::Loop.new
+    def initialize(loop)
+      @loop = loop
       @loop_breaker = Coolio::AsyncWatcher.new
       @loop_breaker.attach(@loop)
-    end
-
-    def run
-      @loop.run
-    end
-
-    def stop
-      @loop.stop
-      break_current_loop
     end
 
     def attach(watcher)

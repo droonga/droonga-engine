@@ -54,7 +54,7 @@ module Droonga
       @catalog = catalog
       @options = options
       @name = @options[:name]
-      @loop = EventLoop.new
+      @loop = EventLoop.new(Coolio::Loop.default)
       @sessions = {}
       @current_id = 0
       @local = Regexp.new("^#{@name}")
@@ -69,9 +69,6 @@ module Droonga
     def start
       @forwarder.start
       @farm.start
-      @loop_thread = Thread.new do
-        @loop.run
-      end
 
       ensure_schema
     end
@@ -85,8 +82,6 @@ module Droonga
         adapter_runner.shutdown
       end
       @farm.shutdown
-      @loop.stop
-      @loop_thread.join
     end
 
     def process_message(message)

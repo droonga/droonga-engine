@@ -20,7 +20,8 @@ require "droonga/message_receiver"
 module Droonga
   module Worker
     def initialize
-      @loop = EventLoop.new
+      @raw_loop = Coolio::Loop.new
+      @loop = EventLoop.new(@raw_loop)
       @handler_runner = HandlerRunner.new(@loop,
                                           config.merge(:dispatcher => nil))
       receiver_socket = config[:message_receiver]
@@ -33,7 +34,7 @@ module Droonga
       Droonga.logger.trace("#{log_tag}: run: start")
       @handler_runner.start
       @message_receiver.start
-      @loop.run
+      @raw_loop.run
       @handler_runner.shutdown
       Droonga.logger.trace("#{log_tag}: run: done")
     end
@@ -41,7 +42,8 @@ module Droonga
     def stop
       Droonga.logger.trace("#{log_tag}: stop: start")
       @message_receiver.shutdown
-      @loop.stop
+      @raw_loop.stop
+      @loop.break_current_loop
       Droonga.logger.trace("#{log_tag}: stop: done")
     end
 
