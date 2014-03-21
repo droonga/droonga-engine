@@ -14,8 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/catalog/schema"
-require "droonga/catalog/single_volume"
-require "droonga/catalog/collection_volume"
+require "droonga/catalog/volume"
 require "droonga/catalog/volume_collection"
 
 module Droonga
@@ -60,11 +59,7 @@ module Droonga
       private
       def create_volumes(raw_volumes)
         raw_volumes.collect do |raw_volume|
-          if raw_volume.key?("address")
-            SingleVolume.new(raw_volume)
-          else
-            CollectionVolume.new(raw_volume)
-          end
+          Volume.create(raw_volume)
         end
       end
     end
