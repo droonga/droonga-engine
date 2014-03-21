@@ -42,5 +42,25 @@ class CatalogVersion2ValidatorTest < Test::Unit::TestCase
         validate({})
       end
     end
+
+    class DatasetTest < self
+      class ReplicasTest < self
+        def test_missing
+          details = [
+            detail("datasets.Droonga.replicas",
+                   "required parameter is missing"),
+          ]
+          assert_raise(validation_error(details)) do
+            data = {
+              "datasets" => {
+                "Droonga" => {
+                }
+              }
+            }
+            validate(data)
+          end
+        end
+      end
+    end
   end
 end

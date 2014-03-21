@@ -39,6 +39,16 @@ module Droonga
           required_parameter_is_missing("datasets")
           return
         end
+        @data["datasets"].each do |name, dataset|
+          validate_dataset(name, dataset)
+        end
+      end
+
+      def validate_dataset(name, dataset)
+        unless dataset.key?("replicas")
+          required_parameter_is_missing("datasets.#{name}.replicas")
+          return
+        end
       end
 
       def add_detail(value_path, message)
