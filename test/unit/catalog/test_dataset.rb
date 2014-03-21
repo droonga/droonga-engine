@@ -22,12 +22,19 @@ class CatalogDatasetTest < Test::Unit::TestCase
   end
 
   class NWorkersTest < self
-    def test_value
+    def test_default
+      data = {
+      }
+      dataset = create_dataset("dataset_name", data)
+      assert_equal(0, dataset.n_workers)
+    end
+
+    def test_specified
       data = {
         "nWorkers" => 2
       }
       dataset = create_dataset("dataset_name", data)
-      assert_equal(2, dataset["nWorkers"])
+      assert_equal(2, dataset.n_workers)
     end
   end
 

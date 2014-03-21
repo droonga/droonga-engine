@@ -33,7 +33,7 @@ module Droonga
         pattern = Regexp.new("^#{name}\.")
         results = {}
         @datasets.each do |dataset_name, dataset|
-          n_workers = dataset["nWorkers"]
+          n_workers = dataset.n_workers
           plugins = dataset["plugins"]
           dataset["replicas"].each do |replica|
             replica["slices"].each do |slice|

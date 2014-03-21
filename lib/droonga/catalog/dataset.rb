@@ -45,6 +45,10 @@ module Droonga
       def fact
         @data["fact"]
       end
+
+      def n_workers
+        @data["nWorkers"] || 0
+      end
     end
   end
 end
