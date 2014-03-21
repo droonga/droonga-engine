@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/catalog/slice"
+
 module Droonga
   module Catalog
     class CollectionVolume
@@ -29,7 +31,9 @@ module Droonga
       end
 
       def slices
-        @data["slices"]
+        @slices ||= @data["slices"].collect do |raw_slice|
+          Slice.new(raw_slice)
+        end
       end
 
       # Just for backward compatibility

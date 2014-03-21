@@ -39,7 +39,7 @@ module Droonga
           plugins = dataset.plugins
           dataset.replicas.each do |volume|
             volume.slices.each do |slice|
-              volume_address = slice["volume"]["address"]
+              volume_address = slice.volume.address
               if pattern =~ volume_address
                 path = File.join([device, $POSTMATCH, "db"])
                 path = File.expand_path(path, base_path)
@@ -125,7 +125,7 @@ module Droonga
 
       def select_slices(volume, range=0..-1)
         sorted_slices = volume.slices.sort_by do |slice|
-          slice["label"]
+          slice.label
         end
         sorted_slices[range]
       end
