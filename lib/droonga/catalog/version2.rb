@@ -15,12 +15,14 @@
 
 require "droonga/catalog/base"
 require "droonga/catalog/dataset"
+require "droonga/catalog/version2_validator"
 
 module Droonga
   module Catalog
     class Version2 < Base
       def initialize(data, path)
         super
+        validate
         prepare_data
       end
 
@@ -81,7 +83,8 @@ module Droonga
 
       private
       def validate
-        # TODO: Implement me.
+        validator = Version2Validator.new(@data, @path)
+        validator.validate
       end
 
       def prepare_data

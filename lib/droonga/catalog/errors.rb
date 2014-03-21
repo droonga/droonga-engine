@@ -18,6 +18,25 @@ require "droonga/error"
 module Droonga
   module Catalog
     class ValidationError < Error
+      class Detail
+        attr_reader :value_path, :message
+        def initialize(value_path, message)
+          @value_path = value_path
+          @message = message
+        end
+      end
+
+      attr_reader :path, :details
+      def initialize(path, details)
+        message = "validation error: <#{path}>"
+        details.each do |detail|
+          message << "\n  * #{detail.value_path}: #{detail.message}"
+        end
+        super(message)
+      end
+    end
+
+    class LegacyValidationError < Error
       def initialize(message, path)
         if path
           super("[Validation Error <#{path}>]#{message}")
@@ -27,13 +46,13 @@ module Droonga
       end
     end
 
-    class MissingRequiredParameter < ValidationError
+    class MissingRequiredParameter < LegacyValidationError
       def initialize(name, path)
         super("[#{name}] A required parameter is missing.", path)
       end
     end
 
-    class MismatchedParameterType < ValidationError
+    class MismatchedParameterType < LegacyValidationError
       def initialize(name, expected_types, actual, path)
         expected_types = [expected_types] unless expected_types.is_a?(Array)
         message = nil
@@ -49,43 +68,43 @@ module Droonga
       end
     end
 
-    class InvalidDate < ValidationError
+    class InvalidDate < LegacyValidationError
       def initialize(name, value, path)
         super("[#{name}] Invalid date string: <#{value}>", path)
       end
     end
 
-    class NegativeNumber < ValidationError
+    class NegativeNumber < LegacyValidationError
       def initialize(name, actual, path)
         super("[#{name}] A positive number is expected, but <#{actual}>", path)
       end
     end
 
-    class SmallerThanOne < ValidationError
+    class SmallerThanOne < LegacyValidationError
       def initialize(name, actual, path)
         super("[#{name}] A number 1 or larger is expected, but <#{actual}>", path)
       end
     end
 
-    class FarmNotZoned < ValidationError
+    class FarmNotZoned < LegacyValidationError
       def initialize(name, zones, path)
         super("The farm does not appear in zones: <#{name}>, zones=<#{zones}>", path)
       end
     end
 
-    class UnknownFarmInZones < ValidationError
+    class UnknownFarmInZones < LegacyValidationError
       def initialize(name, zones, path)
         super("The farm is unknown: <#{name}>, zones=<#{zones}>", path)
       end
     end
 
-    class UnknownFarmForPartition < ValidationError
+    class UnknownFarmForPartition < LegacyValidationError
       def initialize(name, slice, path)
         super("The farm is unknown: <{#name}>, slice=<#{slice}>", path)
       end
     end
 
-    class UnsupportedValue < ValidationError
+    class UnsupportedValue < LegacyValidationError
       def initialize(name, value, path)
         super("[#{name}] Not supported value: <#{value}>", path)
       end

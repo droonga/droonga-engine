@@ -166,7 +166,7 @@ module Droonga
       def do_validation(&block)
         begin
           yield
-        rescue ValidationError => error
+        rescue LegacyValidationError => error
           @errors << error
         end
       end
@@ -413,7 +413,7 @@ module Droonga
                     if directory_name.nil? or directory_name.empty?
                       message = "\"#{partition}\" has no database name. " +
                                   "You mus specify a database name for \"#{name}\"."
-                      raise ValidationError.new(message, @path)
+                      raise LegacyValidationError.new(message, @path)
                     end
                   end
                 end
