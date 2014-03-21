@@ -13,46 +13,30 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/schema"
-require "droonga/catalog/replica_collection"
-
 module Droonga
   module Catalog
-    class Dataset
-      def initialize(name, data)
-        @name = name
-        @data = data
-        @schema = nil
+    class ReplicaCollection
+      include Enumerable
+
+      def initialize(replicas)
+        @replicas = replicas
       end
 
-      # provided for compatibility
-      def [](key)
-        @data[key]
+      def each(&block)
+        @replicas.each(&block)
       end
 
-      # provided for compatibility
-      def []=(key, value)
-        @data[key] = value
+      def ==(other)
+        other.is_a?(self.class) and
+          to_a == other.to_a
       end
 
-      def schema
-        @schema ||= Schema.new(@name, @data["schema"])
+      def eql?(other)
+        self == other
       end
 
-      def plugins
-        @data["plugins"] || []
-      end
-
-      def fact
-        @data["fact"]
-      end
-
-      def n_workers
-        @data["nWorkers"] || 0
-      end
-
-      def replicas
-        @replicas ||= ReplicaCollection.new(@data["replicas"])
+      def hash
+        to_a.hash
       end
     end
   end
