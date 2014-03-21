@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,47 +16,120 @@
 require "msgpack"
 
 require "droonga/logger"
+require "droonga/job_message_protocol"
 
 module Droonga
   class MessagePusher
     include Loggable
 
-    attr_reader :raw_receiver
-    def initialize(loop)
+    attr_reader :socket_path
+    def initialize(loop, base_path)
       @loop = loop
+      @socket_path = "#{base_path}.sock"
+      @job_queue = JobQueue.new(@loop)
     end
 
-    def start(base_path)
-      socket_path = "#{base_path}.sock"
-      FileUtils.rm_f(socket_path)
-      @raw_receiver = UNIXServer.new(socket_path)
-      FileUtils.chmod(0600, socket_path)
+    def start
+      FileUtils.rm_f(@socket_path)
+      @workers = []
+      @server = Coolio::UNIXServer.new(@socket_path) do |connection|
+        @workers << WorkerConnection.new(@loop, @job_queue, connection)
+      end
+      FileUtils.chmod(0600, @socket_path)
+      @loop.attach(@server)
+    end
+
+    def close
+      @server.close
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      socket_path = @raw_receiver.path
-      @raw_receiver.close
-      FileUtils.rm_f(socket_path)
+      @server.close
+      @workers.each do |worker|
+        worker.close
+      end
+      FileUtils.rm_f(@socket_path)
       logger.trace("shutdown: done")
     end
 
     def push(message)
       logger.trace("push: start")
-      packed_message = message.to_msgpack
-      path = @raw_receiver.path
-      sender = Coolio::UNIXSocket.connect(path)
-      sender.write(message.to_msgpack)
-      sender.on_write_complete do
-        close
-      end
-      @loop.attach(sender)
+      @job_queue.push(message)
       logger.trace("push: done")
     end
 
     private
     def log_tag
       "message_pusher"
+    end
+
+    class JobQueue
+      def initialize(loop)
+        @loop = loop
+        @buffers = []
+        @ready_workers = []
+      end
+
+      def push(message)
+        job = message.to_msgpack
+        @buffers << job
+        consume_buffers
+      end
+
+      def ready(worker)
+        if @buffers.empty?
+          @ready_workers << worker
+        else
+          worker.write(@buffers.shift)
+        end
+      end
+
+      private
+      def consume_buffers
+        return if @ready_workers.empty?
+        until @buffers.empty?
+          while worker = @ready_workers.shift
+            worker.write(@buffers.shift)
+            return if @buffers.empty?
+          end
+        end
+      end
+    end
+
+    class WorkerConnection
+      def initialize(loop, job_queue, connection)
+        @loop = loop
+        @job_queue = job_queue
+        @connection = connection
+        @ready = false
+        setup_connection
+      end
+
+      def ready?
+        @ready
+      end
+
+      def write(job)
+        @connection.write(job)
+        @ready = false
+        @loop.break_current_loop
+      end
+
+      def close
+        @connection.close
+      end
+
+      private
+      def setup_connection
+        on_read = lambda do |data|
+          @ready = (data == JobMessageProtocol::READY_SIGNAL)
+          @job_queue.ready(self)
+        end
+        @connection.on_read do |data|
+          on_read.call(data)
+        end
+      end
     end
   end
 end

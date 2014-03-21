@@ -21,6 +21,8 @@ module Droonga
   module Server
     def before_run
       Droonga.logger.trace("#{log_tag}: before_run: start")
+      config[:message_pusher].close
+      config.delete(:message_pusher)
       Droonga.logger.trace("#{log_tag}: before_run: done")
     end
 

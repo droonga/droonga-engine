@@ -30,7 +30,7 @@ module Droonga
       @options = options
       @n_workers = @options[:n_workers] || 0
       @loop = loop
-      @message_pusher = MessagePusher.new(@loop)
+      @message_pusher = MessagePusher.new(@loop, @options[:database])
       @processor = Processor.new(@loop, @message_pusher, @options)
       @supervisor = nil
     end
@@ -38,8 +38,7 @@ module Droonga
     def start
       ensure_database
       @processor.start
-      base_path = @options[:database]
-      @message_pusher.start(base_path)
+      @message_pusher.start
       start_supervisor if @n_workers > 0
     end
 
@@ -84,7 +83,8 @@ module Droonga
           :log_level     => logger.level,
           :server_process_name => "Server[#{@options[:database]}] #$0",
           :worker_process_name => "Worker[#{@options[:database]}] #$0",
-          :message_receiver => @message_pusher.raw_receiver,
+          :message_receive_socket_path => @message_pusher.socket_path,
+          :message_pusher => @message_pusher,
         }
         @options.merge(force_options)
       end

@@ -16,21 +16,22 @@
 require "msgpack"
 
 require "droonga/loggable"
+require "droonga/job_message_protocol"
 
 module Droonga
   class MessageReceiver
     include Loggable
 
-    def initialize(loop, receiver, &callback)
+    def initialize(loop, socket_path, &callback)
       @loop = loop
-      @receiver = Coolio::Server.new(receiver, Coolio::Socket) do |connection|
-        setup_receive_handler(connection)
-      end
+      @socket_path = socket_path
       @callback = callback
     end
 
     def start
       logger.trace("start: start")
+      @receiver = Coolio::UNIXSocket.connect(@socket_path)
+      setup_receive_handler(@receiver)
       @loop.attach(@receiver)
       logger.trace("start: done")
     end
@@ -50,10 +51,16 @@ module Droonga
           @callback.call(message)
         end
         logger.trace("on_read: done")
+        send_ready(connection)
       end
       connection.on_read do |data|
         on_read.call(data)
       end
+      send_ready(connection)
+    end
+
+    def send_ready(connection)
+      connection.write(JobMessageProtocol::READY_SIGNAL)
     end
 
     def log_tag

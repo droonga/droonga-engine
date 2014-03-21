@@ -24,8 +24,8 @@ module Droonga
       @loop = EventLoop.new(@raw_loop)
       @handler_runner = HandlerRunner.new(@loop,
                                           config.merge(:dispatcher => nil))
-      receiver_socket = config[:message_receiver]
-      @message_receiver = MessageReceiver.new(@loop, receiver_socket) do |message|
+      receive_socket_path = config[:message_receive_socket_path]
+      @message_receiver = MessageReceiver.new(@loop, receive_socket_path) do |message|
         process(message)
       end
     end
