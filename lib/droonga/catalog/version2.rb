@@ -62,19 +62,19 @@ module Droonga
         dataset = dataset(name)
         case args["type"]
         when "broadcast"
-          replicas = dataset.replicas.select(args["replica"].to_sym)
-          replicas.each do |replica|
-            slices = select_slices(replica)
+          volumes = dataset.replicas.select(args["replica"].to_sym)
+          volumes.each do |volume|
+            slices = select_slices(volume)
             slices.each do |slice|
               routes << slice["volume"]["address"]
             end
           end
         when "scatter"
-          replicas = dataset.replicas.select(args["replica"].to_sym)
-          replicas.each do |replica|
-            dimension = replica["dimension"] || "_key"
+          volumes = dataset.replicas.select(args["replica"].to_sym)
+          volumes.each do |volume|
+            dimension = volume.dimension
             key = args["key"] || args["record"][dimension]
-            slice = select_slice(replica, key)
+            slice = select_slice(volume, key)
             routes << slice["volume"]["address"]
           end
         end
@@ -123,16 +123,16 @@ module Droonga
         end
       end
 
-      def select_slices(replica, range=0..-1)
-        sorted_slices = replica["slices"].sort_by do |slice|
+      def select_slices(volume, range=0..-1)
+        sorted_slices = volume.slices.sort_by do |slice|
           slice["label"]
         end
         sorted_slices[range]
       end
 
-      def select_slice(replica, key)
-        continuum = replica["continuum"]
-        return replica["slices"].first unless continuum
+      def select_slice(volume, key)
+        continuum = volume["continuum"]
+        return volume.slices.first unless continuum
 
         hash = Zlib.crc32(key)
         min = 0

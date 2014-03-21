@@ -31,6 +31,11 @@ module Droonga
       def slices
         @data["slices"]
       end
+
+      # Just for backward compatibility
+      def [](key)
+        @data[key]
+      end
     end
   end
 end
