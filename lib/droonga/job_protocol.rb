@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  module JobMessageProtocol
+  module JobProtocol
     READY_SIGNAL = "R"
   end
 end

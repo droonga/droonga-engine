@@ -20,9 +20,9 @@ module Droonga
   class Processor
     include Loggable
 
-    def initialize(loop, message_pusher, options={})
+    def initialize(loop, job_pusher, options={})
       @loop = loop
-      @message_pusher = message_pusher
+      @job_pusher = job_pusher
       @options = options
       @n_workers = @options[:n_workers] || 0
     end
@@ -47,7 +47,7 @@ module Droonga
         if @n_workers.zero? or synchronous
           @handler_runner.process(message)
         else
-          @message_pusher.push(message)
+          @job_pusher.push(message)
         end
       else
         logger.trace("process: ignore #{type}")

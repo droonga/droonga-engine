@@ -16,10 +16,10 @@
 require "msgpack"
 
 require "droonga/logger"
-require "droonga/job_message_protocol"
+require "droonga/job_protocol"
 
 module Droonga
-  class MessagePusher
+  class JobPusher
     include Loggable
 
     attr_reader :socket_path
@@ -61,7 +61,7 @@ module Droonga
 
     private
     def log_tag
-      "message_pusher"
+      "job_pusher"
     end
 
     class JobQueue
@@ -123,7 +123,7 @@ module Droonga
       private
       def setup_connection
         on_read = lambda do |data|
-          @ready = (data == JobMessageProtocol::READY_SIGNAL)
+          @ready = (data == JobProtocol::READY_SIGNAL)
           @job_queue.ready(self)
         end
         @connection.on_read do |data|

@@ -15,7 +15,7 @@
 
 require "droonga/event_loop"
 require "droonga/handler_runner"
-require "droonga/message_receiver"
+require "droonga/job_receiver"
 
 module Droonga
   module Worker
@@ -24,8 +24,8 @@ module Droonga
       @loop = EventLoop.new(@raw_loop)
       @handler_runner = HandlerRunner.new(@loop,
                                           config.merge(:dispatcher => nil))
-      receive_socket_path = config[:message_receive_socket_path]
-      @message_receiver = MessageReceiver.new(@loop, receive_socket_path) do |message|
+      receive_socket_path = config[:job_receive_socket_path]
+      @job_receiver = JobReceiver.new(@loop, receive_socket_path) do |message|
         process(message)
       end
     end
@@ -33,7 +33,7 @@ module Droonga
     def run
       Droonga.logger.trace("#{log_tag}: run: start")
       @handler_runner.start
-      @message_receiver.start
+      @job_receiver.start
       @raw_loop.run
       @handler_runner.shutdown
       Droonga.logger.trace("#{log_tag}: run: done")
@@ -41,7 +41,7 @@ module Droonga
 
     def stop
       Droonga.logger.trace("#{log_tag}: stop: start")
-      @message_receiver.shutdown
+      @job_receiver.shutdown
       @raw_loop.stop
       @loop.break_current_loop
       Droonga.logger.trace("#{log_tag}: stop: done")

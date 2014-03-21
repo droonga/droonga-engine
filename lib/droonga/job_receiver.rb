@@ -16,10 +16,10 @@
 require "msgpack"
 
 require "droonga/loggable"
-require "droonga/job_message_protocol"
+require "droonga/job_protocol"
 
 module Droonga
-  class MessageReceiver
+  class JobReceiver
     include Loggable
 
     def initialize(loop, socket_path, &callback)
@@ -60,11 +60,11 @@ module Droonga
     end
 
     def send_ready(connection)
-      connection.write(JobMessageProtocol::READY_SIGNAL)
+      connection.write(JobProtocol::READY_SIGNAL)
     end
 
     def log_tag
-      "message_receiver"
+      "job_receiver"
     end
   end
 end

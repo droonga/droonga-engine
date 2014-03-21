@@ -19,7 +19,7 @@ require "droonga/loggable"
 require "droonga/server"
 require "droonga/worker"
 require "droonga/event_loop"
-require "droonga/message_pusher"
+require "droonga/job_pusher"
 require "droonga/processor"
 
 module Droonga
@@ -30,22 +30,22 @@ module Droonga
       @options = options
       @n_workers = @options[:n_workers] || 0
       @loop = loop
-      @message_pusher = MessagePusher.new(@loop, @options[:database])
-      @processor = Processor.new(@loop, @message_pusher, @options)
+      @job_pusher = JobPusher.new(@loop, @options[:database])
+      @processor = Processor.new(@loop, @job_pusher, @options)
       @supervisor = nil
     end
 
     def start
       ensure_database
       @processor.start
-      @message_pusher.start
+      @job_pusher.start
       start_supervisor if @n_workers > 0
     end
 
     def shutdown
       logger.trace("shutdown: start")
       shutdown_supervisor if @supervisor
-      @message_pusher.shutdown
+      @job_pusher.shutdown
       @processor.shutdown
       logger.trace("shutdown: done")
     end
@@ -83,8 +83,8 @@ module Droonga
           :log_level     => logger.level,
           :server_process_name => "Server[#{@options[:database]}] #$0",
           :worker_process_name => "Worker[#{@options[:database]}] #$0",
-          :message_receive_socket_path => @message_pusher.socket_path,
-          :message_pusher => @message_pusher,
+          :job_receive_socket_path => @job_pusher.socket_path,
+          :job_pusher => @job_pusher,
         }
         @options.merge(force_options)
       end
