@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/catalog/schema"
-require "droonga/catalog/replica_collection"
+require "droonga/catalog/volume_collection"
 
 module Droonga
   module Catalog
@@ -52,7 +52,7 @@ module Droonga
       end
 
       def replicas
-        @replicas ||= ReplicaCollection.new(@data["replicas"])
+        @replicas ||= VolumeCollection.new(@data["replicas"])
       end
     end
   end

@@ -13,37 +13,37 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/catalog/replica_collection"
+require "droonga/catalog/volume_collection"
 
-class CatalogReplicaCollectionTest < Test::Unit::TestCase
+class CatalogVolumeCollectionTest < Test::Unit::TestCase
   private
-  def create_replica_collection(replicas)
-    Droonga::Catalog::ReplicaCollection.new(replicas)
+  def create_volume_collection(volumes)
+    Droonga::Catalog::VolumeCollection.new(volumes)
   end
 
   class SelectTest < self
     def setup
-      replicas = [
-        "replica1",
-        "replica2",
-        "replica3",
+      volumes = [
+        "volume1",
+        "volume2",
+        "volume3",
       ]
-      @collection = create_replica_collection(replicas)
+      @collection = create_volume_collection(volumes)
     end
 
     def test_top
-      assert_equal(["replica1"], @collection.select(:top))
+      assert_equal(["volume1"], @collection.select(:top))
     end
 
     def test_random
-      random_replicas = @collection.select(:random).collect do |replica|
-        replica.gsub(/\Areplica[123]\z/, "any replica")
+      random_volumes = @collection.select(:random).collect do |volume|
+        volume.gsub(/\Avolume[123]\z/, "any volume")
       end
-      assert_equal(["any replica"], random_replicas)
+      assert_equal(["any volume"], random_volumes)
     end
 
     def test_all
-      assert_equal(["replica1", "replica2", "replica3"],
+      assert_equal(["volume1", "volume2", "volume3"],
                    @collection.select(:all))
     end
   end

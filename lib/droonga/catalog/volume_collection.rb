@@ -15,15 +15,15 @@
 
 module Droonga
   module Catalog
-    class ReplicaCollection
+    class VolumeCollection
       include Enumerable
 
-      def initialize(replicas)
-        @replicas = replicas
+      def initialize(volumes)
+        @volumes = volumes
       end
 
       def each(&block)
-        @replicas.each(&block)
+        @volumes.each(&block)
       end
 
       def ==(other)
@@ -42,11 +42,11 @@ module Droonga
       def select(how=nil)
         case how
         when :top
-          [@replicas.first]
+          [@volumes.first]
         when :random
-          [@replicas.sample]
+          [@volumes.sample]
         when :all
-          @replicas
+          @volumes
         else
           super
         end
