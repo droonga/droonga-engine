@@ -21,6 +21,13 @@ class CatalogDatasetTest < Test::Unit::TestCase
     Droonga::Catalog::Dataset.new("DatasetName", data)
   end
 
+  class NameTest < self
+    def test_reader
+      dataset = Droonga::Catalog::Dataset.new("DatasetName", {})
+      assert_equal("DatasetName", dataset.name)
+    end
+  end
+
   class NWorkersTest < self
     def test_default
       data = {
