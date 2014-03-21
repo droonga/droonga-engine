@@ -83,4 +83,14 @@ class CatalogDatasetTest < Test::Unit::TestCase
       assert_equal("Users", dataset.fact)
     end
   end
+
+  class ReplicasTest < self
+    def test_empty
+      data = {
+        "replicas" => [],
+      }
+      dataset = create_dataset(data)
+      assert_equal([], dataset.replicas)
+    end
+  end
 end

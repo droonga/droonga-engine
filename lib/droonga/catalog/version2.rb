@@ -37,7 +37,7 @@ module Droonga
         @datasets.each do |dataset_name, dataset|
           n_workers = dataset.n_workers
           plugins = dataset.plugins
-          dataset["replicas"].each do |replica|
+          dataset.replicas.each do |replica|
             replica["slices"].each do |slice|
               volume_address = slice["volume"]["address"]
               if pattern =~ volume_address
@@ -62,7 +62,7 @@ module Droonga
         dataset = dataset(name)
         case args["type"]
         when "broadcast"
-          replicas = select_replicas(dataset["replicas"], args["replica"])
+          replicas = select_replicas(dataset.replicas, args["replica"])
           replicas.each do |replica|
             slices = select_slices(replica)
             slices.each do |slice|
@@ -70,7 +70,7 @@ module Droonga
             end
           end
         when "scatter"
-          replicas = select_replicas(dataset["replicas"], args["replica"])
+          replicas = select_replicas(dataset.replicas, args["replica"])
           replicas.each do |replica|
             dimension = replica["dimension"] || "_key"
             key = args["key"] || args["record"][dimension]

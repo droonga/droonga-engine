@@ -49,6 +49,10 @@ module Droonga
       def n_workers
         @data["nWorkers"] || 0
       end
+
+      def replicas
+        @data["replicas"]
+      end
     end
   end
 end
