@@ -62,7 +62,7 @@ module Droonga
         dataset = dataset(name)
         case args["type"]
         when "broadcast"
-          replicas = select_replicas(dataset.replicas, args["replica"])
+          replicas = dataset.replicas.select(args["replica"].to_sym)
           replicas.each do |replica|
             slices = select_slices(replica)
             slices.each do |slice|
@@ -70,7 +70,7 @@ module Droonga
             end
           end
         when "scatter"
-          replicas = select_replicas(dataset.replicas, args["replica"])
+          replicas = dataset.replicas.select(args["replica"].to_sym)
           replicas.each do |replica|
             dimension = replica["dimension"] || "_key"
             key = args["key"] || args["record"][dimension]
@@ -120,17 +120,6 @@ module Droonga
         slices = replica["slices"]
         slices.reduce(0) do |result, slice|
           result + (slice["weight"] || default_weight)
-        end
-      end
-
-      def select_replicas(replicas, how)
-        case how
-        when "top"
-          [replicas.first]
-        when "random"
-          [replicas.sample]
-        when "all"
-          replicas
         end
       end
 

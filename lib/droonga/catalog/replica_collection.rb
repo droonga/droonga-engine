@@ -38,6 +38,19 @@ module Droonga
       def hash
         to_a.hash
       end
+
+      def select(how=nil)
+        case how
+        when :top
+          [@replicas.first]
+        when :random
+          [@replicas.sample]
+        when :all
+          @replicas
+        else
+          super
+        end
+      end
     end
   end
 end
