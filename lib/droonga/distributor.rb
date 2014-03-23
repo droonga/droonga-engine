@@ -40,17 +40,10 @@ module Droonga
     def initialize(dispatcher, plan)
       @dispatcher = dispatcher
       @plan = plan
+      build_dependencies
     end
 
     def distribute
-      @dependency = {}
-      @plan.each do |step|
-        @dependency[step] = step["inputs"]
-        next unless step["outputs"]
-        step["outputs"].each do |output|
-          @dependency[output] = [step]
-        end
-      end
       steps = []
       each_strongly_connected_component do |nodes|
         raise CyclicStepsError.new(nodes) if nodes.size > 1
@@ -60,6 +53,16 @@ module Droonga
     end
 
     private
+    def build_dependencies
+      @plan.each do |step|
+        @dependency[step] = step["inputs"]
+        next unless step["outputs"]
+        step["outputs"].each do |output|
+          @dependency[output] = [step]
+        end
+      end
+    end
+
     def tsort_each_node(&block)
       @dependency.each_key(&block)
     end
