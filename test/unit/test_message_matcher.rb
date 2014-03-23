@@ -20,34 +20,34 @@ class MessageMatcherTest < Test::Unit::TestCase
     Droonga::MessageMatcher.new(pattern)
   end
 
-  class ResolvePathTest < self
-    def resolve_path(path, message)
-      matcher(nil).send(:resolve_path, path, message)
+  class ExtractTargetTest < self
+    def extract_target(path, message)
+      matcher([path]).send(:extract_target, message)
     end
 
     def test_nonexistent
       assert_equal(Droonga::MessageMatcher::NONEXISTENT_PATH,
-                   resolve_path("nonexistent.path", {}))
+                   extract_target("nonexistent.path", {}))
     end
 
     def test_top_level
       assert_equal("select",
-                   resolve_path("type",
-                                {
-                                  "type" => "select"
-                                }))
+                   extract_target("type",
+                                  {
+                                    "type" => "select"
+                                  }))
     end
 
     def test_nested
       assert_equal(10,
-                   resolve_path("body.output.limit",
-                                {
-                                  "body" => {
-                                    "output" => {
-                                      "limit" => 10,
+                   extract_target("body.output.limit",
+                                  {
+                                    "body" => {
+                                      "output" => {
+                                        "limit" => 10,
+                                      },
                                     },
-                                  },
-                                }))
+                                  }))
     end
   end
 

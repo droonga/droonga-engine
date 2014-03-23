@@ -59,47 +59,50 @@ module Droonga
   class MessageMatcher
     # @param [Array] pattern The pattern to be matched against a message.
     def initialize(pattern)
-      @pattern = pattern
+      path, operator, *arguments = pattern
+      @path_components = path.split(".")
+      @operator = operator
+      @arguments = arguments
     end
 
     def match?(message)
-      return false if @pattern.nil?
-      path, operator, *arguments = @pattern
-      target = resolve_path(path, message)
-      apply_operator(operator, target, arguments)
+      target = extract_target(message)
+      apply_operator(target)
     end
 
     private
     NONEXISTENT_PATH = Object.new
-    def resolve_path(path, message)
-      path.split(".").inject(message) do |result, component|
+    def extract_target(message)
+      result = message
+      @path_components.each do |component|
         return NONEXISTENT_PATH unless result.is_a?(Hash)
-        result[component]
+        result = result[component]
       end
+      result
     end
 
-    def apply_operator(operator, target, arguments)
-      case operator
+    def apply_operator(target)
+      case @operator
       when :equal
-        [target] == arguments
+        [target] == @arguments
       when :in
-        arguments.any? do |argument|
+        @arguments.any? do |argument|
           argument.include?(target)
         end
       when :include
         return false unless target.respond_to?(:include?)
-        arguments.any? do |argument|
+        @arguments.any? do |argument|
           target.include?(argument)
         end
       when :exist
         target != NONEXISTENT_PATH
       when :start_with
         return false unless target.respond_to?(:start_with?)
-        arguments.any? do |argument|
+        @arguments.any? do |argument|
           target.start_with?(argument)
         end
       else
-        raise ArgumentError, "Unknown operator: <#{operator}>"
+        raise ArgumentError, "Unknown operator: <#{@operator}>"
       end
     end
   end
