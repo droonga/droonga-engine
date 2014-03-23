@@ -118,7 +118,7 @@ module Droonga
       end
 
       def report_statistics_on_push
-        if @buffers.size > @many_jobs_threshold
+        if @buffers.size >= @many_jobs_threshold
           if (@buffers.size % @many_jobs_report_interval).zero?
             logger.warn("push: many jobs in queue: #{@buffers.size}")
           end
@@ -126,7 +126,7 @@ module Droonga
       end
 
       def report_statistics_on_pull
-        if @buffers.size > @many_jobs_threshold
+        if @buffers.size >= @many_jobs_threshold
           if (@buffers.size % @many_jobs_report_interval).zero?
             logger.info("pull: many jobs in queue: #{@buffers.size}")
           end
