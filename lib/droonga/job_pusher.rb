@@ -77,12 +77,8 @@ module Droonga
 
       def add_worker(worker)
         @workers << worker
-        worker.on_ready = lambda do |w|
-          if @buffers.empty?
-            @ready_workers << w
-          else
-            w.write(@buffers.shift)
-          end
+        worker.on_ready = lambda do |ready_worker|
+          supply_job(ready_worker)
         end
       end
 
@@ -98,6 +94,15 @@ module Droonga
             @buffers << job
             worker.write(@buffers.shift)
           end
+        end
+      end
+
+      private
+      def supply_job(worker)
+        if @buffers.empty?
+          @ready_workers << worker
+        else
+          worker.write(@buffers.shift)
         end
       end
     end
