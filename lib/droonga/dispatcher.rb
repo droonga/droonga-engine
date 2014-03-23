@@ -239,8 +239,8 @@ module Droonga
       adapted_message = adapter_runner.adapt_input(message)
       step_runner = @step_runners[dataset]
       plan = step_runner.plan(message)
-      distributor = Distributor.new(self)
-      distributor.distribute(plan)
+      distributor = Distributor.new(self, plan)
+      distributor.distribute
     rescue Droonga::UnsupportedMessageError => error
       target_message = error.message
       raise UnknownType.new(target_message["type"], target_message["dataset"])

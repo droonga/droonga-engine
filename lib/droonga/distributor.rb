@@ -37,13 +37,14 @@ module Droonga
 
     include TSort
 
-    def initialize(dispatcher)
+    def initialize(dispatcher, plan)
       @dispatcher = dispatcher
+      @plan = plan
     end
 
-    def distribute(plan)
+    def distribute
       @dependency = {}
-      plan.each do |step|
+      @plan.each do |step|
         @dependency[step] = step["inputs"]
         next unless step["outputs"]
         step["outputs"].each do |output|
