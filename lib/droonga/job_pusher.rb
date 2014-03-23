@@ -32,7 +32,7 @@ module Droonga
     def start
       FileUtils.rm_f(@socket_path)
       @server = Coolio::UNIXServer.new(@socket_path) do |connection|
-        @job_queue.add_worker(WorkerConnection.new(@loop, connection))
+        @job_queue.add_worker(WorkerConnection.new(connection))
       end
       FileUtils.chmod(0600, @socket_path)
       @loop.attach(@server)
@@ -110,8 +110,7 @@ module Droonga
     class WorkerConnection
       attr_writer :on_ready
 
-      def initialize(loop, connection)
-        @loop = loop
+      def initialize(connection)
         @connection = connection
         @ready = false
         @on_ready = nil
@@ -125,7 +124,6 @@ module Droonga
       def write(job)
         @connection.write(job)
         @ready = false
-        @loop.break_current_loop
       end
 
       def close
