@@ -51,9 +51,9 @@ module Droonga
         end
       end
       steps = []
-      each_strongly_connected_component do |cs|
-        raise CyclicStepsError.new(cs) if cs.size > 1
-        steps.concat(cs) unless cs.first.is_a? String
+      each_strongly_connected_component do |nodes|
+        raise CyclicStepsError.new(nodes) if nodes.size > 1
+        steps.concat(nodes) unless nodes.first.is_a? String
       end
       @dispatcher.dispatch_steps(steps)
     end
