@@ -34,29 +34,17 @@ module Droonga
     end
 
     def start
-      @loop = Cool.io::Loop.new
-      attach(@loop)
-      @thread = Thread.new do
-        begin
-          @loop.run
-        rescue => error
-          logger.exception("error in catalog observing thread", error)
-        end
+      @watcher = Cool.io::TimerWatcher.new(CHECK_INTERVAL, true)
+      observer = self
+      @watcher.on_timer do
+        observer.ensure_latest_catalog_loaded
       end
+      loop = Coolio::Loop.default
+      @watcher.attach(loop)
     end
 
     def stop
-      @loop.stop
-      @thread.join
-    end
-
-    def attach(loop)
-      watcher = Cool.io::TimerWatcher.new(CHECK_INTERVAL, true)
-      observer = self
-      watcher.on_timer do
-        observer.ensure_latest_catalog_loaded
-      end
-      loop.attach(watcher)
+      @watcher.detach
     end
 
     def ensure_latest_catalog_loaded
