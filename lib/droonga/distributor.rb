@@ -60,9 +60,9 @@ module Droonga
       @step_maps = {}
       step_id = 0
       @plan.each do |step|
+        step_id += 1
         # Integer#hash (step_id.hash) is very faster than Hash#hash (step.hash).
         @step_maps[step_id] = step
-        step_id += 1
         @dependencies[step_id] = step["inputs"]
         next unless step["outputs"]
         step["outputs"].each do |output|
