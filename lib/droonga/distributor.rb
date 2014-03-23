@@ -54,25 +54,26 @@ module Droonga
 
     private
     def build_dependencies
+      @dependencies = {}
       @plan.each do |step|
-        @dependency[step] = step["inputs"]
+        @dependencies[step] = step["inputs"]
         next unless step["outputs"]
         step["outputs"].each do |output|
-          @dependency[output] = [step]
+          @dependencies[output] = [step]
         end
       end
     end
 
     def tsort_each_node(&block)
-      @dependency.each_key(&block)
+      @dependencies.each_key(&block)
     end
 
     def tsort_each_child(node, &block)
-      if node.is_a? String and @dependency[node].nil?
+      if node.is_a? String and @dependencies[node].nil?
         raise UndefinedInputError.new(node)
       end
-      if @dependency[node]
-        @dependency[node].each(&block)
+      if @dependencies[node]
+        @dependencies[node].each(&block)
       end
     end
   end
