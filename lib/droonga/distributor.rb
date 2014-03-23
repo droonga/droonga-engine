@@ -47,7 +47,9 @@ module Droonga
       steps = []
       each_strongly_connected_component do |nodes|
         raise CyclicStepsError.new(nodes) if nodes.size > 1
-        steps.concat(nodes) unless nodes.first.is_a? String
+        nodes.each do |node|
+          steps << @step_maps[node] if node.is_a?(Integer)
+        end
       end
       @dispatcher.dispatch_steps(steps)
     end
@@ -55,11 +57,16 @@ module Droonga
     private
     def build_dependencies
       @dependencies = {}
+      @step_maps = {}
+      step_id = 0
       @plan.each do |step|
-        @dependencies[step] = step["inputs"]
+        # Integer#hash (step_id.hash) is very faster than Hash#hash (step.hash).
+        @step_maps[step_id] = step
+        step_id += 1
+        @dependencies[step_id] = step["inputs"]
         next unless step["outputs"]
         step["outputs"].each do |output|
-          @dependencies[output] = [step]
+          @dependencies[output] = [step_id]
         end
       end
     end
