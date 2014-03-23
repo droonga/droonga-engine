@@ -88,11 +88,16 @@ module Droonga
 
       def push(message)
         job = message.to_msgpack
-        if @buffers.empty? and !@ready_workers.empty?
-          worker = @ready_workers.shift
-          worker.write(job)
-        else
+        if @ready_workers.empty?
           @buffers << job
+        else
+          worker = @ready_workers.shift
+          if @buffers.empty?
+            worker.write(job)
+          else
+            @buffers << job
+            worker.write(@buffers.shift)
+          end
         end
       end
     end
