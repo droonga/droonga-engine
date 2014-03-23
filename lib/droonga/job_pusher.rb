@@ -31,9 +31,8 @@ module Droonga
 
     def start
       FileUtils.rm_f(@socket_path)
-      @workers = []
       @server = Coolio::UNIXServer.new(@socket_path) do |connection|
-        @workers << WorkerConnection.new(@loop, @job_queue, connection)
+        @job_queue.add_worker(WorkerConnection.new(@loop, connection))
       end
       FileUtils.chmod(0600, @socket_path)
       @loop.attach(@server)
@@ -46,9 +45,7 @@ module Droonga
     def shutdown
       logger.trace("shutdown: start")
       @server.close
-      @workers.each do |worker|
-        worker.close
-      end
+      @job_queue.close
       FileUtils.rm_f(@socket_path)
       logger.trace("shutdown: done")
     end
@@ -69,20 +66,30 @@ module Droonga
         @loop = loop
         @buffers = []
         @ready_workers = []
+        @workers = []
+      end
+
+      def close
+        @workers.each do |worker|
+          worker.close
+        end
+      end
+
+      def add_worker(worker)
+        @workers << worker
+        worker.on_ready = lambda do |w|
+          if @buffers.empty?
+            @ready_workers << w
+          else
+            w.write(@buffers.shift)
+          end
+        end
       end
 
       def push(message)
         job = message.to_msgpack
         @buffers << job
         consume_buffers
-      end
-
-      def ready(worker)
-        if @buffers.empty?
-          @ready_workers << worker
-        else
-          worker.write(@buffers.shift)
-        end
       end
 
       private
@@ -98,11 +105,13 @@ module Droonga
     end
 
     class WorkerConnection
-      def initialize(loop, job_queue, connection)
+      attr_writer :on_ready
+
+      def initialize(loop, connection)
         @loop = loop
-        @job_queue = job_queue
         @connection = connection
         @ready = false
+        @on_ready = nil
         setup_connection
       end
 
@@ -124,7 +133,7 @@ module Droonga
       def setup_connection
         on_read = lambda do |data|
           @ready = (data == JobProtocol::READY_SIGNAL)
-          @job_queue.ready(self)
+          @on_ready.call(self) if @on_ready
         end
         @connection.on_read do |data|
           on_read.call(data)
