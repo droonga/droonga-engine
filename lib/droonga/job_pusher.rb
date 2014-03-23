@@ -62,11 +62,15 @@ module Droonga
     end
 
     class JobQueue
+      include Loggable
+
       def initialize(loop)
         @loop = loop
         @buffers = []
         @ready_workers = []
         @workers = []
+        @many_jobs_report_interval = 100
+        update_many_jobs_threshold
       end
 
       def close
@@ -77,6 +81,7 @@ module Droonga
 
       def add_worker(worker)
         @workers << worker
+        update_many_jobs_threshold
         worker.on_ready = lambda do |ready_worker|
           supply_job(ready_worker)
         end
@@ -86,6 +91,7 @@ module Droonga
         job = message.to_msgpack
         if @ready_workers.empty?
           @buffers << job
+          report_statistics_on_push
         else
           worker = @ready_workers.shift
           if @buffers.empty?
@@ -103,7 +109,34 @@ module Droonga
           @ready_workers << worker
         else
           worker.write(@buffers.shift)
+          report_statistics_on_pull
         end
+      end
+
+      def update_many_jobs_threshold
+        @many_jobs_threshold = @workers.size * 100
+      end
+
+      def report_statistics_on_push
+        if @buffers.size > @many_jobs_threshold
+          if (@buffers.size % @many_jobs_report_interval).zero?
+            logger.warn("push: many jobs in queue: #{@buffers.size}")
+          end
+        end
+      end
+
+      def report_statistics_on_pull
+        if @buffers.size > @many_jobs_threshold
+          if (@buffers.size % @many_jobs_report_interval).zero?
+            logger.info("pull: many jobs in queue: #{@buffers.size}")
+          end
+        elsif @buffers.size == (@many_jobs_threshold - 1)
+          logger.info("pull: reducing jobs in queue: #{@buffers.size}")
+        end
+      end
+
+      def log_tag
+        "job_queue"
       end
     end
 
