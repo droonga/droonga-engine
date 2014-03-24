@@ -1,0 +1,26 @@
+# -*- js -*-
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "key": "Droonga is fun"
+  }
+}
+#@enable-logging
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "memos": {
+        "source": "Memos",
+        "output": {
+          "elements": ["count", "elapsedTime"]
+        }
+      }
+    }
+  }
+}

@@ -122,6 +122,7 @@ module Droonga
 
             calculate_offset_and_limit!
             build_count_mapper_and_reducer!
+            build_elapsed_time_mapper_and_reducer!
             build_records_mapper_and_reducer!
           end
 
@@ -254,6 +255,14 @@ module Droonga
               end
               @mappers["count"] = mapper
             end
+          end
+
+          def build_elapsed_time_mapper_and_reducer!
+            return unless @output["elements"].include?("elapsedTime")
+
+            @reducers["elapsedTime"] = {
+              "type" => "sum",
+            }
           end
 
           def build_records_mapper_and_reducer!
