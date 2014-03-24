@@ -1,5 +1,23 @@
 # News
 
+## 1.0.1: 2014-03-29 (planned)
+
+### Improvements
+
+  * More documents around plugin APIs are now available.
+    See the plugin development tutorial and the plugin API reference.
+    - http://droonga.org/tutorial/plugin-development/
+    - http://droonga.org/reference/plugin/
+  * Some documented features of the `catalog.json` are actually implemented.
+    For example:
+    * A new `vectorOptions` option for a schema.
+    * New options `fact`, `dimension`, `nWorkers` and so on.
+    For more details, see the reference of the `catalog.json`.
+    - http://droonga.org/reference/catalog/
+  * Connections to other Droonga Engine nodes are automatically re-established correctly.
+  * The `search` command: Support `_nsubrecs` source with `groupBy` and `sortBy`.
+  * And some small bugfixes.
+
 ## 1.0.0: 2014-02-28
 
 ### Improvements
