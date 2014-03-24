@@ -13,8 +13,6 @@
         "sortBy": ["_key"],
         "output": {
           "elements": [
-            "startTime",
-            "elapsedTime",
             "count",
             "attributes",
             "records"
@@ -29,8 +27,6 @@
         "sortBy": ["-_key"],
         "output": {
           "elements": [
-            "startTime",
-            "elapsedTime",
             "count",
             "attributes",
             "records"

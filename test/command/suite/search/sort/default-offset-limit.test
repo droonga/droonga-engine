@@ -11,8 +11,6 @@
         },
         "output": {
           "elements": [
-            "startTime",
-            "elapsedTime",
             "count",
             "attributes",
             "records"
