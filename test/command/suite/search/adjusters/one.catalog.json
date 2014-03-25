@@ -1,0 +1,38 @@
+{
+  "datasets": {
+    "Droonga": {
+      "fact": "Memos",
+      "schema": {
+        "Memos": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "tags": {
+              "type": "Vector",
+              "valueType": "ShortText",
+              "vectorOptions": {
+                "weight": true
+              }
+            }
+          }
+        },
+        "Tags": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "memos_index": {
+              "type": "Index",
+              "valueType": "Memos",
+              "indexOptions": {
+                "sources": [
+                  "tags"
+                ],
+                "weight": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

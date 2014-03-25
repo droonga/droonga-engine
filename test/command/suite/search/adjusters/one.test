@@ -1,0 +1,65 @@
+# -*- js -*-
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "key": "Droonga is fun.",
+    "values": {
+      "tags": [
+        {
+          "value": "droonga",
+          "weight": 9
+        }
+      ]
+    }
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga is fast!",
+    "values": {
+      "tags": [
+        {
+          "value": "groonga",
+          "weight": 9
+        }
+      ]
+    }
+  }
+}
+#@enable-logging
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "memos": {
+        "source": "Memos",
+        "condition": "true",
+        "adjusters": [
+          {
+            "column": "tags",
+            "value": "droonga",
+            "factor": 5
+          }
+        ],
+        "output": {
+          "elements": [
+            "records"
+          ],
+          "limit": 10,
+          "attributes": [
+            "_key",
+            "_score"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -302,7 +302,12 @@ module Droonga
         @records = @request.source
 
         condition = @request.query["condition"]
-        apply_condition!(condition) if condition
+        if condition
+          apply_condition!(condition)
+
+          adjusters = @request.query["adjusters"]
+          apply_adjusters!(adjusters) if adjusters
+        end
 
         group_by = @request.query["groupBy"]
         apply_group_by!(group_by) if group_by
@@ -326,6 +331,29 @@ module Droonga
         @records = @records.select(expression)
         logger.trace("search_query: select: done")
         @result.condition = expression
+      end
+
+      def apply_adjusters!(adjusters)
+        logger.trace("search_query: adjusters: start")
+        adjusters.each do |adjuster|
+          column_name = adjuster["column"]
+          value = adjuster["value"]
+          factor = adjuster["factor"] || 0
+          logger.trace("search_query: adjusters: adjuster: start",
+                       :column_name => column_name,
+                       :value => value,
+                       :factor => factor)
+          column = @request.source.column(column_name)
+          index, = column.indexes(:match)
+          # TODO: add index.nil? check
+          # TODO: add value.nil? check
+          index.search(value,
+                       :result => @records,
+                       :operator => :adjust,
+                       :weight => factor)
+          logger.trace("search_query: adjusters: adjuster: done")
+        end
+        logger.trace("search_query: adjusters: done")
       end
 
       def apply_group_by!(group_by)
