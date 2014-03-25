@@ -134,25 +134,28 @@ module Droonga
         base_items, unified_items = unified_items, base_items
       end
 
-      rest_unified_items = unified_items.dup
+      unified_key_map = {}
+      unified_items.each do |unified_item|
+        unified_key_map[unified_item[key_column_index]] = unified_item
+      end
 
+      unified = false
       base_items.reject! do |base_item|
         key = base_item[key_column_index]
-        rest_unified_items.any? do |unified_item|
-          if unified_item[key_column_index] == key
-            base_item.each_with_index do |value, column|
-              next if column == key_column_index
-              unified_item[column] += value
-            end
-            rest_unified_items -= [unified_item]
-            true
-          else
-            false
+        unified_item = unified_key_map[key]
+        if unified_item
+          base_item.each_with_index do |value, column_index|
+            next if column_index == key_column_index
+            unified_item[column_index] += value
           end
+          unified = true
+          true
+        else
+          false
         end
       end
 
-      unless rest_unified_items.size == unified_items.size
+      if unified
         unified_items.sort! do |a, b|
           if compare(a, b, options[:operators])
             -1
