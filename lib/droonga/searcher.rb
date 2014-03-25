@@ -338,7 +338,7 @@ module Droonga
         adjusters.each do |adjuster|
           column_name = adjuster["column"]
           value = adjuster["value"]
-          factor = adjuster["factor"] || 0
+          factor = adjuster["factor"] || 1
           logger.trace("search_query: adjusters: adjuster: start",
                        :column_name => column_name,
                        :value => value,
