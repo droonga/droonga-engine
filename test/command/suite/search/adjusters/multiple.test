@@ -58,6 +58,7 @@
             "factor": 2
           }
         ],
+        "sortBy": ["-_score"],
         "output": {
           "elements": [
             "records"
