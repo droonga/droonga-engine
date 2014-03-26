@@ -49,6 +49,7 @@
             "factor": 5
           }
         ],
+        "sortBy": ["-_score"],
         "output": {
           "elements": [
             "records"
