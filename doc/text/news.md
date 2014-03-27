@@ -5,17 +5,14 @@
 ### Improvements
 
   * More documents around plugin APIs are now available.
-    See the plugin development tutorial and the plugin API reference.
-    - http://droonga.org/tutorial/plugin-development/
-    - http://droonga.org/reference/plugin/
+    See the plugin [development tutorial](http://droonga.org/tutorial/plugin-development/) and the [plugin API reference](http://droonga.org/reference/plugin/).
   * Some documented features of the `catalog.json` are actually implemented.
     For example:
     * A new `vectorOptions` option for a schema.
     * New options `fact`, `dimension`, `nWorkers` and so on.
-    For more details, see the reference of the `catalog.json`.
-    - http://droonga.org/reference/catalog/
+    For more details, see [the reference of the `catalog.json`](http://droonga.org/reference/catalog/).
   * Connections to other Droonga Engine nodes are automatically re-established correctly.
-  * Some improvements about the `search` command
+  * Some improvements about the [`search` command](http://droonga.org/reference/commands/search/)
     * The column name `_nsubrecs` is available as a source with `groupBy` and `sortBy`.
     * The element `elapsedTime` is now available for a value of `elements`.
     * A new parameter `adjusters` is introduced. (Not documented yet, so see also [Groonga's document](http://groonga.org/docs/reference/commands/select.html#select-adjuster))
