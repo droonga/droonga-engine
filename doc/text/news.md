@@ -15,7 +15,10 @@
     For more details, see the reference of the `catalog.json`.
     - http://droonga.org/reference/catalog/
   * Connections to other Droonga Engine nodes are automatically re-established correctly.
-  * The `search` command: Support `_nsubrecs` source with `groupBy` and `sortBy`.
+  * Some improvements about the `search` command
+    * The column name `_nsubrecs` is available as a source with `groupBy` and `sortBy`.
+    * The element `elapsedTime` is now available for a value of `elements`.
+    * A new parameter `adjusters` is introduced. (Not documented yet, so see also [Groonga's document](http://groonga.org/docs/reference/commands/select.html#select-adjuster))
   * And some small bugfixes.
 
 ## 1.0.0: 2014-02-28
