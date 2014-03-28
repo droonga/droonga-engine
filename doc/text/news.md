@@ -16,6 +16,7 @@
     * The column name `_nsubrecs` is available as a source with `groupBy` and `sortBy`.
     * The element `elapsedTime` is now available for a value of `elements`.
     * A new parameter `adjusters` is introduced. (Not documented yet, so see also [Groonga's document](http://groonga.org/docs/reference/commands/select.html#select-adjuster))
+    * `groupBy` becomes faster.
   * And some small bugfixes.
 
 ## 1.0.0: 2014-02-28
