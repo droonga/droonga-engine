@@ -15,9 +15,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+base_dir = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.join(base_dir, "lib"))
+
+require "droonga/version"
+
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-droonga"
-  gem.version       = "1.0.1"
+  gem.version       = Droonga::VERSION
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
   gem.description   = "Droonga (distributed Groonga) plugin for Fluent event collector"
