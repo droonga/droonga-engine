@@ -75,5 +75,5 @@ end
 
 catalog = generator.generate
 open_output(options.output_path) do |output|
-  output.puts(JSON.generate(catalog))
+  output.puts(JSON.pretty_generate(catalog))
 end
