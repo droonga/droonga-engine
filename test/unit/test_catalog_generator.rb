@@ -71,5 +71,10 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       @generator.add_dataset("Droonga", :plugins => ["search"])
       assert_equal(["search"], generate["datasets"]["Droonga"]["plugins"])
     end
+
+    def test_fact
+      @generator.add_dataset("Droonga", :fact => "Entries")
+      assert_equal("Entries", generate["datasets"]["Droonga"]["fact"])
+    end
   end
 end

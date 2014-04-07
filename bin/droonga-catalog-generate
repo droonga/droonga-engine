@@ -51,6 +51,10 @@ parser.on("--schema=PATH",
     current_dataset[:schema] = JSON.parse(input.read)
   end
 end
+parser.on("--fact=TABLE",
+          "Use TABLE as the fact table for the current dataset.") do |table|
+  current_dataset[:fact] = table
+end
 parser.on("--replicas=PATH",
           "Use replicas in JSON at PATH for the current dataset.") do |path|
   File.open(path) do |input|

@@ -62,17 +62,23 @@ module Droonga
         @options[:schema] || {}
       end
 
+      def fact
+        @options[:fact]
+      end
+
       def replicas
         @options[:replicas] || []
       end
 
       def to_catalog
-        {
+        catalog = {
           "nWorkers" => n_workers,
           "plugins"  => plugins,
           "schema"   => schema,
           "replicas" => replicas,
         }
+        catalog["fact"] = fact if fact
+        catalog
       end
     end
   end
