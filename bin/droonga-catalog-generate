@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "ostruct"
+require "optparse"
+require "json"
+
+require "droonga/version"
+require "droonga/catalog_generator"
+
+generator = Droonga::CatalogGenerator.new
+current_dataset = nil
+datasets = {}
+
+options = OpenStruct.new
+options.output_path = "-"
+parser = OptionParser.new
+parser.version = Droonga::VERSION
+parser.on("--output=PATH",
+          "Output catalog.json to PATH.",
+          "\"-\" means the standard output.",
+          "(#{options.output_path})") do |path|
+  options.output_path = path
+end
+parser.on("--dataset=NAME",
+          "Add a dataset its name is NAME.",
+          "And set the NAME to the current dataset.") do |name|
+  current_dataset = datasets[name] = {}
+end
+parser.on("--n-workers=N", Integer,
+          "Use N workers for the current dataset.") do |n|
+  current_dataset[:n_workers] = n
+end
+parser.on("--schema=PATH",
+          "Use schema in JSON at PATH for the current dataset.") do |path|
+  File.open(path) do |input|
+    current_dataset[:schema] = JSON.parse(input)
+  end
+end
+parser.on("--replicas=PATH",
+          "Use replicas in JSON at PATH for the current dataset.") do |path|
+  File.open(path) do |input|
+    current_dataset[:replicas] = JSON.parse(input)
+  end
+end
+parser.parse!(ARGV)
+
+datasets.each do |name, options|
+  generator.add_dataset(name, options)
+end
+
+def open_output(path)
+  if path == "-"
+    yield($stdout)
+  else
+    File.open(path, "w") do |output|
+      yield(output)
+    end
+  end
+end
+
+catalog = generator.generate
+open_output(options.output_path) do |output|
+  output.puts(JSON.generate(catalog))
+end
