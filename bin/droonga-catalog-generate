@@ -48,13 +48,13 @@ end
 parser.on("--schema=PATH",
           "Use schema in JSON at PATH for the current dataset.") do |path|
   File.open(path) do |input|
-    current_dataset[:schema] = JSON.parse(input)
+    current_dataset[:schema] = JSON.parse(input.read)
   end
 end
 parser.on("--replicas=PATH",
           "Use replicas in JSON at PATH for the current dataset.") do |path|
   File.open(path) do |input|
-    current_dataset[:replicas] = JSON.parse(input)
+    current_dataset[:replicas] = JSON.parse(input.read)
   end
 end
 parser.parse!(ARGV)
