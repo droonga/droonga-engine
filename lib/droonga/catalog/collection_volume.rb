@@ -48,7 +48,7 @@ module Droonga
       def choose_slice(record)
         return slices.first unless ratio_scaled_slicer?
 
-        key = record[dimension]
+        key = stringify_key(record[dimension])
         hash = Zlib.crc32(key)
         min = 0
         max = @continuum.size - 1
@@ -90,6 +90,15 @@ module Droonga
       def compute_total_weight
         slices.reduce(0) do |result, slice|
           result + slice.weight
+        end
+      end
+
+      def stringify_key(key)
+        case key
+        when Integer
+          key.to_s
+        else
+          key
         end
       end
     end
