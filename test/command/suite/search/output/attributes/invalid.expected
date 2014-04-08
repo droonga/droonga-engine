@@ -1,0 +1,48 @@
+[
+  "droonga.message",
+  0,
+  {
+    "inReplyTo": "request-id",
+    "statusCode": 400,
+    "type": "search.result",
+    "body": {
+      "name": "InvalidAttribute",
+      "message": "Invalid attribute: <,>",
+      "detail": {
+        "attribute": ","
+      }
+    },
+    "errors": {
+      "sources0": {
+        "statusCode": 400,
+        "body": {
+          "name": "InvalidAttribute",
+          "message": "Invalid attribute: <,>",
+          "detail": {
+            "attribute": ","
+          }
+        }
+      },
+      "sources1": {
+        "statusCode": 400,
+        "body": {
+          "name": "InvalidAttribute",
+          "message": "Invalid attribute: <,>",
+          "detail": {
+            "attribute": ","
+          }
+        }
+      },
+      "sources2": {
+        "statusCode": 400,
+        "body": {
+          "name": "InvalidAttribute",
+          "message": "Invalid attribute: <,>",
+          "detail": {
+            "attribute": ","
+          }
+        }
+      }
+    }
+  }
+]

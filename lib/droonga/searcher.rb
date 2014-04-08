@@ -54,6 +54,16 @@ module Droonga
       end
     end
 
+    class InvalidAttribute < ErrorMessages::BadRequest
+      attr_reader :attribute
+      def initialize(attribute)
+        detail = {
+          "attribute" => attribute,
+        }
+        super("Invalid attribute: <#{attribute}>", detail)
+      end
+    end
+
     def initialize(context)
       @context = context
     end
@@ -658,7 +668,11 @@ module Droonga
           else
             expression = Groonga::Expression.new(context: @request.context)
             variable = expression.define_variable(domain: domain)
-            expression.parse(source, syntax: :script)
+            begin
+              expression.parse(source, syntax: :script)
+            rescue Groonga::SyntaxError
+              raise InvalidAttribute.new(source)
+            end
             condition = expression.define_variable(name: "$condition",
                                                    reference: true)
             condition.value = @result.condition
