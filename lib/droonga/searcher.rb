@@ -365,7 +365,9 @@ module Droonga
                          :value => value,
                          :factor => factor,
                          :column => column,
-                         :dump => Groonga::Schema.dump(:context => @request.context))
+                         :dump => Groonga::Schema.dump(:context => @request.context,
+                                                       :syntax => :command),
+                         :indexes => column.indexes(:match))
           end
           # TODO: add value.nil? check
           index.search(value,
