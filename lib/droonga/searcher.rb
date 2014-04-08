@@ -461,7 +461,7 @@ module Droonga
         {"name" => label} # TODO include detailed information of expression
       end
 
-      def format_attributes(attributes, table)
+      def format(attributes, table)
         attributes.collect do |attribute|
           format_attribute(attribute, table)
         end
@@ -486,7 +486,7 @@ module Droonga
         {} # TODO include detailed information of expression
       end
 
-      def format_attributes(attributes, table)
+      def format(attributes, table)
         formatted_attributes = {}
         attributes.each do |attribute|
           formatted_attribute = format_attribute(attribute, table)
@@ -627,7 +627,7 @@ module Droonga
         else
           formatter = SimpleAttributesFormatter.new
         end
-        formatter.format_attributes(output_target_attributes, @result.records)
+        formatter.format(output_target_attributes, @result.records)
       end
 
       def output_target_attributes
