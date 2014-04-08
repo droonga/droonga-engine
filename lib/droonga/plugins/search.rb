@@ -65,6 +65,9 @@ module Droonga
           # I have to apply it at first, before "limit" and "offset" are applied.
           body = message.body
           value = message.value
+
+          return if value.nil?
+
           count_mapper = elements["count"]
           if count_mapper
             if count_mapper["no_output"]
