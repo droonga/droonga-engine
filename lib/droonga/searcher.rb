@@ -622,16 +622,12 @@ module Droonga
       end
 
       def format_attributes
-        attributes_formatter = nil
         if @request.complex_output?
-          attributes_formatter = ComplexAttributesFormatter.new
+          formatter = ComplexAttributesFormatter.new
         else
-          attributes_formatter = SimpleAttributesFormatter.new
+          formatter = SimpleAttributesFormatter.new
         end
-        attributes_formatter.format_attributes(
-          output_target_attributes,
-          @result.records
-        )
+        formatter.format_attributes(output_target_attributes, @result.records)
       end
 
       def output_target_attributes
@@ -640,13 +636,12 @@ module Droonga
       end
 
       def format_records
-        records_formatter = nil
         if @request.complex_output?
-          records_formatter = ComplexRecordsFormatter.new
+          formatter = ComplexRecordsFormatter.new
         else
-          records_formatter = SimpleRecordsFormatter.new
+          formatter = SimpleRecordsFormatter.new
         end
-        records_formatter.format_records(output_target_attributes, @result.records, output_limit, output_offset)
+        formatter.format_records(output_target_attributes, @result.records, output_limit, output_offset)
       end
 
       def normalize_target_attributes(attributes, domain = @result.records)
