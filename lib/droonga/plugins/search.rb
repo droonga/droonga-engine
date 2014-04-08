@@ -61,13 +61,13 @@ module Droonga
         def collect_elements(message, elements)
           return unless elements.is_a?(Hash)
 
-          # because "count" mapper requires all records,
-          # I have to apply it at first, before "limit" and "offset" are applied.
           body = message.body
           value = message.value
 
           return if value.nil?
 
+          # because "count" mapper requires all records,
+          # I have to apply it at first, before "limit" and "offset" are applied.
           count_mapper = elements["count"]
           if count_mapper
             if count_mapper["no_output"]
