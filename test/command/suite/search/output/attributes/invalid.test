@@ -18,7 +18,7 @@
       "memos": {
         "source": "Memos",
         "output": {
-          "elements": ["attributes"],
+          "elements": ["attributes", "records"],
           "attributes": [","],
           "limit": 10
         }
