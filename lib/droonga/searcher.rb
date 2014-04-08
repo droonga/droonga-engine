@@ -649,14 +649,6 @@ module Droonga
         records_formatter.format_records(output_target_attributes, @result.records, output_limit, output_offset)
       end
 
-      def resolve_attributes(attribute, record)
-        unless attribute[:target_attributes]
-          attribute[:target_attributes] =
-            normalize_target_attributes(attribute[:attributes], record.table)
-        end
-        return attribute[:target_attributes]
-      end
-
       def normalize_target_attributes(attributes, domain = @result.records)
         attributes.collect do |attribute|
           if attribute.is_a?(String)
