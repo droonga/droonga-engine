@@ -49,32 +49,7 @@ module Droonga
         def collect(message)
           output = message.input || message.name
           if output.is_a?(Hash)
-            elements = output["elements"]
-            if elements and elements.is_a?(Hash)
-              # because "count" mapper requires all records,
-              # I have to apply it at first, before "limit" and "offset" are applied.
-              body = message.body
-              value = message.value
-              count_mapper = elements["count"]
-              if count_mapper
-                if count_mapper["no_output"]
-                  value.delete("count")
-                else
-                  value["count"] = value[count_mapper["target"]].size
-                end
-              end
-
-              records_mapper = elements["records"]
-              if records_mapper and value["records"]
-                if records_mapper["no_output"]
-                  value.delete("records")
-                else
-                  value["records"] = Reducer.apply_range(value["records"],
-                                                         records_mapper)
-                  value["records"] = apply_output_attributes_and_format(value["records"], records_mapper)
-                end
-              end
-            end
+            collect_elements(message, output["elements"])
             output_name = output["output"]
           else
             output_name = output
@@ -83,6 +58,34 @@ module Droonga
         end
 
         private
+        def collect_elements(message, elements)
+          return unless elements.is_a?(Hash)
+
+          # because "count" mapper requires all records,
+          # I have to apply it at first, before "limit" and "offset" are applied.
+          body = message.body
+          value = message.value
+          count_mapper = elements["count"]
+          if count_mapper
+            if count_mapper["no_output"]
+              value.delete("count")
+            else
+              value["count"] = value[count_mapper["target"]].size
+            end
+          end
+
+          records_mapper = elements["records"]
+          if records_mapper and value["records"]
+            if records_mapper["no_output"]
+              value.delete("records")
+            else
+              value["records"] = Reducer.apply_range(value["records"],
+                                                     records_mapper)
+              value["records"] = apply_output_attributes_and_format(value["records"], records_mapper)
+            end
+          end
+        end
+
         def apply_output_attributes_and_format(items, output)
           attributes = output["attributes"] || []
           if output["format"] == "complex"
