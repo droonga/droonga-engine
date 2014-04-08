@@ -526,7 +526,7 @@ module Droonga
         end
       end
 
-      def format_records(output_target_attributes, records, output_limit, output_offset)
+      def format(output_target_attributes, records, output_limit, output_offset)
         cursor_options = {
           :offset => output_offset,
           :limit => output_limit
@@ -641,7 +641,7 @@ module Droonga
         else
           formatter = SimpleRecordsFormatter.new
         end
-        formatter.format_records(output_target_attributes, @result.records, output_limit, output_offset)
+        formatter.format(output_target_attributes, @result.records, output_limit, output_offset)
       end
 
       def normalize_target_attributes(attributes, domain = @result.records)
