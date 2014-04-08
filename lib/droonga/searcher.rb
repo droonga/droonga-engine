@@ -358,6 +358,15 @@ module Droonga
           column = @request.source.column(column_name)
           index, = column.indexes(:match)
           # TODO: add index.nil? check
+          if index.nil?
+            # Temporary. It is just for debug on Travis CI.
+            logger.error("search_query: adjusters: adjuster: not found index",
+                         :column_name => column_name,
+                         :value => value,
+                         :factor => factor,
+                         :column => column,
+                         :dump => Groonga::Schema.dump(:context => @request.context))
+          end
           # TODO: add value.nil? check
           index.search(value,
                        :result => @records,
