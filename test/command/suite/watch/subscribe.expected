@@ -1,10 +1,6 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "watch.subscribe.result",
-    "body": true
-  }
-]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "watch.subscribe.result",
+  "body": true
+}
