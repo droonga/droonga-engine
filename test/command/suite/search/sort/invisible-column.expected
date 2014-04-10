@@ -1,28 +1,24 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 9,
-        "records": [
-          [
-            "Groonga library"
-          ],
-          [
-            "Geo-location (latitude and longitude) search"
-          ],
-          [
-            "Sharable storage and read lock-free"
-          ],
-          [
-            "Inverted index and tokenizer"
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 9,
+      "records": [
+        [
+          "Groonga library"
+        ],
+        [
+          "Geo-location (latitude and longitude) search"
+        ],
+        [
+          "Sharable storage and read lock-free"
+        ],
+        [
+          "Inverted index and tokenizer"
         ]
-      }
+      ]
     }
   }
-]
+}

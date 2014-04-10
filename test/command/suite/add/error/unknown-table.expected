@@ -1,29 +1,25 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 404,
-    "type": "add.result",
-    "body": {
-      "name": "UnknownTable",
-      "message": "The table \"Unknown\" does not exist in the dataset."
+{
+  "inReplyTo": "request-id",
+  "statusCode": 404,
+  "type": "add.result",
+  "body": {
+    "name": "UnknownTable",
+    "message": "The table \"Unknown\" does not exist in the dataset."
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 404,
+      "body": {
+        "name": "UnknownTable",
+        "message": "The table \"Unknown\" does not exist in the dataset."
+      }
     },
-    "errors": {
-      "sources0": {
-        "statusCode": 404,
-        "body": {
-          "name": "UnknownTable",
-          "message": "The table \"Unknown\" does not exist in the dataset."
-        }
-      },
-      "sources1": {
-        "statusCode": 404,
-        "body": {
-          "name": "UnknownTable",
-          "message": "The table \"Unknown\" does not exist in the dataset."
-        }
+    "sources1": {
+      "statusCode": 404,
+      "body": {
+        "name": "UnknownTable",
+        "message": "The table \"Unknown\" does not exist in the dataset."
       }
     }
   }
-]
+}

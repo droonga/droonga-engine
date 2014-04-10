@@ -1,50 +1,46 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "add.result",
-    "body": {
-      "name": "InvalidValue",
-      "message": "The column \"birthday\" cannot store the value \"today\".",
-      "detail": {
-        "table": "User",
-        "key": "key",
-        "values": {
-          "birthday": "today"
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "add.result",
+  "body": {
+    "name": "InvalidValue",
+    "message": "The column \"birthday\" cannot store the value \"today\".",
+    "detail": {
+      "table": "User",
+      "key": "key",
+      "values": {
+        "birthday": "today"
+      }
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 400,
+      "body": {
+        "name": "InvalidValue",
+        "message": "The column \"birthday\" cannot store the value \"today\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "birthday": "today"
+          }
         }
       }
     },
-    "errors": {
-      "sources0": {
-        "statusCode": 400,
-        "body": {
-          "name": "InvalidValue",
-          "message": "The column \"birthday\" cannot store the value \"today\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "birthday": "today"
-            }
-          }
-        }
-      },
-      "sources1": {
-        "statusCode": 400,
-        "body": {
-          "name": "InvalidValue",
-          "message": "The column \"birthday\" cannot store the value \"today\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "birthday": "today"
-            }
+    "sources1": {
+      "statusCode": 400,
+      "body": {
+        "name": "InvalidValue",
+        "message": "The column \"birthday\" cannot store the value \"today\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "birthday": "today"
           }
         }
       }
     }
   }
-]
+}

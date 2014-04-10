@@ -1,52 +1,48 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 9,
-        "records": [
-          {
-            "_key": "1.1",
-            "title": "Groonga overview"
-          },
-          {
-            "_key": "1.2",
-            "title": "Full text search and Instant update"
-          },
-          {
-            "_key": "1.3",
-            "title": "Column store and aggregate query"
-          },
-          {
-            "_key": "1.4",
-            "title": "Inverted index and tokenizer"
-          },
-          {
-            "_key": "1.5",
-            "title": "Sharable storage and read lock-free"
-          },
-          {
-            "_key": "1.6",
-            "title": "Geo-location (latitude and longitude) search"
-          },
-          {
-            "_key": "1.7",
-            "title": "Groonga library"
-          },
-          {
-            "_key": "1.8",
-            "title": "Groonga server"
-          },
-          {
-            "_key": "1.9",
-            "title": "Groonga storage engine"
-          }
-        ]
-      }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 9,
+      "records": [
+        {
+          "_key": "1.1",
+          "title": "Groonga overview"
+        },
+        {
+          "_key": "1.2",
+          "title": "Full text search and Instant update"
+        },
+        {
+          "_key": "1.3",
+          "title": "Column store and aggregate query"
+        },
+        {
+          "_key": "1.4",
+          "title": "Inverted index and tokenizer"
+        },
+        {
+          "_key": "1.5",
+          "title": "Sharable storage and read lock-free"
+        },
+        {
+          "_key": "1.6",
+          "title": "Geo-location (latitude and longitude) search"
+        },
+        {
+          "_key": "1.7",
+          "title": "Groonga library"
+        },
+        {
+          "_key": "1.8",
+          "title": "Groonga server"
+        },
+        {
+          "_key": "1.9",
+          "title": "Groonga storage engine"
+        }
+      ]
     }
   }
-]
+}

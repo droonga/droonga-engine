@@ -1,50 +1,46 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "add.result",
-    "body": {
-      "name": "InvalidValue",
-      "message": "The column \"age\" cannot store the value \"secret\".",
-      "detail": {
-        "table": "User",
-        "key": "key",
-        "values": {
-          "age": "secret"
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "add.result",
+  "body": {
+    "name": "InvalidValue",
+    "message": "The column \"age\" cannot store the value \"secret\".",
+    "detail": {
+      "table": "User",
+      "key": "key",
+      "values": {
+        "age": "secret"
+      }
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 400,
+      "body": {
+        "name": "InvalidValue",
+        "message": "The column \"age\" cannot store the value \"secret\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "age": "secret"
+          }
         }
       }
     },
-    "errors": {
-      "sources0": {
-        "statusCode": 400,
-        "body": {
-          "name": "InvalidValue",
-          "message": "The column \"age\" cannot store the value \"secret\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "age": "secret"
-            }
-          }
-        }
-      },
-      "sources1": {
-        "statusCode": 400,
-        "body": {
-          "name": "InvalidValue",
-          "message": "The column \"age\" cannot store the value \"secret\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "age": "secret"
-            }
+    "sources1": {
+      "statusCode": 400,
+      "body": {
+        "name": "InvalidValue",
+        "message": "The column \"age\" cannot store the value \"secret\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "age": "secret"
           }
         }
       }
     }
   }
-]
+}

@@ -1,13 +1,9 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "add.result",
-    "body": {
-      "name": "MissingDatasetParameter",
-      "message": "Missing required parameter: <dataset>"
-    }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "add.result",
+  "body": {
+    "name": "MissingDatasetParameter",
+    "message": "Missing required parameter: <dataset>"
   }
-]
+}

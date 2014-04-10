@@ -1,23 +1,19 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "memos": {
-        "records": [
-          [
-            "Droonga is fun.",
-            51
-          ],
-          [
-            "Groonga is fast!",
-            1
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "memos": {
+      "records": [
+        [
+          "Droonga is fun.",
+          51
+        ],
+        [
+          "Groonga is fast!",
+          1
         ]
-      }
+      ]
     }
   }
-]
+}

@@ -1,17 +1,14 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "table_create.result",
-    "body": [
-      [
-        0,
-        0.0,
-        0.0
-      ],
-      true
-    ]
-  }
-]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "table_create.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    true
+  ]
+}
+

@@ -1,34 +1,30 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 9,
-        "records": [
-          {
-            "section-id": "1.1",
-            "label": "Groonga overview",
-            "fixed-number": 29,
-            "fixed-string": "Groonga"
-          },
-          {
-            "section-id": "1.2",
-            "label": "Full text search and Instant update",
-            "fixed-number": 29,
-            "fixed-string": "Groonga"
-          },
-          {
-            "section-id": "1.3",
-            "label": "Column store and aggregate query",
-            "fixed-number": 29,
-            "fixed-string": "Groonga"
-          }
-        ]
-      }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 9,
+      "records": [
+        {
+          "section-id": "1.1",
+          "label": "Groonga overview",
+          "fixed-number": 29,
+          "fixed-string": "Groonga"
+        },
+        {
+          "section-id": "1.2",
+          "label": "Full text search and Instant update",
+          "fixed-number": 29,
+          "fixed-string": "Groonga"
+        },
+        {
+          "section-id": "1.3",
+          "label": "Column store and aggregate query",
+          "fixed-number": 29,
+          "fixed-string": "Groonga"
+        }
+      ]
     }
   }
-]
+}

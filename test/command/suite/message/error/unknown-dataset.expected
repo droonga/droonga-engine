@@ -1,13 +1,9 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 404,
-    "type": "add.result",
-    "body": {
-      "name": "UnknownDataset",
-      "message": "Unknown dataset: <Unknown>"
-    }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 404,
+  "type": "add.result",
+  "body": {
+    "name": "UnknownDataset",
+    "message": "Unknown dataset: <Unknown>"
   }
-]
+}

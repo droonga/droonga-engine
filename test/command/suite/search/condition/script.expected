@@ -1,28 +1,24 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 4,
-        "records": [
-          [
-            "Groonga overview"
-          ],
-          [
-            "Groonga library"
-          ],
-          [
-            "Groonga server"
-          ],
-          [
-            "Groonga storage engine"
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 4,
+      "records": [
+        [
+          "Groonga overview"
+        ],
+        [
+          "Groonga library"
+        ],
+        [
+          "Groonga server"
+        ],
+        [
+          "Groonga storage engine"
         ]
-      }
+      ]
     }
   }
-]
+}

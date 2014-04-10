@@ -1,24 +1,20 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 2,
-        "records": [
-          [
-            "Groonga Night 3",
-            "2012-11-29T10:00:00.000000Z"
-          ],
-          [
-            "Groonga Night 4",
-            "2013-11-29T08:00:00.000000Z"
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 2,
+      "records": [
+        [
+          "Groonga Night 3",
+          "2012-11-29T10:00:00.000000Z"
+        ],
+        [
+          "Groonga Night 4",
+          "2013-11-29T08:00:00.000000Z"
         ]
-      }
+      ]
     }
   }
-]
+}

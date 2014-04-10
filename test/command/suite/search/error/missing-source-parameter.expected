@@ -1,17 +1,13 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "search.result",
-    "body": {
-      "name": "MissingSourceParameter",
-      "message": "[no-source] No source is specified. Query must have a valid source.",
-      "detail": {
-        "no-source": {
-        }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "search.result",
+  "body": {
+    "name": "MissingSourceParameter",
+    "message": "[no-source] No source is specified. Query must have a valid source.",
+    "detail": {
+      "no-source": {
       }
     }
   }
-]
+}

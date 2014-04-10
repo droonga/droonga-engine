@@ -1,15 +1,11 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "memos": {
-        "count": 1,
-        "elapsedTime": 0.0
-      }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "memos": {
+      "count": 1,
+      "elapsedTime": 0.0
     }
   }
-]
+}

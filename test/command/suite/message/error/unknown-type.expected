@@ -1,13 +1,9 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "unknown-type.result",
-    "body": {
-      "name": "UnknownType",
-      "message": "[Droonga] Handler not found for the type: <unknown-type>"
-    }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "unknown-type.result",
+  "body": {
+    "name": "UnknownType",
+    "message": "[Droonga] Handler not found for the type: <unknown-type>"
   }
-]
+}

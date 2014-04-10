@@ -1,21 +1,17 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "search.result",
-    "body": {
-      "name": "CyclicSource",
-      "message": "There is cyclic reference of sources.",
-      "detail": {
-        "a": {
-          "source": "b"
-        },
-        "b": {
-          "source": "a"
-        }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "search.result",
+  "body": {
+    "name": "CyclicSource",
+    "message": "There is cyclic reference of sources.",
+    "detail": {
+      "a": {
+        "source": "b"
+      },
+      "b": {
+        "source": "a"
       }
     }
   }
-]
+}

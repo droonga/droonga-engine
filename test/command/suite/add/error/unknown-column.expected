@@ -1,50 +1,46 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 404,
-    "type": "add.result",
-    "body": {
-      "name": "UnknownColumn",
-      "message": "The column \"unknown\" does not exist in the table \"User\".",
-      "detail": {
-        "table": "User",
-        "key": "key",
-        "values": {
-          "unknown": "unknown"
+{
+  "inReplyTo": "request-id",
+  "statusCode": 404,
+  "type": "add.result",
+  "body": {
+    "name": "UnknownColumn",
+    "message": "The column \"unknown\" does not exist in the table \"User\".",
+    "detail": {
+      "table": "User",
+      "key": "key",
+      "values": {
+        "unknown": "unknown"
+      }
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 404,
+      "body": {
+        "name": "UnknownColumn",
+        "message": "The column \"unknown\" does not exist in the table \"User\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "unknown": "unknown"
+          }
         }
       }
     },
-    "errors": {
-      "sources0": {
-        "statusCode": 404,
-        "body": {
-          "name": "UnknownColumn",
-          "message": "The column \"unknown\" does not exist in the table \"User\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "unknown": "unknown"
-            }
-          }
-        }
-      },
-      "sources1": {
-        "statusCode": 404,
-        "body": {
-          "name": "UnknownColumn",
-          "message": "The column \"unknown\" does not exist in the table \"User\".",
-          "detail": {
-            "table": "User",
-            "key": "key",
-            "values": {
-              "unknown": "unknown"
-            }
+    "sources1": {
+      "statusCode": 404,
+      "body": {
+        "name": "UnknownColumn",
+        "message": "The column \"unknown\" does not exist in the table \"User\".",
+        "detail": {
+          "table": "User",
+          "key": "key",
+          "values": {
+            "unknown": "unknown"
           }
         }
       }
     }
   }
-]
+}

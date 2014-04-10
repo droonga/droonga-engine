@@ -1,13 +1,9 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 400,
-    "type": "search.result",
-    "body": {
-      "name": "NoQuery",
-      "message": "You must specify one or more query."
-    }
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "search.result",
+  "body": {
+    "name": "NoQuery",
+    "message": "You must specify one or more query."
   }
-]
+}

@@ -1,36 +1,32 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "Groonga": {
-        "count": 4,
-        "records": [
-          [
-            "Groonga overview"
-          ],
-          [
-            "Groonga library"
-          ],
-          [
-            "Groonga server"
-          ],
-          [
-            "Groonga storage engine"
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "Groonga": {
+      "count": 4,
+      "records": [
+        [
+          "Groonga overview"
+        ],
+        [
+          "Groonga library"
+        ],
+        [
+          "Groonga server"
+        ],
+        [
+          "Groonga storage engine"
         ]
-      },
-      "documents": {
-        "count": 1,
-        "records": [
-          [
-            "Groonga"
-          ]
+      ]
+    },
+    "documents": {
+      "count": 1,
+      "records": [
+        [
+          "Groonga"
         ]
-      }
+      ]
     }
   }
-]
+}

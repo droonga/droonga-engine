@@ -1,43 +1,39 @@
-[
-  "droonga.message",
-  0,
-  {
-    "inReplyTo": "request-id",
-    "statusCode": 200,
-    "type": "search.result",
-    "body": {
-      "result": {
-        "count": 9,
-        "records": [
-          [
-            "1.9"
-          ],
-          [
-            "1.8"
-          ],
-          [
-            "1.7"
-          ],
-          [
-            "1.6"
-          ],
-          [
-            "1.5"
-          ],
-          [
-            "1.4"
-          ],
-          [
-            "1.3"
-          ],
-          [
-            "1.2"
-          ],
-          [
-            "1.1"
-          ]
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "result": {
+      "count": 9,
+      "records": [
+        [
+          "1.9"
+        ],
+        [
+          "1.8"
+        ],
+        [
+          "1.7"
+        ],
+        [
+          "1.6"
+        ],
+        [
+          "1.5"
+        ],
+        [
+          "1.4"
+        ],
+        [
+          "1.3"
+        ],
+        [
+          "1.2"
+        ],
+        [
+          "1.1"
         ]
-      }
+      ]
     }
   }
-]
+}
