@@ -16,6 +16,8 @@
         "Terms": {
           "type": "PatriciaTrie",
           "keyType": "ShortText",
+          "tokenizer": "TokenBigram",
+          "normalizer": "NormalizerAuto",
           "columns": {
             "memos_index": {
               "type": "Index",
