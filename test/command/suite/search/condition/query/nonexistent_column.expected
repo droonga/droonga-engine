@@ -1,0 +1,48 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "search.result",
+  "body": {
+    "name": "SyntaxError",
+    "message": "Syntax error: syntax:<query> input:<nonexistent:Droonga>",
+    "detail": {
+      "syntax": "query",
+      "input": "nonexistent:Droonga"
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 400,
+      "body": {
+        "name": "SyntaxError",
+        "message": "Syntax error: syntax:<query> input:<nonexistent:Droonga>",
+        "detail": {
+          "syntax": "query",
+          "input": "nonexistent:Droonga"
+        }
+      }
+    },
+    "sources1": {
+      "statusCode": 400,
+      "body": {
+        "name": "SyntaxError",
+        "message": "Syntax error: syntax:<query> input:<nonexistent:Droonga>",
+        "detail": {
+          "syntax": "query",
+          "input": "nonexistent:Droonga"
+        }
+      }
+    },
+    "sources2": {
+      "statusCode": 400,
+      "body": {
+        "name": "SyntaxError",
+        "message": "Syntax error: syntax:<query> input:<nonexistent:Droonga>",
+        "detail": {
+          "syntax": "query",
+          "input": "nonexistent:Droonga"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+# -*- js -*-
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "key": "droonga",
+    "values": {
+      "content": "Droonga is fun!"
+    }
+  }
+}
+#@enable-logging
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "memos": {
+        "source": "Memos",
+        "condition": {
+          "matchTo": ["content"],
+          "query": "nonexistent:Droonga"
+        },
+        "output": {
+          "elements": ["count"]
+        }
+      }
+    }
+  }
+}

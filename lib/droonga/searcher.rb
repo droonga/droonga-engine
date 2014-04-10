@@ -293,7 +293,7 @@ module Droonga
           end
           begin
             expression.parse(query, options)
-          rescue Groonga::SyntaxError
+          rescue Groonga::SyntaxError, Groonga::InvalidArgument
             raise SyntaxError.new("query", query)
           end
         elsif condition["script"]
