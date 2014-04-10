@@ -63,6 +63,18 @@ module Droonga
       end
     end
 
+    class SyntaxError < ErrorMessages::BadRequest
+      attr_reader :syntax
+      attr_reader :input
+      def initialize(syntax, input)
+        detail = {
+          "syntax" => syntax,
+          "input" => input,
+        }
+        super("Syntax error: syntax:<#{syntax}> input:<#{input}>", detail)
+      end
+    end
+
     def initialize(context)
       @context = context
     end
@@ -262,7 +274,8 @@ module Droonga
           matchTo.parse(match_columns, :syntax => :script)
           options[:default_column] = matchTo
         end
-        if condition["query"]
+        query = condition["query"]
+        if query
           options[:syntax] = :query
           if condition["defaultOperator"]
             default_operator_string = condition["defaultOperator"]
@@ -278,7 +291,11 @@ module Droonga
           if condition["allowColumn"]
             options[:allow_column] = true
           end
-          expression.parse(condition["query"], options)
+          begin
+            expression.parse(query, options)
+          rescue Groonga::SyntaxError
+            raise SyntaxError.new("query", query)
+          end
         elsif condition["script"]
           # "script" is ignored when "query" is also assigned.
           options[:syntax] = :script
