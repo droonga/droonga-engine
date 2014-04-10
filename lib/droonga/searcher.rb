@@ -18,7 +18,6 @@ require "tsort"
 require "groonga"
 
 require "droonga/loggable"
-require "droonga/time_formatter"
 require "droonga/error_messages"
 
 module Droonga
@@ -697,7 +696,7 @@ module Droonga
       end
 
       def format_start_time
-        TimeFormatter.format(@result.start_time)
+        @result.start_time
       end
 
       def format_elapsed_time

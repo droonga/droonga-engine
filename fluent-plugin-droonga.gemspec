@@ -36,6 +36,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rroonga", ">= 3.1.0"
   gem.add_dependency "groonga-command-parser"
   gem.add_dependency "serverengine"
+  gem.add_dependency "droonga-message-pack-packer"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "droonga-client"

@@ -19,8 +19,9 @@ require "thread"
 
 require "cool.io"
 
+require "droonga/message-pack-packer"
+
 require "droonga/loggable"
-require "droonga/message_pack_packer"
 
 module Droonga
   class FluentMessageSender
