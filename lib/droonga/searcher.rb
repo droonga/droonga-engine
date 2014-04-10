@@ -291,9 +291,14 @@ module Droonga
           if condition["allowColumn"]
             options[:allow_column] = true
           end
+          syntax_errors = [
+            Groonga::SyntaxError,
+            Groonga::InvalidArgument,
+            Encoding::CompatibilityError,
+          ]
           begin
             expression.parse(query, options)
-          rescue Groonga::SyntaxError, Groonga::InvalidArgument
+          rescue *syntax_errors
             raise SyntaxError.new("query", query)
           end
         elsif condition["script"]
