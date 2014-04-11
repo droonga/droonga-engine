@@ -100,7 +100,6 @@ module Droonga
         :default_tokenizer => table.tokenizer,
         :normalizer => table.normalizer,
       }
-      p [table.name, options]
       schema.create_table(table.name, options) do |table_definition|
         each_column(table) do |column|
           next unless normal_column?(column)
