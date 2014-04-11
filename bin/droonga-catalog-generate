@@ -45,6 +45,10 @@ parser.on("--n-workers=N", Integer,
           "Use N workers for the current dataset.") do |n|
   current_dataset[:n_workers] = n
 end
+parser.on("--plugins=PLUGIN1,PLUGIN2,...", Array,
+          "Use PLUGINS for the current dataset.") do |plugins|
+  current_dataset[:plugins] = plugins
+end
 parser.on("--schema=PATH",
           "Use schema in JSON at PATH for the current dataset.") do |path|
   File.open(path) do |input|
