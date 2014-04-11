@@ -198,12 +198,22 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
-      def test_value_type
-        assert_equal("ShortText",
-                     create_column("column_name",
-                                   {
-                                     "valueType" => "ShortText"
-                                   }).value_type)
+      class ValueType < self
+        def value_type(data)
+          create_column("column_name", data).value_type
+        end
+
+        def test_data_type
+          assert_equal("ShortText", value_type("valueType" => "ShortText"))
+        end
+
+        def test_reference_type
+          assert_equal("Users", value_type("valueType" => "Users"))
+        end
+
+        def test_default
+          assert_nil(value_type({}))
+        end
       end
 
       def test_value_type_groonga
