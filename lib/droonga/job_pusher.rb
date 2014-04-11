@@ -25,7 +25,7 @@ module Droonga
     attr_reader :socket_path
     def initialize(loop, base_path)
       @loop = loop
-      @socket_path = "#{base_path}.sock"
+      @socket_path = "#{base_path}.#{Process.pid}.#{object_id}.sock"
       @job_queue = JobQueue.new(@loop)
     end
 
