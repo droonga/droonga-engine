@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,24 +16,32 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/loggable"
+require "droonga/catalog_observer"
 require "droonga/dispatcher"
 
 module Droonga
   class Engine
     include Loggable
 
-    def initialize(catalog, options={})
-      @catalog = catalog
+    def initialize(options={})
       @options = options
-      @dispatcher = Dispatcher.new(@catalog, @options)
+      @catalog_observer = Droonga::CatalogObserver.new
+      @catalog_observer.on_reload = lambda do |catalog|
+        graceful_restart(catalog)
+        logger.info("restarted")
+      end
     end
 
     def start
+      @catalog_observer.start
+      catalog = @catalog_observer.catalog
+      @dispatcher = create_dispatcher(catalog)
       @dispatcher.start
     end
 
     def shutdown
       logger.trace("shutdown: start")
+      @catalog_observer.stop
       @dispatcher.shutdown
       logger.trace("shutdown: done")
     end
@@ -43,6 +51,22 @@ module Droonga
     end
 
     private
+    def create_dispatcher(catalog)
+      Dispatcher.new(catalog, @options)
+    end
+
+    def graceful_restart(catalog)
+      logger.trace("graceful_restart: start")
+      old_dispatcher = @dispatcher
+      logger.trace("graceful_restart: creating new dispatcher")
+      new_dispatcher = create_dispatcher(catalog)
+      new_dispatcher.start
+      @dispatcher = new_dispatcher
+      logger.trace("graceful_restart: shutdown old dispatcher")
+      old_dispatcher.shutdown
+      logger.trace("graceful_restart: done")
+    end
+
     def log_tag
       "engine"
     end

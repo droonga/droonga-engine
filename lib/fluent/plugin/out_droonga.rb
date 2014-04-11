@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,6 @@
 
 require "droonga/engine"
 require "droonga/plugin_loader"
-require "droonga/catalog_observer"
 
 module Fluent
   class DroongaOutput < Output
@@ -28,20 +27,12 @@ module Fluent
     def start
       super
       Droonga::PluginLoader.load_all
-      @catalog_observer = Droonga::CatalogObserver.new
-      @catalog_observer.on_reload = lambda do |catalog|
-        graceful_engine_restart(catalog)
-        $log.info("engine restarted")
-      end
-      @catalog_observer.start
-      catalog = @catalog_observer.catalog
-      @engine = create_engine(catalog)
+      @engine = Droonga::Engine.new(:name => @name)
       @engine.start
     end
 
     def shutdown
       @engine.shutdown
-      @catalog_observer.stop
       super
     end
 
@@ -53,22 +44,6 @@ module Fluent
     end
 
     private
-    def create_engine(catalog)
-      Droonga::Engine.new(catalog, :name => @name)
-    end
-
-    def graceful_engine_restart(catalog)
-      $log.trace("out_droonga: start: graceful_engine_restart")
-      old_engine = @engine
-      $log.trace("out_droonga: creating new engine")
-      new_engine = create_engine(catalog)
-      new_engine.start
-      @engine = new_engine
-      $log.trace("out_droonga: shutdown old engine")
-      old_engine.shutdown
-      $log.trace("out_droonga: done: graceful_engine_restart")
-    end
-
     def process_event(tag, record)
       $log.trace("out_droonga: tag: <#{tag}>")
       @engine.process(parse_record(tag, record))
