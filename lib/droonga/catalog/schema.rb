@@ -26,12 +26,6 @@ module Droonga
         def weight
           @data["weight"]
         end
-
-        def flags
-          flags = []
-          flags << "WITH_WEIGHT" if weight
-          flags
-        end
       end
 
       class ColumnIndexOptions
@@ -53,14 +47,6 @@ module Droonga
 
         def sources
           @data["sources"]
-        end
-
-        def flags
-          flags = []
-          flags << "WITH_SECTION"  if section
-          flags << "WITH_WEIGHT"   if weight
-          flags << "WITH_POSITION" if position
-          flags
         end
       end
 
@@ -95,23 +81,6 @@ module Droonga
           end
         end
 
-        def type_flag
-          case type
-          when "Scalar"
-            "COLUMN_SCALAR"
-          when "Vector"
-            "COLUMN_VECTOR"
-          when "Index"
-            "COLUMN_INDEX"
-          else
-            # TODO raise appropriate error
-          end
-        end
-
-        def flags
-          [type_flag] + vector_options.flags + index_options.flags
-        end
-
         def value_type
           @data["valueType"]
         end
@@ -122,21 +91,6 @@ module Droonga
           else
             value_type
           end
-        end
-
-        def to_column_create_body
-          body = {
-            "name"  => name,
-            "table" => table,
-            "flags" => flags.join("|"),
-            "type"  => value_type_groonga
-          }
-          sources = index_options.sources
-          if sources
-            body["source"] = sources.join(",")
-          end
-
-          body
         end
 
         private
@@ -195,7 +149,7 @@ module Droonga
           when "Float", "Time", "ShortText", "TokyoGeoPoint", "WGS84GeoPoint"
             key_type
           else
-            # TODO raise appropriate error
+            key_type
           end
         end
 
@@ -207,73 +161,9 @@ module Droonga
           @data["normalizer"]
         end
 
-        def type_flag
-          case type
-          when "Array"
-            "TABLE_NO_KEY"
-          when "Hash"
-            "TABLE_HASH_KEY"
-          when "PatriciaTrie"
-            "TABLE_PAT_KEY"
-          when "DoubleArrayTrie"
-            "TABLE_DAT_KEY"
-          else
-            # TODO raise appropriate error
-          end
-        end
-
-        def flags
-          [type_flag]
-        end
-
-        def to_table_create_body
-          body = {
-            "name"     => name,
-            "key_type" => key_type_groonga,
-            "flags"    => flags.join("|")
-          }
-
-          if tokenizer
-            body["default_tokenizer"] = tokenizer
-          end
-
-          if normalizer
-            body["normalizer"] = normalizer
-          end
-
-          body
-        end
-
         private
         def columns_data
           @data["columns"] || []
-        end
-      end
-
-      class ColumnCreateSorter
-        include TSort
-
-        def initialize(tables)
-          @tables = tables
-        end
-
-        def all_columns
-          @tables.values.collect {|table| table.columns.values}.flatten
-        end
-
-        def tsort_each_node(&block)
-          all_columns.each(&block)
-        end
-
-        def tsort_each_child(column, &block)
-          dependent_column_names = column.index_options.sources || []
-          dependent_column_names -= ["_key"] # _key always exists after the table created
-          reference_table = @tables[column.value_type_groonga]
-          # TODO when _key specified, check to ensure reference_table is not Array
-          dependent_columns = dependent_column_names.collect do |column_name|
-            reference_table.columns[column_name]
-          end
-          dependent_columns.each(&block)
         end
       end
 
@@ -285,32 +175,6 @@ module Droonga
         @data.each do |table_name, table_data|
           @tables[table_name] = Table.new(table_name, table_data)
         end
-      end
-
-      def to_messages
-        messages = []
-
-        tables.each do |name, table|
-          messages << {
-            "type" => "table_create",
-            "dataset" => @dataset_name,
-            "body" => table.to_table_create_body
-          }
-        end
-
-        sorter = ColumnCreateSorter.new(tables)
-        columns = sorter.tsort
-        # TODO handle TSort::Cyclic
-
-        columns.each do |column|
-          messages << {
-            "type" => "column_create",
-            "dataset" => @dataset_name,
-            "body" => column.to_column_create_body
-          }
-        end
-
-        messages
       end
 
       def ==(other)

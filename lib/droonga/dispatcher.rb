@@ -62,8 +62,6 @@ module Droonga
 
     def start
       @farm.start
-
-      ensure_schema
     end
 
     def shutdown
@@ -265,16 +263,6 @@ module Droonga
     def create_step_runners
       create_runners do |dataset|
         StepRunner.new(dataset, dataset.plugins)
-      end
-    end
-
-    def ensure_schema
-      @catalog.datasets.each do |name, dataset|
-        schema = dataset.schema
-        messages = schema.to_messages
-        messages.each do |message|
-          process_message(message)
-        end
       end
     end
 

@@ -16,78 +16,11 @@
 require "droonga/catalog/schema"
 
 class CatalogSchemaTest < Test::Unit::TestCase
-  private
-  def create_schema(dataset_name, data)
-    Droonga::Catalog::Schema.new(dataset_name, data)
-  end
-
   class SchemaTest < self
-    def test_schema_not_specified
-      assert_equal([],
-                   create_schema("dataset_name", nil).to_messages)
+    def create_schema(dataset_name, data)
+      Droonga::Catalog::Schema.new(dataset_name, data)
     end
-
-    def test_no_table
-      assert_equal([],
-                   create_schema("dataset_name", {}).to_messages)
-    end
-
-    def test_key_index
-      assert_equal([
-                     {
-                       "type" => "table_create",
-                       "dataset" => "dataset_name",
-                       "body" => {
-                         "name"       => "Term",
-                         "key_type"   => "ShortText",
-                         "flags"      => "TABLE_PAT_KEY",
-                         "normalizer" => "NormalizerAuto",
-                       }
-                     },
-                     {
-                       "type" => "table_create",
-                       "dataset" => "dataset_name",
-                       "body" => {
-                         "name"       => "Store",
-                         "key_type"   => "ShortText",
-                         "flags"      => "TABLE_HASH_KEY",
-                       }
-                     },
-                     {
-                       "type" => "column_create",
-                       "dataset" => "dataset_name",
-                       "body" => {
-                         "name"       => "stores__key",
-                         "table"      => "Term",
-                         "type"       => "Store",
-                         "flags"      => "COLUMN_INDEX",
-                         "source"     => "_key"
-                       }
-                     }
-                   ],
-                   create_schema(
-                     "dataset_name",
-                     "Term" => {
-                       "type"       => "PatriciaTrie",
-                       "keyType"    => "ShortText",
-                       "normalizer" => "NormalizerAuto",
-                       "columns" => {
-                         "stores__key" => {
-                           "type"      => "Index",
-                           "valueType" => "Store",
-                           "indexOptions" => {
-                             "sources" => [
-                               "_key"
-                             ]
-                           }
-                         }
-                       }
-                     },
-                     "Store" => {
-                       "keyType" => "ShortText"
-                     }
-                   ).to_messages)
-    end
+  end
 
     class TableTest < self
       def create_table(name, data)
@@ -139,14 +72,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
-      def test_flags
-        assert_equal(["TABLE_HASH_KEY"],
-                     create_table("table_name",
-                                  {
-                                    "type" => "Hash"
-                                  }).flags)
-      end
-
       def test_key_type
         assert_equal("ShortText",
                      create_table("table_name",
@@ -177,24 +102,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   {
                                     "normalizer" => "NormalizerAuto"
                                   }).normalizer)
-      end
-
-      def test_to_table_create_body
-        assert_equal({
-                       "name"              => "table_name",
-                       "key_type"          => "ShortText",
-                       "flags"             => "TABLE_PAT_KEY",
-                       "normalizer"        => "NormalizerAuto",
-                       "default_tokenizer" => "TokenBigram"
-                     },
-                     create_table("table_name",
-                                  {
-                                    "type"       => "PatriciaTrie",
-                                    "keyType"    => "ShortText",
-                                    "normalizer" => "NormalizerAuto",
-                                    "tokenizer"  => "TokenBigram"
-                                  }).to_table_create_body)
-
       end
     end
 
@@ -274,56 +181,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
           assert_equal("Int64", value_type_groonga("Integer"))
         end
       end
-
-      def test_to_column_create_body
-        assert_equal({
-                       "name"  => "column_name",
-                       "flags" => "COLUMN_SCALAR",
-                       "table" => "table_name",
-                       "type"  => "ShortText"
-                     },
-                     create_column("column_name",
-                                   {
-                                     "type"      => "Scalar",
-                                     "valueType" => "ShortText"
-                                   }).to_column_create_body)
-      end
-
-      class FlagsTest < self
-        def flags(data)
-          create_column("column_name", data).flags
-        end
-
-        def test_type
-          data = {
-            "type" => "Scalar"
-          }
-          assert_equal(["COLUMN_SCALAR"],
-                       flags(data))
-        end
-
-        def test_weight_options
-          data = {
-            "type" => "Vector",
-            "vectorOptions" => {
-              "weight" => true
-            }
-          }
-          assert_equal(["COLUMN_VECTOR", "WITH_WEIGHT"],
-                       flags(data))
-        end
-
-        def test_index_options
-          data = {
-            "type" => "Index",
-            "indexOptions" => {
-              "section" => true
-            }
-          }
-          assert_equal(["COLUMN_INDEX", "WITH_SECTION"],
-                       flags(data))
-        end
-      end
     end
 
     class ColumnVectorOptionsTest < self
@@ -337,15 +194,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
         }
         options = create_options(data)
         assert_equal(true, options.weight)
-      end
-
-      def test_flags
-        data = {
-          "weight" => true
-        }
-        options = create_options(data)
-        assert_equal(["WITH_WEIGHT"],
-                     options.flags)
       end
     end
 
@@ -374,13 +222,5 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                       "position" => true
                                     }).position)
       end
-
-      def test_flags
-        assert_equal(["WITH_SECTION"],
-                     create_options({
-                                      "section" => true
-                                    }).flags)
-      end
     end
-  end
 end

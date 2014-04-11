@@ -27,7 +27,9 @@ module Droonga
       @slices = {}
       slices = @catalog.slices(name)
       slices.each do |slice_name, slice_options|
-        slice = Droonga::Slice.new(@loop,
+        dataset = @catalog.datasets[slice_options[:dataset]]
+        slice = Droonga::Slice.new(dataset,
+                                   @loop,
                                    @options.merge(slice_options))
         @slices[slice_name] = slice
       end

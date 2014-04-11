@@ -21,15 +21,17 @@ require "droonga/worker"
 require "droonga/event_loop"
 require "droonga/job_pusher"
 require "droonga/processor"
+require "droonga/schema_applier"
 
 module Droonga
   class Slice
     include Loggable
 
-    def initialize(loop, options={})
+    def initialize(dataset, loop, options={})
+      @dataset = dataset
+      @loop = loop
       @options = options
       @n_workers = @options[:n_workers] || 0
-      @loop = loop
       @job_pusher = JobPusher.new(@loop, @options[:database])
       @processor = Processor.new(@loop, @job_pusher, @options)
       @supervisor = nil
@@ -59,12 +61,18 @@ module Droonga
     private
     def ensure_database
       enforce_umask
-      database_path = @options[:database]
-      return if File.exist?(database_path)
-      FileUtils.mkdir_p(File.dirname(database_path))
       context = Groonga::Context.new
       begin
-        context.create_database(database_path) do
+        database_path = @options[:database]
+        if File.exist?(database_path)
+          context.open_database(database_path) do
+            apply_schema(context)
+          end
+        else
+          FileUtils.mkdir_p(File.dirname(database_path))
+          context.create_database(database_path) do
+            apply_schema(context)
+          end
         end
       ensure
         context.close
@@ -73,6 +81,11 @@ module Droonga
 
     def enforce_umask
       File.umask(022)
+    end
+
+    def apply_schema(context)
+      applier = SchemaApplier.new(context, @dataset.schema)
+      applier.apply
     end
 
     def start_supervisor
