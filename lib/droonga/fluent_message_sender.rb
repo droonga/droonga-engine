@@ -55,7 +55,10 @@ module Droonga
       packed_fluent_message = MessagePackPacker.pack(fluent_message)
       @write_mutex.synchronize do
         @buffer << packed_fluent_message
-        @writer.signal
+        unless @signaling
+          @signaling = true
+          @writer.signal
+        end
       end
       logger.trace("send: done")
     end
@@ -107,9 +110,11 @@ module Droonga
 
     def start_writer
       @writer = Coolio::AsyncWatcher.new
+      @signaling = false
 
       on_signal = lambda do
         @write_mutex.synchronize do
+          @signaling = false
           connect unless connected?
           @buffer.each do |data|
             @socket.write(data)
