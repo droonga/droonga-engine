@@ -171,6 +171,19 @@ module Droonga
           @data["type"] || "Hash"
         end
 
+        def type_symbol
+          case type
+          when "Array"
+            :array
+          when "Hash"
+            :hash
+          when "PatriciaTrie"
+            :patricia_trie
+          when "DoubleArrayTrie"
+            :double_array_trie
+          end
+        end
+
         def key_type
           @data["keyType"]
         end

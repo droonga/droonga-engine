@@ -114,6 +114,31 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
+      class TypeSymbolTest < self
+        def type_symbol(type)
+          data = {
+            "type" => type,
+          }
+          create_table("table_name", data).type_symbol
+        end
+
+        def test_array
+          assert_equal(:array, type_symbol("Array"))
+        end
+
+        def test_hash
+          assert_equal(:hash, type_symbol("Hash"))
+        end
+
+        def test_patricia_trie
+          assert_equal(:patricia_trie, type_symbol("PatriciaTrie"))
+        end
+
+        def test_double_array_trie
+          assert_equal(:double_array_trie, type_symbol("DoubleArrayTrie"))
+        end
+      end
+
       def test_flags
         assert_equal(["TABLE_HASH_KEY"],
                      create_table("table_name",
