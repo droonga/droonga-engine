@@ -114,14 +114,6 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
-      def test_type
-        assert_equal("Hash",
-                     create_table("table_name",
-                                  {
-                                    "type" => "Hash"
-                                  }).type)
-      end
-
       def test_flags
         assert_equal(["TABLE_HASH_KEY"],
                      create_table("table_name",
