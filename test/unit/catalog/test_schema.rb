@@ -216,12 +216,17 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
-      def test_value_type_groonga
-        assert_equal("Int64",
-                     create_column("column_name",
-                                   {
-                                     "valueType" => "Integer"
-                                   }).value_type_groonga)
+      class ValueTypeGroonga < self
+        def value_type_groonga(type)
+          data = {
+            "valueType" => type,
+          }
+          create_column("column_name", data).value_type_groonga
+        end
+
+        def test_integer
+          assert_equal("Int64", value_type_groonga("Integer"))
+        end
       end
 
       def test_to_column_create_body
