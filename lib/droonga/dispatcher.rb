@@ -22,15 +22,12 @@ require "droonga/collector_runner"
 require "droonga/step_runner"
 require "droonga/farm"
 require "droonga/session"
-require "droonga/replier"
 require "droonga/error_messages"
 require "droonga/distributor"
 
 module Droonga
   class Dispatcher
     include Loggable
-
-    attr_reader :name
 
     class MissingDatasetParameter < ErrorMessages::BadRequest
       def initialize
@@ -50,31 +47,26 @@ module Droonga
       end
     end
 
-    def initialize(catalog, options)
+    def initialize(engine_state, catalog, options)
+      @engine_state = engine_state
       @catalog = catalog
       @options = options
-      @name = @options[:name]
-      @loop = EventLoop.new(Coolio::Loop.default)
-      @sessions = {}
-      @current_id = 0
-      @local = Regexp.new("^#{@name}")
       @adapter_runners = create_adapter_runners
-      @farm = Farm.new(name, @catalog, @loop, :dispatcher => self)
-      @forwarder = Forwarder.new(@loop)
-      @replier = Replier.new(@forwarder)
+      @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
+                       :dispatcher => self)
       @collector_runners = create_collector_runners
       @step_runners = create_step_runners
+      @forwarder = @engine_state.forwarder
+      @replier = @engine_state.replier
     end
 
     def start
-      @forwarder.start
       @farm.start
 
       ensure_schema
     end
 
     def shutdown
-      @forwarder.shutdown
       @collector_runners.each_value do |collector_runner|
         collector_runner.shutdown
       end
@@ -146,7 +138,7 @@ module Droonga
 
     def process_internal_message(message)
       id = message["id"]
-      session = @sessions[id]
+      session = @engine_state.find_session(id)
       if session
         session.receive(message["input"], message["value"])
       else
@@ -156,13 +148,13 @@ module Droonga
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, collector_runner)
-          @sessions[id] = session
+          @engine_state.register_session(id, session)
         else
           #todo: take cases receiving result before its query into account
         end
         session.start
       end
-      @sessions.delete(id) if session.done?
+      @engine_state.unregister_session(id) if session.done?
     end
 
     def dispatch(message, destination)
@@ -176,7 +168,7 @@ module Droonga
     end
 
     def dispatch_steps(steps)
-      id = generate_id
+      id = @engine_state.generate_id
       destinations = {}
       steps.each do |step|
         dataset = step["dataset"]
@@ -215,16 +207,10 @@ module Droonga
     end
 
     def local?(route)
-      route =~ @local
+      @engine_state.local_route?(route)
     end
 
     private
-    def generate_id
-      id = @current_id
-      @current_id = id.succ
-      return [@name, id].join('.#')
-    end
-
     def farm_path(route)
       if route =~ /\A.*:\d+\/[^\.]+/
         $MATCH

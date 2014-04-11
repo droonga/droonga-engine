@@ -28,7 +28,8 @@ module Droonga
     attr_reader :catalog
     attr_accessor :on_reload
 
-    def initialize
+    def initialize(loop)
+      @loop = loop
       @catalog_path = catalog_path
       load_catalog!
     end
@@ -39,8 +40,7 @@ module Droonga
       @watcher.on_timer do
         observer.ensure_latest_catalog_loaded
       end
-      loop = Coolio::Loop.default
-      @watcher.attach(loop)
+      @loop.attach(@watcher)
     end
 
     def stop

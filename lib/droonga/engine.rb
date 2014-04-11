@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/loggable"
+require "droonga/engine_state"
 require "droonga/catalog_observer"
 require "droonga/dispatcher"
 
@@ -25,7 +26,8 @@ module Droonga
 
     def initialize(options={})
       @options = options
-      @catalog_observer = Droonga::CatalogObserver.new
+      @state = EngineState.new(@options[:name])
+      @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
       @catalog_observer.on_reload = lambda do |catalog|
         graceful_restart(catalog)
         logger.info("restarted")
@@ -33,16 +35,20 @@ module Droonga
     end
 
     def start
+      logger.trace("start: start")
+      @state.start
       @catalog_observer.start
       catalog = @catalog_observer.catalog
       @dispatcher = create_dispatcher(catalog)
       @dispatcher.start
+      logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
       @catalog_observer.stop
       @dispatcher.shutdown
+      @state.shutdown
       logger.trace("shutdown: done")
     end
 
@@ -52,7 +58,7 @@ module Droonga
 
     private
     def create_dispatcher(catalog)
-      Dispatcher.new(catalog, @options)
+      Dispatcher.new(@state, catalog, @options)
     end
 
     def graceful_restart(catalog)
