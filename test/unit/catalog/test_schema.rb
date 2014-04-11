@@ -198,6 +198,27 @@ class CatalogSchemaTest < Test::Unit::TestCase
         end
       end
 
+      class TypeSymbolTest < self
+        def type_symbol(type)
+          data = {
+            "type" => type,
+          }
+          create_column("column_name", data).type_symbol
+        end
+
+        def test_scalar
+          assert_equal(:scalar, type_symbol("Scalar"))
+        end
+
+        def test_vector
+          assert_equal(:vector, type_symbol("Vector"))
+        end
+
+        def test_index
+          assert_equal(:index, type_symbol("Index"))
+        end
+      end
+
       class ValueType < self
         def value_type(data)
           create_column("column_name", data).value_type

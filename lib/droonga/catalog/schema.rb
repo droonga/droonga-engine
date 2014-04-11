@@ -84,6 +84,17 @@ module Droonga
           @data["type"] || "Scalar"
         end
 
+        def type_symbol
+          case type
+          when "Scalar"
+            :scalar
+          when "Vector"
+            :vector
+          when "Index"
+            :index
+          end
+        end
+
         def type_flag
           case type
           when "Scalar"
