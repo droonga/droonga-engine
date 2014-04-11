@@ -30,9 +30,11 @@ class SearchHandlerTest < Test::Unit::TestCase
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
+    @loop = nil
     @plugin = Droonga::Plugins::Search::Handler.new("droonga",
                                                     @handler.context,
-                                                    @messenger)
+                                                    @messenger,
+                                                    @loop)
   end
 
   def teardown_plugin

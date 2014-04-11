@@ -37,6 +37,7 @@ class WatchHandlerTest < Test::Unit::TestCase
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
+    @loop = nil
   end
 
   def teardown_plugin
@@ -53,7 +54,8 @@ class WatchHandlerTest < Test::Unit::TestCase
     def create_plugin
       Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
                                                     @handler.context,
-                                                    @messenger)
+                                                    @messenger,
+                                                    @loop)
     end
 
     def test_subscribe
@@ -119,7 +121,8 @@ class WatchHandlerTest < Test::Unit::TestCase
     def create_plugin
       Droonga::Plugins::Watch::UnsubscribeHandler.new("droonga",
                                                       @handler.context,
-                                                      @messenger)
+                                                      @messenger,
+                                                      @loop)
     end
 
     def test_unsubscribe
@@ -153,7 +156,8 @@ class WatchHandlerTest < Test::Unit::TestCase
     def create_plugin
       Droonga::Plugins::Watch::FeedHandler.new("droonga",
                                                @handler.context,
-                                               @messenger)
+                                               @messenger,
+                                               @loop)
     end
 
     def test_feed_match
@@ -198,7 +202,8 @@ class WatchHandlerTest < Test::Unit::TestCase
       subscribe_handler =
         Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
                                                       @handler.context,
-                                                      @messenger)
+                                                      @messenger,
+                                                      @loop)
       response = subscribe_handler.handle(message)
       assert_equal(SUCCESS_RESULT, response)
     end

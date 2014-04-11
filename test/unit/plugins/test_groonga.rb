@@ -32,6 +32,7 @@ class GroongaHandlerTest < Test::Unit::TestCase
   def setup_plugin
     @handler = Droonga::Test::StubHandler.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
+    @loop = nil
   end
 
   def teardown_plugin

@@ -17,7 +17,8 @@ class ColumnCreateTest < GroongaHandlerTest
   def create_handler
     Droonga::Plugins::Groonga::ColumnCreate::Handler.new("droonga",
                                                          @handler.context,
-                                                         @messages)
+                                                         @messages,
+                                                         @loop)
   end
 
   def test_success

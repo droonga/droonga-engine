@@ -95,7 +95,7 @@ module Droonga
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      handler = handler_class.new(@name, @context, messenger)
+      handler = handler_class.new(@name, @context, messenger, @loop)
       begin
         result = handler.handle(handler_message)
         unless result.nil?
