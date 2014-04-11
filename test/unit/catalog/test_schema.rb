@@ -100,10 +100,18 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                   {}).name)
       end
 
-      def test_type_default
-        assert_equal("Hash",
-                     create_table("table_name",
-                                  {}).type)
+      class TypeTest < self
+        def type(data)
+          create_table("table_name", data).type
+        end
+
+        def test_default
+          assert_equal("Hash", type({}))
+        end
+
+        def test_array
+          create_table("Array", type("Array"))
+        end
       end
 
       def test_type
