@@ -184,18 +184,18 @@ class CatalogSchemaTest < Test::Unit::TestCase
                                    {}).name)
       end
 
-      def test_type
-        assert_equal("Scalar",
-                     create_column("column_name",
-                                   {
-                                     "type" => "Scalar"
-                                   }).type)
-      end
+      class TypeTest < self
+        def type(data)
+          create_column("column_name", data).type
+        end
 
-      def test_type_default
-        assert_equal("Scalar",
-                     create_column("column_name",
-                                   {}).type)
+        def test_scalar
+          assert_equal("Scalar", type("type" => "Scalar"))
+        end
+
+        def test_default
+          assert_equal("Scalar", type({}))
+        end
       end
 
       def test_value_type
