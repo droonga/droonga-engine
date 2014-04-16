@@ -32,17 +32,6 @@ require "test-unit"
 require "test/unit/notify"
 require "test/unit/rr"
 
-require "fluent/test"
-unless ENV.has_key?("VERBOSE")
-  null_logger = Object.new
-  null_logger.instance_eval do |obj|
-    def method_missing(method, *args)
-      # pass
-    end
-  end
-  $log = null_logger
-end
-
 base_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", ".."))
 lib_dir = File.join(base_dir, "lib")
 test_dir = File.join(base_dir, "test", "unit")

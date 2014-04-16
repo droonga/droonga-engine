@@ -19,7 +19,7 @@ module Droonga
   module Loggable
     private
     def logger
-      @logger ||= Logger.new(:depth_offset => 1, :tag => log_tag)
+      @logger ||= Logger.new(:tag => log_tag)
     end
 
     def log_tag

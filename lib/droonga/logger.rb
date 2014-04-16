@@ -27,50 +27,97 @@ module Droonga
   end
 
   class Logger
+    module Level
+      TRACE = 0
+      DEBUG = 1
+      INFO  = 2
+      WARN  = 3
+      ERROR = 4
+      FATAL = 5
+
+      LABELS = [
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error",
+        "fatal",
+      ]
+
+      class << self
+        def lable(level)
+          LABELS[level]
+        end
+      end
+    end
+
     def initialize(options={})
-      @output = Fluent::PluginLogger.new($log)
-      depth_offset = options[:depth_offset] || 0
-      @output.instance_variable_set(:@depth_offset, 4 + depth_offset)
+      @output = options[:output] || $stdout
       @tag = options[:tag]
+      @level = Level::INFO
     end
 
     def level
-      @output.level
+      Level.label(@level)
+    end
+
+    def level=(level)
+      @level = Level::LABELS.index(level.to_s)
     end
 
     def trace(message, data={})
-      log(:trace, message, data)
+      log(Level::TRACE, message, data)
     end
 
     def debug(message, data={})
-      log(:debug, message, data)
+      log(Level::DEBUG, message, data)
     end
 
     def info(message, data={})
-      log(:info, message, data)
+      log(Level::INFO, message, data)
     end
 
     def warn(message, data={})
-      log(:warn, message, data)
+      log(Level::WARN, message, data)
     end
 
     def error(message, data={})
-      log(:error, message, data)
+      log(Level::ERROR, message, data)
     end
 
     def exception(message, exception, data={})
-      log(:error,
+      log(Level::Error,
           "#{message}: #{exception.message}(#{exception.class})",
           data)
-      @output.error_backtrace(exception.backtrace)
+      log_backtrace(Level::Error, exception.backtrace)
     end
 
     private
     def log(level, message, data)
-      message = "#{@tag}: #{message}" if @tag
-      arguments = [message]
-      arguments << data unless data.empty?
-      @output.send(level, *arguments)
+      return unless target_level?(level)
+      @output.print(build_log_line(message, data))
+    end
+
+    def log_backtrace(level, backtrace)
+      return unless target_level?(level)
+      backtrace.each do |message|
+        @output.write(build_log_line(message))
+      end
+    end
+
+    def target_level?(level)
+      @level <= level
+    end
+
+    def build_log_line(level, message, data={})
+      line = "#{Time.now.iso8601}[#{Level.label(level)}]: "
+      line << "#{@tag}: " if @tag
+      line << message
+      data.each do |key, value|
+        line << " #{key}=#{value.inspect}"
+      end
+      line << "\n"
+      line
     end
   end
 end
