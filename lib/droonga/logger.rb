@@ -45,7 +45,7 @@ module Droonga
       ]
 
       class << self
-        def lable(level)
+        def label(level)
           LABELS[level]
         end
       end
