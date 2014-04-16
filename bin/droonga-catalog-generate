@@ -19,7 +19,7 @@ require "ostruct"
 require "optparse"
 require "json"
 
-require "droonga/version"
+require "droonga/engine/version"
 require "droonga/catalog_generator"
 
 generator = Droonga::CatalogGenerator.new
@@ -29,7 +29,7 @@ datasets = {}
 options = OpenStruct.new
 options.output_path = "-"
 parser = OptionParser.new
-parser.version = Droonga::VERSION
+parser.version = Droonga::Engine::VERSION
 parser.on("--output=PATH",
           "Output catalog.json to PATH.",
           "\"-\" means the standard output.",

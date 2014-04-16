@@ -18,11 +18,11 @@
 base_dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(File.join(base_dir, "lib"))
 
-require "droonga/version"
+require "droonga/engine/version"
 
 Gem::Specification.new do |gem|
   gem.name          = "droonga-engine"
-  gem.version       = Droonga::VERSION
+  gem.version       = Droonga::Engine::VERSION
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
   gem.summary       = "Droonga engine"

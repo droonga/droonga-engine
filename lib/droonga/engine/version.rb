@@ -14,5 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  VERSION = "1.0.1"
+  class Engine
+    VERSION = "1.0.1"
+  end
 end
