@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "droonga/engine"
+require "droonga/event_loop"
+require "droonga/fluent_message_receiver"
+require "droonga/plugin_loader"
+
+Droonga::PluginLoader.load_all
+
+raw_loop = Coolio::Loop.default
+loop = Droonga::EventLoop.new(raw_loop)
+
+engine = Droonga::Engine.new(:name => "droonga")
+engine.start
+
+receiver = Droonga::FluentMessageReceiver.new(loop) do |tag, time, record|
+  prefix, type, *arguments = tag.split(/\./)
+  if type.nil? or type.empty? or type == "message"
+    message = record
+  else
+    message = {
+      "type" => type,
+      "arguments" => arguments,
+      "body" => record
+    }
+  end
+  reply_to = message["replyTo"]
+  if reply_to.is_a? String
+    message["replyTo"] = {
+      "type" => "#{message["type"]}.result",
+      "to" => reply_to
+    }
+  end
+  message
+
+  engine.process(message)
+end
+receiver.start
+
+begin
+  raw_loop.run
+rescue Interrupt
+end
+
+receiver.shutdown
+engine.shutdown
