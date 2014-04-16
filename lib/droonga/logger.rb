@@ -95,13 +95,13 @@ module Droonga
     private
     def log(level, message, data)
       return unless target_level?(level)
-      @output.print(build_log_line(message, data))
+      @output.print(build_log_line(level, message, data))
     end
 
     def log_backtrace(level, backtrace)
       return unless target_level?(level)
       backtrace.each do |message|
-        @output.write(build_log_line(message))
+        @output.write(build_log_line(level, message))
       end
     end
 
