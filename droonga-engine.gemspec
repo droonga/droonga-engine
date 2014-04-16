@@ -21,20 +21,24 @@ $LOAD_PATH.unshift(File.join(base_dir, "lib"))
 require "droonga/version"
 
 Gem::Specification.new do |gem|
-  gem.name          = "fluent-plugin-droonga"
+  gem.name          = "droonga-engine"
   gem.version       = Droonga::VERSION
   gem.authors       = ["Droonga Project"]
   gem.email         = ["droonga@groonga.org"]
-  gem.description   = "Droonga (distributed Groonga) plugin for Fluent event collector"
-  gem.summary       = gem.description
-  gem.homepage      = "https://github.com/droonga/fluent-plugin-droonga"
+  gem.summary       = "Droonga engine"
+  gem.description   =
+    "Droonga engine is a core component in Droonga system. " +
+    "Droonga is a scalable data processing engine based on Groonga. " +
+    "Droonga means Distributed Groonga."
+  gem.homepage      = "https://github.com/droonga/droonga-engine"
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
-  gem.add_dependency "fluentd"
   gem.add_dependency "rroonga", ">= 3.1.0"
   gem.add_dependency "groonga-command-parser"
+  gem.add_dependency "json"
+  gem.add_dependency "cool.io"
   gem.add_dependency "serverengine"
   gem.add_dependency "droonga-message-pack-packer"
   gem.add_development_dependency "rake"

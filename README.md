@@ -1,4 +1,4 @@
-# Fluent::Plugin::Droonga
+# Droonga engine
 
 ## What's "Droonga"?
 
