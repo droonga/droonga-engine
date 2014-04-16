@@ -37,6 +37,12 @@ lib_dir = File.join(base_dir, "lib")
 test_dir = File.join(base_dir, "test", "unit")
 
 $LOAD_PATH.unshift(lib_dir)
+
+require "droonga/engine"
+require "droonga/plugin_loader"
+
+Droonga::PluginLoader.load_all
+
 $LOAD_PATH.unshift(test_dir)
 
 require "helper"
