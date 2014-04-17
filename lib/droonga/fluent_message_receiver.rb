@@ -162,6 +162,10 @@ module Droonga
         end
       end
 
+      def close
+        @io.close
+      end
+
       private
       def feed(data)
         @unpacker.feed_each(data) do |object|
