@@ -87,10 +87,14 @@ receiver = Droonga::FluentMessageReceiver.new(loop,
                                               &on_message)
 receiver.start
 
-begin
-  raw_loop.run
-rescue Interrupt
+trap(:INT) do
+  raw_loop.stop
 end
+trap(:TERM) do
+  raw_loop.stop
+end
+
+raw_loop.run
 
 receiver.shutdown
 engine.shutdown
