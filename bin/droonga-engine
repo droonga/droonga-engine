@@ -26,7 +26,7 @@ require "droonga/plugin_loader"
 
 options = OpenStruct.new
 options.host = Socket.gethostname
-options.port = 24224
+options.port = 10031
 options.tag = "droonga"
 
 parser = OptionParser.new
