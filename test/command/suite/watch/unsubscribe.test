@@ -4,6 +4,6 @@
   "body": {
     "condition": "condition",
     "subscriber": "subscriber",
-    "route": "localhost:23003/output"
+    "route": "127.0.0.1:23003/output"
   }
 }

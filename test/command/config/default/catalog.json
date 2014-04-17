@@ -14,21 +14,21 @@
               "label": "slice000",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.000"
+                "address": "127.0.0.1:23003/droonga.000"
               }
             },
             {
               "label": "slice001",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.001"
+                "address": "127.0.0.1:23003/droonga.001"
               }
             },
             {
               "label": "slice002",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.002"
+                "address": "127.0.0.1:23003/droonga.002"
               }
             }
           ]
@@ -41,21 +41,21 @@
               "label": "slice010",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.010"
+                "address": "127.0.0.1:23003/droonga.010"
               }
             },
             {
               "label": "slice011",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.011"
+                "address": "127.0.0.1:23003/droonga.011"
               }
             },
             {
               "label": "slice012",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.012"
+                "address": "127.0.0.1:23003/droonga.012"
               }
             }
           ]
@@ -74,7 +74,7 @@
               "label": "slice100",
               "weight": 50,
               "volume": {
-                "address": "localhost:23003/droonga.watch"
+                "address": "127.0.0.1:23003/droonga.watch"
               }
             }
           ]
