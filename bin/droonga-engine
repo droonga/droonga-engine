@@ -42,7 +42,7 @@ parser.on("--port=PORT", Integer,
 end
 parser.on("--tag=TAG",
           "The tag of the Droonga engine",
-          "(#{options.tag})") do |name|
+          "(#{options.tag})") do |tag|
   options.tag = tag
 end
 parser.parse!(ARGV)
