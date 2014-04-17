@@ -15,20 +15,50 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "ostruct"
+require "optparse"
+
 require "droonga/engine"
 require "droonga/event_loop"
 require "droonga/fluent_message_receiver"
 require "droonga/plugin_loader"
+
+options = OpenStruct.new
+options.host = "0.0.0.0"
+options.port = 24224
+options.name = "droonga"
+
+parser = OptionParser.new
+parser.on("--host=HOST",
+          "The host name of the Droonga engine",
+          "(#{options.host})") do |host|
+  options.host = host
+end
+parser.on("--port=PORT", Integer,
+          "The port number of the Droonga engine",
+          "(#{options.port})") do |port|
+  options.port = port
+end
+parser.on("--name=NAME",
+          "The name of the Droonga engine",
+          "(#{options.name})") do |name|
+  options.port = name
+end
+parser.parse!(ARGV)
 
 Droonga::PluginLoader.load_all
 
 raw_loop = Coolio::Loop.default
 loop = Droonga::EventLoop.new(raw_loop)
 
-engine = Droonga::Engine.new(:name => "droonga")
+engine = Droonga::Engine.new(:name => options.name)
 engine.start
 
-receiver = Droonga::FluentMessageReceiver.new(loop) do |tag, time, record|
+receiver_options = {
+  :host => options.host,
+  :port => options.port,
+}
+on_message = lambda do |tag, time, record|
   prefix, type, *arguments = tag.split(/\./)
   if type.nil? or type.empty? or type == "message"
     message = record
@@ -50,6 +80,9 @@ receiver = Droonga::FluentMessageReceiver.new(loop) do |tag, time, record|
 
   engine.process(message)
 end
+receiver = Droonga::FluentMessageReceiver.new(loop,
+                                              receiver_options,
+                                              &on_message)
 receiver.start
 
 begin
