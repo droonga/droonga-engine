@@ -48,13 +48,21 @@ module Droonga
         def label(level)
           LABELS[level]
         end
+
+        def default
+          INFO
+        end
+
+        def default_label
+          label(default)
+        end
       end
     end
 
     def initialize(options={})
       @output = options[:output] || $stdout
       @tag = options[:tag]
-      @level = Level::INFO
+      self.level = ENV["DROONGA_LOG_LEVEL"] || Level.default_label
     end
 
     def level

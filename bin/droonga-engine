@@ -28,6 +28,7 @@ options = OpenStruct.new
 options.host = Droonga::FluentMessageReceiver::DEFAULT_HOST
 options.port = Droonga::FluentMessageReceiver::DEFAULT_PORT
 options.tag = "droonga"
+options.log_level = Droonga::Logger::Level.default_label
 
 parser = OptionParser.new
 parser.on("--host=HOST",
@@ -45,7 +46,17 @@ parser.on("--tag=TAG",
           "(#{options.tag})") do |tag|
   options.tag = tag
 end
+levels = Droonga::Logger::Level::LABELS
+levels_label = levels.join(",")
+parser.on("--log-level=LEVEL", levels,
+          "The log level of the Droonga engine",
+          "[#{levels_label}]",
+          "(#{options.log_level})") do |level|
+  options.log_level = level
+end
 parser.parse!(ARGV)
+
+ENV["DROOGNA_LOG_LEVEL"] = options.log_level
 
 Droonga::PluginLoader.load_all
 
