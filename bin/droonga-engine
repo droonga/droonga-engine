@@ -53,7 +53,7 @@ raw_loop = Coolio::Loop.default
 loop = Droonga::EventLoop.new(raw_loop)
 
 name = "#{options.host}:#{options.port}/#{options.tag}"
-engine = Droonga::Engine.new(:name => name)
+engine = Droonga::Engine.new(loop, name)
 engine.start
 
 receiver_options = {

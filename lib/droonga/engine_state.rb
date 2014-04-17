@@ -24,13 +24,13 @@ module Droonga
   class EngineState
     include Loggable
 
-    attr_reader :name
     attr_reader :loop
+    attr_reader :name
     attr_reader :forwarder
     attr_reader :replier
-    def initialize(name)
+    def initialize(loop, name)
+      @loop = loop
       @name = name
-      @loop = EventLoop.new(Coolio::Loop.default)
       @sessions = {}
       @current_id = 0
       @forwarder = Forwarder.new(@loop)

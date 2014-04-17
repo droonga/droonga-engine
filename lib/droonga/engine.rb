@@ -25,9 +25,8 @@ module Droonga
   class Engine
     include Loggable
 
-    def initialize(options={})
-      @options = options
-      @state = EngineState.new(@options[:name])
+    def initialize(loop, name)
+      @state = EngineState.new(loop, name)
       @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
       @catalog_observer.on_reload = lambda do |catalog|
         graceful_restart(catalog)
@@ -59,7 +58,7 @@ module Droonga
 
     private
     def create_dispatcher(catalog)
-      Dispatcher.new(@state, catalog, @options)
+      Dispatcher.new(@state, catalog)
     end
 
     def graceful_restart(catalog)

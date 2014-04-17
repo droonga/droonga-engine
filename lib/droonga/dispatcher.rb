@@ -47,10 +47,9 @@ module Droonga
       end
     end
 
-    def initialize(engine_state, catalog, options)
+    def initialize(engine_state, catalog)
       @engine_state = engine_state
       @catalog = catalog
-      @options = options
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
                        :dispatcher => self)
