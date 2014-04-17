@@ -25,10 +25,13 @@ module Droonga
   class FluentMessageReceiver
     include Loggable
 
+    DEFAULT_HOST = Socket.gethostname
+    DEFAULT_PORT = 10031
+
     def initialize(loop, options={}, &on_message)
       @loop = loop
-      @host = options[:host] || "0.0.0.0"
-      @port = options[:port] || 24224
+      @host = options[:host] || DEFAULT_HOST
+      @port = options[:port] || DEFAULT_PORT
       @server = nil
       @clients = []
       @on_message = on_message

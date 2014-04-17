@@ -25,8 +25,8 @@ require "droonga/fluent_message_receiver"
 require "droonga/plugin_loader"
 
 options = OpenStruct.new
-options.host = Socket.gethostname
-options.port = 10031
+options.host = Droonga::FluentMessageReceiver::DEFAULT_HOST
+options.port = Droonga::FluentMessageReceiver::DEFAULT_PORT
 options.tag = "droonga"
 
 parser = OptionParser.new
