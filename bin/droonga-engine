@@ -15,6 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "socket"
 require "ostruct"
 require "optparse"
 
@@ -24,9 +25,9 @@ require "droonga/fluent_message_receiver"
 require "droonga/plugin_loader"
 
 options = OpenStruct.new
-options.host = "0.0.0.0"
+options.host = Socket.gethostname
 options.port = 24224
-options.name = "droonga"
+options.tag = "droonga"
 
 parser = OptionParser.new
 parser.on("--host=HOST",
@@ -39,10 +40,10 @@ parser.on("--port=PORT", Integer,
           "(#{options.port})") do |port|
   options.port = port
 end
-parser.on("--name=NAME",
-          "The name of the Droonga engine",
-          "(#{options.name})") do |name|
-  options.port = name
+parser.on("--tag=TAG",
+          "The tag of the Droonga engine",
+          "(#{options.tag})") do |name|
+  options.tag = tag
 end
 parser.parse!(ARGV)
 
@@ -51,7 +52,8 @@ Droonga::PluginLoader.load_all
 raw_loop = Coolio::Loop.default
 loop = Droonga::EventLoop.new(raw_loop)
 
-engine = Droonga::Engine.new(:name => options.name)
+name = "#{options.host}:#{options.port}/#{options.tag}"
+engine = Droonga::Engine.new(:name => name)
 engine.start
 
 receiver_options = {
