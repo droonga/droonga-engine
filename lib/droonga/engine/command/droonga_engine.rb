@@ -62,6 +62,16 @@ module Droonga
         private
         def parse_command_line_arguments!(command_line_arguments)
           parser = OptionParser.new
+          add_connection_options(parser)
+          add_log_options(parser)
+          parser.parse!(command_line_arguments)
+
+          ENV["DROOGNA_LOG_LEVEL"] = @log_level
+        end
+
+        def add_connection_options(parser)
+          parser.separator("")
+          parser.separator("Connection:")
           parser.on("--host=HOST",
                     "The host name of the Droonga engine",
                     "(#{@host})") do |host|
@@ -77,6 +87,11 @@ module Droonga
                     "(#{@tag})") do |tag|
             @tag = tag
           end
+        end
+
+        def add_log_options(parser)
+          parser.separator("")
+          parser.separator("Log:")
           levels = Logger::Level::LABELS
           levels_label = levels.join(",")
           parser.on("--log-level=LEVEL", levels,
@@ -85,9 +100,6 @@ module Droonga
                     "(#{@log_level})") do |level|
             @log_level = level
           end
-          parser.parse!(command_line_arguments)
-
-          ENV["DROOGNA_LOG_LEVEL"] = @log_level
         end
 
         def run_engine(loop)
