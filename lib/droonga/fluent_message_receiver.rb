@@ -14,7 +14,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "socket"
-require "ipaddr"
 
 require "msgpack"
 
@@ -25,13 +24,10 @@ module Droonga
   class FluentMessageReceiver
     include Loggable
 
-    DEFAULT_HOST = Socket.gethostname
-    DEFAULT_PORT = 10031
-
     def initialize(loop, options={}, &on_message)
       @loop = loop
-      @host = options[:host] || DEFAULT_HOST
-      @port = options[:port] || DEFAULT_PORT
+      @listen_fd = options[:listen_fd]
+      @heartbeat_fd = options[:heartbeat_fd]
       @server = nil
       @clients = []
       @on_message = on_message
@@ -55,7 +51,7 @@ module Droonga
     private
     def start_heartbeat_receiver
       logger.trace("start_heartbeat_receiver: start")
-      @heartbeat_receiver = HeartbeatReceiver.new(@loop, @host, @port)
+      @heartbeat_receiver = HeartbeatReceiver.new(@loop, @heartbeat_fd)
       @heartbeat_receiver.start
       logger.trace("start_heartbeat_receiver: done")
     end
@@ -70,7 +66,7 @@ module Droonga
       logger.trace("start_server: start")
 
       @clients = []
-      @server = Coolio::TCPServer.new(@host, @port) do |connection|
+      @server = create_server do |connection|
         client = Client.new(connection) do |tag, time, record|
           @on_message.call(tag, time, record)
         end
@@ -81,8 +77,11 @@ module Droonga
       logger.trace("start_server: done")
     end
 
+    def create_server(&block)
+      Coolio::Server.new(TCPServer.for_fd(@listen_fd), Coolio::TCPSocket, &block)
+    end
+
     def shutdown_server
-      @server.close
     end
 
     def shutdown_clients
@@ -96,15 +95,13 @@ module Droonga
     end
 
     class HeartbeatReceiver
-      def initialize(loop, host, port)
+      def initialize(loop, fd)
         @loop = loop
-        @host = host
-        @port = port
+        @fd = fd
       end
 
       def start
-        @socket = UDPSocket.new(address_family)
-        @socket.bind(@host, @port)
+        @socket = UDPSocket.for_fd(@fd)
 
         @watcher = Coolio::IOWatcher.new(@socket, "r")
         on_readable = lambda do
@@ -118,15 +115,9 @@ module Droonga
 
       def shutdown
         @watcher.detach
-        @socket.close
       end
 
       private
-      def address_family
-        ip_address = IPAddr.new(IPSocket.getaddress(@host))
-        ip_address.family
-      end
-
       def receive_heartbeat
         address = nil
         begin

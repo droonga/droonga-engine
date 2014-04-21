@@ -17,4 +17,4 @@
 
 require "droonga/engine/command/droonga_engine"
 
-exit(Droonga::Engine::Command::DroongaEngine::Supervisor.run(ARGV))
+exit(Droonga::Engine::Command::DroongaEngine::Service.run(ARGV))
