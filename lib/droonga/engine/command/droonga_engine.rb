@@ -106,8 +106,8 @@ module Droonga
 
         def run_receiver(loop, engine)
           receiver_options = {
-            :host => options.host,
-            :port => options.port,
+            :host => @host,
+            :port => @port,
           }
           on_message = lambda do |tag, time, record|
             prefix, type, *arguments = tag.split(/\./)
