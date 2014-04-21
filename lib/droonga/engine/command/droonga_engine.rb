@@ -41,19 +41,10 @@ module Droonga
           parse_command_line_arguments!(command_line_arguments)
           PluginLoader.load_all
 
-          raw_loop = Coolio::Loop.default
-          loop = EventLoop.new(raw_loop)
-
-          run_engine(loop) do |engine|
-            run_receiver(loop, engine) do |receiver|
-              trap(:INT) do
-                loop.stop
-              end
-              trap(:TERM) do
-                loop.stop
-              end
-              loop.run
-            end
+          begin
+            run_services
+          ensure
+            shutdown_services
           end
 
           true
@@ -102,41 +93,61 @@ module Droonga
           end
         end
 
-        def run_engine(loop)
-          engine = Engine.new(loop, engine_name)
-          begin
-            engine.start
-            yield(engine)
-          ensure
-            engine.shutdown
-          end
+        def run_services
+          @engine = nil
+          @receiver = nil
+          raw_loop = Coolio::Loop.default
+          @loop = EventLoop.new(raw_loop)
+
+          run_engine
+          run_receiver
+          setup_signals
+          @loop.run
+        end
+
+        def shutdown_services
+          shutdown_receiver
+          shutdown_engine
+          @loop = nil
+        end
+
+        def run_engine
+          @engine = Engine.new(@loop, engine_name)
+          @engine.start
         end
 
         def engine_name
           "#{@host}:#{@port}/#{@tag}"
         end
 
-        def run_receiver(loop, engine)
-          receiver = create_receiver(loop, engine)
-          begin
-            receiver.start
-            yield(receiver)
-          ensure
-            receiver.shutdown
-          end
+        def shutdown_engine
+          return if @engine.nil?
+          @engine.shutdown
+          @engine = nil
         end
 
-        def create_receiver(loop, engine)
+        def run_receiver
+          @receiver = create_receiver
+          @receiver.start
+        end
+
+        def shutdown_receiver
+          return if @receiver.nil?
+          @receiver.shutdown
+          @receiver = nil
+        end
+
+        def create_receiver
           options = {
             :host => @host,
             :port => @port,
           }
-          FluentMessageReceiver.new(loop, options) do |tag, time, record|
-            on_message(engine, tag, time, record)
+          FluentMessageReceiver.new(@loop, options) do |tag, time, record|
+            on_message(tag, time, record)
           end
         end
 
-        def on_message(engine, tag, time, record)
+        def on_message(tag, time, record)
           prefix, type, *arguments = tag.split(/\./)
           if type.nil? or type.empty? or type == "message"
             message = record
@@ -155,7 +166,16 @@ module Droonga
             }
           end
 
-          engine.process(message)
+          @engine.process(message)
+        end
+
+        def setup_signals
+          trap(:INT) do
+            @loop.stop
+          end
+          trap(:TERM) do
+            @loop.stop
+          end
         end
       end
     end
