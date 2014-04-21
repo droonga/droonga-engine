@@ -39,7 +39,7 @@ module Droonga
 
         def run(command_line_arguments)
           parse_command_line_arguments!(command_line_arguments)
-          Droonga::PluginLoader.load_all
+          PluginLoader.load_all
 
           raw_loop = Coolio::Loop.default
           loop = EventLoop.new(raw_loop)
@@ -77,7 +77,7 @@ module Droonga
                     "(#{@tag})") do |tag|
             @tag = tag
           end
-          levels = Droonga::Logger::Level::LABELS
+          levels = Logger::Level::LABELS
           levels_label = levels.join(",")
           parser.on("--log-level=LEVEL", levels,
                     "The log level of the Droonga engine",
@@ -91,7 +91,7 @@ module Droonga
         end
 
         def run_engine(loop)
-          engine = Droonga::Engine.new(loop, engine_name)
+          engine = Engine.new(loop, engine_name)
           begin
             engine.start
             yield(engine)
@@ -131,9 +131,9 @@ module Droonga
 
             engine.process(message)
           end
-          receiver = Droonga::FluentMessageReceiver.new(loop,
-                                                        receiver_options,
-                                                        &on_message)
+          receiver = FluentMessageReceiver.new(loop,
+                                               receiver_options,
+                                               &on_message)
           begin
             receiver.start
             yield(receiver)
