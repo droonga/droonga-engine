@@ -105,41 +105,45 @@ module Droonga
         end
 
         def run_receiver(loop, engine)
-          receiver_options = {
-            :host => @host,
-            :port => @port,
-          }
-          on_message = lambda do |tag, time, record|
-            prefix, type, *arguments = tag.split(/\./)
-            if type.nil? or type.empty? or type == "message"
-              message = record
-            else
-              message = {
-                "type" => type,
-                "arguments" => arguments,
-                "body" => record
-              }
-            end
-            reply_to = message["replyTo"]
-            if reply_to.is_a? String
-              message["replyTo"] = {
-                "type" => "#{message["type"]}.result",
-                "to" => reply_to
-              }
-            end
-            message
-
-            engine.process(message)
-          end
-          receiver = FluentMessageReceiver.new(loop,
-                                               receiver_options,
-                                               &on_message)
+          receiver = create_receiver(loop, engine)
           begin
             receiver.start
             yield(receiver)
           ensure
             receiver.shutdown
           end
+        end
+
+        def create_receiver(loop, engine)
+          options = {
+            :host => @host,
+            :port => @port,
+          }
+          FluentMessageReceiver.new(loop, options) do |tag, time, record|
+            on_message(engine, tag, time, record)
+          end
+        end
+
+        def on_message(engine, tag, time, record)
+          prefix, type, *arguments = tag.split(/\./)
+          if type.nil? or type.empty? or type == "message"
+            message = record
+          else
+            message = {
+              "type" => type,
+              "arguments" => arguments,
+              "body" => record
+            }
+          end
+          reply_to = message["replyTo"]
+          if reply_to.is_a? String
+            message["replyTo"] = {
+              "type" => "#{message["type"]}.result",
+              "to" => reply_to
+            }
+          end
+
+          engine.process(message)
         end
       end
     end
