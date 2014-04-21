@@ -170,12 +170,25 @@ module Droonga
         end
 
         def setup_signals
+          trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
+            stop_graceful
+          end
+          trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
+            stop_immediate
+          end
           trap(:INT) do
-            @loop.stop
+            stop_immediate
+            trap(:INT, "DEFAULT")
           end
-          trap(:TERM) do
-            @loop.stop
-          end
+        end
+
+        def stop_graceful
+          @loop.stop
+        end
+
+        def stop_immediate
+          @loop.stop
+          shutdown_services
         end
       end
     end
