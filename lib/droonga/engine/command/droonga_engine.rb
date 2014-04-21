@@ -47,12 +47,12 @@ module Droonga
           run_engine(loop) do |engine|
             run_receiver(loop, engine) do |receiver|
               trap(:INT) do
-                raw_loop.stop
+                loop.stop
               end
               trap(:TERM) do
-                raw_loop.stop
+                loop.stop
               end
-              raw_loop.run
+              loop.run
             end
           end
 

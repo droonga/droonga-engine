@@ -33,5 +33,14 @@ module Droonga
     def break_current_loop
       @loop_breaker.signal
     end
+
+    def run
+      @loop.run
+    end
+
+    def stop
+      @loop.stop
+      break_current_loop
+    end
   end
 end
