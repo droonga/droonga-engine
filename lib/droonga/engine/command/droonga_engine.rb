@@ -55,6 +55,8 @@ module Droonga
               raw_loop.run
             end
           end
+
+          true
         end
 
         private
