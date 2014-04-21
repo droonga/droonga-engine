@@ -50,7 +50,7 @@ module Droonga
         end
 
         def default
-          INFO
+          WARN
         end
 
         def default_label
