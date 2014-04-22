@@ -181,6 +181,11 @@ module Droonga
                 Process.kill(Signals::GRACEFUL_STOP, old_service_pid)
               end
             end
+            trap(Signals::IMMEDIATE_RESTART) do
+              old_service_pid = service_pid
+              service_pid = run_service
+              Process.kill(Signals::IMMEDIATE_STOP, old_service_pid)
+            end
 
             succeeded = true
             while running
