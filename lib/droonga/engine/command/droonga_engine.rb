@@ -117,14 +117,28 @@ module Droonga
             @heartbeat_socket = UDPSocket.new(@configuration.address_family)
             @heartbeat_socket.bind(@configuration.host,
                                    @configuration.port)
+
+            service_pid = nil
+            running = true
             trap(:INT) do
-              Process.kill(:INT, @service_pid)
+              Process.kill(:INT, service_pid)
+              running = false
             end
-            trap(:TERM) do
-              Process.kill(:TERM, @service_pid)
+            trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
+              Process.kill(ServerEngine::Daemon::Signals::GRACEFUL_STOP,
+                           service_pid)
+              running = false
             end
-            @service_pid = run_service
-            Process.waitpid(@service_pid)
+            trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
+              Process.kill(ServerEngine::Daemon::Signals::IMMEDIATE_STOP,
+                           service_pid)
+              running = false
+            end
+            while running
+              service_pid = run_service
+              Process.waitpid(service_pid)
+            end
+
             true
           end
 
