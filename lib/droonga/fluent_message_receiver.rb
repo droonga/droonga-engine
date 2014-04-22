@@ -171,7 +171,7 @@ module Droonga
             entries = MessagePack.unpack(object[1])
           when Array # Forward message
             entries = object[1]
-          when Integer # Message message
+          when Integer, Float # Message message
             entries = [[object[1], object[2]]]
           else
             logger.error("unknown message", :message => object)
