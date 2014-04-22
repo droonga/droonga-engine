@@ -167,14 +167,21 @@ module Droonga
               running = false
             end
 
+            succeeded = true
             while running
               service_pid = run_service
               _, status = Process.waitpid2(service_pid)
-              break if status.nil?
-              break unless status.success?
+              if status.nil?
+                succeeded = false
+                break
+              end
+              unless status.success?
+                succeeded = false
+                break
+              end
             end
 
-            true
+            succeeded
           end
         end
 
