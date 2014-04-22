@@ -26,6 +26,10 @@ module Droonga
   class Engine
     module Command
       module DroongaEngine
+        module Signals
+          include ServerEngine::Daemon::Signals
+        end
+
         class Configuration
           DEFAULT_HOST = Socket.gethostname
           DEFAULT_PORT = 10031
@@ -156,14 +160,12 @@ module Droonga
               Process.kill(:INT, service_pid)
               running = false
             end
-            trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
-              Process.kill(ServerEngine::Daemon::Signals::GRACEFUL_STOP,
-                           service_pid)
+            trap(Signals::GRACEFUL_STOP) do
+              Process.kill(Signals::GRACEFUL_STOP, service_pid)
               running = false
             end
-            trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
-              Process.kill(ServerEngine::Daemon::Signals::IMMEDIATE_STOP,
-                           service_pid)
+            trap(Signals::IMMEDIATE_STOP) do
+              Process.kill(Signals::IMMEDIATE_STOP, service_pid)
               running = false
             end
 
@@ -307,10 +309,10 @@ module Droonga
           end
 
           def setup_signals
-            trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
+            trap(Signals::GRACEFUL_STOP) do
               stop_graceful
             end
-            trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
+            trap(Signals::IMMEDIATE_STOP) do
               stop_immediate
             end
             trap(:INT) do
