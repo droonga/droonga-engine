@@ -112,36 +112,14 @@ module Droonga
 
           def run(command_line_arguments)
             parse_command_line_arguments!(command_line_arguments)
+
             @listen_socket = TCPServer.new(@configuration.host,
                                            @configuration.port)
             @heartbeat_socket = UDPSocket.new(@configuration.address_family)
             @heartbeat_socket.bind(@configuration.host,
                                    @configuration.port)
 
-            service_pid = nil
-            running = true
-            trap(:INT) do
-              Process.kill(:INT, service_pid)
-              running = false
-            end
-            trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
-              Process.kill(ServerEngine::Daemon::Signals::GRACEFUL_STOP,
-                           service_pid)
-              running = false
-            end
-            trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
-              Process.kill(ServerEngine::Daemon::Signals::IMMEDIATE_STOP,
-                           service_pid)
-              running = false
-            end
-            while running
-              service_pid = run_service
-              _, status = Process.waitpid2(service_pid)
-              break if status.nil?
-              break unless status.success?
-            end
-
-            true
+            run_main_loop
           end
 
           private
@@ -168,6 +146,35 @@ module Droonga
               heartbeat_fd => heartbeat_fd,
             }
             spawn(env, *command_line, options)
+          end
+
+          def run_main_loop
+            service_pid = nil
+            running = true
+
+            trap(:INT) do
+              Process.kill(:INT, service_pid)
+              running = false
+            end
+            trap(ServerEngine::Daemon::Signals::GRACEFUL_STOP) do
+              Process.kill(ServerEngine::Daemon::Signals::GRACEFUL_STOP,
+                           service_pid)
+              running = false
+            end
+            trap(ServerEngine::Daemon::Signals::IMMEDIATE_STOP) do
+              Process.kill(ServerEngine::Daemon::Signals::IMMEDIATE_STOP,
+                           service_pid)
+              running = false
+            end
+
+            while running
+              service_pid = run_service
+              _, status = Process.waitpid2(service_pid)
+              break if status.nil?
+              break unless status.success?
+            end
+
+            true
           end
         end
 
