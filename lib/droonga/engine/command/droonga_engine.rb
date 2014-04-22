@@ -133,7 +133,7 @@ module Droonga
             parser.parse!(command_line_arguments)
           end
 
-          def run_service
+          def run_service(ready_notify_fd=nil)
             listen_fd = @listen_socket.fileno
             heartbeat_fd = @heartbeat_socket.fileno
             env = {}
@@ -149,6 +149,10 @@ module Droonga
               listen_fd => listen_fd,
               heartbeat_fd => heartbeat_fd,
             }
+            if ready_notify_fd
+              command_line.push("--ready-notify-fd", ready_notify_fd.to_s)
+              options[ready_notify_fd] = ready_notify_fd
+            end
             spawn(env, *command_line, options)
           end
 
@@ -168,11 +172,21 @@ module Droonga
               Process.kill(Signals::IMMEDIATE_STOP, service_pid)
               running = false
             end
+            trap(Signals::GRACEFUL_RESTART) do
+              old_service_pid = service_pid
+              IO.pipe do |ready_notify_read_io, ready_notify_write_io|
+                service_pid = run_service(ready_notify_write_io.fileno)
+                ready_notify_write_io.close
+                IO.select([ready_notify_read_io])
+                Process.kill(Signals::GRACEFUL_STOP, old_service_pid)
+              end
+            end
 
             succeeded = true
             while running
-              service_pid = run_service
+              service_pid ||= run_service
               _, status = Process.waitpid2(service_pid)
+              service_pid = nil
               if status.nil?
                 succeeded = false
                 break
@@ -198,6 +212,7 @@ module Droonga
             @configuration = Configuration.new
             @listen_fd = nil
             @heartbeat_fd = nil
+            @ready_notiofy_fd = nil
           end
 
           def run(command_line_arguments)
@@ -232,6 +247,10 @@ module Droonga
                       "Use FD as the heartbeat file descriptor") do |fd|
               @heartbeat_fd = fd
             end
+            parser.on("--ready-notify-fd=FD", Integer,
+                      "Use FD for notifying the service ready") do |fd|
+              @ready_notify_fd = fd
+            end
           end
 
           def run_services
@@ -243,6 +262,7 @@ module Droonga
             run_engine
             run_receiver
             setup_signals
+            notify_ready
             @loop.run
           end
 
@@ -328,6 +348,19 @@ module Droonga
           def stop_immediate
             stop_graceful
             shutdown_services
+          end
+
+          def notify_ready
+            return if @ready_notify_fd.nil?
+            ready_notify_io = IO.new(@ready_notify_fd)
+            @ready_notify_fd = nil
+            watcher = Coolio::IOWatcher.new(ready_notify_io, "w")
+            @loop.attach(watcher)
+            watcher.on_writable do
+              ready_notify_io.write("ready\n")
+              ready_notify_io.close
+              detach
+            end
           end
         end
       end
