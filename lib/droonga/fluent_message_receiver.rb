@@ -82,6 +82,7 @@ module Droonga
     end
 
     def shutdown_server
+      @server.close
     end
 
     def shutdown_clients
@@ -114,6 +115,7 @@ module Droonga
       end
 
       def shutdown
+        @socket.close
         @watcher.detach
       end
 
