@@ -27,6 +27,7 @@ module Droonga
       @loop = loop
       @socket_path = "#{base_path}.#{Process.pid}.#{object_id}.sock"
       @job_queue = JobQueue.new(@loop)
+      @server = nil
     end
 
     def start
@@ -39,12 +40,12 @@ module Droonga
     end
 
     def close
-      @server.close
+      @server.close if @server
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      @server.close
+      @server.close if @server
       @job_queue.close
       FileUtils.rm_f(@socket_path)
       logger.trace("shutdown: done")
