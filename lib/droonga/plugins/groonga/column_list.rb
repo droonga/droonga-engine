@@ -86,12 +86,14 @@ module Droonga
               flags << "WITH_SECTION" if column.with_section?
               flags << "WITH_WEIGHT" if column.with_weight?
               flags << "WITH_POSITION" if column.with_position?
-            elsif column.scalar?
-              flags << "COLUMN_SCALAR"
-            elsif column.vector?
-              flags << "COLUMN_VECTOR"
+            else
+              if column.scalar?
+                flags << "COLUMN_SCALAR"
+              elsif column.vector?
+                flags << "COLUMN_VECTOR"
+              end
+              flags << "WITH_WEIGHT" if column.with_weight?
             end
-            flags << "WITH_WEIGHT" if column.with_weight?
             flags.join('|')
           end
 
