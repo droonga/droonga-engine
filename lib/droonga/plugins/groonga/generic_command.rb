@@ -43,7 +43,11 @@ module Droonga
           result = process_request(request)
           [header(Status::SUCCESS), result]
         rescue CommandError => error
-          [header(error.status, error.message), error.result]
+          unless error.result.nil?
+            [header(error.status, error.message), error.result]
+          else
+            [header(error.status, error.message)]
+          end
         end
 
         private
