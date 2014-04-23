@@ -1,0 +1,16 @@
+{
+  "type": "table_create",
+  "dataset": "Droonga",
+  "body": {
+    "name"  : "User",
+    "flags" : "TABLE_PAT_KEY"
+  }
+}
+{
+  "type": "column_rename",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "User",
+    "name"  : "unknown"
+  }
+}

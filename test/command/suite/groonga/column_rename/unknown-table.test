@@ -1,0 +1,7 @@
+{
+  "type": "column_rename",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "Unknown"
+  }
+}
