@@ -26,6 +26,7 @@ module Droonga
             "column_create",
             "column_remove",
             "column_rename",
+            "column_list",
           ]
           input_message.pattern  = ["type", :in, groonga_commands]
           output_message.pattern = ["body.result", :exist]
