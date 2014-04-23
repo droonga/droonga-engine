@@ -46,7 +46,8 @@ module Droonga
                                      :result => false)
             end
 
-            list_columns(table_name)
+            columns = list_columns(table_name)
+            [HEADER, *columns]
           end
 
           private
