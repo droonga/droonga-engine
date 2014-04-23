@@ -58,8 +58,8 @@ class ColumnListTest < GroongaHandlerTest
     }
     response = process(:column_list, message)
     assert_equal(
-      [NORMALIZED_HEADER_INVALID_ARGUMENT, "table doesnt' exist: <Unknown>"],
-      [normalize_header(response.first), response.last]
+      NORMALIZED_HEADER_INVALID_ARGUMENT,
+      normalize_header(response.first)
     )
   end
 
