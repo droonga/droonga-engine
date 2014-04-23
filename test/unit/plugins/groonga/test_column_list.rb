@@ -68,6 +68,29 @@ class ColumnListTest < GroongaHandlerTest
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
+          table.column("age", "UInt32", :type => :scalar)
+        end
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        [257,
+         "age",
+         @database_path.to_s + ".0000101",
+         "fix",
+         "COLUMN_SCALAR",
+         "Books",
+         "UInt32",
+         []],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_var_column
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :hash)
+        schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
         end
       end
@@ -75,12 +98,19 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "title", path, "fix", "COLUMN_SCALAR", "Foo", "ShortText", []],
+        [257,
+         "title",
+         @database_path.to_s + ".0000101",
+         "var",
+         "COLUMN_SCALAR",
+         "Books",
+         "ShortText",
+         []],
       ]
       assert_equal(expected, response.last)
     end
 
-    def test_var_column
+    def test_vector_column
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
@@ -91,7 +121,14 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "authors", path, "var", "COLUMN_VECTOR", "Foo", "ShortText", []],
+        [257,
+         "authors",
+         @database_path.to_s + ".0000101",
+         "var",
+         "COLUMN_VECTOR",
+         "Books",
+         "ShortText",
+        []],
       ]
       assert_equal(expected, response.last)
     end
@@ -108,15 +145,24 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "title", path, "fix", "COLUMN_SCALAR", "Foo", "ShortText", []],
-        [258, "entry_title", path, "index", "COLUMN_INDEX", "Foo", "Foo", ["Foo.age"]],
+        [258,
+         "entry_title",
+         @database_path.to_s + ".0000102",
+         "index",
+         "COLUMN_INDEX",
+         "Books",
+         "Books",
+         ["title"]],
+        [257,
+         "title",
+         @database_path.to_s + ".0000101",
+         "var",
+         "COLUMN_SCALAR",
+         "Books",
+         "ShortText",
+         []],
       ]
       assert_equal(expected, response.last)
-    end
-
-    private
-    def path
-      @context.database.path
     end
   end
 end
