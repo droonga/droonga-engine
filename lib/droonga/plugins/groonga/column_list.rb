@@ -73,18 +73,18 @@ module Droonga
 
           def column_type(column)
             case column
-            when Groonga::FixSizeColumn
+            when ::Groonga::FixSizeColumn
               "fix"
-            when Groonga::VariableSizeColumn
+            when ::Groonga::VariableSizeColumn
               "var"
-            when Groonga::IndexColumn
+            when ::Groonga::IndexColumn
               "index"
             end
           end
 
           def column_flags(column)
             flags = []
-            if column.is_a?(Groonga::IndexColumn)
+            if column.is_a?(::Groonga::IndexColumn)
               flags << "COLUMN_INDEX"
               flags << "WITH_SECTION" if column.with_section?
               flags << "WITH_WEIGHT" if column.with_weight?
@@ -101,9 +101,9 @@ module Droonga
           end
 
           def column_source(column)
-            return [] unless column.is_a?(Groonga::IndexColumn)
+            return [] unless column.is_a?(::Groonga::IndexColumn)
             column.sources.collect do |source|
-              if source.is_a?(Groonga::Table)
+              if source.is_a?(::Groonga::Table)
                 "_key"
               else
                 source.local_name
