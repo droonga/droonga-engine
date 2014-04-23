@@ -75,7 +75,7 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "title", "fix", "ShortText", "COLUMN_SCALAR", "Foo", "ShortText", []],
+        [257, "title", path, "fix", "COLUMN_SCALAR", "Foo", "ShortText", []],
       ]
       assert_equal(expected, response.last)
     end
@@ -91,7 +91,7 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "authors", "var", "ShortText", "COLUMN_SCALAR", "Foo", "ShortText", []],
+        [257, "authors", path, "var", "COLUMN_VECTOR", "Foo", "ShortText", []],
       ]
       assert_equal(expected, response.last)
     end
@@ -108,10 +108,15 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257, "title", "fix", "ShortText", "COLUMN_SCALAR", "Foo", "ShortText", []],
-        [258, "entry_title", "index", "ShortText", "COLUMN_INDEX", "Foo", "Foo", ["Foo.age"]],
+        [257, "title", path, "fix", "COLUMN_SCALAR", "Foo", "ShortText", []],
+        [258, "entry_title", path, "index", "COLUMN_INDEX", "Foo", "Foo", ["Foo.age"]],
       ]
       assert_equal(expected, response.last)
+    end
+
+    private
+    def path
+      @context.database.path
     end
   end
 end
