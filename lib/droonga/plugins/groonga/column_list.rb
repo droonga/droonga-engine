@@ -69,12 +69,12 @@ module Droonga
           end
 
           def column_type(column)
-            when column
-            case Groonga::FixSizeColumn
+            case column
+            when Groonga::FixSizeColumn
               "fix"
-            case Groonga::VariableSizeColumn
+            when Groonga::VariableSizeColumn
               "var"
-            case Groonga::IndexColumn
+            when Groonga::IndexColumn
               "index"
             end
           end
