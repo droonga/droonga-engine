@@ -80,4 +80,19 @@ class ColumnRemoveTest < GroongaHandlerTest
 table_create Books TABLE_HASH_KEY --key_type ShortText
     SCHEMA
   end
+
+  def test_remove_index
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+      schema.change_table("Books") do |table|
+        table.column("title", "ShortText", :type => :scalar)
+        table.index("Books", "title", :name => "entry_title")
+      end
+    end
+    process(:column_remove,
+            {"table" => "Books", "name" => "title"})
+    assert_equal(<<-SCHEMA, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+    SCHEMA
+  end
 end
