@@ -52,7 +52,10 @@ module Droonga
 
           private
           def list_columns(table_name)
-            @context[table_name].columns.each(&:format_column)
+            table = @context[table_name]
+            table.columns.each do |column|
+              format_column(column)
+            end
           end
 
           def format_column(column)
