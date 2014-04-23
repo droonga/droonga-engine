@@ -52,7 +52,7 @@ module Droonga
 
           private
           def list_columns(table_name)
-            @contest[table_name].columns.each(&:format_column)
+            @context[table_name].columns.each(&:format_column)
           end
 
           def format_column(column)
