@@ -70,7 +70,7 @@ module Droonga
         end
 
         Groonga.define_single_step do |step|
-          step.name = "column_create"
+          step.name = "column_remove"
           step.write = true
           step.handler = Handler
           step.collector = Collectors::Or
