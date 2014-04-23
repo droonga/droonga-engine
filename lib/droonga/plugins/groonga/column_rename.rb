@@ -43,15 +43,13 @@ module Droonga
                                      :result => false)
             end
 
-            rename_column
+            new_name = @command["new_name"]
+
+            rename_column(table_name, column_name, new_name)
           end
 
           private
-          def rename_column
-            table_name = @command["table"]
-            column_name = @command["name"]
-            new_name = @command["new_name"]
-
+          def rename_column(table_name, column_name, new_name)
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.change_table(table_name) do |table|
                 table.rename_column(column_name, new_name)

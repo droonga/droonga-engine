@@ -43,14 +43,11 @@ module Droonga
                                      :result => false)
             end
 
-            remove_column
+            remove_column(table_name, column_name)
           end
 
           private
-          def remove_column
-            table_name = @command["table"]
-            column_name = @command["name"]
-
+          def remove_column(table_name, column_name)
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.change_table(table_name) do |table|
                 table.remove_column(column_name)

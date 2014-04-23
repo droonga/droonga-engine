@@ -36,15 +36,14 @@ module Droonga
             end
 
             if @command.column_index?
-              define_index
+              define_index(table_name)
             else
-              define_column
+              define_column(table_name)
             end
           end
 
           private
-          def define_column
-            table_name = @command["table"]
+          def define_column(table_name)
             column_name = @command["name"]
             column_type = @command["type"]
 
@@ -76,8 +75,7 @@ module Droonga
             options
           end
 
-          def define_index
-            table_name = @command["table"]
+          def define_index(table_name)
             target_table = @command["type"]
             target_columns = (@command["source"] || "").split(/\s*,\s*/)
 
