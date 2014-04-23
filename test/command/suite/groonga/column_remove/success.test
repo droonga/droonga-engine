@@ -1,0 +1,25 @@
+{
+  "type": "table_create",
+  "dataset": "Droonga",
+  "body": {
+    "name"  : "User",
+    "flags" : "TABLE_PAT_KEY"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "User",
+    "name"  : "age",
+    "type"  : "Int32"
+  }
+}
+{
+  "type": "column_remove",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "User",
+    "name"  : "age"
+  }
+}

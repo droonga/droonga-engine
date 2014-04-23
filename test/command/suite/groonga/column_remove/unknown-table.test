@@ -1,0 +1,7 @@
+{
+  "type": "column_remove",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "Unknown"
+  }
+}
