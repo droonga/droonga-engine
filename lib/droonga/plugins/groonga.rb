@@ -29,4 +29,5 @@ require "droonga/plugins/groonga/select"
 require "droonga/plugins/groonga/table_create"
 require "droonga/plugins/groonga/table_remove"
 require "droonga/plugins/groonga/column_create"
+require "droonga/plugins/groonga/column_remove"
 
