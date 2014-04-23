@@ -98,6 +98,7 @@ column_create Books label COLUMN_SCALAR ShortText
     assert_equal(<<-SCHEMA, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
 column_create Books label COLUMN_SCALAR ShortText
+
 column_create Books entry_title COLUMN_INDEX Books label
     SCHEMA
   end
