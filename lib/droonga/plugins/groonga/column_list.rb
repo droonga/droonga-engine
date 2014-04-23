@@ -43,7 +43,7 @@ module Droonga
               message = "table doesn't exist: <#{table_name.to_s}>"
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                      :message => message,
-                                     :result => false)
+                                     :result => message)
             end
 
             columns = list_columns(table_name)
