@@ -46,7 +46,7 @@ module Droonga
           def format_table(table)
             [
               table.id,
-              table.local_name,
+              table.name,
               table.path,
               table_flags(table),
               domain_name(table),
