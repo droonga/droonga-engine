@@ -79,9 +79,11 @@ module Droonga
           def delete_record(table_name, parameters={})
             table = @context[table_name]
             if parameters[:id]
-              table.delete(parameters[:id].to_i)
+              record = table[parameters[:id].to_i]
+              record.delete if record and record.valid_id?
             else
-              table.delete(parameters[:key])
+              record = table[parameters[:key]]
+              record.delete unless record.nil?
             end
             true
           end
