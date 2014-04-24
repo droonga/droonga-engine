@@ -81,5 +81,104 @@ class TableListTest < GroongaHandlerTest
       ]
       assert_equal(expected, response.last)
     end
+
+    def test_patricia_trie_table
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :patricia_trie)
+      end
+      response = process(:table_list, {})
+      expected = [
+        TABLES_HEADER,
+        [256,
+         "Books",
+         @database_path.to_s + ".0000100",
+         "TABLE_PAT_KEY|PERSISTENT",
+         "ShortText",
+         nil,
+         nil,
+         nil],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_double_array_trie_table
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :double_array_trie)
+      end
+      response = process(:table_list, {})
+      expected = [
+        TABLES_HEADER,
+        [256,
+         "Books",
+         @database_path.to_s + ".0000100",
+         "TABLE_DAT_KEY|PERSISTENT",
+         "ShortText",
+         nil,
+         nil,
+         nil],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_with_value_type
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("BookIds", :type => :hash,
+                                       :key_type => "UInt32",
+                                       :value_type => "UInt32")
+      end
+      response = process(:table_list, {})
+      expected = [
+        TABLES_HEADER,
+        [256,
+         "BookIds",
+         @database_path.to_s + ".0000100",
+         "TABLE_HASH_KEY|PERSISTENT",
+         "UInt32",
+         "UInt32",
+         nil,
+         nil],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_with_default_tokenizer
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :hash,
+                                     :default_tokenizer => "TokenBigram")
+      end
+      response = process(:table_list, {})
+      expected = [
+        TABLES_HEADER,
+        [256,
+         "Books",
+         @database_path.to_s + ".0000100",
+         "TABLE_HASH_KEY|PERSISTENT",
+         "ShortText",
+         nil,
+         "TokenBigram",
+         nil],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_with_normalizer
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :hash,
+                                     :normalizer => "NormalizerAuto")
+      end
+      response = process(:table_list, {})
+      expected = [
+        TABLES_HEADER,
+        [256,
+         "Books",
+         @database_path.to_s + ".0000100",
+         "TABLE_HASH_KEY|PERSISTENT",
+         "ShortText",
+         nil,
+         nil,
+         "NormalizerAuto"],
+      ]
+      assert_equal(expected, response.last)
+    end
   end
 end
