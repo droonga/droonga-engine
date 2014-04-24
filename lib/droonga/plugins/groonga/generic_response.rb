@@ -23,6 +23,7 @@ module Droonga
           groonga_commands = [
             "table_create",
             "table_remove",
+            "table_list",
             "column_create",
             "column_remove",
             "column_rename",
