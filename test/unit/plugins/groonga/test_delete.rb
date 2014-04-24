@@ -22,7 +22,7 @@ class DeleteTest < GroongaHandlerTest
   end
 
   def test_success
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     Groonga::Context.default["Books"].add("sample")
@@ -49,7 +49,7 @@ class DeleteTest < GroongaHandlerTest
   end
 
   def test_no_identifier
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     message = {
@@ -66,7 +66,7 @@ class DeleteTest < GroongaHandlerTest
        :id_and_filter => { "id" => "1", "filter" => "filter" },
        :key_and_filter => { "key" => "key", "filter" => "filter" })
   def test_duplicated_identifier(data)
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     message = {
@@ -81,7 +81,7 @@ class DeleteTest < GroongaHandlerTest
 
   class DeleteTest < self
     def test_key
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
       end
       Groonga::Context.default["Books"].add("sample")
@@ -93,7 +93,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
     end
 
     def test_id
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Ages", :type => :array)
       end
       Groonga::Context.default["Ages"].add([])
@@ -105,7 +105,7 @@ table_create Ages TABLE_NO_KEY
     end
 
     def test_filter
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
       end
       table = Groonga::Context.default["Books"]

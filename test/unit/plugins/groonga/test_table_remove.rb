@@ -23,7 +23,7 @@ class TableRemoveTest < GroongaHandlerTest
 
   def setup
     super
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
   end

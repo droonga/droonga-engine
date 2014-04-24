@@ -22,7 +22,7 @@ class ColumnCreateTest < GroongaHandlerTest
   end
 
   def test_success
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     message = {
@@ -51,7 +51,7 @@ class ColumnCreateTest < GroongaHandlerTest
   end
 
   def test_name
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     process(:column_create,
@@ -63,7 +63,7 @@ column_create Books title COLUMN_SCALAR ShortText
   end
 
   def test_type
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     process(:column_create,
@@ -94,7 +94,7 @@ column_create Books main_text COLUMN_SCALAR LongText
           "type"  => "ShortText",
           "flags" => data[:flags],
         }
-        Groonga::Schema.define(:context => @context) do |schema|
+        Groonga::Schema.define do |schema|
           schema.create_table("Books", :type => :hash)
         end
         process(:column_create, request)
@@ -108,7 +108,7 @@ column_create Books title #{data[:flags]} ShortText
     class IndexTest < self
       def setup
         super
-        Groonga::Schema.define(:context => @context) do |schema|
+        Groonga::Schema.define do |schema|
           schema.create_table("Books", :type => :hash)
         end
         process(:column_create,

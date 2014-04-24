@@ -22,7 +22,7 @@ class ColumnRemoveTest < GroongaHandlerTest
   end
 
   def test_success
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
       schema.change_table("Books") do |table|
         table.column("title", "ShortText", :type => :scalar)
@@ -53,7 +53,7 @@ class ColumnRemoveTest < GroongaHandlerTest
   end
 
   def test_unknown_column
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     message = {
@@ -68,7 +68,7 @@ class ColumnRemoveTest < GroongaHandlerTest
   end
 
   def test_remove
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
       schema.change_table("Books") do |table|
         table.column("title", "ShortText", :type => :scalar)
@@ -82,7 +82,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
   end
 
   def test_remove_index
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
       schema.change_table("Books") do |table|
         table.column("title", "ShortText", :type => :scalar)

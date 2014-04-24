@@ -33,7 +33,7 @@ class TableListTest < GroongaHandlerTest
   end
 
   def test_success
-    Groonga::Schema.define(:context => @context) do |schema|
+    Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
     end
     response = process(:column_list, {})
@@ -45,7 +45,7 @@ class TableListTest < GroongaHandlerTest
 
   class ListTest < self
     def test_hash_table
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
       end
       response = process(:table_list, {})
@@ -64,7 +64,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_array_table
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("HistoryEntries", :type => :array)
       end
       response = process(:table_list, {})
@@ -83,7 +83,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_patricia_trie_table
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :patricia_trie)
       end
       response = process(:table_list, {})
@@ -102,7 +102,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_double_array_trie_table
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :double_array_trie)
       end
       response = process(:table_list, {})
@@ -121,7 +121,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_with_value_type
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("BookIds", :type => :hash,
                                        :key_type => "UInt32",
                                        :value_type => "UInt32")
@@ -142,7 +142,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_with_default_tokenizer
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash,
                                      :default_tokenizer => "TokenBigram")
       end
@@ -162,7 +162,7 @@ class TableListTest < GroongaHandlerTest
     end
 
     def test_with_normalizer
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash,
                                      :normalizer => "NormalizerAuto")
       end

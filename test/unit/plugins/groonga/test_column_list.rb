@@ -34,7 +34,7 @@ class ColumnListTest < GroongaHandlerTest
 
   class HeaderTest < self
     def test_success
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
@@ -67,7 +67,7 @@ class ColumnListTest < GroongaHandlerTest
 
   class BodyTest < self
     def test_fix
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
           table.column("age", "UInt32", :type => :scalar)
@@ -90,7 +90,7 @@ class ColumnListTest < GroongaHandlerTest
     end
 
     def test_var
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
@@ -113,7 +113,7 @@ class ColumnListTest < GroongaHandlerTest
     end
 
     def test_vector
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
           table.column("authors", "ShortText", :type => :vector)
@@ -136,7 +136,7 @@ class ColumnListTest < GroongaHandlerTest
     end
 
     def test_index
-      Groonga::Schema.define(:context => @context) do |schema|
+      Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
