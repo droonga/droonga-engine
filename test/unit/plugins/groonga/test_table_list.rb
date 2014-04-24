@@ -22,7 +22,7 @@ class TableListTest < GroongaHandlerTest
     ["domain", "ShortText"],
     ["range", "ShortText"],
     ["default_tokenizer","ShortText"],
-    ["normalier","ShortText"],
+    ["normalizer","ShortText"],
   ]
 
   def create_handler

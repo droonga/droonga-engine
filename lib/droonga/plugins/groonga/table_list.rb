@@ -28,7 +28,7 @@ module Droonga
           ["domain", "ShortText"],
           ["range", "ShortText"],
           ["default_tokenizer","ShortText"],
-          ["normalier","ShortText"],
+          ["normalizer","ShortText"],
         ].freeze
 
         class Command < GenericCommand
