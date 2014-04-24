@@ -34,12 +34,13 @@ module Droonga
 
             validate_parameters(table_name, key, id, filter)
 
+            table = @context[table_name]
             if key
-              delete_record_by_key(table_name, key)
+              delete_record_by_key(table, key)
             elsif id
-              delete_record_by_id(table_name, id)
+              delete_record_by_id(table, id)
             else
-              delete_record_by_filter(table_name, filter)
+              delete_record_by_filter(table, filter)
             end
 
             true
@@ -73,20 +74,17 @@ module Droonga
             end
           end
 
-          def delete_record_by_key(table_name, key)
-            table = @context[table_name]
+          def delete_record_by_key(table, key)
             record = table[key]
             record.delete unless record.nil?
           end
 
-          def delete_record_by_id(table_name, id)
-            table = @context[table_name]
+          def delete_record_by_id(table, id)
             record = table[id.to_i]
             record.delete if record and record.valid_id?
           end
 
-          def delete_record_by_filter(table_name, filter)
-            table = @context[table_name]
+          def delete_record_by_filter(table, filter)
             condition = ::Groonga::Expression.new(:context => @context)
             condition.define_variable(:domain => table)
             begin
