@@ -33,4 +33,5 @@ require "droonga/plugins/groonga/column_create"
 require "droonga/plugins/groonga/column_remove"
 require "droonga/plugins/groonga/column_rename"
 require "droonga/plugins/groonga/column_list"
+require "droonga/plugins/groonga/delete"
 
