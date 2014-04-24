@@ -72,7 +72,7 @@
       [
         257,
         "age",
-        "path/to/column",
+        "/path/to/column",
         "fix",
         "COLUMN_SCALAR",
         "User",
