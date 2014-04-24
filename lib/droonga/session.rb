@@ -73,21 +73,25 @@ module Droonga
           end
           @dispatcher.reply("body" => reply_body)
         end
-        step["descendants"].each do |name, routes|
-          message = {
-            "id" => @id,
-            "input" => name,
-            "value" => result[name]
-          }
-          routes.each do |route|
-            @dispatcher.dispatch(message, route)
-          end
-        end
+        send_to_descendantas(step["descendants"], result)
         @n_dones += 1
       end
     end
 
     private
+    def send_to_descendantas(descendantas, result)
+      descendantas.each do |name, routes|
+        message = {
+          "id" => @id,
+          "input" => name,
+          "value" => result[name]
+        }
+        routes.each do |route|
+          @dispatcher.dispatch(message, route)
+        end
+      end
+    end
+
     def log_tag
       "session"
     end
