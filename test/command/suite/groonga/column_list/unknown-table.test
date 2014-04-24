@@ -1,0 +1,7 @@
+{
+  "type": "column_list",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "Unknown"
+  }
+}
