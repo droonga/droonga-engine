@@ -51,7 +51,7 @@ module Droonga
           end
 
           def log_level
-            ENV["DROOGNA_LOG_LEVEL"] || Logger::Level.default_label
+            ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default_label
           end
 
           def to_command_line
@@ -98,7 +98,7 @@ module Droonga
                       "The log level of the Droonga engine",
                       "[#{levels_label}]",
                       "(#{log_level})") do |level|
-              ENV["DROOGNA_LOG_LEVEL"] = level
+              ENV["DROONGA_LOG_LEVEL"] = level
             end
           end
         end
