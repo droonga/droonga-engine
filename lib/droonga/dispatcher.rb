@@ -221,7 +221,7 @@ module Droonga
       adapter_runner = @adapter_runners[dataset]
       adapted_message = adapter_runner.adapt_input(message)
       step_runner = @step_runners[dataset]
-      plan = step_runner.plan(message)
+      plan = step_runner.plan(adapted_message)
       distributor = Distributor.new(self, plan)
       distributor.distribute
     rescue Droonga::UnsupportedMessageError => error
