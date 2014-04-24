@@ -115,9 +115,9 @@ module Droonga
           slices << generate_slice
         end
         {
-          "dimension": "_key",
-          "slicer": "hash",
-          "slices": slices
+          "dimension" => "_key",
+          "slicer" => "hash",
+          "slices" => slices,
         }
       end
 
@@ -125,10 +125,10 @@ module Droonga
         name = sprintf('%03d', @n_volumes)
         @n_volumes += 1
         {
-          "weight": weight,
-          "volume": {
-            "address": "#{host}:#{port}/#{tag}.#{name}"
-          }
+          "weight" => weight,
+          "volume" => {
+            "address" => "#{host}:#{port}/#{tag}.#{name}",
+          },
         }
       end
 
