@@ -4,6 +4,6 @@
   "dataset": "Droonga",
   "body": {
     "table"  : "User",
-    "filter" : "_key"
+    "filter" : "*"
   }
 }
