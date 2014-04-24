@@ -61,7 +61,6 @@ module Droonga
         def collect_elements(message, elements)
           return unless elements.is_a?(Hash)
 
-          body = message.body
           value = message.value
 
           return if value.nil?
