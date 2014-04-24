@@ -1,11 +1,4 @@
-{
-  "type": "table_create",
-  "dataset": "Droonga",
-  "body": {
-    "name"  : "User",
-    "flags" : "TABLE_PAT_KEY"
-  }
-}
+#@include fixture/user-table.jsons
 {
   "type": "add",
   "dataset": "Droonga",
