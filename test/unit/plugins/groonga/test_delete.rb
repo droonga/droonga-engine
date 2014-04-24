@@ -25,7 +25,7 @@ class DeleteTest < GroongaHandlerTest
     Groonga::Schema.define(:context => @context) do |schema|
       schema.create_table("Books", :type => :hash)
     end
-    @context["Books"].add("sample")
+    Groonga::Context.default["Books"].add("sample")
     message = {
       "table" => "Books",
       "key"   => "sample",
@@ -84,7 +84,7 @@ class DeleteTest < GroongaHandlerTest
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
       end
-      @context["Books"].add("sample")
+      Groonga::Context.default["Books"].add("sample")
       process(:delete,
               {"table" => "Books", "key" => "sample"})
       assert_equal(<<-DUMP, dump)
@@ -96,11 +96,11 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Ages", :type => :array)
       end
-      @context["Ages"].add(10)
+      Groonga::Context.default["Ages"].add([])
       process(:delete,
               {"table" => "Ages", "id" => 1})
       assert_equal(<<-DUMP, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Ages TABLE_NO_KEY
       DUMP
     end
   end
