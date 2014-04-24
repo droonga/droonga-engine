@@ -49,7 +49,7 @@ parser.on("--host=NAME",
           "Use the NAME as the host for the current dataset.") do |host|
   current_dataset[:host] = host
 end
-parser.on("--port=PORT", Integer
+parser.on("--port=PORT", Integer,
           "Use the PORT as the port for the current dataset.") do |port|
   current_dataset[:port] = port
 end
