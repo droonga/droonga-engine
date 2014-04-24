@@ -51,9 +51,9 @@ class TableListTest < GroongaHandlerTest
       response = process(:table_list, {})
       expected = [
         TABLES_HEADER,
-        [257,
+        [256,
          "Books",
-         @database_path.to_s + ".0000101",
+         @database_path.to_s + ".0000100",
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -70,9 +70,9 @@ class TableListTest < GroongaHandlerTest
       response = process(:table_list, {})
       expected = [
         TABLES_HEADER,
-        [257,
+        [256,
          "HistoryEntries",
-         @database_path.to_s + ".0000101",
+         @database_path.to_s + ".0000100",
          "TABLE_NO_KEY|PERSISTENT",
          nil,
          nil,
