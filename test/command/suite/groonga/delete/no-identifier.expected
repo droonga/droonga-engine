@@ -20,7 +20,7 @@
       -22,
       0.0,
       0.0,
-      ""
+      "you must specify \"key\", \"id\", or \"filter\""
     ],
     false
   ]
