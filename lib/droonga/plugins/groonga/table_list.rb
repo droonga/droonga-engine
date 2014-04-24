@@ -33,12 +33,11 @@ module Droonga
 
         class Command < GenericCommand
           def process_request(request)
-            tables = list_tables(table_name)
-            [HEADER, *tables]
+            [HEADER, *list_tables]
           end
 
           private
-          def list_tables(table_name)
+          def list_tables
             @context.database.tables.collect do |table|
               format_table(table)
             end
