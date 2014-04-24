@@ -83,7 +83,7 @@ module Droonga
                 filter.parse(parameters[:filter], :syntax => :script)
                 records = table.select(filter)
                 records.each do |record|
-                  record.delete
+                  record.key.delete
                 end
               rescue ::Groonga::SyntaxError
                 message = "syntax error in filter: <#{parameters[:filter].to_s}>"
