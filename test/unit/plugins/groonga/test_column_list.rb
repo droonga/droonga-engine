@@ -33,36 +33,36 @@ class ColumnListTest < GroongaHandlerTest
   end
 
   class HeaderTest < self
-  def test_success
-    Groonga::Schema.define(:context => @context) do |schema|
-      schema.create_table("Books", :type => :hash)
-      schema.change_table("Books") do |table|
-        table.column("title", "ShortText", :type => :scalar)
+    def test_success
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :hash)
+        schema.change_table("Books") do |table|
+          table.column("title", "ShortText", :type => :scalar)
+        end
       end
+      message = {
+        "table" => "Books",
+        "name"  => "title",
+      }
+      response = process(:column_list, message)
+      assert_equal(
+        NORMALIZED_HEADER_SUCCESS,
+        normalize_header(response.first)
+      )
     end
-    message = {
-      "table" => "Books",
-      "name"  => "title",
-    }
-    response = process(:column_list, message)
-    assert_equal(
-      NORMALIZED_HEADER_SUCCESS,
-      normalize_header(response.first)
-    )
-  end
 
-  def test_unknown_table
-    message = {
-      "table" => "Unknown",
-      "name"  => "title",
-      "type"  => "ShortText",
-    }
-    response = process(:column_list, message)
-    assert_equal(
-      NORMALIZED_HEADER_INVALID_ARGUMENT,
-      normalize_header(response.first)
-    )
-  end
+    def test_unknown_table
+      message = {
+        "table" => "Unknown",
+        "name"  => "title",
+        "type"  => "ShortText",
+      }
+      response = process(:column_list, message)
+      assert_equal(
+        NORMALIZED_HEADER_INVALID_ARGUMENT,
+        normalize_header(response.first)
+      )
+    end
   end
 
   class BodyTest < self
