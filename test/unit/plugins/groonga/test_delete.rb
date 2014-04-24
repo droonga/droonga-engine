@@ -79,21 +79,6 @@ class DeleteTest < GroongaHandlerTest
     )
   end
 
-  def test_not_implemented_identifier
-    Groonga::Schema.define(:context => @context) do |schema|
-      schema.create_table("Books", :type => :hash)
-    end
-    message = {
-      "table" => "Books",
-      "filter" => "filter",
-    }
-    response = process(:delete, message)
-    assert_equal(
-      [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
-      [normalize_header(response.first), response.last]
-    )
-  end
-
   class DeleteTest < self
     def test_key
       Groonga::Schema.define(:context => @context) do |schema|
@@ -116,6 +101,25 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
               {"table" => "Ages", "id" => 1})
       assert_equal(<<-DUMP, dump)
 table_create Ages TABLE_NO_KEY
+      DUMP
+    end
+
+    def test_filter
+      Groonga::Schema.define(:context => @context) do |schema|
+        schema.create_table("Books", :type => :hash)
+      end
+      table = Groonga::Context.default["Books"]
+      table.add("Groonga")
+      table.add("Droonga")
+      process(:delete,
+              {"table" => "Books", "filter" => '_key @^ "D"'})
+      assert_equal(<<-DUMP, dump)
+table_create Books TABLE_HASH_KEY --key_type ShortText
+load --table Books
+[
+  ["_key"],
+  ["Groonga"]
+]
       DUMP
     end
   end

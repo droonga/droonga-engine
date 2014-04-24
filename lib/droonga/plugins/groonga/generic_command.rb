@@ -21,6 +21,7 @@ module Droonga
       module Status
         SUCCESS          = 0
         INVALID_ARGUMENT = -22
+        SYNTAX_ERROR     = -63
       end
 
       class GenericCommand

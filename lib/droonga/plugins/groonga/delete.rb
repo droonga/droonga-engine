@@ -66,14 +66,6 @@ module Droonga
                                      :message => message,
                                      :result => false)
             end
-
-            #XXX this must be removed after it is implemented
-            if filter
-              message = "\"filter\" is not supported yet"
-              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                     :message => message,
-                                     :result => false)
-            end
           end
 
           def delete_record(table_name, parameters={})
@@ -81,9 +73,23 @@ module Droonga
             if parameters[:id]
               record = table[parameters[:id].to_i]
               record.delete if record and record.valid_id?
-            else
+            else if parameters[:key]
               record = table[parameters[:key]]
               record.delete unless record.nil?
+            else
+              filter = Groonga::Expression.new(:context => @context)
+              begin
+                filter.parse(parameters[:filter].dump, :syntax => :script)
+                records = table.select(filter)
+                records.each do |record|
+                  record.delete
+                end
+              rescue ::Groonga::SyntaxError
+                message = "syntax error in filter: <#{parameters[:filter].to_s}>"
+                raise CommandError.new(:status => Status::SYNTAX_ERROR,
+                                       :message => message,
+                                       :result => false)
+              end
             end
             true
           end
