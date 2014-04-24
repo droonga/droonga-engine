@@ -79,7 +79,8 @@ module Droonga
             else
               filter = ::Groonga::Expression.new(:context => @context)
               begin
-                filter.parse(parameters[:filter].dump, :syntax => :script)
+                filter.define_variable(:domain => table)
+                filter.parse(parameters[:filter], :syntax => :script)
                 records = table.select(filter)
                 records.each do |record|
                   record.delete
