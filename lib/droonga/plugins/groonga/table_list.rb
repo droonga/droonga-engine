@@ -13,8 +13,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "groonga/command/table-list"
-
 require "droonga/plugin"
 require "droonga/plugins/groonga/generic_command"
 
@@ -35,9 +33,6 @@ module Droonga
 
         class Command < GenericCommand
           def process_request(request)
-            command_class = ::Groonga::Command.find("table_list")
-            @command = command_class.new("table_list", request)
-
             tables = list_tables(table_name)
             [HEADER, *tables]
           end
