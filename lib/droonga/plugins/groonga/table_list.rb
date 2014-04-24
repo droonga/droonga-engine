@@ -89,11 +89,13 @@ module Droonga
           end
 
           def default_tokenizer_name(table)
+            return nil if table.is_a?(::Groonga::Array)
             return nil unless table.default_tokenizer
             table.default_tokenizer.name
           end
 
           def normalizer_name(table)
+            return nil if table.is_a?(::Groonga::Array)
             return nil unless table.domain
             return nil unless table.normalizer
             table.normalizer.name
