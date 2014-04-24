@@ -62,8 +62,8 @@ class DeleteTest < GroongaHandlerTest
     )
   end
 
-  data(:key_and_id => { "key" => "key", "id" => 1 },
-       :id_and_filter => { "id" => 1, "filter" => "filter" },
+  data(:key_and_id => { "key" => "key", "id" => "1" },
+       :id_and_filter => { "id" => "1", "filter" => "filter" },
        :key_and_filter => { "key" => "key", "filter" => "filter" })
   def test_duplicated_identifier(data)
     Groonga::Schema.define(:context => @context) do |schema|
