@@ -102,6 +102,7 @@ module Droonga
 
         def handle(message)
           subscriber, condition, query, route = parse_message(message)
+          _ = route # suppress a warning
           normalized_request = {
             :subscriber => subscriber,
             :condition  => condition,
