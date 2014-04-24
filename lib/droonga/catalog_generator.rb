@@ -87,10 +87,9 @@ module Droonga
 
     class Replicas
       def initialize(parameters={})
-        @host       = parameters[:host]       || "127.0.0.1"
+        @hosts      = parameters[:hosts]      || ["127.0.0.1"]
         @port       = parameters[:port]       || 10031
         @tag        = parameters[:tag]        || "droonga"
-        @n_replicas = parameters[:n_replicas] || 2
         @n_slices   = parameters[:n_slices]   || 1
 
         @n_volumes = 0
@@ -103,16 +102,16 @@ module Droonga
       private
       def generate_json
         replicas = []
-        @n_replicas.times do |index|
-          replicas << generate_replica
+        @hosts.each do |host|
+          replicas << generate_replica(host)
         end
         replicas
       end
 
-      def generate_replica
+      def generate_replica(host)
         slices = []
         @n_slices.times do |index|
-          slices << generate_slice
+          slices << generate_slice(host)
         end
         {
           "dimension" => "_key",
@@ -121,13 +120,13 @@ module Droonga
         }
       end
 
-      def generate_slice
+      def generate_slice(host)
         name = sprintf('%03d', @n_volumes)
         @n_volumes += 1
         {
           "weight" => weight,
           "volume" => {
-            "address" => "#{@host}:#{@port}/#{@tag}.#{name}",
+            "address" => "#{host}:#{@port}/#{@tag}.#{name}",
           },
         }
       end

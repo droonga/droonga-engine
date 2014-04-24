@@ -45,9 +45,9 @@ parser.on("--n-workers=N", Integer,
           "Use N workers for the current dataset.") do |n|
   current_dataset[:n_workers] = n
 end
-parser.on("--host=NAME",
-          "Use the NAME as the host for the current dataset.") do |host|
-  current_dataset[:host] = host
+parser.on("--hosts=NAME1,NAME2,...", Array,
+          "Use given hosts for replicas of the current dataset.") do |hosts|
+  current_dataset[:hosts] = hosts
 end
 parser.on("--port=PORT", Integer,
           "Use the PORT as the port for the current dataset.") do |port|
@@ -56,10 +56,6 @@ end
 parser.on("--tag=TAG",
           "Use the TAG as the tag for the current dataset.") do |tag|
   current_dataset[:tag] = tag
-end
-parser.on("--n-replicas=N", Integer,
-          "Use N replicas for the current dataset.") do |n|
-  current_dataset[:n_replicas] = n
 end
 parser.on("--n-slices=N", Integer,
           "Use N slices for each replica.") do |n|
