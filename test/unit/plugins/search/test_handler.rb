@@ -54,7 +54,7 @@ class SearchHandlerTest < Test::Unit::TestCase
       result_set[name] = normalize_result(result)
     end
     result_set
-   end
+  end
 
   def normalize_result(result)
     result["startTime"] = start_time if result["startTime"]
