@@ -97,7 +97,7 @@ module Droonga
       log(Level::ERROR,
           "#{message}: #{exception.message}(#{exception.class})",
           data)
-      log_backtrace(Level::Error, exception.backtrace)
+      log_backtrace(Level::ERROR, exception.backtrace)
     end
 
     private
