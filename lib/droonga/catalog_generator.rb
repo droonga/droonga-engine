@@ -127,7 +127,7 @@ module Droonga
         {
           "weight" => weight,
           "volume" => {
-            "address" => "#{host}:#{port}/#{tag}.#{name}",
+            "address" => "#{@host}:#{@port}/#{@tag}.#{name}",
           },
         }
       end
