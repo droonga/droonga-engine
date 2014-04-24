@@ -79,8 +79,8 @@ module Droonga
         return unless query_record
 
         subscriptions = subscriber_record.subscriptions
-        new_subscriptions = subscriptions.select do |query|
-          query != query_record
+        new_subscriptions = subscriptions.select do |subscription|
+          subscription != query_record
         end
 
         if new_subscriptions.empty?
