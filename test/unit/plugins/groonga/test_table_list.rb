@@ -50,7 +50,7 @@ class TableListTest < GroongaHandlerTest
       end
       response = process(:table_list, {})
       expected = [
-        COLUMNS_HEADER,
+        TABLES_HEADER,
         [257,
          "Books",
          @database_path.to_s + ".0000101",
@@ -69,7 +69,7 @@ class TableListTest < GroongaHandlerTest
       end
       response = process(:table_list, {})
       expected = [
-        COLUMNS_HEADER,
+        TABLES_HEADER,
         [257,
          "HistoryEntries",
          @database_path.to_s + ".0000101",
