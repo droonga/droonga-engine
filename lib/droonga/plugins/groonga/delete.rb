@@ -27,27 +27,32 @@ module Droonga
             command_class = ::Groonga::Command.find("delete")
             @command = command_class.new("delete", request)
 
-            validate_parameters
+            table_name = @command["table"]
+            key = @command["key"]
+            id = @command["id"]
+            filter = @command["filter"]
 
-            delete_record(@command["table"],
-                          :key => @command["key"],
-                          :id => @command["id"],
-                          :filter => @command["filter"])
+            validate_parameters(table_name, key, id, filter)
+
+            if key
+              delete_record_by_key(table_name, key)
+            elsif id
+              delete_record_by_id(table_name, id)
+            else
+              delete_record_by_filter(table_name, filter)
+            end
+
+            true
           end
 
           private
-          def validate_parameters
-            table_name = @command["table"]
+          def validate_parameters(table_name, key, id, filter)
             if table_name.nil? or @context[table_name].nil?
               message = "table doesn't exist: <#{table_name.to_s}>"
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                      :message => message,
                                      :result => false)
             end
-
-            key = @command["key"]
-            id = @command["id"]
-            filter = @command["filter"]
 
             if key.nil? and id.nil? and filter.nil?
               message = "you must specify \"key\", \"id\", or \"filter\""
@@ -68,31 +73,34 @@ module Droonga
             end
           end
 
-          def delete_record(table_name, parameters={})
+          def delete_record_by_key(table_name, key)
             table = @context[table_name]
-            if parameters[:id]
-              record = table[parameters[:id].to_i]
-              record.delete if record and record.valid_id?
-            elsif parameters[:key]
-              record = table[parameters[:key]]
-              record.delete unless record.nil?
-            else
-              filter = ::Groonga::Expression.new(:context => @context)
-              begin
-                filter.define_variable(:domain => table)
-                filter.parse(parameters[:filter], :syntax => :script)
-                records = table.select(filter)
-                records.each do |record|
-                  record.key.delete
-                end
-              rescue ::Groonga::SyntaxError
-                message = "syntax error in filter: <#{parameters[:filter].to_s}>"
-                raise CommandError.new(:status => Status::SYNTAX_ERROR,
-                                       :message => message,
-                                       :result => false)
-              end
+            record = table[key]
+            record.delete unless record.nil?
+          end
+
+          def delete_record_by_id(table_name, id)
+            table = @context[table_name]
+            record = table[id.to_i]
+            record.delete if record and record.valid_id?
+          end
+
+          def delete_record_by_filter(table_name, filter)
+            table = @context[table_name]
+            condition = ::Groonga::Expression.new(:context => @context)
+            condition.define_variable(:domain => table)
+            begin
+              condition.parse(filter, :syntax => :script)
+            rescue ::Groonga::SyntaxError
+              message = "syntax error in filter: <#{filter.to_s}>"
+              raise CommandError.new(:status => Status::SYNTAX_ERROR,
+                                     :message => message,
+                                     :result => false)
             end
-            true
+            records = table.select(condition)
+            records.each do |record|
+              record.key.delete
+            end
           end
         end
 
