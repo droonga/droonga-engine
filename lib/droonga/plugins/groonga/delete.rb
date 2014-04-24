@@ -77,8 +77,7 @@ module Droonga
 
           def delete_record(table_name, parameters={})
             table = @context[table_name]
-            case table
-            when ::Groonga::Array
+            if parameters[:id]
               table.delete(parameters[:id].to_i)
             else
               table.delete(parameters[:key])
