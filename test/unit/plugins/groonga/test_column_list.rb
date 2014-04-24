@@ -32,6 +32,7 @@ class ColumnListTest < GroongaHandlerTest
                                                        @loop)
   end
 
+  class HeaderTest < self
   def test_success
     Groonga::Schema.define(:context => @context) do |schema|
       schema.create_table("Books", :type => :hash)
@@ -62,8 +63,9 @@ class ColumnListTest < GroongaHandlerTest
       normalize_header(response.first)
     )
   end
+  end
 
-  class ListTest < self
+  class BodyTest < self
     def test_fix
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
