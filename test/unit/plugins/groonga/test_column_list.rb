@@ -64,7 +64,7 @@ class ColumnListTest < GroongaHandlerTest
   end
 
   class ListTest < self
-    def test_fix_column
+    def test_fix
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
@@ -87,7 +87,7 @@ class ColumnListTest < GroongaHandlerTest
       assert_equal(expected, response.last)
     end
 
-    def test_var_column
+    def test_var
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
@@ -110,7 +110,7 @@ class ColumnListTest < GroongaHandlerTest
       assert_equal(expected, response.last)
     end
 
-    def test_vector_column
+    def test_vector
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
@@ -133,7 +133,7 @@ class ColumnListTest < GroongaHandlerTest
       assert_equal(expected, response.last)
     end
 
-    def test_index_column
+    def test_index
       Groonga::Schema.define(:context => @context) do |schema|
         schema.create_table("Books", :type => :hash)
         schema.change_table("Books") do |table|
