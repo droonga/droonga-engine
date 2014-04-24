@@ -86,13 +86,11 @@ module Droonga
     end
 
     class Replicas
-      def initialize(parameters={})
-        @hosts      = parameters[:hosts]      || ["127.0.0.1"]
-        @port       = parameters[:port]       || 10031
-        @tag        = parameters[:tag]        || "droonga"
-        @n_slices   = parameters[:n_slices]   || 1
-
-        @n_volumes = 0
+      def initialize(options={})
+        @hosts      = options[:hosts] || ["127.0.0.1"]
+        @port       = options[:port]
+        @tag        = options[:tag]
+        @n_slices   = options[:n_slices]
       end
 
       def to_json
@@ -103,15 +101,34 @@ module Droonga
       def generate_json
         replicas = []
         @hosts.each do |host|
-          replicas << generate_replica(host)
+          replica = Replica.new(host, :port => @port,
+                                      :tag => @tag,
+                                      :n_slices => @n_slices)
+          replicas << replica.to_json
         end
         replicas
       end
+    end
 
-      def generate_replica(host)
+    class Replica
+      def initialize(host, options={})
+        @host       = host
+        @port       = options[:port]     || 10031
+        @tag        = options[:tag]      || "droonga"
+        @n_slices   = options[:n_slices] || 1
+
+        @n_volumes = 0
+      end
+
+      def to_json
+        @json ||= generate_json
+      end
+
+      private
+      def generate_json
         slices = []
         @n_slices.times do |index|
-          slices << generate_slice(host)
+          slices << generate_slice
         end
         {
           "dimension" => "_key",
@@ -120,13 +137,13 @@ module Droonga
         }
       end
 
-      def generate_slice(host)
+      def generate_slice
         name = sprintf('%03d', @n_volumes)
         @n_volumes += 1
         {
           "weight" => weight,
           "volume" => {
-            "address" => "#{host}:#{@port}/#{@tag}.#{name}",
+            "address" => "#{@host}:#{@port}/#{@tag}.#{name}",
           },
         }
       end
