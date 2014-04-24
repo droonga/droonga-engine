@@ -115,10 +115,11 @@ table_create Ages TABLE_NO_KEY
               {"table" => "Books", "filter" => '_key @^ "D"'})
       assert_equal(<<-DUMP, dump)
 table_create Books TABLE_HASH_KEY --key_type ShortText
+
 load --table Books
 [
-  ["_key"],
-  ["Groonga"]
+["_key"],
+["Groonga"]
 ]
       DUMP
     end
