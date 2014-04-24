@@ -12,12 +12,12 @@
           "slices": [
             {
               "volume": {
-                "address": "localhost:23003/droonga.000"
+                "address": "127.0.0.1:10031/droonga.000"
               }
             },
             {
               "volume": {
-                "address": "localhost:23003/droonga.001"
+                "address": "127.0.0.1:10031/droonga.001"
               }
             }
           ]
@@ -26,12 +26,12 @@
           "slices": [
             {
               "volume": {
-                "address": "localhost:23003/droonga.010"
+                "address": "127.0.0.1:10031/droonga.010"
               }
             },
             {
               "volume": {
-                "address": "localhost:23003/droonga.011"
+                "address": "127.0.0.1:10031/droonga.011"
               }
             }
           ]
