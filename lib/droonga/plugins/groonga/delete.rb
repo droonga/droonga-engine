@@ -57,8 +57,8 @@ module Droonga
 
             count = 0
             count += 1 if key
-            id += 1 if id
-            filter += 1 if filter
+            count += 1 if id
+            count += 1 if filter
             if count > 1
               message = "\"key\", \"id\", and \"filter\" are exclusive"
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
