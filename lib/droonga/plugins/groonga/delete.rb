@@ -77,7 +77,7 @@ module Droonga
               record = table[parameters[:key]]
               record.delete unless record.nil?
             else
-              filter = Groonga::Expression.new(:context => @context)
+              filter = ::Groonga::Expression.new(:context => @context)
               begin
                 filter.parse(parameters[:filter].dump, :syntax => :script)
                 records = table.select(filter)
