@@ -1,0 +1,26 @@
+{
+  "type": "table_create",
+  "dataset": "Droonga",
+  "body": {
+    "name"  : "User",
+    "flags" : "TABLE_PAT_KEY"
+  }
+}
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table"  : "User",
+    "key"    : "key",
+    "values" : {
+    }
+  }
+}
+{
+  "type": "delete",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "User",
+    "key"   : "key"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "delete",
+  "dataset": "Droonga",
+  "body": {
+    "table" : "Unknown"
+  }
+}
