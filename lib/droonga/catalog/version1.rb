@@ -195,7 +195,7 @@ module Droonga
         validate_parameter_type(String, value, name)
         begin
           Time.parse(value)
-        rescue ArgumentError => error
+        rescue ArgumentError
           raise InvalidDate.new(name, value, @path)
         end
       end
