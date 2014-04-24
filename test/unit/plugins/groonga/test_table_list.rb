@@ -28,7 +28,7 @@ class TableListTest < GroongaHandlerTest
   def create_handler
     Droonga::Plugins::Groonga::TableList::Handler.new("droonga",
                                                       @handler.context,
-                                                      @messages,
+                                                      @messenger,
                                                       @loop)
   end
 
