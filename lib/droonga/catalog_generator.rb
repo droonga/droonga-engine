@@ -67,7 +67,8 @@ module Droonga
       end
 
       def replicas
-        @options[:replicas] || []
+        return @options[:replicas] if @options[:replicas]
+        @generated_replicas ||= Replicas.new(@options).to_json
       end
 
       def to_catalog
@@ -79,6 +80,60 @@ module Droonga
         }
         catalog["fact"] = fact if fact
         catalog
+      end
+
+      private
+    end
+
+    class Replicas
+      def initialize(parameters={})
+        @host       = parameters[:host]       || "127.0.0.1"
+        @port       = parameters[:port]       || 10031
+        @tag        = parameters[:tag]        || "droonga"
+        @n_replicas = parameters[:n_replicas] || 2
+        @n_slices   = parameters[:n_slices]   || 1
+
+        @n_volumes = 0
+      end
+
+      def to_json
+        @json ||= generate_json
+      end
+
+      private
+      def generate_json
+        replicas = []
+        @n_replicas.times do |index|
+          replicas << generate_replica
+        end
+        replicas
+      end
+
+      def generate_replica
+        slices = []
+        @n_slices.times do |index|
+          slices << generate_slice
+        end
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": slices
+        }
+      end
+
+      def generate_slice
+        name = sprintf('%03d', @n_volumes)
+        @n_volumes += 1
+        {
+          "weight": weight,
+          "volume": {
+            "address": "#{host}:#{port}/#{tag}.#{name}"
+          }
+        }
+      end
+
+      def weight
+        @weight ||= 100 / @n_slices
       end
     end
   end
