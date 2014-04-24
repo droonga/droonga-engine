@@ -79,6 +79,21 @@ class DeleteTest < GroongaHandlerTest
     )
   end
 
+  def test_not_implemented_identifier
+    Groonga::Schema.define(:context => @context) do |schema|
+      schema.create_table("Books", :type => :hash)
+    end
+    message = {
+      "table" => "Books",
+      "filter" => "filter",
+    }
+    response = process(:delete, message)
+    assert_equal(
+      [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
+      [normalize_header(response.first), response.last]
+    )
+  end
+
   class DeleteTest < self
     def test_key
       Groonga::Schema.define(:context => @context) do |schema|
