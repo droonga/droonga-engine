@@ -48,7 +48,7 @@ module Droonga
           private
           def validate_parameters(table_name, key, id, filter)
             if table_name.nil? or @context[table_name].nil?
-              message = "table doesn't exist: <#{table_name.to_s}>"
+              message = "table doesn't exist: <#{table_name}>"
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                      :message => message,
                                      :result => false)
@@ -92,7 +92,7 @@ module Droonga
             begin
               condition.parse(filter, :syntax => :script)
             rescue ::Groonga::SyntaxError
-              message = "syntax error in filter: <#{filter.to_s}>"
+              message = "syntax error in filter: <#{filter}>"
               raise CommandError.new(:status => Status::SYNTAX_ERROR,
                                      :message => message,
                                      :result => false)
