@@ -73,7 +73,7 @@ module Droonga
             if parameters[:id]
               record = table[parameters[:id].to_i]
               record.delete if record and record.valid_id?
-            else if parameters[:key]
+            elsif parameters[:key]
               record = table[parameters[:key]]
               record.delete unless record.nil?
             else
