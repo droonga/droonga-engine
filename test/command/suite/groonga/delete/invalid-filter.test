@@ -1,0 +1,9 @@
+#@include fixture/user-table.jsons
+{
+  "type": "delete",
+  "dataset": "Droonga",
+  "body": {
+    "table"  : "User",
+    "filter" : "_key"
+  }
+}

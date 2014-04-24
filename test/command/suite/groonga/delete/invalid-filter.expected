@@ -1,0 +1,14 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "delete.result",
+  "body": [
+    [
+      -63,
+      0.0,
+      0.0,
+      "syntax error in filter: <_key>"
+    ],
+    false
+  ]
+}
