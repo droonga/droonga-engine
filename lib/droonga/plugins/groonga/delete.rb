@@ -31,7 +31,8 @@ module Droonga
 
             delete_record(@command["table"],
                           :key => @command["key"],
-                          :id => @command["id"])
+                          :id => @command["id"],
+                          :filter => @command["filter"])
           end
 
           private
