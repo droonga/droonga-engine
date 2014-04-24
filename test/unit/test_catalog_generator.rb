@@ -36,14 +36,14 @@ class CatalogGeneratorTest < Test::Unit::TestCase
     rescue ArgumentError
       # Do nothing for invalid time value
     else
-      catalog[key] = @normalize_time_value
+      catalog[key] = @normalized_time_value
     end
   end
 
   def test_default
     catalog = {
       "version" => 2,
-      "effectiveDate" => @normalize_time_value,
+      "effectiveDate" => @normalized_time_value,
       "datasets" => {
       },
     }
