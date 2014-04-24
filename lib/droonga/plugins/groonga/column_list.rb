@@ -23,14 +23,14 @@ module Droonga
     module Groonga
       module ColumnList
         HEADER = [
-          ["id", "UInt32"],
-          ["name","ShortText"],
-          ["path","ShortText"],
-          ["type","ShortText"],
-          ["flags","ShortText"],
+          ["id",     "UInt32"],
+          ["name",   "ShortText"],
+          ["path",   "ShortText"],
+          ["type",   "ShortText"],
+          ["flags",  "ShortText"],
           ["domain", "ShortText"],
-          ["range", "ShortText"],
-          ["source","ShortText"],
+          ["range",  "ShortText"],
+          ["source", "ShortText"],
         ].freeze
 
         class Command < GenericCommand

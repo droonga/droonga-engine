@@ -15,14 +15,14 @@
 
 class ColumnListTest < GroongaHandlerTest
   COLUMNS_HEADER = [
-    ["id", "UInt32"],
-    ["name","ShortText"],
-    ["path","ShortText"],
-    ["type","ShortText"],
-    ["flags","ShortText"],
+    ["id",     "UInt32"],
+    ["name",   "ShortText"],
+    ["path",   "ShortText"],
+    ["type",   "ShortText"],
+    ["flags",  "ShortText"],
     ["domain", "ShortText"],
-    ["range", "ShortText"],
-    ["source","ShortText"],
+    ["range",  "ShortText"],
+    ["source", "ShortText"],
   ]
 
   def create_handler

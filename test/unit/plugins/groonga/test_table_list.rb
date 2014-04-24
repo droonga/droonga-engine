@@ -15,14 +15,14 @@
 
 class TableListTest < GroongaHandlerTest
   TABLES_HEADER = [
-    ["id", "UInt32"],
-    ["name","ShortText"],
-    ["path","ShortText"],
-    ["flags","ShortText"],
-    ["domain", "ShortText"],
-    ["range", "ShortText"],
-    ["default_tokenizer","ShortText"],
-    ["normalizer","ShortText"],
+    ["id",                "UInt32"],
+    ["name",              "ShortText"],
+    ["path",              "ShortText"],
+    ["flags",             "ShortText"],
+    ["domain",            "ShortText"],
+    ["range",             "ShortText"],
+    ["default_tokenizer", "ShortText"],
+    ["normalizer",        "ShortText"],
   ]
 
   def create_handler
