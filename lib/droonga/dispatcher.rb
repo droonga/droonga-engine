@@ -89,7 +89,6 @@ module Droonga
           formatted_error = ErrorMessages::InternalServerError.new("Unknown internal error")
           reply("statusCode" => formatted_error.status_code,
                 "body"       => formatted_error.response_body)
-          raise error
         end
       end
     end
