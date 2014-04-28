@@ -151,6 +151,8 @@ module Droonga
                                    @configuration.port)
 
             if @configuration.daemon?
+              ENV["DROONGA_CATALOG"] ||= "catalog.json"
+              ENV["DROONGA_CATALOG"] = File.expand_path(ENV["DROONGA_CATALOG"])
               Process.daemon
             end
 
