@@ -35,11 +35,12 @@ module Droonga
           DEFAULT_HOST = Socket.gethostname
           DEFAULT_PORT = 10031
 
-          attr_reader :host, :port, :tag, :pid_file
+          attr_reader :host, :port, :tag, :log_file, :pid_file
           def initialize
             @host = DEFAULT_HOST
             @port = DEFAULT_PORT
             @tag = "droonga"
+            @log_file = nil
             @daemon = false
             @pid_file = nil
           end
@@ -108,6 +109,10 @@ module Droonga
                       "(#{log_level})") do |level|
               ENV["DROONGA_LOG_LEVEL"] = level
             end
+            parser.on("--log-file=FILE",
+                      "Output logs to FILE") do |file|
+              @log_file = file
+            end
           end
 
           def add_process_options(parser)
@@ -133,6 +138,7 @@ module Droonga
 
           def initialize
             @configuration = Configuration.new
+            @log_output = nil
           end
 
           def run(command_line_arguments)
@@ -148,8 +154,10 @@ module Droonga
               Process.daemon
             end
 
-            write_pid_file do
-              run_main_loop
+            open_log_file do
+              write_pid_file do
+                run_main_loop
+              end
             end
           end
 
@@ -179,6 +187,10 @@ module Droonga
             if ready_notify_fd
               command_line.push("--ready-notify-fd", ready_notify_fd.to_s)
               options[ready_notify_fd] = ready_notify_fd
+            end
+            if @log_output
+              options[:out] = @log_output
+              options[:err] = @log_output
             end
             spawn(env, *command_line, options)
           end
@@ -230,6 +242,17 @@ module Droonga
             end
 
             succeeded
+          end
+
+          def open_log_file
+            if @configuration.log_file
+              File.open(@configuration.log_file, "a") do |file|
+                @log_output = file
+                yield
+              end
+            else
+              yield
+            end
           end
 
           def write_pid_file

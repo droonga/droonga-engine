@@ -59,8 +59,19 @@ module Droonga
       end
     end
 
+    class << self
+      @@default_output = nil
+      def default_output
+        @@default_output || $stdout
+      end
+
+      def default_output=(output)
+        @@default_output = output
+      end
+    end
+
     def initialize(options={})
-      @output = options[:output] || $stdout
+      @output = options[:output] || self.class.default_output
       @tag = options[:tag]
       self.level = ENV["DROONGA_LOG_LEVEL"] || Level.default_label
     end
