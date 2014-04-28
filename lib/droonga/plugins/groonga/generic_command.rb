@@ -78,6 +78,27 @@ module Droonga
 
           table_name
         end
+
+        def valid_column_name(name, table_name)
+          column_name = @command[name]
+
+          if column_name.nil?
+            message = "you must specify column via \"#{name}\""
+            raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                   :message => message,
+                                   :result => false)
+          end
+
+          if @context[table_name].column(column_name).nil?
+            message = "column not found: <#{column_name.to_s}> in " +
+                          "<#{table_name.to_s}>"
+            raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                   :message => message,
+                                   :result => false)
+          end
+
+          column_name
+        end
       end
     end
   end

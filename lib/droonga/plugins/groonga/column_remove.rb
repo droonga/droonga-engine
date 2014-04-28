@@ -28,14 +28,7 @@ module Droonga
             @command = command_class.new("column_remove", request)
 
             table_name = valid_table_name("table")
-
-            column_name = @command["name"]
-            if column_name.nil? or @context[table_name].column(column_name).nil?
-              message = "column doesn't exist: <#{column_name.to_s}>"
-              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                     :message => message,
-                                     :result => false)
-            end
+            column_name = valid_column_name("name", table_name)
 
             remove_column(table_name, column_name)
           end
