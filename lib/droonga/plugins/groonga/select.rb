@@ -19,6 +19,8 @@ module Droonga
   module Plugins
     module Groonga
       module Select
+        DRILLDOWN_RESULT_PREFIX = "drilldown_result_"
+
         class RequestConverter
           def convert(select_request)
             @table = select_request["table"]
@@ -114,6 +116,7 @@ module Droonga
                 "output" => {
                   "elements"   => [
                     "count",
+                    "attributes",
                     "records",
                   ],
                   "attributes" => columns,
@@ -131,7 +134,7 @@ module Droonga
                 }
               end
 
-              queries["drilldown_result_#{key}"] = query
+              queries["#{DRILLDOWN_RESULT_PREFIX}#{key}"] = query
             end
             queries
           end
@@ -139,17 +142,27 @@ module Droonga
 
         class ResponseConverter
           def convert(search_response)
+            @drilldown_results = []
             search_response.each do |key, value|
-              convert_main_result(value)
+              if key.start_with?(DRILLDOWN_RESULT_PREFIX)
+                key = key[DRILLDOWN_RESULT_PREFIX.size..-1]
+                convert_drilldown_result(key, value)
+              else
+                convert_main_result(value)
+              end
             end
 
             select_results = [@header, [@body]]
+            unless @drilldown_results.empty?
+              select_results.last += @drilldown_results
+            end
 
             select_results
           end
 
           private
           def convert_main_result(result)
+            status_code = 0
             start_time = result["startTime"]
             start_time_in_unix_time = if start_time
                                         Time.parse(start_time).to_f
@@ -157,25 +170,32 @@ module Droonga
                                         Time.now.to_f
                                       end
             elapsed_time = result["elapsedTime"] || 0
-            count = result["count"]
+            @header = [status_code, start_time_in_unix_time, elapsed_time]
+            @body = convert_search_result(result)
+          end
 
-            attributes = result["attributes"] || []
-            converted_attributes = attributes.collect do |attribute|
+          def convert_drilldown_result(key, result)
+            @drilldown_results << convert_search_result(result)
+          end
+
+          def convert_search_result(result)
+            count      = result["count"]
+            attributes = convert_attributes(result["attributes"])
+            records    = result["records"]
+            if records.empty?
+              [[count], attributes]
+            else
+              [[count], attributes, records]
+            end
+          end
+
+          def convert_attributes(attributes)
+            attributes = attributes || []
+            attributes.collect do |attribute|
               name = attribute["name"]
               type = attribute["type"]
               [name, type]
             end
-
-            status_code = 0
-            @header = [status_code, start_time_in_unix_time, elapsed_time]
-            records = result["records"]
-            if records.empty?
-              results = [[count], converted_attributes]
-            else
-              results = [[count], converted_attributes, records]
-            end
-
-            @body = results
           end
         end
 
