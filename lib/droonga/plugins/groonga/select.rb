@@ -99,14 +99,12 @@ module Droonga
             drilldown_keys = select_request["drilldown"]
             return nil if drilldown_keys.nil? or drilldown_keys.empty?
 
-            sort_keys = select_request["drilldown_sortby"] || ""
-            columns   = select_request["drilldown_output_columns"] || ""
-            offset    = select_request["drilldown_offset"] || 0
-            limit     = select_request["drilldown_limit"] || 10
-
             drilldown_keys = drilldown_keys.split(",")
-            sort_keys      = sort_keys.split(",")
-            columns        = columns.split(",")
+
+            sort_keys = (select_request["drilldown_sortby"] || "").split(",")
+            columns   = (select_request["drilldown_output_columns"] || "").split(",")
+            offset    = (select_request["drilldown_offset"] || "0").to_i
+            limit     = (select_request["drilldown_limit"] || "10").to_i
 
             queries = {}
             drilldown_keys.each_with_index do |key, index|
@@ -116,10 +114,9 @@ module Droonga
                 "output" => {
                   "elements"   => [
                     "count",
-                    "attributes",
                     "records",
                   ],
-                  "attributes" => "_key,_nsubrecs",
+                  "attributes" => columns,
                   "limit" => limit,
                 },
               }
