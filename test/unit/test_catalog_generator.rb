@@ -57,7 +57,20 @@ class CatalogGeneratorTest < Test::Unit::TestCase
         "nWorkers" => 4,
         "plugins" => ["groonga", "search", "crud"],
         "schema" => {},
-        "replicas" => [],
+        "replicas" => [
+          {
+            "dimension" => "_key",
+            "slicer" => "hash",
+            "slices" => [
+              {
+                "volume" => {
+                  "address" => "127.0.0.1:10031/droonga.000",
+                },
+                "weight" => 100,
+              },
+            ],
+          },
+        ],
       }
       assert_equal(dataset, generate["datasets"]["Droonga"])
     end
