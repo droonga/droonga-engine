@@ -287,6 +287,80 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
     end
   end
 
+  class SortTest < self
+    data(
+      :only_keys => {
+        :input => {
+          :keys => "-_id",
+        },
+        :expected => {
+          :keys => ["-_id"],
+          :offset => 0,
+          :limit => 10,
+        },
+      },
+      :offset => {
+        :input => {
+          :keys => "-_id",
+          :offset => 5,
+        },
+        :expected => {
+          :keys => ["-_id"],
+          :offset => 5,
+          :limit => 10,
+        },
+      },
+      :limit => {
+        :input => {
+          :keys => "-_id",
+          :limit => 5,
+        },
+        :expected => {
+          :keys => ["-_id"],
+          :offset => 0,
+          :limit => 5,
+        },
+      },
+    )
+    def test_sort(data)
+      expected = data[:expected]
+      input = data[:input]
+      select_request = {
+        "table"          => "EmptyTable",
+        "output_columns" => "_id",
+      }
+      select_request["sortby"] = input[:keys]  unless input[:keys].nil?
+      select_request["offset"] = input[:offset]  unless input[:offset].nil?
+      select_request["limit"] = input[:limit]  unless input[:limit].nil?
+
+      expected_search_request = {
+        "queries" => {
+          "EmptyTable_result" => {
+            "source"   => "EmptyTable",
+            "sortBy" => {
+              "keys" => expected[:keys],
+              "offset" => expected[:offset],
+              "limit" => expected[:limit],
+            },
+            "output"   => {
+              "elements"   => [
+                "startTime",
+                "elapsedTime",
+                "count",
+                "attributes",
+                "records",
+              ],
+              "attributes" => ["_id"],
+              "offset" => 0,
+              "limit" => expected[:limit],
+            },
+          },
+        },
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+  end
+
   class DrilldownTest < self
     def base_request
       {
