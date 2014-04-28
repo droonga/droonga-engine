@@ -51,4 +51,147 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
       assert_equal(expected_select_response, convert(search_response))
     end
   end
+
+  class DrilldownTest < self
+    START_TIME   = "2001-08-02T10:45:23.5+09:00"
+    ELAPSED_TIME = 0
+    COUNT        = 0
+
+    def main_search_result
+      {
+        "startTime"   => START_TIME,
+        "elapsedTime" => ELAPSED_TIME,
+        "count"       => COUNT,
+        "attributes"  => [
+          {"name" => "_id", "type" => "UInt32", "vector" => false},
+        ],
+        "records"     => [],
+      }
+    end
+
+    def expected_header
+      status_code = 0
+      start_time_in_unix_time = Time.parse(START_TIME).to_f
+      [status_code, start_time_in_unix_time, ELAPSED_TIME]
+    end
+
+    def expected_main_select_result
+      headers = [["_id","UInt32"]]
+      [[[COUNT], headers]]
+    end
+
+    def test_no_drilldown
+      search_response = {
+        "EmptyTable" => main_search_result,
+      }
+
+      expected_select_response = [
+        expected_header,
+        expected_main_select_result,
+      ]
+
+      assert_equal(expected_select_response, convert(search_response))
+    end
+
+    def test_have_one_result
+      search_response = {
+        "EmptyTable" => main_search_result,
+        "drilldown_result_a" => {
+          "count" => 3,
+          "attributes" => [
+            {"name" => "_id", "type" => "UInt32", "vector" => false},
+            {"name" => "_key", "type" => "ShortText", "vector" => false},
+            {"name" => "_nsubrecs", "type" => "UInt32", "vector" => false},
+          ],
+          "records" => [
+            [1, "a1", 10],
+            [2, "a2", 20],
+            [3, "a3", 30],
+          ],
+        },
+      }
+
+      header = [
+        ["_id", "UInt32"],
+        ["_key", "ShortText"],
+        ["_nsubrecs", "UInt32"],
+      ]
+      expected_select_response = [
+        expected_header,
+        expected_main_select_result,
+        [
+          [
+            [3],
+            header,
+            [
+              [1, "a1", 10],
+              [2, "a2", 20],
+              [3, "a3", 30],
+            ],
+          ],
+        ]
+      ]
+
+      assert_equal(expected_select_response, convert(search_response))
+    end
+
+    def test_have_multiple_results
+      search_response = {
+        "EmptyTable" => main_search_result,
+        "drilldown_result_a" => {
+          "count" => 3,
+          "attributes" => [
+            {"name" => "_key", "type" => "ShortText", "vector" => false},
+            {"name" => "_nsubrecs", "type" => "UInt32", "vector" => false},
+          ],
+          "records" => [
+            ["a1", 10],
+            ["a2", 20],
+            ["a3", 30],
+          ],
+        },
+        "drilldown_result_b" => {
+          "count" => 2,
+          "attributes" => [
+            {"name" => "_key", "type" => "ShortText", "vector" => false},
+            {"name" => "_nsubrecs", "type" => "UInt32", "vector" => false},
+          ],
+          "records" => [
+            ["b1", 10],
+            ["b2", 20],
+          ],
+        },
+      }
+
+      header = [
+        ["_key", "ShortText"],
+        ["_nsubrecs", "UInt32"],
+      ]
+      expected_select_response = [
+        expected_header,
+        expected_main_select_result,
+        [
+          [
+            [3],
+            header,
+            [
+              ["a1", 10],
+              ["a2", 20],
+              ["a3", 30],
+            ],
+          ],
+          [
+            [2],
+            header,
+            [
+              ["b1", 10],
+              ["b2", 20],
+            ],
+          ],
+        ]
+      ]
+
+      assert_equal(expected_select_response, convert(search_response))
+    end
+  end
 end
