@@ -139,37 +139,43 @@ module Droonga
 
         class ResponseConverter
           def convert(search_response)
-            select_responses = search_response.collect do |key, value|
-              status_code = 0
-
-              start_time = value["startTime"]
-              start_time_in_unix_time = if start_time
-                                          Time.parse(start_time).to_f
-                                        else
-                                          Time.now.to_f
-                                        end
-              elapsed_time = value["elapsedTime"] || 0
-              count = value["count"]
-
-              attributes = value["attributes"] || []
-              converted_attributes = attributes.collect do |attribute|
-                name = attribute["name"]
-                type = attribute["type"]
-                [name, type]
-              end
-
-              header = [status_code, start_time_in_unix_time, elapsed_time]
-              records = value["records"]
-              if records.empty?
-                results = [[count], converted_attributes]
-              else
-                results = [[count], converted_attributes, records]
-              end
-              body = [results]
-
-              [header, body]
+            search_response.each do |key, value|
+              convert_main_result(value)
             end
-            select_responses.first
+
+            select_results = [@header, [@body]]
+
+            select_results
+          end
+
+          private
+          def convert_main_result(result)
+            start_time = result["startTime"]
+            start_time_in_unix_time = if start_time
+                                        Time.parse(start_time).to_f
+                                      else
+                                        Time.now.to_f
+                                      end
+            elapsed_time = result["elapsedTime"] || 0
+            count = result["count"]
+
+            attributes = result["attributes"] || []
+            converted_attributes = attributes.collect do |attribute|
+              name = attribute["name"]
+              type = attribute["type"]
+              [name, type]
+            end
+
+            status_code = 0
+            @header = [status_code, start_time_in_unix_time, elapsed_time]
+            records = result["records"]
+            if records.empty?
+              results = [[count], converted_attributes]
+            else
+              results = [[count], converted_attributes, records]
+            end
+
+            @body = results
           end
         end
 
