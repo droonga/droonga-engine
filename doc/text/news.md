@@ -1,5 +1,32 @@
 # News
 
+## 1.0.2: 2014-04-29 (planned)
+
+The most important topic on this release is that the core component aka Droonga Engine becomes fluentd-free.
+As the result, the project (and gem package) `fluent-plugin-droonga` is renamed to `droonga-engine`.
+Of course the compatibility of the protocol is still there.
+
+ * Becomes fluentd-free.
+ * Supports new `--daemon` and `--pid-file` options for the daemon mode.
+ * More Groonga-compatible features are available:
+   * `table_list` command
+   * `column_list` command
+   * `column_remove` command
+   * `column_rename` command
+   * `delete` command
+   * options for `select` command
+     * `filter`
+     * `sortby`
+     * `drilldown`
+     * `drilldown_output_columns`
+     * `drilldown_sortby`
+     * `drilldown_offset`
+     * `drilldown_limit`
+ * A useful command line tool `droonga-catalog-generate` is included.
+   It helps you to write your custom `catalog.json`.
+ * Parameters for the `search` command is validated more strictly.
+ * The default port number is changed from 24224 (fluentd's one) to 10031.
+
 ## 1.0.1: 2014-03-29
 
 ### Improvements
