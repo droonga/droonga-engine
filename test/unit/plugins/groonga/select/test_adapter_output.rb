@@ -120,14 +120,12 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
         expected_header,
         expected_main_select_result,
         [
+          [3],
+          header,
           [
-            [3],
-            header,
-            [
-              [1, "a1", 10],
-              [2, "a2", 20],
-              [3, "a3", 30],
-            ],
+            [1, "a1", 10],
+            [2, "a2", 20],
+            [3, "a3", 30],
           ],
         ]
       ]
@@ -171,22 +169,20 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
         expected_header,
         expected_main_select_result,
         [
+          [3],
+          header,
           [
-            [3],
-            header,
-            [
-              ["a1", 10],
-              ["a2", 20],
-              ["a3", 30],
-            ],
+            ["a1", 10],
+            ["a2", 20],
+            ["a3", 30],
           ],
+        ],
+        [
+          [2],
+          header,
           [
-            [2],
-            header,
-            [
-              ["b1", 10],
-              ["b2", 20],
-            ],
+            ["b1", 10],
+            ["b2", 20],
           ],
         ]
       ]
