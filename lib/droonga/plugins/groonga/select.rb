@@ -153,8 +153,8 @@ module Droonga
             end
 
             select_results = [@header, [@body]]
-            unless @drilldown_results.empty?
-              select_results.last += @drilldown_results
+            @drilldown_results.each do |result|
+              select_results.last << result
             end
 
             select_results
