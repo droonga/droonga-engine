@@ -58,6 +58,26 @@ module Droonga
           header.push(error_message) unless error_message.empty?
           header
         end
+
+        def valid_table_name(name)
+          table_name = @command[name]
+
+          if table_name.nil?
+            message = "you must specify table via \"#{name}\""
+            raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                   :message => message,
+                                   :result => false)
+          end
+
+          if @context[table_name].nil?
+            message = "table not found: <#{table_name.to_s}>"
+            raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                   :message => message,
+                                   :result => false)
+          end
+
+          table_name
+        end
       end
     end
   end

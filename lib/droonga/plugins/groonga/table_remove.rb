@@ -27,12 +27,7 @@ module Droonga
             command_class = ::Groonga::Command.find("table_remove")
             @command = command_class.new("table_remove", request)
 
-            name = @command["name"]
-            if name.nil? or @context[name].nil?
-              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                     :message => "table not found",
-                                     :result => false)
-            end
+            table_name = valid_table_name("name")
 
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.remove_table(name)

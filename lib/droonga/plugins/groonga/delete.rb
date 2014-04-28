@@ -27,12 +27,13 @@ module Droonga
             command_class = ::Groonga::Command.find("delete")
             @command = command_class.new("delete", request)
 
-            table_name = @command["table"]
+            table_name = valid_table_name("table")
+
             key = @command["key"]
             id = @command["id"]
             filter = @command["filter"]
 
-            validate_parameters(table_name, key, id, filter)
+            validate_parameters(key, id, filter)
 
             table = @context[table_name]
             if key
@@ -47,14 +48,7 @@ module Droonga
           end
 
           private
-          def validate_parameters(table_name, key, id, filter)
-            if table_name.nil? or @context[table_name].nil?
-              message = "table doesn't exist: <#{table_name}>"
-              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                     :message => message,
-                                     :result => false)
-            end
-
+          def validate_parameters(key, id, filter)
             if key.nil? and id.nil? and filter.nil?
               message = "you must specify \"key\", \"id\", or \"filter\""
               raise CommandError.new(:status => Status::INVALID_ARGUMENT,

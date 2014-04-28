@@ -27,13 +27,7 @@ module Droonga
             command_class = ::Groonga::Command.find("column_remove")
             @command = command_class.new("column_remove", request)
 
-            table_name = @command["table"]
-            if table_name.nil? or @context[table_name].nil?
-              message = "table doesn't exist: <#{table_name.to_s}>"
-              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
-                                     :message => message,
-                                     :result => false)
-            end
+            table_name = valid_table_name("table")
 
             column_name = @command["name"]
             if column_name.nil? or @context[table_name].column(column_name).nil?
