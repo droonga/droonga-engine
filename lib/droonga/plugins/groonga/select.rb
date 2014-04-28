@@ -26,6 +26,7 @@ module Droonga
             match_columns = select_request["match_columns"]
             match_to = match_columns ? match_columns.split(/ *\|\| */) : []
             query = select_request["query"]
+            filter = select_request["filter"]
             output_columns = select_request["output_columns"] || ""
             attributes = output_columns.split(/, */)
             offset = (select_request["offset"] || "0").to_i
@@ -50,16 +51,33 @@ module Droonga
                 }
               }
             }
+
+            conditions = []
             if query
-              condition = {
+              conditions << {
                 "query"  => query,
                 "matchTo"=> match_to,
                 "defaultOperator"=> "&&",
                 "allowPragma"=> false,
                 "allowColumn"=> true,
               }
+            end
+
+            if filter
+              conditions << filter
+            end
+
+            case conditions.size
+            when 1
+              condition = conditions.first
+            when 2
+              condition = ["&&"] + conditions
+            end
+
+            if condition
               search_request["queries"][result_name]["condition"] = condition
             end
+
             search_request
           end
         end
