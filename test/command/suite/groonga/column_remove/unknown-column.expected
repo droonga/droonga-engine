@@ -20,7 +20,7 @@
       -22,
       0.0,
       0.0,
-      "column doesn't exist: <unknown>"
+      "column not found: <unknown>"
     ],
     false
   ]
