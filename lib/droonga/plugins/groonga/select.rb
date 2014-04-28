@@ -195,7 +195,7 @@ module Droonga
             count      = result["count"]
             attributes = convert_attributes(result["attributes"])
             records    = result["records"]
-            if records.empty?
+            if records.nil? or records.empty?
               [[count], attributes]
             else
               [[count], attributes, records]
