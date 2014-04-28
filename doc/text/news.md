@@ -1,6 +1,6 @@
 # News
 
-## 1.0.2: 2014-04-29 (planned)
+## 1.0.2: 2014-04-29
 
 The most important topic on this release is that the core component aka Droonga Engine becomes fluentd-free.
 As the result, the project (and gem package) `fluent-plugin-droonga` is renamed to `droonga-engine`.
