@@ -325,6 +325,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       expected_output = {
         "elements"   => [
           "count",
+          "attributes",
           "records",
         ],
         "attributes" => ["_key", "_nsubrecs"],
@@ -365,6 +366,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       expected_output = {
         "elements"   => [
           "count",
+          "attributes",
           "records",
         ],
         "attributes" => ["_key", "_nsubrecs"],
@@ -406,6 +408,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       expected_output = {
         "elements"   => [
           "count",
+          "attributes",
           "records",
         ],
         "attributes" => ["_key", "_nsubrecs"],
