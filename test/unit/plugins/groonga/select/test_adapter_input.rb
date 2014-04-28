@@ -286,4 +286,145 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       assert_limit(10, nil)
     end
   end
+
+  class DrilldownTest < self
+    def base_request
+      {
+        "table"          => "EmptyTable",
+        "output_columns" => "_id",
+        "limit"          => 1,
+      }
+    end
+
+    def base_queries
+      {
+        "EmptyTable_result" => {
+          "source"   => "EmptyTable",
+          "output"   => {
+            "elements"   => [
+              "startTime",
+              "elapsedTime",
+              "count",
+              "attributes",
+              "records",
+            ],
+            "attributes" => ["_id"],
+            "offset" => 0,
+            "limit" => 1,
+          },
+        },
+      }
+    end
+
+    def test_simple
+      select_request = base_request.merge({
+        "drilldown"                => "a,b",
+        "drilldown_output_columns" => "_key,_nsubrecs",
+      })
+
+      expected_output = {
+        "elements"   => [
+          "count",
+          "records",
+        ],
+        "attributes" => ["_key", "_nsubrecs"],
+        "offset" => 0,
+        "limit" => 10,
+      }
+      expected_search_request = {
+        "queries" => base_queries.merge({
+          "drilldown_result_a" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "a",
+            "output" => expected_output,
+          },
+          "drilldown_result_b" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "b",
+            "output" => expected_output,
+          },
+        }),
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+
+    def test_sorted
+      select_request = base_request.merge({
+        "drilldown"                => "a,b",
+        "drilldown_output_columns" => "_key,_nsubrecs",
+        "drilldown_sortby"         => "-_nsubrecs",
+        "drilldown_offset"         => "0",
+      })
+
+      expected_sort_by = {
+        "keys"   => ["-_nsubrecs"],
+        "offset" => 1,
+        "limit"  => 2,
+      }
+      expected_output = {
+        "elements"   => [
+          "count",
+          "records",
+        ],
+        "attributes" => ["_key", "_nsubrecs"],
+        "limit" => 2,
+      }
+      expected_search_request = {
+        "queries" => base_queries.merge({
+          "drilldown_result_a" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "a",
+            "sortBy" => expected_sort_by,
+            "output" => expected_output,
+          },
+          "drilldown_result_b" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "b",
+            "sortBy" => expected_sort_by,
+            "output" => expected_output,
+          },
+        }),
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+
+    def test_pagination
+      select_request = base_request.merge({
+        "drilldown"                => "a,b",
+        "drilldown_output_columns" => "_key,_nsubrecs",
+        "drilldown_sortby"         => "-_nsubrecs"
+      })
+
+      expected_sort_by = {
+        "keys"   => ["-_nsubrecs"],
+        "offset" => 1,
+        "limit"  => 2,
+      }
+      expected_output = {
+        "elements"   => [
+          "count",
+          "records",
+        ],
+        "attributes" => ["_key", "_nsubrecs"],
+        "limit" => 2,
+      }
+      expected_search_request = {
+        "queries" => base_queries.merge({
+          "drilldown_result_a" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "a",
+            "sortBy" => expected_sort_by,
+            "output" => expected_output,
+          },
+          "drilldown_result_b" => {
+            "source" => "EmptyTable_result",
+            "groupBy" => "b",
+            "sortBy" => expected_sort_by,
+            "output" => expected_output,
+          },
+        }),
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+  end
 end
