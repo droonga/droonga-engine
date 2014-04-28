@@ -27,8 +27,9 @@ module Droonga
             command_class = ::Groonga::Command.find("column_remove")
             @command = command_class.new("column_remove", request)
 
-            table_name = valid_table_name("table")
-            column_name = valid_column_name("name", table_name)
+            table_name = valid_table_name("table", :error_result => false)
+            column_name = valid_column_name("name", :table_name => table_name,
+                                                    :error_result => false)
 
             remove_column(table_name, column_name)
           end

@@ -27,7 +27,7 @@ module Droonga
             command_class = ::Groonga::Command.find("delete")
             @command = command_class.new("delete", request)
 
-            table_name = valid_table_name("table")
+            table_name = valid_table_name("table", :error_result => false)
 
             key = @command["key"]
             id = @command["id"]

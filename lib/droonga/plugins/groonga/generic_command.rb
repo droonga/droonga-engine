@@ -59,34 +59,37 @@ module Droonga
           header
         end
 
-        def valid_table_name(name)
+        def valid_table_name(name, params={})
+          error_result = params[:error_result]
           table_name = @command[name]
 
           if table_name.nil?
             message = "you must specify table via \"#{name}\""
             raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                    :message => message,
-                                   :result => false)
+                                   :result => error_result)
           end
 
           if @context[table_name].nil?
             message = "table not found: <#{table_name.to_s}>"
             raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                    :message => message,
-                                   :result => false)
+                                   :result => error_result)
           end
 
           table_name
         end
 
-        def valid_column_name(name, table_name)
+        def valid_column_name(name, params={})
+          table_name = params[:table_name]
+          error_result = params[:error_result]
           column_name = @command[name]
 
           if column_name.nil?
             message = "you must specify column via \"#{name}\""
             raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                    :message => message,
-                                   :result => false)
+                                   :result => error_result)
           end
 
           if @context[table_name].column(column_name).nil?
@@ -94,7 +97,7 @@ module Droonga
                           "<#{table_name.to_s}>"
             raise CommandError.new(:status => Status::INVALID_ARGUMENT,
                                    :message => message,
-                                   :result => false)
+                                   :result => error_result)
           end
 
           column_name

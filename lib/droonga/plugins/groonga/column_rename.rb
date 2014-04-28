@@ -27,8 +27,9 @@ module Droonga
             command_class = ::Groonga::Command.find("column_rename")
             @command = command_class.new("column_rename", request)
 
-            table_name = valid_table_name("table")
-            column_name = valid_column_name("name", table_name)
+            table_name = valid_table_name("table", :error_result => false)
+            column_name = valid_column_name("name", :table_name => table_name,
+                                                    :error_result => false)
 
             new_name = @command["new_name"]
 

@@ -27,7 +27,7 @@ module Droonga
             command_class = ::Groonga::Command.find("column_create")
             @command = command_class.new("column_create", request)
 
-            table_name = valid_table_name("table")
+            table_name = valid_table_name("table", :error_result => false)
 
             if @command.column_index?
               define_index(table_name)
