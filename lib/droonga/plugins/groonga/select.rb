@@ -23,10 +23,6 @@ module Droonga
           def convert(select_request)
             table = select_request["table"]
             result_name = table + "_result"
-            match_columns = select_request["match_columns"]
-            match_to = match_columns ? match_columns.split(/ *\|\| */) : []
-            query = select_request["query"]
-            filter = select_request["filter"]
             output_columns = select_request["output_columns"] || ""
             attributes = output_columns.split(/, */)
             offset = (select_request["offset"] || "0").to_i
@@ -52,6 +48,20 @@ module Droonga
               }
             }
 
+            condition = convert_condition(select_request)
+            if condition
+              search_request["queries"][result_name]["condition"] = condition
+            end
+
+            search_request
+          end
+
+          def convert_condition(select_request)
+            match_columns = select_request["match_columns"]
+            match_to = match_columns ? match_columns.split(/ *\|\| */) : []
+            query = select_request["query"]
+            filter = select_request["filter"]
+
             conditions = []
             if query
               conditions << {
@@ -67,6 +77,8 @@ module Droonga
               conditions << filter
             end
 
+            condition = nil
+
             case conditions.size
             when 1
               condition = conditions.first
@@ -74,11 +86,7 @@ module Droonga
               condition = ["&&"] + conditions
             end
 
-            if condition
-              search_request["queries"][result_name]["condition"] = condition
-            end
-
-            search_request
+            condition
           end
         end
 
