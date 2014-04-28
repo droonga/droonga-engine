@@ -27,7 +27,7 @@ module Droonga
             command_class = ::Groonga::Command.find("table_remove")
             @command = command_class.new("table_remove", request)
 
-            table_name = valid_table_name("name")
+            name = valid_table_name("name")
 
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.remove_table(name)
