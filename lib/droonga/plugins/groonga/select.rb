@@ -31,6 +31,20 @@ module Droonga
             offset = (select_request["offset"] || "0").to_i
             limit = (select_request["limit"] || "10").to_i
 
+            output_offset = offset
+            output_limit = limit
+
+            sort_by = nil
+            sort_keys = (select_request["sortby"] || "").split(",")
+            unless sort_keys.empty?
+              sort_by = {
+                "keys" => sort_keys,
+                "offset" => offset,
+                "limit" => limit,
+              }
+              output_offset = 0
+            end
+
             search_request = {
               "queries" => {
                 @result_name => {
@@ -44,12 +58,15 @@ module Droonga
                       "records",
                     ],
                     "attributes" => attributes,
-                    "offset" => offset,
-                    "limit" => limit,
+                    "offset" => output_offset,
+                    "limit" => output_limit,
                   },
                 }
               }
             }
+            if sort_by
+              search_request["queries"][@result_name]["sortBy"] = sort_by
+            end
 
             condition = convert_condition(select_request)
             if condition
