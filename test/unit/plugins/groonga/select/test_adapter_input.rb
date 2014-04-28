@@ -393,7 +393,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       select_request = base_request.merge({
         "drilldown"                => "a,b",
         "drilldown_output_columns" => "_key,_nsubrecs",
-        "drilldown_sortby"         => "-_nsubrecs"
+        "drilldown_sortby"         => "-_nsubrecs",
         "drilldown_offset"         => "1",
         "drilldown_limit"          => "2",
       })
