@@ -152,12 +152,8 @@ module Droonga
               end
             end
 
-            select_results = [@header, [@body]]
-            @drilldown_results.each do |result|
-              select_results.last << result
-            end
-
-            select_results
+            select_results = [@body] + @drilldown_results
+            [@header, select_results]
           end
 
           private
