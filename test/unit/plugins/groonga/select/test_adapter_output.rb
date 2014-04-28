@@ -45,7 +45,9 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
       headers = [["_id","UInt32"]]
       expected_select_response = [
         [status_code, start_time_in_unix_time, elapsed_time],
-        [[[count], headers]],
+        [
+          [[count], headers],
+        ],
       ]
 
       assert_equal(expected_select_response, convert(search_response))
@@ -77,7 +79,7 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
 
     def expected_main_select_result
       headers = [["_id","UInt32"]]
-      [[[COUNT], headers]]
+      [[COUNT], headers]
     end
 
     def test_no_drilldown
@@ -87,7 +89,9 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
 
       expected_select_response = [
         expected_header,
-        expected_main_select_result,
+        [
+          expected_main_select_result,
+        ],
       ]
 
       assert_equal(expected_select_response, convert(search_response))
@@ -111,23 +115,25 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
         },
       }
 
-      header = [
+      headers = [
         ["_id", "UInt32"],
         ["_key", "ShortText"],
         ["_nsubrecs", "UInt32"],
       ]
       expected_select_response = [
         expected_header,
-        expected_main_select_result,
         [
-          [3],
-          header,
+          expected_main_select_result,
           [
-            [1, "a1", 10],
-            [2, "a2", 20],
-            [3, "a3", 30],
+            [3],
+            headers,
+            [
+              [1, "a1", 10],
+              [2, "a2", 20],
+              [3, "a3", 30],
+            ],
           ],
-        ]
+        ],
       ]
 
       assert_equal(expected_select_response, convert(search_response))
@@ -161,30 +167,32 @@ class GroongaSelectAdapterOutputTest < Test::Unit::TestCase
         },
       }
 
-      header = [
+      headers = [
         ["_key", "ShortText"],
         ["_nsubrecs", "UInt32"],
       ]
       expected_select_response = [
         expected_header,
-        expected_main_select_result,
         [
-          [3],
-          header,
+          expected_main_select_result,
           [
-            ["a1", 10],
-            ["a2", 20],
-            ["a3", 30],
+            [3],
+            headers,
+            [
+              ["a1", 10],
+              ["a2", 20],
+              ["a3", 30],
+            ],
+          ],
+          [
+            [2],
+            headers,
+            [
+              ["b1", 10],
+              ["b2", 20],
+            ],
           ],
         ],
-        [
-          [2],
-          header,
-          [
-            ["b1", 10],
-            ["b2", 20],
-          ],
-        ]
       ]
 
       assert_equal(expected_select_response, convert(search_response))
