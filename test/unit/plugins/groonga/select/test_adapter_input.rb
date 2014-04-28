@@ -113,6 +113,82 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
     end
   end
 
+  class FilterTest < self
+    def test_filter
+      select_request = {
+        "table"          => "EmptyTable",
+        "filter"         => "title@'FilterTest'",
+        "output_columns" => "_id",
+      }
+
+      expected_search_request = {
+        "queries" => {
+          "EmptyTable_result" => {
+            "source"   => "EmptyTable",
+            "condition"=> "title@'FilterTest'",
+            "output"   => {
+              "elements"   => [
+                "startTime",
+                "elapsedTime",
+                "count",
+                "attributes",
+                "records",
+              ],
+              "attributes" => ["_id"],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+        },
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+  end
+
+  class CombinedConditionsTest < self
+    def test_conditions
+      select_request = {
+        "table"          => "EmptyTable",
+        "match_columns"  => "_key",
+        "query"          => "QueryTest",
+        "filter"         => "title@'FilterTest'",
+        "output_columns" => "_id",
+      }
+
+      expected_search_request = {
+        "queries" => {
+          "EmptyTable_result" => {
+            "source"   => "EmptyTable",
+            "condition"=> [
+              "&&",
+              {
+                "query"  => "QueryTest",
+                "matchTo"=> ["_key"],
+                "defaultOperator"=> "&&",
+                "allowPragma"=> false,
+                "allowColumn"=> true,
+              },
+              "title@'FilterTest'",
+            ],
+            "output"   => {
+              "elements"   => [
+                "startTime",
+                "elapsedTime",
+                "count",
+                "attributes",
+                "records",
+              ],
+              "attributes" => ["_id"],
+              "offset" => 0,
+              "limit" => 10,
+            },
+          },
+        },
+      }
+      assert_equal(expected_search_request, convert(select_request))
+    end
+  end
+
   class OffsetTest < self
     def assert_offset(expected_offset, offset)
       select_request = {
