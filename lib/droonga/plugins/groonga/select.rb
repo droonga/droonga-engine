@@ -21,8 +21,9 @@ module Droonga
       module Select
         class RequestConverter
           def convert(select_request)
-            table = select_request["table"]
-            result_name = table + "_result"
+            @table = select_request["table"]
+            @result_name = @table + "_result"
+
             output_columns = select_request["output_columns"] || ""
             attributes = output_columns.split(/, */)
             offset = (select_request["offset"] || "0").to_i
@@ -30,8 +31,8 @@ module Droonga
 
             search_request = {
               "queries" => {
-                result_name => {
-                  "source" => table,
+                @result_name => {
+                  "source" => @table,
                   "output" => {
                     "elements"   => [
                       "startTime",
@@ -50,7 +51,12 @@ module Droonga
 
             condition = convert_condition(select_request)
             if condition
-              search_request["queries"][result_name]["condition"] = condition
+              search_request["queries"][@result_name]["condition"] = condition
+            end
+
+            drilldown_queries = convert_drilldown(select_request)
+            if drilldown_queries
+              search_request["queries"].merge!(drilldown_queries)
             end
 
             search_request
@@ -87,6 +93,50 @@ module Droonga
             end
 
             condition
+          end
+
+          def convert_drilldown(select_request)
+            drilldown_keys = select_request["drilldown"]
+            return nil if drilldown_keys.nil? or drilldown_keys.empty?
+
+            sort_keys = select_request["drilldown_sortby"] || ""
+            columns   = select_request["drilldown_output_columns"] || ""
+            offset    = select_request["drilldown_offset"] || 0
+            limit     = select_request["drilldown_limit"] || 10
+
+            drilldown_keys = drilldown_keys.split(",")
+            sort_keys      = sort_keys.split(",")
+            columns        = columns.split(",")
+
+            queries = {}
+            drilldown_keys.each_with_index do |key, index|
+              query = {
+                "source" => @result_name,
+                "groupBy" => key,
+                "output" => {
+                  "elements"   => [
+                    "count",
+                    "attributes",
+                    "records",
+                  ],
+                  "attributes" => "_key,_nsubrecs",
+                  "limit" => limit,
+                },
+              }
+
+              if sort_keys.empty?
+                query["output"]["offset"] = offset
+              else
+                query["sortBy"] = {
+                  "keys"   => sort_keys,
+                  "offset" => offset,
+                  "limit"  => limit,
+                }
+              end
+
+              queries["drilldown_result_#{key}"] = query
+            end
+            queries
           end
         end
 
