@@ -16,6 +16,7 @@
 require "optparse"
 require "socket"
 require "ipaddr"
+require "fileutils"
 
 require "droonga/engine"
 require "droonga/event_loop"
@@ -34,11 +35,13 @@ module Droonga
           DEFAULT_HOST = Socket.gethostname
           DEFAULT_PORT = 10031
 
-          attr_reader :host, :port, :tag
+          attr_reader :host, :port, :tag, :pid_file
           def initialize
             @host = DEFAULT_HOST
             @port = DEFAULT_PORT
             @tag = "droonga"
+            @daemon = false
+            @pid_file = nil
           end
 
           def engine_name
@@ -54,6 +57,10 @@ module Droonga
             ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default_label
           end
 
+          def daemon?
+            @daemon
+          end
+
           def to_command_line
             [
               "--host", @host,
@@ -66,6 +73,7 @@ module Droonga
           def add_command_line_options(parser)
             add_connection_options(parser)
             add_log_options(parser)
+            add_process_options(parser)
           end
 
           private
@@ -101,6 +109,19 @@ module Droonga
               ENV["DROONGA_LOG_LEVEL"] = level
             end
           end
+
+          def add_process_options(parser)
+            parser.separator("")
+            parser.separator("Process:")
+            parser.on("--daemon",
+                      "Run as a daemon") do
+              @daemon = true
+            end
+            parser.on("--pid-file=FILE",
+                      "Put PID to the FILE") do |file|
+              @pid_file = file
+            end
+          end
         end
 
         class Supervisor
@@ -123,7 +144,13 @@ module Droonga
             @heartbeat_socket.bind(@configuration.host,
                                    @configuration.port)
 
-            run_main_loop
+            if @configuration.daemon?
+              Process.daemon
+            end
+
+            write_pid_file do
+              run_main_loop
+            end
           end
 
           private
@@ -203,6 +230,21 @@ module Droonga
             end
 
             succeeded
+          end
+
+          def write_pid_file
+            if @configuration.pid_file
+              File.open(@configuration.pid_file, "w") do |file|
+                file.puts(Process.pid)
+              end
+              begin
+                yield
+              ensure
+                FileUtils.rm_f(@configuration.pid_file)
+              end
+            else
+              yield
+            end
           end
         end
 
