@@ -353,7 +353,8 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "drilldown"                => "a,b",
         "drilldown_output_columns" => "_key,_nsubrecs",
         "drilldown_sortby"         => "-_nsubrecs",
-        "drilldown_offset"         => "0",
+        "drilldown_offset"         => "1",
+        "drilldown_limit"          => "2",
       })
 
       expected_sort_by = {
@@ -388,11 +389,13 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       assert_equal(expected_search_request, convert(select_request))
     end
 
-    def test_pagination
+    def test_only_pagination
       select_request = base_request.merge({
         "drilldown"                => "a,b",
         "drilldown_output_columns" => "_key,_nsubrecs",
         "drilldown_sortby"         => "-_nsubrecs"
+        "drilldown_offset"         => "1",
+        "drilldown_limit"          => "2",
       })
 
       expected_sort_by = {
