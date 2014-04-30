@@ -1,4 +1,105 @@
-#@include fixture/documents.jsons
+#@require-catalog-version 2
+#@disable-logging
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.1",
+    "values": {
+      "title": "Groonga overview"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.2",
+    "values": {
+      "title": "Full text search and Instant update"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.3",
+    "values": {
+      "title": "Column store and aggregate query"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.4",
+    "values": {
+      "title": "Inverted index and tokenizer"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.5",
+    "values": {
+      "title": "Sharable storage and read lock-free"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.6",
+    "values": {
+      "title": "Geo-location (latitude and longitude) search"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.7",
+    "values": {
+      "title": "Groonga library"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.8",
+    "values": {
+      "title": "Groonga server"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "1.9",
+    "values": {
+      "title": "Groonga storage engine"
+    }
+  }
+}
+#@enable-logging
 {
   "type": "search",
   "dataset": "Droonga",
