@@ -30,8 +30,12 @@ Packnga::DocumentTask.new(spec) do |task|
 end
 
 def run_command_test(*options)
+  default_options = []
+  if ENV["TRAVIS"] == "true"
+    default_options.push("--timeout", "3")
+  end
   ruby(File.join(File.dirname(__FILE__), "test", "command", "run-test.rb"),
-       *options)
+       *(default_options + options))
 end
 
 namespace :test do
