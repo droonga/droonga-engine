@@ -30,7 +30,7 @@ Packnga::DocumentTask.new(spec) do |task|
 end
 
 def run_command_test(*options)
-  ruby(File.join(File.dirname(__FILE__), "test", "command", "run-test.rb",),
+  ruby(File.join(File.dirname(__FILE__), "test", "command", "run-test.rb"),
        *options)
 end
 
