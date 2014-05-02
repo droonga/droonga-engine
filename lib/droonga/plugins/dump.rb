@@ -26,6 +26,8 @@ module Droonga
 
       class Handler < Droonga::Handler
         def handle(message)
+          id = message.raw["id"]
+          dataset = message.raw["dataset"]
           replyTo = (message.raw["replyTo"] || {})["to"]
           return false unless replyTo
 
@@ -42,7 +44,8 @@ module Droonga
                   values[key] = value unless key.start_with?("_")
                 end
                 dump_message = {
-                  "dataset" => message.raw["dataset"],
+                  "inReplyTo" => id,
+                  "dataset" => dataset,
                   "body" => {
                     "table" => table.name,
                     "key" => record.key,
@@ -56,6 +59,13 @@ module Droonga
                 Fiber.yield if n.zero?
               end
             end
+            dump_end_message = {
+              "inReplyTo" => id,
+              "dataset" => dataset,
+            }
+            messenger.forward(dump_end_message,
+                              "to" => replyTo,
+                              "type" => "dump.end")
           end
 
           timer = Coolio::TimerWatcher.new(0.1, true)
