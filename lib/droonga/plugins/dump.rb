@@ -33,7 +33,7 @@ module Droonga
           messages_per_seconds = request["messagesPerSecond"] || 10000
           messages_per_seconds = [10, messages_per_seconds.to_i].max
           messages_per_100msec = messages_per_seconds / 10
-          dumper = Enumerator.new do |yielder|
+          dumper = Fiber.new do
             n = 0
             each_table do |table|
               table.each do |record|
@@ -53,7 +53,7 @@ module Droonga
                                   "to" => replyTo,
                                   "type" => "dump.record")
                 n = (n + 1) % messages_per_100msec
-                yielder << nil if n.zero?
+                Fiber.yield if n.zero?
               end
             end
           end
@@ -61,8 +61,8 @@ module Droonga
           timer = Coolio::TimerWatcher.new(0.1, true)
           timer.on_timer do
             begin
-              dumper.next
-            rescue StopIteration
+              dumper.resume
+            rescue FiberError
               timer.detach
             end
           end
