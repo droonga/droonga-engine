@@ -121,7 +121,7 @@ module Droonga
             drilldown_keys = drilldown_keys.split(",")
 
             sort_keys = (select_request["drilldown_sortby"] || "").split(",")
-            columns   = (select_request["drilldown_output_columns"] || "").split(",")
+            columns   = (select_request["drilldown_output_columns"] || "_key,_nsubrecs").split(",")
             offset    = (select_request["drilldown_offset"] || "0").to_i
             limit     = (select_request["drilldown_limit"] || "10").to_i
 
