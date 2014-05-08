@@ -25,11 +25,11 @@ module Droonga
       end
     end
 
-    attr_writer :live_nodes
-
     def run(command_line_arguments)
       parse_command_line_arguments!(command_line_arguments)
       parse_event
+
+      @live_nodes = load_live_nodes(@list_file)
 
       update_live_nodes
       output_live_nodes
@@ -38,10 +38,6 @@ module Droonga
 
     def changed_nodes
       @changed_nodes ||= parse_changed_nodes(@payload)
-    end
-
-    def live_nodes
-      @live_nodes ||= load_live_nodes(@list_file)
     end
 
     private
@@ -95,18 +91,17 @@ module Droonga
     def update_live_nodes
       case @event_name
       when "member-join"
-        nodes = live_nodes
-        live_nodes = nodes.merge(changed_nodes)
+        @live_nodes = @live_nodes.merge(changed_nodes)
       when "member-leave", "member-failed"
         changed_nodes.each do |name, attributes|
-          live_nodes.delete(name)
+          @live_nodes.delete(name)
         end
       # when "user:XXX", "query:XXX"
       end
     end
 
     def output_live_nodes
-      list_file_contents = JSON.pretty_generate(live_nodes)
+      list_file_contents = JSON.pretty_generate(@live_nodes)
       if @list_file
         @list_file.write(list_file_contents)
       else
