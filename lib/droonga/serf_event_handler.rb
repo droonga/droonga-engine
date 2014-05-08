@@ -25,6 +25,10 @@ module Droonga
       end
     end
 
+    def initialize
+      @serf_command = "serf"
+    end
+
     def run(command_line_arguments)
       parse_command_line_arguments!(command_line_arguments)
       parse_event
@@ -41,6 +45,10 @@ module Droonga
                 "Output list of live nodes to FILE") do |file|
         @live_nodes_file = Pathname(file)
       end
+      parser.on("--serf-command=FILE",
+                "Path to the serf command") do |file|
+        @serf_command = file
+      end
 
       parser.parse!(command_line_arguments)
     end
@@ -53,63 +61,24 @@ module Droonga
       when "query"
         @event_name += ":#{ENV["SERF_USER_QUERY"]}"
       end
-
-      @payload = $stdin
     end
 
-    def self_changed?
-      changed_nodes.key?(ENV["SERF_SELF_NAME"])
-    end
-
-    def changed_nodes
-      @changed_nodes ||= parse_changed_nodes
-    end
-
-    def parse_changed_nodes
+    def live_nodes
       nodes = {}
-      @payload.each_line do |node|
-        name, address, role, tags = node.strip.split(/\s+/)
-        nodes[name] = {
-          "address" => address,
-          "role"    => role,
-          "tags"    => tags,
-        }
+      members = system(@serf_command, "members")
+      members.each_line do |member|
+        name, address, status, = member.strip.split(/\s+/)
+        if status == "alive"
+          nodes[name] = {
+            "address" => address,
+          }
+        end
       end
       nodes
     end
 
-    def last_live_nodes
-      return {} if self_changed?
-
-      return {} unless @live_nodes_file
-      return {} unless @live_nodes_file.exist?
-
-      contents = @live_nodes_file.read
-      return {} if contents.empty?
-
-      begin
-        JSON.parse(contents)
-      rescue JSON::ParserError
-        {}
-      end
-    end
-
-    def updated_live_nodes
-      case @event_name
-      when "member-join"
-        last_live_nodes.merge(changed_nodes)
-      when "member-leave", "member-failed"
-        nodes = last_live_nodes
-        changed_nodes.each do |name, attributes|
-          nodes.delete(name)
-        end
-        nodes
-      # when "user:XXX", "query:XXX"
-      end
-    end
-
     def output_live_nodes
-      nodes = updated_live_nodes
+      nodes = live_nodes
       file_contents = JSON.pretty_generate(nodes)
       if @live_nodes_file
         @live_nodes_file.write(file_contents)
