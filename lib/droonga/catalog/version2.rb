@@ -20,7 +20,7 @@ require "droonga/catalog/version2_validator"
 module Droonga
   module Catalog
     class Version2 < Base
-      def initialize(data, path)
+      def initialize(data, path, options={})
         super
         validate
         prepare_data
