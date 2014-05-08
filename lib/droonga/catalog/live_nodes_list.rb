@@ -18,14 +18,13 @@ require "json"
 
 module Droonga
   module Catalog
-    class LiveNodes
-      attr_reader :path, :base_path
+    class LiveNodesList
       def initialize(list_file)
         @list_file = Pathname(list_file)
         @list = parse_list_file
       end
 
-      def live?(node)
+      def live_node?(node)
         @list.key?(node)
       end
 
