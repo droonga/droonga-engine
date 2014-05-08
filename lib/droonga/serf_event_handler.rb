@@ -54,12 +54,12 @@ module Droonga
         @event_name += ":#{ENV["SERF_USER_QUERY"]}"
       end
 
-      @payload = STDIN.read
+      @payload = $stdin
     end
 
     def changed_nodes
       nodes = {}
-      @payload.each_line do |node|
+      @payload.each do |node|
         name, address, role, tags = node.strip.split(/\s+/)
         nodes[name] = {
           "address" => address,
