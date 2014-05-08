@@ -67,7 +67,7 @@ module Droonga
       @payload = STDIN.read
     end
 
-    def parse_changed_nodes
+    def parse_changed_nodes(payload)
       nodes = {}
       payload.each_line do |node|
         name, address, role, tags = node.strip.split(/\s+/)
