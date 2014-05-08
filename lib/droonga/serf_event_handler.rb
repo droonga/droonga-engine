@@ -33,6 +33,7 @@ module Droonga
 
       update_live_nodes
       output_live_nodes
+      0
     end
 
     def changed_nodes
