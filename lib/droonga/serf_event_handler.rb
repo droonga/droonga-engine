@@ -77,7 +77,7 @@ module Droonga
         nodes = JSON.parse(contents) if contents and not contents.empty?
       end
       nodes
-    rescue StandardError, LoadError, SyntaxError => error
+    rescue JSON::ParserError
       {}
     end
 
