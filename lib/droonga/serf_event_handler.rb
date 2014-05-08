@@ -58,7 +58,7 @@ module Droonga
     end
 
     def self_changed?
-      changed_nodes.keys.include?(ENV["SERF_SELF_NAME"])
+      changed_nodes.key?(ENV["SERF_SELF_NAME"])
     end
 
     def changed_nodes
