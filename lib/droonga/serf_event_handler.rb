@@ -29,15 +29,8 @@ module Droonga
       parse_command_line_arguments!(command_line_arguments)
       parse_event
 
-      @live_nodes = load_live_nodes(@live_nodes_file)
-
-      update_live_nodes
       output_live_nodes
-      0
-    end
-
-    def changed_nodes
-      @changed_nodes ||= parse_changed_nodes(@payload)
+      true
     end
 
     private
@@ -64,9 +57,9 @@ module Droonga
       @payload = STDIN.read
     end
 
-    def parse_changed_nodes(payload)
+    def changed_nodes
       nodes = {}
-      payload.each_line do |node|
+      @payload.each_line do |node|
         name, address, role, tags = node.strip.split(/\s+/)
         nodes[name] = {
           "address" => address,
@@ -77,10 +70,10 @@ module Droonga
       nodes
     end
 
-    def load_live_nodes(file)
+    def last_live_nodes
       nodes = {}
-      if file
-        contents = file.read
+      if @live_nodes_file
+        contents = @live_nodes_file.read
         nodes = JSON.parse(contents) if contents and not contents.empty?
       end
       nodes
@@ -88,20 +81,23 @@ module Droonga
       {}
     end
 
-    def update_live_nodes
+    def updated_live_nodes
       case @event_name
       when "member-join"
-        @live_nodes = @live_nodes.merge(changed_nodes)
+        last_live_nodes.merge(changed_nodes)
       when "member-leave", "member-failed"
+        nodes = last_live_nodes
         changed_nodes.each do |name, attributes|
-          @live_nodes.delete(name)
+          nodes.delete(name)
         end
+        nodes
       # when "user:XXX", "query:XXX"
       end
     end
 
     def output_live_nodes
-      file_contents = JSON.pretty_generate(@live_nodes)
+      nodes = updated_live_nodes
+      file_contents = JSON.pretty_generate(nodes)
       if @live_nodes_file
         @live_nodes_file.write(file_contents)
       else
