@@ -71,14 +71,17 @@ module Droonga
     end
 
     def last_live_nodes
-      nodes = {}
-      if @live_nodes_file
-        contents = @live_nodes_file.read
-        nodes = JSON.parse(contents) if contents and not contents.empty?
+      return {} unless @live_nodes_file
+      return {} unless @live_nodes_file.exist?
+
+      contents = @live_nodes_file.read
+      return {} if contents.empty?
+
+      begin
+        JSON.parse(contents)
+      rescue JSON::ParserError
+        {}
       end
-      nodes
-    rescue JSON::ParserError
-      {}
     end
 
     def updated_live_nodes
