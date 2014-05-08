@@ -26,8 +26,12 @@ module Droonga
     include Loggable
 
     def initialize(loop, name)
-      @state = EngineState.new(loop, name)
-      @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
+      @state = EngineState.new(loop, name, options={})
+      observer_options = {
+        :live_nodes_list => options[:live_nodes_list],
+      }
+      observer = Droonga::CatalogObserver.new(@state.loop, observer_options)
+      @catalog_observer = observer
       @catalog_observer.on_reload = lambda do |catalog|
         graceful_restart(catalog)
         logger.info("restarted")

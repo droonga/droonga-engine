@@ -357,7 +357,10 @@ module Droonga
           end
 
           def run_engine
-            @engine = Engine.new(@loop, @configuration.engine_name)
+            engine_options = {
+              :live_nodes_file => @configuration.live_nodes_file,
+            }
+            @engine = Engine.new(@loop, @configuration.engine_name, engine_options)
             @engine.start
           end
 

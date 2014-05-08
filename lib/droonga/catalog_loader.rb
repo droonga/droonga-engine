@@ -20,8 +20,9 @@ require "droonga/catalog/version2"
 
 module Droonga
   class CatalogLoader
-    def initialize(path)
+    def initialize(path, options={})
       @path = path
+      @options = options
     end
 
     def load
@@ -45,7 +46,10 @@ module Droonga
       when 1
         Catalog::Version1.new(data, @path)
       when 2
-        Catalog::Version2.new(data, @path)
+        catalog_options = {
+          :live_nodes_file => @options[:live_nodes_file],
+        }
+        Catalog::Version2.new(data, @path, catalog_options)
       when nil
         raise Error.new("Catalog version must be specified in #{@path}")
       else
