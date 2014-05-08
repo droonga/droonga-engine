@@ -15,7 +15,7 @@
 
 require "pathname"
 require "json"
-require "dronga/live_nodes_list"
+require "droonga/live_nodes_list"
 
 module Droonga
   class LiveNodesListLoader
