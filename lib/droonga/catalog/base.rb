@@ -24,10 +24,9 @@ module Droonga
   module Catalog
     class Base
       attr_reader :path, :base_path
-      def initialize(data, path, options={})
+      def initialize(data, path)
         @data = data
         @path = path
-        @options = options
         @base_path = File.dirname(path)
       end
 

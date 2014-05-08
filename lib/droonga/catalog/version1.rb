@@ -19,7 +19,7 @@ require "droonga/catalog/dataset"
 module Droonga
   module Catalog
     class Version1 < Base
-      def initialize(data, path, options={})
+      def initialize(data, path)
         super
         @errors = []
 

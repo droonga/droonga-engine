@@ -28,10 +28,9 @@ module Droonga
     attr_reader :catalog
     attr_accessor :on_reload
 
-    def initialize(loop, options={})
+    def initialize(loop)
       @loop = loop
       @catalog_path = catalog_path
-      @options = options
       load_catalog!
     end
 
@@ -69,10 +68,7 @@ module Droonga
     end
 
     def load_catalog!
-      loader_options = {
-        :live_nodes_file => @options[:live_nodes_file],
-      }
-      loader = CatalogLoader.new(@catalog_path, loader_options)
+      loader = CatalogLoader.new(@catalog_path)
       @catalog = loader.load
       logger.info("loaded", :path => @catalog_path, :mtime => @catalog_mtime)
     ensure
