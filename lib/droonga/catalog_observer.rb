@@ -23,6 +23,7 @@ module Droonga
     include Loggable
 
     DEFAULT_CATALOG_PATH = "catalog.json"
+    DEFAULT_LIVE_NODES_LIST_PATH = "live-nodes.json"
     CHECK_INTERVAL = 1
 
     attr_reader :catalog
@@ -58,9 +59,13 @@ module Droonga
       end
     end
 
+    def base_path
+      ENV["DROONGA_BASE_DIR"]
+    end
+
     def catalog_path
       path = ENV["DROONGA_CATALOG"] || DEFAULT_CATALOG_PATH
-      File.expand_path(path)
+      File.expand_path(path, base_path)
     end
 
     def catalog_updated?
@@ -73,6 +78,11 @@ module Droonga
       logger.info("loaded", :path => @catalog_path, :mtime => @catalog_mtime)
     ensure
       @catalog_mtime = File.mtime(@catalog_path)
+    end
+
+    def live_nodes_list_path
+      path = ENV["DROONGA_LIVE_NODES_LIST"] || DEFAULT_LIVE_NODES_LIST_PATH
+      File.expand_path(path, base_path)
     end
 
     private
