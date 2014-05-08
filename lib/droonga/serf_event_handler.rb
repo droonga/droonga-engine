@@ -29,7 +29,7 @@ module Droonga
       parse_command_line_arguments!(command_line_arguments)
       parse_event
 
-      @live_nodes = load_live_nodes(@list_file)
+      @live_nodes = load_live_nodes(@live_nodes_file)
 
       update_live_nodes
       output_live_nodes
@@ -44,9 +44,9 @@ module Droonga
     def parse_command_line_arguments!(command_line_arguments)
       parser = OptionParser.new
 
-      parser.on("--list-file=FILE",
+      parser.on("--live-nodes-file=FILE",
                 "Output list of live nodes to FILE") do |file|
-        @list_file = Pathname(file)
+        @live_nodes_file = Pathname(file)
       end
 
       parser.parse!(command_line_arguments)
@@ -101,11 +101,11 @@ module Droonga
     end
 
     def output_live_nodes
-      list_file_contents = JSON.pretty_generate(@live_nodes)
-      if @list_file
-        @list_file.write(list_file_contents)
+      file_contents = JSON.pretty_generate(@live_nodes)
+      if @live_nodes_file
+        @live_nodes_file.write(file_contents)
       else
-        puts list_file_contents
+        puts file_contents
       end
     end
   end
