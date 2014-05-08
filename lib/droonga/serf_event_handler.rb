@@ -57,7 +57,15 @@ module Droonga
       @payload = $stdin
     end
 
+    def self_changed?
+      changed_nodes.keys.include?(ENV["SERF_SELF_NAME"])
+    end
+
     def changed_nodes
+      @changed_nodes ||= parse_changed_nodes
+    end
+
+    def parse_changed_nodes
       nodes = {}
       @payload.each_line do |node|
         name, address, role, tags = node.strip.split(/\s+/)
@@ -71,6 +79,8 @@ module Droonga
     end
 
     def last_live_nodes
+      return {} if self_changed?
+
       return {} unless @live_nodes_file
       return {} unless @live_nodes_file.exist?
 
