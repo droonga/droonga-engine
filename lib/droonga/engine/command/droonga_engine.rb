@@ -17,6 +17,7 @@ require "optparse"
 require "socket"
 require "ipaddr"
 require "fileutils"
+require "pathname"
 
 require "droonga/engine"
 require "droonga/event_loop"
@@ -35,11 +36,12 @@ module Droonga
           DEFAULT_HOST = Socket.gethostname
           DEFAULT_PORT = 10031
 
-          attr_reader :host, :port, :tag, :log_file, :pid_file
+          attr_reader :host, :port, :tag, :live_nodes_file, :log_file, :pid_file
           def initialize
             @host = DEFAULT_HOST
             @port = DEFAULT_PORT
             @tag = "droonga"
+            @live_nodes_file = nil
             @log_file = nil
             @daemon = false
             @pid_file = nil
@@ -63,12 +65,18 @@ module Droonga
           end
 
           def to_command_line
-            [
+            command_line_options = [
               "--host", @host,
               "--port", @port.to_s,
               "--tag", @tag,
               "--log-level", log_level,
             ]
+            if live_nodes_file
+              command_line_options += [
+                "--live-nodes-file", live_nodes_file.to_s,
+              ]
+            end
+            command_line_options
           end
 
           def add_command_line_options(parser)
@@ -95,6 +103,10 @@ module Droonga
                       "The tag of the Droonga engine",
                       "(#{@tag})") do |tag|
               @tag = tag
+            end
+            parser.on("--live-nodes-file=FILE",
+                      "Path to the list file of live nodes") do |file|
+              @live_nodes_file = Pathname(file)
             end
           end
 
