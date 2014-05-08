@@ -59,7 +59,7 @@ module Droonga
 
     def changed_nodes
       nodes = {}
-      @payload.each do |node|
+      @payload.each_line do |node|
         name, address, role, tags = node.strip.split(/\s+/)
         nodes[name] = {
           "address" => address,
