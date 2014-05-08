@@ -95,7 +95,8 @@ module Droonga
     def update_live_nodes
       case @event_name
       when "member-join"
-        live_nodes = live_nodes.merge(changed_nodes)
+        nodes = live_nodes
+        live_nodes = nodes.merge(changed_nodes)
       when "member-leave", "member-failed"
         changed_nodes.each do |name, attributes|
           live_nodes.delete(name)
