@@ -66,20 +66,6 @@ module Droonga
         return results
       end
 
-      def select_range_and_replicas(partition, args, routes)
-        date_range = args["date_range"] || 0..-1
-        partition["partitions"].sort[date_range].each do |time, replicas|
-          case args["replica"]
-          when "top"
-            routes << replicas[0]
-          when "random"
-            routes << replicas[rand(replicas.size)]
-          when "all"
-            routes.concat(replicas)
-          end
-        end
-      end
-
       def all_nodes
         nodes = @data["zones"].collect do |zone|
           zone.split("/").first
@@ -428,6 +414,20 @@ module Droonga
             end
           end
           return continuum[max][1]
+        end
+
+        def select_range_and_replicas(partition, args, routes)
+          date_range = args["date_range"] || 0..-1
+          partition["partitions"].sort[date_range].each do |time, replicas|
+            case args["replica"]
+            when "top"
+              routes << replicas[0]
+            when "random"
+              routes << replicas[rand(replicas.size)]
+            when "all"
+              routes.concat(replicas)
+            end
+          end
         end
       end
     end
