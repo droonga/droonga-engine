@@ -28,4 +28,13 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
     assert_equal("127.0.0.1:10047/volume.000",
                  volume.address)
   end
+
+  def test_all_nodes
+    data = {
+      "address" => "127.0.0.1:10047/volume.000",
+    }
+    volume = create_single_volume(data)
+    assert_equal(["127.0.0.1:10047"],
+                 volume.all_nodes)
+  end
 end

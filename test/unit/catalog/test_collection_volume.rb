@@ -100,4 +100,20 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       end
     end
   end
+
+  class NodesTest < self
+    def test_all_nodes
+      data = {
+        "slices" => [
+          { "volume": { "address": "127.0.0.1:23003/droonga.000" } },
+          { "volume": { "address": "127.0.0.1:23003/droonga.001" } },
+          { "volume": { "address": "127.0.0.1:23004/droonga.100" } },
+          { "volume": { "address": "127.0.0.1:23004/droonga.101" } },
+        ],
+      }
+      volume = create_collection_volume(data)
+      assert_equal(["127.0.0.1:23003", "127.0.0.1:23004"],
+                   volume.all_nodes)
+    end
+  end
 end
