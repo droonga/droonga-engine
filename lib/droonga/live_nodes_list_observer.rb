@@ -13,6 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "listen"
 require "droonga/loggable"
 require "droonga/live_nodes_list_loader"
 
@@ -22,10 +23,20 @@ module Droonga
 
     attr_accessor :on_update
 
+    def initialize
+      @listener = Listen.to(directory_path) do |modified, added, removed|
+        if added == file_path or modified == file_path
+          load_list!
+        end
+      end
+    end
+
     def start
+      @listener.start
     end
 
     def stop
+      @listener.stop
     end
 
     DEFAULT_LIST_PATH = "live-nodes.json"
@@ -37,6 +48,10 @@ module Droonga
     def file_path
       path = ENV["DROONGA_LIVE_NODES_LIST"] || DEFAULT_LIST_PATH
       File.expand_path(path, base_path)
+    end
+
+    def directory_path
+      File.dirname(file_path)
     end
 
     def load_list!
