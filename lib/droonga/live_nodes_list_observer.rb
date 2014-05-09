@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (C) 2014 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
@@ -13,38 +15,43 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "pathname"
-require "json"
+require "droonga/loggable"
+require "droonga/live_nodes_list_loader"
 
 module Droonga
-  class LiveNodesListLoader
-    def initialize(file_path)
-      @file_path = file_path
+  class LiveNodesListObserver
+    include Loggable
+
+    attr_accessor :on_update
+
+    def start
     end
 
-    def load
-      list_file = Pathname(file_path)
-      list = parse_list_file(list_file)
-      list.keys
+    def stop
+    end
+
+    DEFAULT_LIST_PATH = "live-nodes.json"
+
+    def base_path
+      ENV["DROONGA_BASE_DIR"]
+    end
+
+    def file_path
+      path = ENV["DROONGA_LIVE_NODES_LIST"] || DEFAULT_LIST_PATH
+      File.expand_path(path, base_path)
+    end
+
+    def load_list!
+      loader = LiveNodesListLoader.new(file_path)
+      live_nodes = loader.load
+      logger.info("loaded", :path => file_path, :live_nodes => live_nodes)
+
+      on_update.call(live_nodes) if on_update
     end
 
     private
-    def parse_list_file(list_file)
-      return default_list unless list_file
-      return default_list unless list_file.exist?
-
-      contents = list_file.read
-      return default_list if contents.empty?
-
-      begin
-        JSON.parse(contents).keys
-      rescue JSON::ParserError
-        default_list
-      end
-    end
-
-    def default_list
-      {}
+    def log_tag
+      "live-nodes-list-observer"
     end
   end
 end

@@ -24,7 +24,6 @@ require "droonga/farm"
 require "droonga/session"
 require "droonga/error_messages"
 require "droonga/distributor"
-require "droonga/live_nodes_list_loader"
 
 module Droonga
   class Dispatcher
@@ -48,9 +47,12 @@ module Droonga
       end
     end
 
+    attr_accessor :live_nodes
+
     def initialize(engine_state, catalog)
       @engine_state = engine_state
       @catalog = catalog
+      @live_nodes = catalog.all_nodes
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
                        :dispatcher => self)
@@ -58,7 +60,6 @@ module Droonga
       @step_runners = create_step_runners
       @forwarder = @engine_state.forwarder
       @replier = @engine_state.replier
-      # @live_nodes = LiveNodesListLoader.load
     end
 
     def start

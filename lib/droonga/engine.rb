@@ -20,6 +20,7 @@ require "droonga/loggable"
 require "droonga/engine_state"
 require "droonga/catalog_observer"
 require "droonga/dispatcher"
+require "droonga/live_nodes_list_observer"
 
 module Droonga
   class Engine
@@ -27,19 +28,27 @@ module Droonga
 
     def initialize(loop, name)
       @state = EngineState.new(loop, name)
-      observer = Droonga::CatalogObserver.new(@state.loop)
-      @catalog_observer = observer
+
+      @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
       @catalog_observer.on_reload = lambda do |catalog|
         graceful_restart(catalog)
         logger.info("restarted")
+      end
+
+      @live_nodes_list_observer = LiveNodesListObserver.new
+      @live_nodes_list_observer.on_update = lambda do |live_nodes|
+        @live_nodes = live_nodes
+        @dispatcher.live_nodes = live_nodes if @dispatcher
       end
     end
 
     def start
       logger.trace("start: start")
       @state.start
+      @live_nodes_list_observer.start
       @catalog_observer.start
       catalog = @catalog_observer.catalog
+      @live_nodes = catalog.all_nodes
       @dispatcher = create_dispatcher(catalog)
       @dispatcher.start
       logger.trace("start: done")
@@ -48,6 +57,7 @@ module Droonga
     def shutdown
       logger.trace("shutdown: start")
       @catalog_observer.stop
+      @live_nodes_list_observer.stop
       @dispatcher.shutdown
       @state.shutdown
       logger.trace("shutdown: done")
@@ -59,7 +69,9 @@ module Droonga
 
     private
     def create_dispatcher(catalog)
-      Dispatcher.new(@state, catalog)
+      dispatcher = Dispatcher.new(@state, catalog)
+      dispatcher.live_nodes = @live_nodes
+      dispatcher
     end
 
     def graceful_restart(catalog)
