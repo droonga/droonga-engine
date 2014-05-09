@@ -39,14 +39,15 @@ module Droonga
         to_a.hash
       end
 
-      def select(how=nil)
+      def select(how=nil, live_nodes=nil)
+        volumes = live_volumes(live_nodes)
         case how
         when :top
-          [@volumes.first]
+          [volumes.first]
         when :random
-          [@volumes.sample]
+          [volumes.sample]
         when :all
-          @volumes
+          volumes
         else
           super
         end
@@ -54,6 +55,15 @@ module Droonga
 
       def all_nodes
         @all_nodes ||= collect_all_nodes
+      end
+
+      def live_volumes(live_nodes=nil)
+        return @volumes unless live_nodes
+
+        @volumes.select do |volume|
+          dead_nodes = volume.all_nodes - live_nodes
+          dead_nodes.empty?
+        end
       end
 
       private
