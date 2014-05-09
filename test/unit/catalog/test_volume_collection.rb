@@ -47,4 +47,32 @@ class CatalogVolumeCollectionTest < Test::Unit::TestCase
                    @collection.select(:all))
     end
   end
+
+  class NodesTest < self
+    def create_volume_collection(volumes)
+      volumes = volumes.collect do |volume|
+        create_single_volume(volume)
+      end
+      super(volumes)
+    end
+
+    def create_single_volume(data)
+      Droonga::Catalog::SingleVolume.new(data)
+    end
+
+    def setup
+      volumes = [
+        { "address" => "volume1:10047/droonga.000" },
+        { "address" => "volume1:10047/droonga.001" },
+        { "address" => "volume2:10047/droonga.002" },
+        { "address" => "volume2:10047/droonga.003" },
+      ]
+      @collection = create_volume_collection(volumes)
+    end
+
+    def test_all_nodes
+      assert_equal(["volume1:10047", "volume2:10047"],
+                   @collection.all_nodes)
+    end
+  end
 end
