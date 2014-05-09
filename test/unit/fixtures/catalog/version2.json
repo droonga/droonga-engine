@@ -32,7 +32,7 @@
                 "address": "localhost:23003/test.002"
               }
             }
-	  ]
+          ]
         },
         {
           "slices": [
@@ -54,7 +54,7 @@
                 "address": "localhost:23004/test.012"
               }
             }
-	  ]
+          ]
         }
       ]
     }
