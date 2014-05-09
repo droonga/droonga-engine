@@ -116,9 +116,8 @@ module Droonga
       end
 
       def all_nodes
-        nodes = []
-        @datasets.each do |name, dataset|
-          nodes += dataset.all_nodes
+        nodes = @data["zones"].collect do |zone|
+          nodes << zone.split("/").first
         end
         nodes.sort.uniq
       end
