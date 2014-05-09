@@ -23,6 +23,6 @@ module Droonga
       def live_node?(node)
         @list.key?(node)
       end
-    emd
+    end
   end
 end
