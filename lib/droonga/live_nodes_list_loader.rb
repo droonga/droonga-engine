@@ -15,7 +15,6 @@
 
 require "pathname"
 require "json"
-require "droonga/live_nodes_list"
 
 module Droonga
   class LiveNodesListLoader
@@ -33,7 +32,7 @@ module Droonga
     def load
       list_file = Pathname(file_path)
       list = parse_list_file(list_file)
-      LiveNodesList.new(list)
+      list.keys
     end
 
     private
