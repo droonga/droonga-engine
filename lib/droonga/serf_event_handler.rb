@@ -16,6 +16,7 @@
 require "optparse"
 require "pathname"
 require "json"
+require "droonga/live_nodes_list_observer"
 
 module Droonga
   class SerfEventHandler
@@ -41,9 +42,9 @@ module Droonga
     def parse_command_line_arguments!(command_line_arguments)
       parser = OptionParser.new
 
-      parser.on("--live-nodes-file=FILE",
-                "Output list of live nodes to FILE") do |file|
-        @live_nodes_file = Pathname(file)
+      parser.on("--base-dir=DIR",
+                "Path to the directory the list is saved to") do |dir|
+        @base_dir = Pathname(dir)
       end
       parser.on("--serf-command=FILE",
                 "Path to the serf command") do |file|
@@ -77,11 +78,19 @@ module Droonga
       nodes
     end
 
+    def list_file
+      @list_file ||= @base_dir + LiveNodesListObserver::DEFAULT_LIST_PATH
+    end
+
+    def output_to_file?
+      not @base_dir.nil?
+    end
+
     def output_live_nodes
       nodes = live_nodes
       file_contents = JSON.pretty_generate(nodes)
-      if @live_nodes_file
-        @live_nodes_file.write(file_contents)
+      if output_to_file?
+        list_file.write(file_contents)
       else
         puts file_contents
       end
