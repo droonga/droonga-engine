@@ -23,7 +23,7 @@ module Droonga
     end
 
     def load
-      list_file = Pathname(file_path)
+      list_file = Pathname(@file_path)
       list = parse_list_file(list_file)
       list.keys
     end
