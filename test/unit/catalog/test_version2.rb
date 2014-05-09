@@ -120,5 +120,12 @@ class CatalogVersion2Test < Test::Unit::TestCase
 
       end
     end
+
+    class NodesTest < self
+      def test_all_nodes
+        assert_equal(["localhost:23003", "localhost:23004"],
+                     @catalog.all_nodes)
+      end
+    end
   end
 end

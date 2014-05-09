@@ -61,11 +61,6 @@ class CatalogVersion1Test < Test::Unit::TestCase
                    partitions)
     end
 
-    def test_all_nodes
-      assert_equal(["localhost:23003", "localhost:23004"],
-                   @catalog.all_nodes)
-    end
-
     def fixture_path(base_path)
       File.expand_path("../../fixtures/#{base_path}", __FILE__)
     end
@@ -126,6 +121,13 @@ class CatalogVersion1Test < Test::Unit::TestCase
         assert_equal([["search", "groonga", "add"]],
                      plugins(@data))
 
+      end
+    end
+
+    class NodesTest < self
+      def test_all_nodes
+        assert_equal(["localhost:23003", "localhost:23004"],
+                     @catalog.all_nodes)
       end
     end
   end
