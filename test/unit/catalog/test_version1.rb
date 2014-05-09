@@ -62,7 +62,7 @@ class CatalogVersion1Test < Test::Unit::TestCase
     end
 
     def test_all_nodes
-      assert_equal(["localhost:23004", "localhost:23003"],
+      assert_equal(["localhost:23003", "localhost:23004"],
                    @catalog.all_nodes)
     end
 
