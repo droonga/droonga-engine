@@ -62,6 +62,27 @@ module Droonga
         replicas.all_nodes
       end
 
+      def get_routes(args)
+        routes = []
+        case args["type"]
+        when "broadcast"
+          volumes = replicas.select(args["replica"].to_sym)
+          volumes.each do |volume|
+            slices = volume.select_slices
+            slices.each do |slice|
+              routes << slice.volume.address
+            end
+          end
+        when "scatter"
+          volumes = replicas.select(args["replica"].to_sym)
+          volumes.each do |volume|
+            slice = volume.choose_slice(args["record"])
+            routes << slice.volume.address
+          end
+        end
+        routes
+      end
+
       private
       def create_volumes(raw_volumes)
         raw_volumes.collect do |raw_volume|

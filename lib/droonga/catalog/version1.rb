@@ -66,41 +66,6 @@ module Droonga
         return results
       end
 
-      def get_routes(name, args)
-        routes = []
-        dataset = dataset(name)
-        case args["type"]
-        when "broadcast"
-          dataset["ring"].each do |key, partition|
-            select_range_and_replicas(partition, args, routes)
-          end
-        when "scatter"
-          name = get_partition(dataset, args["record"]["_key"])
-          partition = dataset["ring"][name]
-          select_range_and_replicas(partition, args, routes)
-        end
-        return routes
-      end
-
-      def get_partition(dataset, key)
-        continuum = dataset["continuum"]
-        return dataset["ring"].keys[0] unless continuum
-        hash = Zlib.crc32(key)
-        min = 0
-        max = continuum.size - 1
-        while (min < max) do
-          index = (min + max) / 2
-          value, key = continuum[index]
-          return key if value == hash
-          if value > hash
-            max = index
-          else
-            min = index + 1
-          end
-        end
-        return continuum[max][1]
-      end
-
       def select_range_and_replicas(partition, args, routes)
         date_range = args["date_range"] || 0..-1
         partition["partitions"].sort[date_range].each do |time, replicas|
@@ -427,6 +392,42 @@ module Droonga
               end
             end
           end
+        end
+      end
+
+      class Dataset < Catalog::Dataset
+        def get_routes(args)
+          routes = []
+          case args["type"]
+          when "broadcast"
+            self["ring"].each do |key, partition|
+              select_range_and_replicas(partition, args, routes)
+            end
+          when "scatter"
+            name = get_partition(args["record"]["_key"])
+            partition = self["ring"][name]
+            select_range_and_replicas(partition, args, routes)
+          end
+          return routes
+        end
+
+        def get_partition(key)
+          continuum = self["continuum"]
+          return self["ring"].keys[0] unless continuum
+          hash = Zlib.crc32(key)
+          min = 0
+          max = continuum.size - 1
+          while (min < max) do
+            index = (min + max) / 2
+            value, key = continuum[index]
+            return key if value == hash
+            if value > hash
+              max = index
+            else
+              min = index + 1
+            end
+          end
+          return continuum[max][1]
         end
       end
     end

@@ -167,9 +167,9 @@ module Droonga
       id = @engine_state.generate_id
       destinations = {}
       steps.each do |step|
-        dataset = step["dataset"]
+        dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = @catalog.get_routes(dataset, step)
+          routes = dataset.get_routes(step)
           step["routes"] = routes
         else
           step["routes"] ||= [id]

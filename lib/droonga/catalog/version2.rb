@@ -57,28 +57,6 @@ module Droonga
         results
       end
 
-      def get_routes(name, args)
-        routes = []
-        dataset = dataset(name)
-        case args["type"]
-        when "broadcast"
-          volumes = dataset.replicas.select(args["replica"].to_sym)
-          volumes.each do |volume|
-            slices = volume.select_slices
-            slices.each do |slice|
-              routes << slice.volume.address
-            end
-          end
-        when "scatter"
-          volumes = dataset.replicas.select(args["replica"].to_sym)
-          volumes.each do |volume|
-            slice = volume.choose_slice(args["record"])
-            routes << slice.volume.address
-          end
-        end
-        routes
-      end
-
       def all_nodes
         nodes = []
         @datasets.each do |name, dataset|
