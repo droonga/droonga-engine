@@ -105,10 +105,10 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
     def test_all_nodes
       data = {
         "slices" => [
-          { "volume": { "address": "127.0.0.1:23003/droonga.000" } },
-          { "volume": { "address": "127.0.0.1:23003/droonga.001" } },
-          { "volume": { "address": "127.0.0.1:23004/droonga.100" } },
-          { "volume": { "address": "127.0.0.1:23004/droonga.101" } },
+          { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
+          { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+          { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
+          { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
         ],
       }
       volume = create_collection_volume(data)
