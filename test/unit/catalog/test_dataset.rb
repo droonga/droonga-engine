@@ -101,4 +101,36 @@ class CatalogDatasetTest < Test::Unit::TestCase
                    dataset.replicas)
     end
   end
+
+  class NodesTest < self
+    def test_all_nodes
+      data = {
+        "replicas" => [
+         {
+            "dimension" =>"_key",
+            "slicer" =>"hash",
+            "slices" =>[
+              { "volume" =>{ "address" =>"127.0.0.1:23003/droonga.000" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23004/droonga.001" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23003/droonga.002" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23005/droonga.003" } },
+            ],
+          },
+         {
+            "dimension" =>"_key",
+            "slicer" =>"hash",
+            "slices" =>[
+              { "volume" =>{ "address" =>"127.0.0.1:23004/droonga.000" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23005/droonga.001" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23003/droonga.002" } },
+              { "volume" =>{ "address" =>"127.0.0.1:23004/droonga.003" } },
+            ],
+          },
+        ],
+      }
+      dataset = create_dataset(data)
+      assert_equal(["127.0.0.1:23003", "127.0.0.1:23004", "127.0.0.1:23005"],
+                   dataset.all_nodes)
+    end
+  end
 end
