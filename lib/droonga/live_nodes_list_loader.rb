@@ -18,6 +18,12 @@ require "json"
 
 module Droonga
   class LiveNodesListLoader
+    class << self
+      def load
+        new.load
+      end
+    end
+
     DEFAULT_LIST_PATH = "live-nodes.json"
 
     def base_path

@@ -62,11 +62,11 @@ module Droonga
         @all_nodes ||= replicas.all_nodes
       end
 
-      def get_routes(args)
+      def get_routes(args, live_nodes=nil)
         routes = []
         case args["type"]
         when "broadcast"
-          volumes = replicas.select(args["replica"].to_sym, args["live_nodes"])
+          volumes = replicas.select(args["replica"].to_sym, live_nodes)
           volumes.each do |volume|
             slices = volume.select_slices
             slices.each do |slice|
@@ -74,7 +74,7 @@ module Droonga
             end
           end
         when "scatter"
-          volumes = replicas.select(args["replica"].to_sym, args["live_nodes"])
+          volumes = replicas.select(args["replica"].to_sym, live_nodes)
           volumes.each do |volume|
             slice = volume.choose_slice(args["record"])
             routes << slice.volume.address

@@ -24,6 +24,7 @@ require "droonga/farm"
 require "droonga/session"
 require "droonga/error_messages"
 require "droonga/distributor"
+require "droonga/live_nodes_list_loader"
 
 module Droonga
   class Dispatcher
@@ -57,6 +58,7 @@ module Droonga
       @step_runners = create_step_runners
       @forwarder = @engine_state.forwarder
       @replier = @engine_state.replier
+      # @live_nodes = LiveNodesListLoader.load
     end
 
     def start
@@ -169,7 +171,7 @@ module Droonga
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = dataset.get_routes(step)
+          routes = dataset.get_routes(step, @live_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
