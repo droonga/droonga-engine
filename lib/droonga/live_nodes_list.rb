@@ -19,7 +19,7 @@ module Droonga
       @list = list
     end
 
-    def live_node?(node)
+    def include?(node)
       @list.key?(node)
     end
   end
