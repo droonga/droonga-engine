@@ -38,7 +38,7 @@ module Droonga
       end
 
       def all_nodes
-        volume.all_nodes
+        @all_nodes ||= volume.all_nodes
       end
     end
   end

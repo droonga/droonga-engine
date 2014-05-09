@@ -67,10 +67,7 @@ module Droonga
       end
 
       def all_nodes
-        nodes = @data["zones"].collect do |zone|
-          zone.split("/").first
-        end
-        nodes.sort.uniq
+        @all_nodes ||= collect_all_nodes
       end
 
       private
@@ -98,6 +95,13 @@ module Droonga
         dataset["ring"].reduce(0) do |result, zone|
           result + zone[1]["weight"]
         end
+      end
+
+      def collect_all_nodes
+        nodes = @data["zones"].collect do |zone|
+          zone.split("/").first
+        end
+        nodes.sort.uniq
       end
 
       def validate

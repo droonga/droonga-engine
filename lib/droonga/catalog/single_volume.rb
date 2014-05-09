@@ -25,7 +25,7 @@ module Droonga
       end
 
       def all_nodes
-        [address.split("/").first]
+        @all_nodes ||= [address.split("/").first]
       end
     end
   end

@@ -70,11 +70,7 @@ module Droonga
       end
 
       def all_nodes
-        nodes = []
-        slices.each do |slice|
-          nodes += slice.all_nodes
-        end
-        nodes.uniq.sort
+        @all_nodes ||= collect_all_nodes
       end
 
       private
@@ -108,6 +104,14 @@ module Droonga
         else
           key
         end
+      end
+
+      def collect_all_nodes
+        nodes = []
+        slices.each do |slice|
+          nodes += slice.all_nodes
+        end
+        nodes.uniq.sort
       end
     end
   end

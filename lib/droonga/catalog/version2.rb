@@ -58,11 +58,7 @@ module Droonga
       end
 
       def all_nodes
-        nodes = []
-        @datasets.each do |name, dataset|
-          nodes += dataset.all_nodes
-        end
-        nodes.sort.uniq
+        @all_nodes ||= collect_all_nodes
       end
 
       private
@@ -76,6 +72,14 @@ module Droonga
         @data["datasets"].each do |name, dataset|
           @datasets[name] = Dataset.new(name, dataset)
         end
+      end
+
+      def collect_all_nodes
+        nodes = []
+        @datasets.each do |name, dataset|
+          nodes += dataset.all_nodes
+        end
+        nodes.sort.uniq
       end
     end
   end

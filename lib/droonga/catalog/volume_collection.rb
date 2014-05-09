@@ -53,6 +53,11 @@ module Droonga
       end
 
       def all_nodes
+        @all_nodes ||= collect_all_nodes
+      end
+
+      private
+      def collect_all_nodes
         nodes = []
         @volumes.each do |volume|
           nodes += volume.all_nodes
