@@ -16,6 +16,7 @@
 require "optparse"
 require "pathname"
 require "json"
+require "fileutils"
 require "droonga/live_nodes_list_observer"
 
 module Droonga
@@ -90,6 +91,7 @@ module Droonga
       nodes = live_nodes
       file_contents = JSON.pretty_generate(nodes)
       if output_to_file?
+        FileUtils.mkdir_p(list_file.parent.to_s)
         list_file.write(file_contents)
       else
         puts file_contents
