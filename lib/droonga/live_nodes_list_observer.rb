@@ -25,7 +25,8 @@ module Droonga
 
     def initialize
       @listener = Listen.to(directory_path) do |modified, added, removed|
-        if added == file_path or modified == file_path
+        if added.include?(file_path) or
+             modified.include?(file_path)
           load_list!
         end
       end
@@ -46,8 +47,7 @@ module Droonga
     end
 
     def file_path
-      path = ENV["DROONGA_LIVE_NODES_LIST"] || DEFAULT_LIST_PATH
-      File.expand_path(path, base_path)
+      @file_path ||= prepare_file_path
     end
 
     def directory_path
@@ -63,6 +63,11 @@ module Droonga
     end
 
     private
+    def prepare_file_path
+      path = ENV["DROONGA_LIVE_NODES_LIST"] || DEFAULT_LIST_PATH
+      File.expand_path(path, base_path)
+    end
+
     def log_tag
       "live-nodes-list-observer"
     end
