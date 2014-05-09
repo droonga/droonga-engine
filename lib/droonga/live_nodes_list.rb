@@ -14,15 +14,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 module Droonga
-  module Catalog
-    class LiveNodesList
-      def initialize(list)
-        @list = list
-      end
+  class LiveNodesList
+    def initialize(list)
+      @list = list
+    end
 
-      def live_node?(node)
-        @list.key?(node)
-      end
+    def live_node?(node)
+      @list.key?(node)
     end
   end
 end

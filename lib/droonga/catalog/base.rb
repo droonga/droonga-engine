@@ -18,7 +18,6 @@ require "zlib"
 require "time"
 require "droonga/error_messages"
 require "droonga/catalog/errors"
-require "droonga/catalog/live_nodes_list"
 
 module Droonga
   module Catalog
@@ -36,10 +35,6 @@ module Droonga
 
       def dataset(name)
         datasets[name]
-      end
-
-      def live_nodes_list
-        @live_nodes_list ||= LiveNodesList.new(@options[:live_nodes_file])
       end
     end
   end
