@@ -117,7 +117,7 @@ module Droonga
 
       def all_nodes
         nodes = @data["zones"].collect do |zone|
-          nodes << zone.split("/").first
+          zone.split("/").first
         end
         nodes.sort.uniq
       end
