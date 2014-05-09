@@ -37,7 +37,7 @@ module Droonga
       return default_list if contents.empty?
 
       begin
-        JSON.parse(contents).keys
+        JSON.parse(contents)
       rescue JSON::ParserError
         default_list
       end
