@@ -51,26 +51,19 @@ class CatalogVersion1Test < Test::Unit::TestCase
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
-                     "localhost:23003/test.001" => {
-                       :database  => "#{base_path}/001/db",
-                       :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
-                     },
                      "localhost:23003/test.002" => {
                        :database  => "#{base_path}/002/db",
                        :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
-                     "localhost:23003/test.003" => {
-                       :database  => "#{base_path}/003/db",
-                       :dataset   => "Test",
-                       :plugins   => ["for_dataset"],
-                       :n_workers => 0
-                     },
                    },
                    partitions)
+    end
+
+    def test_all_nodes
+      assert_equal(["localhost:23004", "localhost:23003"],
+                   @catalog.all_nodes)
     end
 
     def fixture_path(base_path)

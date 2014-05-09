@@ -5,6 +5,10 @@
     "localhost:23003/test": {
       "device": ".",
       "capacity": 10
+    },
+    "localhost:23004/test": {
+      "device": ".",
+      "capacity": 10
     }
   },
   "datasets": {
@@ -21,7 +25,7 @@
           "partitions": {
             "2013-09-01": [
               "localhost:23003/test.000",
-              "localhost:23003/test.001"
+              "localhost:23004/test.001"
             ]
           }
         },
@@ -30,7 +34,7 @@
           "partitions": {
             "2013-09-01": [
               "localhost:23003/test.002",
-              "localhost:23003/test.003"
+              "localhost:23004/test.003"
             ]
           }
         }
