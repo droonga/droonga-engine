@@ -58,6 +58,10 @@ module Droonga
         @replicas ||= VolumeCollection.new(create_volumes(@data["replicas"]))
       end
 
+      def all_nodes
+        replicas.all_nodes
+      end
+
       private
       def create_volumes(raw_volumes)
         raw_volumes.collect do |raw_volume|

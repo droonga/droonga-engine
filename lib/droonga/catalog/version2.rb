@@ -79,6 +79,14 @@ module Droonga
         routes
       end
 
+      def all_nodes
+        nodes = []
+        @datasets.each do |dataset|
+          nodes += dataset.all_nodes
+        end
+        nodes.sort.uniq
+      end
+
       private
       def validate
         validator = Version2Validator.new(@data, @path)

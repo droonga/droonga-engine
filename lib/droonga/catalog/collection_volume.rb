@@ -69,6 +69,14 @@ module Droonga
         slicer == "hash"
       end
 
+      def all_nodes
+        nodes = []
+        slices.each do |slice|
+          nodes += slice.all_nodes
+        end
+        nodes.uniq.sort
+      end
+
       private
       def compute_continuum
         total_weight = compute_total_weight

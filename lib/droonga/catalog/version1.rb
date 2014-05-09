@@ -115,6 +115,14 @@ module Droonga
         end
       end
 
+      def all_nodes
+        nodes = []
+        @datasets.each do |dataset|
+          nodes += dataset.all_nodes
+        end
+        nodes.sort.uniq
+      end
+
       private
       def prepare_data
         @datasets = {}

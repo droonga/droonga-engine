@@ -51,6 +51,14 @@ module Droonga
           super
         end
       end
+
+      def all_nodes
+        nodes = []
+        @volumes.each do |volume|
+          nodes += volume.all_nodes
+        end
+        nodes.sort.uniq
+      end
     end
   end
 end

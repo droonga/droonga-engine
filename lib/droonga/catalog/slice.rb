@@ -36,6 +36,10 @@ module Droonga
       def volume
         @volume ||= Volume.create(@dataset, @data["volume"])
       end
+
+      def all_nodes
+        volume.all_nodes
+      end
     end
   end
 end

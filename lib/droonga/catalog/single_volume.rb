@@ -23,6 +23,10 @@ module Droonga
       def address
         @data["address"]
       end
+
+      def all_nodes
+        [address.split("/").first]
+      end
     end
   end
 end
