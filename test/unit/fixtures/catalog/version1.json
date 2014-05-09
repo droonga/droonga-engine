@@ -1,6 +1,9 @@
 {
   "effective_date": "2013-09-01T00:00:00Z",
-  "zones": ["localhost:23003/test"],
+  "zones": [
+    "localhost:23003/test",
+    "localhost:23004/test"
+  ],
   "farms": {
     "localhost:23003/test": {
       "device": ".",
