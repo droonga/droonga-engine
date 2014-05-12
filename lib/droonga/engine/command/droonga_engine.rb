@@ -152,8 +152,9 @@ module Droonga
             @heartbeat_socket.bind(@configuration.host,
                                    @configuration.port)
 
+            ENV["DROONGA_BASE_DIR"] ||= Dir.pwd
+
             if @configuration.daemon?
-              ENV["DROONGA_BASE_DIR"] ||= Dir.pwd
               Process.daemon
             end
 
