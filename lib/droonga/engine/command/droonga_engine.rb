@@ -153,7 +153,7 @@ module Droonga
                                    @configuration.port)
 
             if @configuration.daemon?
-              ENV["DROONGA_BASE_DIR"] ||= ENV["PWD"]
+              ENV["DROONGA_BASE_DIR"] ||= Dir.pwd
               Process.daemon
             end
 
