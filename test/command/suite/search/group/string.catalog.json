@@ -1,0 +1,41 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Sections": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "document": {
+              "type": "Scalar",
+              "valueType": "ShortText"
+            },
+            "title": {
+              "type": "Scalar",
+              "valueType": "ShortText"
+            }
+          }
+        },
+        "Terms": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText",
+          "normalizer": "NormalizerAuto",
+          "tokenizer": "TokenBigram",
+          "columns": {
+            "title_index": {
+              "type": "Index",
+              "valueType": "Sections",
+              "indexOptions": {
+                "sources": [
+                  "title"
+                ],
+                "position": true
+              }
+            }
+          }
+        }
+      },
+      "fact": "Sections"
+    }
+  }
+}
