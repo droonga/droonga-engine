@@ -32,6 +32,15 @@ module Droonga
           return false unless replyTo
 
           request = message.request || {}
+
+          dump_start_message = {
+            "inReplyTo" => id,
+            "dataset" => dataset,
+          }
+          messenger.forward(dump_start_message,
+                            "to" => replyTo,
+                            "type" => "dump.start")
+
           messages_per_seconds = request["messagesPerSecond"] || 10000
           messages_per_seconds = [10, messages_per_seconds.to_i].max
           messages_per_100msec = messages_per_seconds / 10
