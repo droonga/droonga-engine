@@ -106,7 +106,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
     def test_all_nodes
       data = {
         "replicas" => [
-         {
+          {
             "dimension" =>"_key",
             "slicer" =>"hash",
             "slices" =>[
@@ -116,7 +116,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
               { "volume" =>{ "address" =>"127.0.0.1:23005/droonga.003" } },
             ],
           },
-         {
+          {
             "dimension" =>"_key",
             "slicer" =>"hash",
             "slices" =>[

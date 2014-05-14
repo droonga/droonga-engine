@@ -1,30 +1,75 @@
-#@include fixture/documents.jsons
+#@require-catalog-version 2
+#@disable-logging
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "groonga-1.1",
+    "values": {
+      "document": "Groonga",
+      "title": "Groonga overview"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "groonga-1.2",
+    "values": {
+      "document": "Groonga",
+      "title": "Full text search and Instant update"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "groonga-1.3",
+    "values": {
+      "document": "Groonga",
+      "title": "Column store and aggregate query"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "mroonga-1.1",
+    "values": {
+      "document": "Mroonga",
+      "title": "What is Mroonga?"
+    }
+  }
+}
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Sections",
+    "key": "mroonga-1.2",
+    "values": {
+      "document": "Mroonga",
+      "title": "The successor of Tritonn"
+    }
+  }
+}
+#@enable-logging
 {
   "type": "search",
   "dataset": "Droonga",
   "body": {
     "queries": {
-      "Groonga": {
-        "source": "Sections",
-        "condition": {
-          "query": "groonga",
-          "matchTo": ["title"]
-        },
-        "sortBy": ["_key"],
-        "output": {
-          "elements": [
-            "count",
-            "attributes",
-            "records"
-          ],
-          "limit": -1,
-          "attributes": ["title"]
-        }
-      },
       "documents": {
-        "source": "Groonga",
+        "source": "Sections",
         "groupBy": "document",
-        "sortBy": ["-_key"],
+        "sortBy": ["-_nsubrecs"],
         "output": {
           "elements": [
             "count",
@@ -32,7 +77,7 @@
             "records"
           ],
           "limit": -1,
-          "attributes": ["_key"]
+          "attributes": ["_key", "_nsubrecs"]
         }
       }
     }
