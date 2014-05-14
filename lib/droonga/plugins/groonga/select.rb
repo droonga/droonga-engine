@@ -177,14 +177,16 @@ module Droonga
           def convert_main_result(result)
             status_code = 0
             start_time = result["startTime"]
-            start_time_in_unix_time = if start_time
-                                        Time.parse(start_time).to_f
-                                      else
-                                        Time.now.to_f
-                                      end
+            start_time_in_unix_time = normalize_time(start_time).to_f
             elapsed_time = result["elapsedTime"] || 0
             @header = [status_code, start_time_in_unix_time, elapsed_time]
             @body = convert_search_result(result)
+          end
+
+          def normalize_time(time)
+            time ||= Time.now
+            time = Time.parse(time) if time.is_a?(String)
+            time
           end
 
           def convert_drilldown_result(key, result)
