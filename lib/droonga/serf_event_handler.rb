@@ -67,7 +67,7 @@ module Droonga
 
     def live_nodes
       nodes = {}
-      members = system(@serf_command, "members")
+      members = `#{@serf_command} members`
       members.each_line do |member|
         name, address, status, = member.strip.split(/\s+/)
         if status == "alive"
