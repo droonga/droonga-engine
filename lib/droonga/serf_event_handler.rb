@@ -92,7 +92,7 @@ module Droonga
       file_contents = JSON.pretty_generate(nodes)
       if output_to_file?
         FileUtils.mkdir_p(list_file.parent.to_s)
-        File.open(list_file.to_s, "w") do |file
+        File.open(list_file.to_s, "w") do |file|
           file.write(file_contents)
         end
       else
