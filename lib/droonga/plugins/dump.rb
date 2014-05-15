@@ -82,20 +82,7 @@ module Droonga
           forward("dump.start")
 
           dumper = Fiber.new do
-            each_table do |table|
-              table.each do |record|
-                values = {}
-                record.attributes.each do |key, value|
-                  values[key] = value unless key.start_with?("_")
-                end
-                body = {
-                  "table" => table.name,
-                  "key" => record.key,
-                  "values" => values,
-                }
-                forward("dump.record", body)
-              end
-            end
+            dump_records
             forward("dump.end")
           end
 
@@ -134,6 +121,23 @@ module Droonga
           @n_forwarded_messages += 1
           @n_forwarded_messages %= @messages_per_100msec
           Fiber.yield if @n_forwarded_messages.zero?
+        end
+
+        def dump_records
+          each_table do |table|
+            table.each do |record|
+              values = {}
+              record.attributes.each do |key, value|
+                values[key] = value unless key.start_with?("_")
+              end
+              body = {
+                "table" => table.name,
+                "key" => record.key,
+                "values" => values,
+              }
+              forward("dump.record", body)
+            end
+          end
         end
 
         def each_table
