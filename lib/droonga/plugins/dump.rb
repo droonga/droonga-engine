@@ -225,7 +225,7 @@ module Droonga
         end
 
         def column_type(column)
-          if column.is_a?(::Groonga::IndexColumn)
+          if index_column?(column)
             "Index"
           elsif column.vector?
             "Vector"
@@ -274,25 +274,33 @@ module Droonga
             :order_by => :key,
           }
           @context.database.each(options) do |object|
-            next unless object.is_a?(::Groonga::Table)
+            next unless table?(object)
             yield(object)
           end
         end
 
+        def table?(object)
+          object.is_a?(::Groonga::Table)
+        end
+
         def index_only_table?(table)
           table.columns.all? do |column|
-            column.is_a?(::Groonga::IndexColumn)
+            index_column?(column)
           end
         end
 
         def reference_table?(table)
-          table.support_key? and table.domain.is_a?(::Groonga::Table)
+          table.support_key? and table?(table.domain)
+        end
+
+        def index_column?(column)
+          column.is_a?(::Groonga::IndexColumn)
         end
 
         def each_index_columns
           each_table do |table|
             table.columns.each do |column|
-              yield(column) if column.is_a?(::Groonga::IndexColumn)
+              yield(column) if index_column?(column)
             end
           end
         end
