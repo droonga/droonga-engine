@@ -131,8 +131,8 @@ module Droonga
                 values[key] = value unless key.start_with?("_")
               end
               body = {
-                "table" => table.name,
-                "key" => record.key,
+                "table"  => table.name,
+                "key"    => record.key,
                 "values" => values,
               }
               forward("dump.record", body)
