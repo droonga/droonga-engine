@@ -69,6 +69,8 @@ module Droonga
       end
 
       class Dumper
+        include Loggable
+
         def initialize(context, loop, messenger, request)
           @context = context
           @loop = loop
@@ -82,8 +84,16 @@ module Droonga
           forward("dump.start")
 
           dumper = Fiber.new do
+            dump_schema
             dump_records
+            dump_indexes
             forward("dump.end")
+          end
+
+          on_error = lambda do |exception|
+            message = "failed to dump"
+            logger.exception(message, $!)
+            error("DumpFailure", message)
           end
 
           timer = Coolio::TimerWatcher.new(0.1, true)
@@ -92,6 +102,9 @@ module Droonga
               dumper.resume
             rescue FiberError
               timer.detach
+            rescue
+              timer.detach
+              on_error.call($!)
             end
           end
 
@@ -109,6 +122,20 @@ module Droonga
           @messages_per_100msec = @request.messages_per_seconds / 10
         end
 
+        def error(name, message)
+          message = {
+            "statusCode" => ErrorMessages::InternalServerError::STATUS_CODE,
+            "body" => {
+              "name"    => name,
+              "message" => message,
+            },
+          }
+          error_message = @base_forward_message.merge(message)
+          @messenger.forward(error_message,
+                             "to"   => @forward_to,
+                             "type" => "dump.error")
+        end
+
         def forward(type, body=nil)
           forward_message = @base_forward_message
           if body
@@ -123,8 +150,103 @@ module Droonga
           Fiber.yield if @n_forwarded_messages.zero?
         end
 
+        def dump_schema
+          reference_tables = []
+          each_table do |table|
+            if reference_table?(table)
+              reference_tables << table
+              next
+            end
+            dump_table(table)
+          end
+
+          reference_tables.each do |table|
+            dump_table(table)
+          end
+        end
+
+        def dump_table(table)
+          forward("dump.table", table_body(table))
+
+          columns = table.columns.sort_by(&:name)
+          columns.each do |column|
+            dump_column(column)
+          end
+        end
+
+        def table_body(table)
+          body = {
+            "type" => table_type(table),
+            "name" => table.name,
+          }
+          if table.support_key?
+            body["keyType"] = table.domain.name
+          end
+          if body["keyType"] == "ShortText"
+            if table.default_tokenizer
+              body["tokenizer"] = table.default_tokenizer.name
+            end
+            if table.normalizer
+              body["normalizer"] = table.normalizer.name
+            end
+          end
+          body
+        end
+
+        def table_type(table)
+          table.class.name.split(/::/).last
+        end
+
+        def dump_column(column)
+          forward("dump.column", column_body(column))
+        end
+
+        def column_body(column)
+          body = {
+            "table"     => column.domain.name,
+            "name"      => column.local_name,
+            "type"      => column_type(column),
+            "valueType" => column.range.name,
+          }
+          case body["type"]
+          when "Index"
+            body["indexOptions"] = {
+              "section"  => column.with_section?,
+              "weight"   => column.with_weight?,
+              "position" => column.with_position?,
+              "sources"  => index_column_sources(column),
+            }
+          when "Vector"
+            body["vectorOptions"] = {
+              "weight" => column.with_weight?,
+            }
+          end
+          body
+        end
+
+        def column_type(column)
+          if column.is_a?(::Groonga::IndexColumn)
+            "Index"
+          elsif column.vector?
+            "Vector"
+          else
+            "Scalar"
+          end
+        end
+
+        def index_column_sources(index_column)
+          index_column.sources.collect do |source|
+            if source.is_a?(::Groonga::Table)
+              "_key"
+            else
+              source.local_name
+            end
+          end
+        end
+
         def dump_records
           each_table do |table|
+            next if index_only_table?(table)
             table.each do |record|
               values = {}
               record.attributes.each do |key, value|
@@ -140,10 +262,19 @@ module Droonga
           end
         end
 
+        def dump_indexes
+          each_index_columns do |column|
+            dump_column(column)
+          end
+        end
+
         def each_table
-          @context.database.each(:ignore_missing_object => true) do |object|
+          options = {
+            :ignore_missing_object => true,
+            :order_by => :key,
+          }
+          @context.database.each(options) do |object|
             next unless object.is_a?(::Groonga::Table)
-            next if index_only_table?(object)
             yield(object)
           end
         end
@@ -152,6 +283,22 @@ module Droonga
           table.columns.all? do |column|
             column.is_a?(::Groonga::IndexColumn)
           end
+        end
+
+        def reference_table?(table)
+          table.support_key? and table.domain.is_a?(::Groonga::Table)
+        end
+
+        def each_index_columns
+          each_table do |table|
+            table.columns.each do |column|
+              yield(column) if column.is_a?(::Groonga::IndexColumn)
+            end
+          end
+        end
+
+        def log_tag
+          "[#{Process.ppid}][#{Process.pid}] dumper"
         end
       end
 
