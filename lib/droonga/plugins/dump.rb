@@ -170,6 +170,7 @@ module Droonga
 
           columns = table.columns.sort_by(&:name)
           columns.each do |column|
+            next if index_column?(column)
             dump_column(column)
           end
         end
