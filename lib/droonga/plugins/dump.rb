@@ -251,7 +251,8 @@ module Droonga
             table.each do |record|
               values = {}
               record.attributes.each do |key, value|
-                values[key] = value unless key.start_with?("_")
+                next if key.start_with?("_")
+                values[key] = normalize_record_value(value)
               end
               body = {
                 "table"  => table.name,
@@ -260,6 +261,22 @@ module Droonga
               }
               forward("dump.record", body)
             end
+          end
+        end
+
+        def normalize_record_value(value)
+          case value
+          when Array
+            value.collect do |element|
+              case element
+              when Hash
+                element["_key"]
+              else
+                element
+              end
+            end
+          else
+            value
           end
         end
 

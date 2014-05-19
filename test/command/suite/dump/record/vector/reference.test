@@ -1,0 +1,21 @@
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga newbie",
+    "values": {
+      "tags" : [
+        "Groonga",
+        "column store"
+      ]
+    }
+  }
+}
+#@enable-logging
+{
+  "type": "dump",
+  "dataset": "Droonga"
+}
