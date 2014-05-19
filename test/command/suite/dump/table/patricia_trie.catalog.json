@@ -1,0 +1,14 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Memos": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText",
+          "columns": {}
+        }
+      },
+      "fact": "Memos"
+    }
+  }
+}
