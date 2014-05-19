@@ -1,0 +1,195 @@
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "dump.result",
+  "body": true
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}

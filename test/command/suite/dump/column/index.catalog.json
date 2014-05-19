@@ -1,0 +1,40 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Memos": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "content": {
+              "type": "Scalar",
+              "valueType": "ShortText"
+            }
+          }
+        },
+        "Terms": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText",
+          "tokenizer": "TokenBigram",
+          "normalizer": "NormalizerAuto",
+          "columns": {
+            "index": {
+              "type": "Index",
+              "valueType": "Memos",
+              "indexOptions": {
+                "section": true,
+                "weight": true,
+                "position": true,
+                "sources": [
+                  "_key",
+                  "content"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "fact": "Memos"
+    }
+  }
+}
