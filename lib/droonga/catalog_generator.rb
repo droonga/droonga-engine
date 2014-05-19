@@ -55,7 +55,7 @@ module Droonga
       end
 
       def plugins
-        @options[:plugins] || ["groonga", "search", "crud"]
+        @options[:plugins] || ["groonga", "search", "crud", "dump"]
       end
 
       def schema
