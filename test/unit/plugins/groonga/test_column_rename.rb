@@ -80,7 +80,7 @@ class ColumnRenameTest < GroongaHandlerTest
     process(:column_rename,
             {"table" => "Books", "name" => "title", "new_name" => "label"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books label COLUMN_SCALAR ShortText
     SCHEMA
   end
@@ -96,7 +96,7 @@ column_create Books label COLUMN_SCALAR ShortText
     process(:column_rename,
             {"table" => "Books", "name" => "title", "new_name" => "label"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books label COLUMN_SCALAR ShortText
 
 column_create Books entry_title COLUMN_INDEX Books label

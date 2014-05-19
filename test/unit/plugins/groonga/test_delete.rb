@@ -88,7 +88,7 @@ class DeleteTest < GroongaHandlerTest
       process(:delete,
               {"table" => "Books", "key" => "sample"})
       assert_equal(<<-DUMP, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
       DUMP
     end
 
@@ -114,7 +114,7 @@ table_create Ages TABLE_NO_KEY
       process(:delete,
               {"table" => "Books", "filter" => '_key @^ "D"'})
       assert_equal(<<-DUMP, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 
 load --table Books
 [

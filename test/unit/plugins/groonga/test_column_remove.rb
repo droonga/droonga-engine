@@ -77,7 +77,7 @@ class ColumnRemoveTest < GroongaHandlerTest
     process(:column_remove,
             {"table" => "Books", "name" => "title"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
     SCHEMA
   end
 
@@ -92,7 +92,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText
     process(:column_remove,
             {"table" => "Books", "name" => "title"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
     SCHEMA
   end
 end

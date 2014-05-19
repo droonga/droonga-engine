@@ -51,9 +51,9 @@ class SchemaCreatorTest < Test::Unit::TestCase
     }
     apply(schema_data)
     assert_equal(<<-DUMP, dump)
-table_create Names TABLE_HASH_KEY --key_type ShortText
+table_create Names TABLE_HASH_KEY ShortText
 
-table_create Users TABLE_HASH_KEY --key_type Names
+table_create Users TABLE_HASH_KEY Names
     DUMP
   end
 end

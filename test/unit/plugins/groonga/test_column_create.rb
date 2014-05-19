@@ -57,7 +57,7 @@ class ColumnCreateTest < GroongaHandlerTest
     process(:column_create,
             {"table" => "Books", "name" => "title", "type" => "ShortText"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books title COLUMN_SCALAR ShortText
     SCHEMA
   end
@@ -69,7 +69,7 @@ column_create Books title COLUMN_SCALAR ShortText
     process(:column_create,
             {"table" => "Books", "name" => "main_text", "type" => "LongText"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books main_text COLUMN_SCALAR LongText
     SCHEMA
   end
@@ -99,7 +99,7 @@ column_create Books main_text COLUMN_SCALAR LongText
         end
         process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books title #{data[:flags]} ShortText
         EXPECTED
       end
@@ -128,7 +128,7 @@ column_create Books title #{data[:flags]} ShortText
         }
         process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books title COLUMN_SCALAR ShortText
 
 column_create Books entry_title #{data[:flags]} Books title
@@ -160,7 +160,7 @@ column_create Books entry_title #{data[:flags]} Books title
         }
         process(:column_create, request)
         assert_equal(<<-EXPECTED, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
 column_create Books title COLUMN_SCALAR ShortText
 
 column_create Books entry_title #{flags} Books title

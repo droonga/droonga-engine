@@ -55,7 +55,7 @@ class TableRemoveTest < GroongaHandlerTest
   def test_unknown_table
     process(:table_remove, {"name" => "Unknown"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
     SCHEMA
   end
 end

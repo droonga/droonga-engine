@@ -40,7 +40,7 @@ class TableCreateTest < GroongaHandlerTest
   def test_name
     process(:table_create, {"name" => "Books"})
     assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
     SCHEMA
   end
 
@@ -55,25 +55,25 @@ table_create Books TABLE_NO_KEY
            "TABLE_HASH_KEY" => {
              :flags => "TABLE_HASH_KEY",
              :schema => <<-SCHEMA,
-table_create Books TABLE_HASH_KEY --key_type ShortText
+table_create Books TABLE_HASH_KEY ShortText
              SCHEMA
            },
            "TABLE_PAT_KEY" => {
              :flags => "TABLE_PAT_KEY",
              :schema => <<-SCHEMA,
-table_create Books TABLE_PAT_KEY --key_type ShortText
+table_create Books TABLE_PAT_KEY ShortText
              SCHEMA
            },
            "TABLE_DAT_KEY" => {
              :flags => "TABLE_DAT_KEY",
              :schema => <<-SCHEMA,
-table_create Books TABLE_DAT_KEY --key_type ShortText
+table_create Books TABLE_DAT_KEY ShortText
              SCHEMA
            },
            "KEY_WITH_SIS with TABLE_PAT_KEY" => {
              :flags => "KEY_WITH_SIS|TABLE_PAT_KEY",
              :schema => <<-SCHEMA,
-table_create Books TABLE_PAT_KEY|KEY_WITH_SIS --key_type ShortText
+table_create Books TABLE_PAT_KEY|KEY_WITH_SIS ShortText
              SCHEMA
            },
            "KEY_WITH_SIS without TABLE_PAT_KEY" => {
@@ -101,7 +101,7 @@ table_create Books TABLE_NO_KEY
       }
       process(:table_create, request)
       assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type Int32
+table_create Books TABLE_HASH_KEY Int32
       SCHEMA
     end
   end
@@ -114,7 +114,7 @@ table_create Books TABLE_HASH_KEY --key_type Int32
       }
       process(:table_create, request)
       assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
+table_create Books TABLE_HASH_KEY ShortText --value_type Int32
       SCHEMA
     end
   end
@@ -127,7 +127,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --value_type Int32
       }
       process(:table_create, request)
       assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer TokenBigram
+table_create Books TABLE_HASH_KEY ShortText --default_tokenizer TokenBigram
       SCHEMA
     end
   end
@@ -140,7 +140,7 @@ table_create Books TABLE_HASH_KEY --key_type ShortText --default_tokenizer Token
       }
       process(:table_create, request)
       assert_equal(<<-SCHEMA, dump)
-table_create Books TABLE_HASH_KEY --key_type ShortText --normalizer NormalizerAuto
+table_create Books TABLE_HASH_KEY ShortText --normalizer NormalizerAuto
       SCHEMA
     end
   end

@@ -35,13 +35,13 @@ class WatchSchemaTest < Test::Unit::TestCase
                                                      :database => database)
     end
     assert_equal(<<-SCHEMA, dumped_commands)
-table_create Keyword TABLE_PAT_KEY --key_type ShortText --normalizer NormalizerAuto
+table_create Keyword TABLE_PAT_KEY ShortText --normalizer NormalizerAuto
 
-table_create Query TABLE_HASH_KEY --key_type ShortText
+table_create Query TABLE_HASH_KEY ShortText
 
-table_create Route TABLE_HASH_KEY --key_type ShortText
+table_create Route TABLE_HASH_KEY ShortText
 
-table_create Subscriber TABLE_HASH_KEY --key_type ShortText
+table_create Subscriber TABLE_HASH_KEY ShortText
 column_create Subscriber last_modified COLUMN_SCALAR Time
 
 column_create Query keywords COLUMN_VECTOR Keyword
