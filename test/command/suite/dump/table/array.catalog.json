@@ -1,0 +1,13 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Logs": {
+          "type": "Array",
+          "columns": {}
+        }
+      },
+      "fact": "Logs"
+    }
+  }
+}

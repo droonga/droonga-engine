@@ -1,0 +1,63 @@
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "dump.result",
+  "body": true
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Array",
+    "name": "Logs"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Array",
+    "name": "Logs"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "body": {
+    "type": "Array",
+    "name": "Logs"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Droonga",
+  "type": "dump.end"
+}
