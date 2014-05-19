@@ -1,0 +1,35 @@
+#@require-catalog-version 2
+{
+  "dataset": "Droonga",
+  "type": "add",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga newbie",
+    "values": {
+      "content": "Groonga is a full text search engine",
+      "categories": [
+        "Groonga",
+        "full text search"
+      ]
+    }
+  }
+}
+{
+  "type": "search",
+  "dataset": "Droonga",
+  "body": {
+    "queries": {
+      "documents": {
+        "source": "Memos",
+        "output": {
+          "elements": [
+            "attributes",
+            "records"
+          ],
+          "limit": -1,
+          "attributes": ["_key", "content", "categories"]
+        }
+      }
+    }
+  }
+}

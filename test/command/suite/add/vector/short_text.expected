@@ -1,0 +1,25 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "add.result",
+  "body": true
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "search.result",
+  "body": {
+    "documents": {
+      "records": [
+        [
+          "Groonga newbie",
+          "Groonga is a full text search engine",
+          [
+            "Groonga",
+            "full text search"
+          ]
+        ]
+      ]
+    }
+  }
+}
