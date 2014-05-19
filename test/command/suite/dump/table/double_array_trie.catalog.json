@@ -1,0 +1,14 @@
+{
+  "datasets": {
+    "Droonga": {
+      "schema": {
+        "Memos": {
+          "type": "DoubleArrayTrie",
+          "keyType": "ShortText",
+          "columns": {}
+        }
+      },
+      "fact": "Memos"
+    }
+  }
+}
