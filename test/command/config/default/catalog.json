@@ -4,7 +4,7 @@
   "datasets": {
     "Droonga": {
       "nWorkers": 4,
-      "plugins": ["groonga", "crud", "search"],
+      "plugins": ["groonga", "crud", "search", "dump"],
       "replicas": [
         {
           "dimension": "_key",
