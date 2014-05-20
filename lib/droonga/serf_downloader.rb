@@ -1,0 +1,91 @@
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "stringio"
+require "tmpdir"
+require "fileutils"
+
+require "faraday"
+require "faraday_middleware"
+require "archive/zip"
+
+require "droonga/base_path"
+require "droonga/loggable"
+
+module Droonga
+  class SerfDownloader
+    include Loggable
+
+    def initialize(output_path)
+      @output_path = output_path
+    end
+
+    def download
+      detect_platform
+      version = "0.6.0"
+      url_base = "https://dl.bintray.com/mitchellh/serf"
+      base_name = "#{version}_#{@os}_#{@architecture}.zip"
+      connection = Faraday.new(url_base) do |builder|
+        builder.response(:follow_redirects)
+        builder.adapter(Faraday.default_adapter)
+      end
+      response = connection.get(base_name)
+      absolete_output_path = @output_path.expand_path
+      Dir.mktmpdir do |dir|
+        Archive::Zip.extract(StringIO.new(response.body),
+                             dir,
+                             :directories => false)
+        FileUtils.mv("#{dir}/serf", absolete_output_path.to_s)
+        FileUtils.chmod(0755, absolete_output_path.to_s)
+      end
+    end
+
+    private
+    def detect_platform
+      detect_os
+      detect_architecture
+    end
+
+    def detect_os
+      case RUBY_PLATFORM
+      when /linux/
+        @os = "linux"
+      when /freebsd/
+        @os = "freebsd"
+      when /darwin/
+        @os = "darwin"
+      when /mswin|mingw/
+        @os = "windows"
+      else
+        raise "Unsupported OS: #{RUBY_PLATFORM}"
+      end
+    end
+
+    def detect_architecture
+      case RUBY_PLATFORM
+      when /x86_64|x64/
+        @architecture = "amd64"
+      when /i\d86/
+        @architecture = "i386"
+      else
+        raise "Unsupported architecture: #{RUBY_PLATFORM}"
+      end
+    end
+
+    def log_tag
+      "serf-downloader"
+    end
+  end
+end
