@@ -16,7 +16,7 @@
 require "fileutils"
 require "listen"
 
-require "droonga/base_name"
+require "droonga/base_path"
 require "droonga/loggable"
 require "droonga/live_nodes_list_loader"
 
