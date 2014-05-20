@@ -25,7 +25,6 @@ require "droonga/fluent_message_receiver"
 require "droonga/plugin_loader"
 
 module Droonga
-  class Engine
     module Command
       module DroongaEngine
         module Signals
@@ -439,5 +438,4 @@ module Droonga
         end
       end
     end
-  end
 end
