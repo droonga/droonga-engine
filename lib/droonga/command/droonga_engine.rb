@@ -19,6 +19,7 @@ require "ipaddr"
 require "fileutils"
 require "pathname"
 
+require "droonga/base_path"
 require "droonga/engine"
 require "droonga/event_loop"
 require "droonga/fluent_message_receiver"
@@ -151,7 +152,7 @@ module Droonga
           @heartbeat_socket.bind(@configuration.host,
                                  @configuration.port)
 
-          ENV["DROONGA_BASE_DIR"] ||= Dir.pwd
+          ENV[Droonga::BASE_DIR_ENV_NAME] ||= Dir.pwd
 
           if @configuration.daemon?
             Process.daemon
