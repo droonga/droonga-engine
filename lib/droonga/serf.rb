@@ -38,17 +38,20 @@ module Droonga
       ensure_serf
       ENV["SERF"] = self.class.path.to_s
       ENV["SERF_RPC_ADDRESS"] = rpc_address
+      retry_joins = []
+      detect_other_hosts.each do |other_host|
+        retry_joins.push("--retry-join", other_host)
+      end
       @serf_pid = run("agent",
                       "-node", @name,
                       "-bind", extract_host(@name),
-                      "-event-handler", "#{$0}-serf-event-handler")
-      start_join
+                      "-event-handler", "#{$0}-serf-event-handler",
+                      *retry_joins)
       logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      shutdown_join
       Process.waitpid(run("leave"))
       Process.waitpid(@serf_pid)
       logger.trace("shutdown: done")
@@ -70,6 +73,10 @@ module Droonga
       node_name.split(":").first
     end
 
+    def address
+      @name.split("/", 2).first
+    end
+
     def rpc_address
       "#{extract_host(@name)}:7373"
     end
@@ -78,55 +85,11 @@ module Droonga
       catalog_observer = Droonga::CatalogObserver.new(@loop)
       catalog = catalog_observer.catalog
       other_nodes = catalog.all_nodes.reject do |node|
-        node == @name
+        node == address
       end
       other_nodes.collect do |node|
         extract_host(node)
       end
-    end
-
-    def try_join
-      logger.trace("join: start")
-
-      if @serf_join_pid
-        _, status = Process.waitpid2(@serf_join_pid, Process::WNOHANG)
-        if status
-          @serf_join_pid = nil
-          if status.success?
-            detach_join_timer
-            return
-          end
-        end
-      end
-
-      return if @serf_join_pid
-
-      @serf_join_pid = run("join", @other_hosts[@join_host_index])
-      @join_host_index = (@join_host_index + 1) % @other_hosts.size
-    end
-
-    def detach_join_timer
-      @join_timer.detach
-      @join_timer = nil
-    end
-
-    def start_join
-      @other_hosts = detect_other_hosts
-      @join_host_index = 0
-
-      @join_timer = Coolio::TimerWatcher.new(1, true)
-      @serf_join_pid = nil
-      on_timer = lambda do
-        try_join
-      end
-      @join_timer.on_timer do
-        on_timer.call
-      end
-      @loop.attach(@join_timer)
-    end
-
-    def shutdown_join
-      detach_join_timer if @join_timer
     end
 
     def log_tag
