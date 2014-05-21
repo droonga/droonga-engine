@@ -23,6 +23,7 @@ require "droonga/serf"
 require "droonga/live_nodes_list_observer"
 
 module Droonga
+  module Command
   class SerfEventHandler
     class << self
       def run
@@ -79,5 +80,6 @@ module Droonga
         file.write(file_contents)
       end
     end
+  end
   end
 end
