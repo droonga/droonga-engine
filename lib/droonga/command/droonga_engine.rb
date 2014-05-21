@@ -21,6 +21,7 @@ require "pathname"
 
 require "droonga/base_path"
 require "droonga/engine"
+require "droonga/serf"
 require "droonga/event_loop"
 require "droonga/fluent_message_receiver"
 require "droonga/plugin_loader"
@@ -183,19 +184,29 @@ module Droonga
           service_runner
         end
 
+        def run_serf(loop)
+          serf = Serf.new(loop, @configuration.engine_name)
+          serf.start
+          serf
+        end
+
         def run_main_loop
           raw_loop = Coolio::Loop.default
 
+          serf = nil
           service_runner = nil
           trap(:INT) do
-            service_runner.stop_immedieate
+            serf.shutdown if serf
+            service_runner.stop_immedieate if service_runner
             raw_loop.stop
           end
           trap(Signals::GRACEFUL_STOP) do
-            service_runner.stop_graceful
+            serf.shutdown if serf
+            service_runner.stop_graceful if service_runner
           end
           trap(Signals::IMMEDIATE_STOP) do
-            service_runner.stop_immediate
+            serf.shutdown if serf
+            service_runner.stop_immediate if service_runner
             raw_loop.stop
           end
           trap(Signals::GRACEFUL_RESTART) do
@@ -211,6 +222,7 @@ module Droonga
             old_service_runner.stop_immediate
           end
 
+          serf = run_serf(raw_loop)
           service_runner = run_service(raw_loop)
           raw_loop.run
 

@@ -19,6 +19,7 @@ require "json"
 require "fileutils"
 
 require "droonga/base_path"
+require "droonga/serf"
 require "droonga/live_nodes_list_observer"
 
 module Droonga
@@ -30,7 +31,7 @@ module Droonga
     end
 
     def initialize
-      @serf = ENV["SERF"] || "serf"
+      @serf = ENV["SERF"] || Serf.path
       @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:7373"
     end
 

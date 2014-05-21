@@ -25,7 +25,9 @@ module Droonga
     def load
       list_file = Pathname(@file_path)
       list = parse_list_file(list_file)
-      list.keys
+      list.collect do |key, value|
+        value["address"]
+      end
     end
 
     private
