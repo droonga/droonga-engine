@@ -17,22 +17,24 @@ require "optparse"
 require "pathname"
 require "json"
 require "fileutils"
+
+require "droonga/base_path"
 require "droonga/live_nodes_list_observer"
 
 module Droonga
   class SerfEventHandler
     class << self
-      def run(command_line_arguments)
-        new.run(command_line_arguments)
+      def run
+        new.run
       end
     end
 
     def initialize
-      @serf_command = "serf"
+      @serf = ENV["SERF"] || "serf"
+      @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:7373"
     end
 
-    def run(command_line_arguments)
-      parse_command_line_arguments!(command_line_arguments)
+    def run
       parse_event
 
       output_live_nodes
@@ -40,21 +42,6 @@ module Droonga
     end
 
     private
-    def parse_command_line_arguments!(command_line_arguments)
-      parser = OptionParser.new
-
-      parser.on("--base-dir=DIR",
-                "Path to the directory the list is saved to") do |dir|
-        @base_dir = Pathname(dir)
-      end
-      parser.on("--serf-command=FILE",
-                "Path to the serf command") do |file|
-        @serf_command = file
-      end
-
-      parser.parse!(command_line_arguments)
-    end
-
     def parse_event
       @event_name = ENV["SERF_EVENT"]
       case @event_name
@@ -67,7 +54,7 @@ module Droonga
 
     def live_nodes
       nodes = {}
-      members = `#{@serf_command} members`
+      members = `#{@serf} members -rpc-addr #{@serf_rpc_address}`
       members.each_line do |member|
         name, address, status, = member.strip.split(/\s+/)
         if status == "alive"
@@ -80,23 +67,15 @@ module Droonga
     end
 
     def list_file
-      @list_file ||= @base_dir + LiveNodesListObserver::DEFAULT_LIST_PATH
-    end
-
-    def output_to_file?
-      not @base_dir.nil?
+      @list_file ||= Droonga.base_path + LiveNodesListObserver::DEFAULT_LIST_PATH
     end
 
     def output_live_nodes
       nodes = live_nodes
       file_contents = JSON.pretty_generate(nodes)
-      if output_to_file?
-        FileUtils.mkdir_p(list_file.parent.to_s)
-        File.open(list_file.to_s, "w") do |file|
-          file.write(file_contents)
-        end
-      else
-        puts file_contents
+      FileUtils.mkdir_p(list_file.parent.to_s)
+      File.open(list_file.to_s, "w") do |file|
+        file.write(file_contents)
       end
     end
   end
