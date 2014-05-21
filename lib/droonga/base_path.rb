@@ -20,7 +20,7 @@ module Droonga
 
   class << self
     def base_path
-      @base_dir ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd)
+      @base_path ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd)
     end
   end
 end
