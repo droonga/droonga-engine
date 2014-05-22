@@ -13,6 +13,7 @@ rvm:
 before_install:
 #  - GROONGA_MASTER=yes curl --silent --location https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
   - curl --silent --location https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
-  - curl --silent -O https://dl.bintray.com/mitchellh/serf/0.6.0_linux_amd64.zip
+  - curl -O https://dl.bintray.com/mitchellh/serf/0.6.0_linux_amd64.zip
+  - ls -la
   - unzip 0.6.0_linux_amd64.zip
   - sudo install serf /usr/local/bin/
