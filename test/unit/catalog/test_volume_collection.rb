@@ -71,7 +71,7 @@ class CatalogVolumeCollectionTest < Test::Unit::TestCase
     end
 
     def test_all_nodes
-      assert_equal(["volume1:10047", "volume2:10047"],
+      assert_equal(["volume1:10047/test", "volume2:10047/test"],
                    @collection.all_nodes)
     end
   end

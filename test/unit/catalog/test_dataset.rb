@@ -129,7 +129,11 @@ class CatalogDatasetTest < Test::Unit::TestCase
         ],
       }
       dataset = create_dataset(data)
-      assert_equal(["127.0.0.1:23003", "127.0.0.1:23004", "127.0.0.1:23005"],
+      assert_equal([
+                     "127.0.0.1:23003/droonga",
+                     "127.0.0.1:23004/droonga",
+                     "127.0.0.1:23005/droonga",
+                   ],
                    dataset.all_nodes)
     end
   end

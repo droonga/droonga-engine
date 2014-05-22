@@ -96,7 +96,7 @@ class CatalogSliceTest < Test::Unit::TestCase
         },
       }
       slice = create_slice(data)
-      assert_equal(["127.0.0.1:10047"],
+      assert_equal(["127.0.0.1:10047/volume"],
                    slice.all_nodes)
     end
   end
