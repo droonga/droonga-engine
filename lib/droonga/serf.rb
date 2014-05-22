@@ -36,7 +36,7 @@ module Droonga
     def start
       logger.trace("start: start")
       ensure_serf
-      ENV["SERF"] = self.class.path.to_s
+      ENV["SERF"] = @serf
       ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
@@ -59,14 +59,27 @@ module Droonga
 
     private
     def ensure_serf
+      @serf = find_system_serf
+      return if @serf
+
       serf_path = self.class.path
+      @serf = serf_path.to_s
       return if serf_path.executable?
       downloader = SerfDownloader.new(serf_path)
       downloader.download
     end
 
+    def find_system_serf
+      paths = (ENV["PATH"] || "").split(File::PATH_SEPARATOR)
+      paths.each do |path|
+        serf = File.join(path, "serf")
+        return serf if File.executable?(serf)
+      end
+      nil
+    end
+
     def run(command, *options)
-      spawn(self.class.path.to_s, command, "-rpc-addr", rpc_address, *options)
+      spawn(@serf, command, "-rpc-addr", rpc_address, *options)
     end
 
     def extract_host(node_name)
