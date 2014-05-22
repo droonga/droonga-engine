@@ -17,4 +17,4 @@
 
 require "droonga/command/serf_event_handler"
 
-exit(Droonga::Commnad::SerfEventHandler.run)
+exit(Droonga::Command::SerfEventHandler.run)
