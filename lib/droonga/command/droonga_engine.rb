@@ -193,19 +193,15 @@ module Droonga
         def run_main_loop
           raw_loop = Coolio::Loop.default
 
-          serf = nil
           service_runner = nil
           trap(:INT) do
-            serf.shutdown if serf
             service_runner.stop_immedieate if service_runner
             raw_loop.stop
           end
           trap(Signals::GRACEFUL_STOP) do
-            serf.shutdown if serf
             service_runner.stop_graceful if service_runner
           end
           trap(Signals::IMMEDIATE_STOP) do
-            serf.shutdown if serf
             service_runner.stop_immediate if service_runner
             raw_loop.stop
           end
@@ -223,8 +219,12 @@ module Droonga
           end
 
           serf = run_serf(raw_loop)
-          service_runner = run_service(raw_loop)
-          raw_loop.run
+          begin
+            service_runner = run_service(raw_loop)
+            raw_loop.run
+          ensure
+            serf.shutdown
+          end
 
           service_runner.success?
         end
