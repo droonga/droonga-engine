@@ -73,10 +73,6 @@ module Droonga
       node_name.split(":").first
     end
 
-    def address
-      @name.split("/", 2).first
-    end
-
     def rpc_address
       "#{extract_host(@name)}:7373"
     end
@@ -85,7 +81,7 @@ module Droonga
       catalog_observer = Droonga::CatalogObserver.new(@loop)
       catalog = catalog_observer.catalog
       other_nodes = catalog.all_nodes.reject do |node|
-        node == address
+        node == @name
       end
       other_nodes.collect do |node|
         extract_host(node)

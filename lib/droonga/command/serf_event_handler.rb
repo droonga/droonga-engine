@@ -61,7 +61,7 @@ module Droonga
           name, address, status, = member.strip.split(/\s+/)
           if status == "alive"
             nodes[name] = {
-              "address" => address,
+              "serfAddress" => address,
             }
           end
         end

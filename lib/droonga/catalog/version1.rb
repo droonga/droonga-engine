@@ -98,10 +98,7 @@ module Droonga
       end
 
       def collect_all_nodes
-        nodes = @data["zones"].collect do |zone|
-          zone.split("/").first
-        end
-        nodes.sort.uniq
+        @data["zones"].sort
       end
 
       def validate

@@ -24,8 +24,14 @@ module Droonga
         @data["address"]
       end
 
+      def node
+        ip_address_and_port, path = address.split("/")
+        tag = path.split(".").first
+        "#{ip_address_and_port}/#{tag}"
+      end
+
       def all_nodes
-        @all_nodes ||= [address.split("/").first]
+        @all_nodes ||= [node]
       end
     end
   end
