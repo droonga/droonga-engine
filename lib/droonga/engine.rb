@@ -26,6 +26,8 @@ module Droonga
   class Engine
     include Loggable
 
+    LAST_PROCESSED_TIMESTAMP_FILE_NAME = "last_processed_timestamp"
+
     def initialize(loop, name)
       @state = EngineState.new(loop, name)
 
@@ -56,6 +58,7 @@ module Droonga
 
     def shutdown
       logger.trace("shutdown: start")
+      output_last_processed_timestamp
       @catalog_observer.stop
       @live_nodes_list_observer.stop
       @dispatcher.shutdown
@@ -64,6 +67,7 @@ module Droonga
     end
 
     def process(message)
+      @last_processed_timestamp = message["date"]
       @dispatcher.process_message(message)
     end
 
@@ -84,6 +88,13 @@ module Droonga
       logger.trace("graceful_restart: shutdown old dispatcher")
       old_dispatcher.shutdown
       logger.trace("graceful_restart: done")
+    end
+
+    def output_last_processed_timestamp
+      file_path = File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP_FILE_NAME)
+      File.open(file_path, "w") do |file|
+        file.write(@last_processed_timestamp)
+      end
     end
 
     def log_tag
