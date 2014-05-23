@@ -31,6 +31,7 @@ module Droonga
     def initialize(loop, name)
       @loop = loop
       @name = name
+      @serf_pid = nil
     end
 
     def start
@@ -50,10 +51,15 @@ module Droonga
       logger.trace("start: done")
     end
 
+    def running?
+      not @serf_pid.nil?
+    end
+
     def shutdown
       logger.trace("shutdown: start")
       Process.waitpid(run("leave"))
       Process.waitpid(@serf_pid)
+      @serf_pid = nil
       logger.trace("shutdown: done")
     end
 
