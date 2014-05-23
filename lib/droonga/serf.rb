@@ -41,7 +41,7 @@ module Droonga
       ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
-        retry_joins.push("--retry-join", other_host)
+        retry_joins.push("-retry-join", other_host)
       end
       @serf_pid = run("agent",
                       "-node", @name,
