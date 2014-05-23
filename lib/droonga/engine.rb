@@ -26,7 +26,7 @@ module Droonga
   class Engine
     include Loggable
 
-    LAST_PROCESSED_TIMESTAMP_FILE_NAME = "last_processed_timestamp"
+    LAST_PROCESSED_TIMESTAMP = "last_processed_timestamp"
 
     def initialize(loop, name)
       @state = EngineState.new(loop, name)
@@ -91,7 +91,7 @@ module Droonga
     end
 
     def output_last_processed_timestamp
-      file_path = File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP_FILE_NAME)
+      file_path = File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP)
       File.open(file_path, "w") do |file|
         file.write(@last_processed_timestamp)
       end
