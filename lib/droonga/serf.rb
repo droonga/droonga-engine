@@ -31,7 +31,7 @@ module Droonga
     def initialize(loop, name)
       @loop = loop
       @name = name
-      @serf_pid = nil
+      @pid = nil
     end
 
     def start
@@ -43,7 +43,7 @@ module Droonga
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
-      @serf_pid = run("agent",
+      @pid = run("agent",
                       "-node", @name,
                       "-bind", extract_host(@name),
                       "-event-handler", "#{$0}-serf-event-handler",
@@ -52,14 +52,14 @@ module Droonga
     end
 
     def running?
-      not @serf_pid.nil?
+      not @pid.nil?
     end
 
     def shutdown
       logger.trace("shutdown: start")
       Process.waitpid(run("leave"))
-      Process.waitpid(@serf_pid)
-      @serf_pid = nil
+      Process.waitpid(@pid)
+      @pid = nil
       logger.trace("shutdown: done")
     end
 
