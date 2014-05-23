@@ -15,6 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "time"
+require "fileutils"
 require "droonga/engine/version"
 require "droonga/loggable"
 require "droonga/engine_state"
@@ -27,6 +29,7 @@ module Droonga
     include Loggable
 
     LAST_PROCESSED_TIMESTAMP = "last_processed_timestamp"
+    EFFECTIVE_MESSAGE_TIMESTAMP = "effective_message_timestamp"
 
     def initialize(loop, name)
       @state = EngineState.new(loop, name)
@@ -67,6 +70,7 @@ module Droonga
     end
 
     def process(message)
+      return unless effective_message?(message)
       @last_processed_timestamp = message["date"]
       @dispatcher.process_message(message)
     end
@@ -91,10 +95,39 @@ module Droonga
     end
 
     def output_last_processed_timestamp
-      file_path = File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP)
-      File.open(file_path, "w") do |file|
+      File.open(last_processed_timestamp_file, "w") do |file|
         file.write(@last_processed_timestamp)
       end
+    end
+
+    def last_processed_timestamp_file
+      @last_processed_timestamp_file ||= File.join(Droonga.state_dir_path, EFFECTIVE_MESSAGE_TIMESTAMP)
+    end
+
+    def effective_message?(message)
+      effective_timestamp = effective_message_timestamp
+      return true if effective_timestamp.nil?
+
+      message_timestamp = Time.parse(message["date"])
+      return false if effective_timestamp >= message_timestamp
+
+      FileUtils.rm(effective_message_timestamp_file)
+      true
+    end
+
+    def effective_message_timestamp
+      return nil unless File.exist?(effective_message_timestamp_file)
+
+      timestamp = File.read(effective_message_timestamp_file)
+      begin
+        Time.parse(timestamp)
+      rescue ArgumentError
+        nil
+      end
+    end
+
+    def effective_message_timestamp_file
+      @effective_message_timestamp_file ||= File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP)
     end
 
     def log_tag
