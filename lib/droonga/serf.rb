@@ -44,10 +44,10 @@ module Droonga
         retry_joins.push("-retry-join", other_host)
       end
       @pid = run("agent",
-                      "-node", @name,
-                      "-bind", extract_host(@name),
-                      "-event-handler", "#{$0}-serf-event-handler",
-                      *retry_joins)
+                 "-node", @name,
+                 "-bind", extract_host(@name),
+                 "-event-handler", "#{$0}-serf-event-handler",
+                 *retry_joins)
       logger.trace("start: done")
     end
 
