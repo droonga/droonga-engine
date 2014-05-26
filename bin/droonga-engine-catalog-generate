@@ -24,7 +24,9 @@ require "droonga/catalog_generator"
 
 generator = Droonga::CatalogGenerator.new
 current_dataset = nil
-datasets = {}
+datasets = {
+  Droonga::CatalogGenerator::DEFAULT_DATASET => current_dataset
+}
 
 options = OpenStruct.new
 options.output_path = "-"
@@ -82,6 +84,10 @@ parser.on("--replicas=PATH",
   end
 end
 parser.parse!(ARGV)
+
+if datasets[Droonga::CatalogGenerator::DEFAULT_DATASET].empty?
+  datasets.delete(Droonga::CatalogGenerator::DEFAULT_DATASET)
+end
 
 datasets.each do |name, options|
   generator.add_dataset(name, options)
