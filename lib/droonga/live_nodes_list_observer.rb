@@ -27,16 +27,18 @@ module Droonga
     attr_accessor :on_update
 
     def initialize
-      FileUtils.mkdir_p(directory_path)
-      @listener = Listen.to(directory_path) do |modified, added, removed|
-        if added.include?(file_path) or
-             modified.include?(file_path)
-          load_list!
-        end
-      end
     end
 
     def start
+      file_name = path.to_s
+      directory = path.dirname.to_s
+      FileUtils.mkdir_p(directory)
+      @listener = Listen.to(directory) do |modified, added, removed|
+        if added.include?(file_name) or
+             modified.include?(file_name)
+          load_list!
+        end
+      end
       @listener.start
     end
 
@@ -46,18 +48,14 @@ module Droonga
 
     LIST_FILE_NAME = "live-nodes.json"
 
-    def file_path
-      (Droonga::Path.state + LIST_FILE_NAME).to_s
-    end
-
-    def directory_path
-      File.dirname(file_path)
+    def path
+      Droonga::Path.state + LIST_FILE_NAME
     end
 
     def load_list!
-      loader = LiveNodesListLoader.new(file_path)
+      loader = LiveNodesListLoader.new(path)
       live_nodes = loader.load
-      logger.info("loaded", :path => file_path, :live_nodes => live_nodes)
+      logger.info("loaded", :path => path.to_s, :live_nodes => live_nodes)
 
       on_update.call(live_nodes) if on_update
     end

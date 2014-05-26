@@ -18,22 +18,20 @@ require "json"
 
 module Droonga
   class LiveNodesListLoader
-    def initialize(file_path)
-      @file_path = file_path
+    def initialize(path)
+      @path = path
     end
 
     def load
-      list_file = Pathname(@file_path)
-      list = parse_list_file(list_file)
+      list = parse
       list.keys
     end
 
     private
-    def parse_list_file(list_file)
-      return default_list unless list_file
-      return default_list unless list_file.exist?
+    def parse
+      return default_list unless @path.exist?
 
-      contents = list_file.read
+      contents = @path.read
       return default_list if contents.empty?
 
       begin
