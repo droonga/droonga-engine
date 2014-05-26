@@ -101,7 +101,7 @@ module Droonga
     end
 
     def last_processed_timestamp_file
-      @last_processed_timestamp_file ||= File.join(Droonga.state_dir_path, LAST_PROCESSED_TIMESTAMP)
+      @last_processed_timestamp_file ||= File.join(Droonga.state_path, LAST_PROCESSED_TIMESTAMP)
     end
 
     def effective_message?(message)
@@ -127,7 +127,7 @@ module Droonga
     end
 
     def effective_message_timestamp_file
-      @effective_message_timestamp_file ||= File.join(Droonga.state_dir_path, EFFECTIVE_MESSAGE_TIMESTAMP)
+      @effective_message_timestamp_file ||= File.join(Droonga.state_path, EFFECTIVE_MESSAGE_TIMESTAMP)
     end
 
     def log_tag

@@ -23,7 +23,7 @@ module Droonga
       @base_path ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd)
     end
 
-    def state_dir_path
+    def state_path
       base_path + "state"
     end
   end

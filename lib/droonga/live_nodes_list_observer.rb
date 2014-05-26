@@ -65,7 +65,7 @@ module Droonga
     private
     def prepare_file_path
       path = ENV["DROONGA_LIVE_NODES_LIST"] || LIST_FILE_NAME
-      File.expand_path(path, Droonga.state_dir_path)
+      File.expand_path(path, Droonga.state_path)
     end
 
     def log_tag
