@@ -47,7 +47,7 @@ module Droonga
     LIST_FILE_NAME = "live-nodes.json"
 
     def file_path
-      @file_path ||= prepare_file_path
+      (Droonga::Path.state + LIST_FILE_NAME).to_s
     end
 
     def directory_path
@@ -63,11 +63,6 @@ module Droonga
     end
 
     private
-    def prepare_file_path
-      path = ENV["DROONGA_LIVE_NODES_LIST"] || LIST_FILE_NAME
-      File.expand_path(path, Droonga::Path.state)
-    end
-
     def log_tag
       "live-nodes-list-observer"
     end
