@@ -24,6 +24,7 @@ require "droonga/engine"
 require "droonga/serf"
 require "droonga/event_loop"
 require "droonga/fluent_message_receiver"
+require "droonga/internal_fluent_message_receiver"
 require "droonga/plugin_loader"
 
 module Droonga
@@ -360,6 +361,8 @@ module Droonga
           end
         end
 
+        include Loggable
+
         def initialize
           @engine_name = nil
           @listen_fd = nil
@@ -373,6 +376,8 @@ module Droonga
 
           begin
             run_services
+          rescue
+            logger.exception("failed to run services", $!)
           ensure
             shutdown_services
           end
@@ -408,12 +413,17 @@ module Droonga
           end
         end
 
+        def host
+          @engine_name.split(":", 2).first
+        end
+
         def run_services
           @engine = nil
           @receiver = nil
           raw_loop = Coolio::Loop.default
           @loop = EventLoop.new(raw_loop)
 
+          run_internal_message_receiver
           run_engine
           run_receiver
           setup_signals
@@ -424,12 +434,32 @@ module Droonga
         def shutdown_services
           shutdown_control_io
           shutdown_receiver
+          shutdown_internal_message_receiver
           shutdown_engine
           @loop = nil
         end
 
+        def run_internal_message_receiver
+          @internal_message_receiver = create_internal_message_receiver
+          host, port = @internal_message_receiver.start
+          tag = @engine_name.split("/", 2).last.split(".", 2).first
+          @internal_engine_name = "#{host}:#{port}/#{tag}"
+        end
+
+        def create_internal_message_receiver
+          InternalFluentMessageReceiver.new(@loop, host) do |tag, time, record|
+            on_message(tag, time, record)
+          end
+        end
+
+        def shutdown_internal_message_receiver
+          return if @internal_message_receiver.nil?
+          @internal_message_receiver, receiver = nil, @internal_message_receiver
+          receiver.shutdown
+        end
+
         def run_engine
-          @engine = Engine.new(@loop, @engine_name)
+          @engine = Engine.new(@loop, @engine_name, @internal_engine_name)
           @engine.start
         end
 
@@ -466,8 +496,6 @@ module Droonga
 
         def create_receiver
           options = {
-            :host => @host,
-            :port => @port,
             :listen_fd => @listen_fd,
             :heartbeat_fd => @heartbeat_fd,
           }
@@ -517,6 +545,10 @@ module Droonga
 
         def stop_immediate
           shutdown_services
+        end
+
+        def log_tag
+          "service"
         end
       end
     end

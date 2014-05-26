@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "English"
+
 require "coolio"
 
 require "droonga/loggable"
@@ -26,11 +28,13 @@ module Droonga
 
     attr_reader :loop
     attr_reader :name
+    attr_reader :internal_name
     attr_reader :forwarder
     attr_reader :replier
-    def initialize(loop, name)
+    def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
+      @internal_name = internal_name
       @sessions = {}
       @current_id = 0
       @forwarder = Forwarder.new(@loop)
@@ -50,13 +54,26 @@ module Droonga
     end
 
     def local_route?(route)
-      route.start_with?(@name)
+      route.start_with?(@name) or route.start_with?(@internal_name)
+    end
+
+    def farm_path(route)
+      if /\A[^:]+:\d+\/[^.]+/ =~ route
+        name = $MATCH
+        if name == @internal_name
+          @name
+        else
+          name
+        end
+      else
+        route
+      end
     end
 
     def generate_id
       id = @current_id
       @current_id = id.succ
-      return [@name, id].join(".#")
+      return [@internal_name, id].join(".#")
     end
 
     def find_session(id)

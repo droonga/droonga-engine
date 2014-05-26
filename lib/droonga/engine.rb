@@ -31,8 +31,8 @@ module Droonga
     LAST_PROCESSED_TIMESTAMP = "last_processed_timestamp"
     EFFECTIVE_MESSAGE_TIMESTAMP = "effective_message_timestamp"
 
-    def initialize(loop, name)
-      @state = EngineState.new(loop, name)
+    def initialize(loop, name, internal_name)
+      @state = EngineState.new(loop, name, internal_name)
 
       @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
       @catalog_observer.on_reload = lambda do |catalog|
