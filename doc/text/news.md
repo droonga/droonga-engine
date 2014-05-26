@@ -1,5 +1,15 @@
 # News
 
+## 1.0.3: 2014-05-29 (planned)
+
+ * Alive monitoring (based on [Serf](http://serfdom.io/)) lands.
+   Now, nodes in a cluster observe each other, and the cluster keeps working, even if one of replicas is dead.
+ * New commands to dump whole contents of an existing cluster are available.
+   They are used by [`drndump`](https://github.com/droonga/drndump) internally.
+ * The path of the configuration directory is now specified via an environment variable `DROONGA_BASE_DIR`.
+ * Fix compatibility issue of Groonga commands:
+   the default value of the `drilldown_output_columns` option for the `select` command becomes same to Groonga's one.
+
 ## 1.0.2: 2014-04-29
 
 The most important topic on this release is that the core component aka Droonga Engine becomes fluentd-free.
