@@ -76,6 +76,7 @@ module Droonga
           add_connection_options(parser)
           add_log_options(parser)
           add_process_options(parser)
+          add_path_options(parser)
         end
 
         def listen_socket
@@ -137,6 +138,16 @@ module Droonga
           end
         end
 
+        def add_path_options(parser)
+          parser.separator("")
+          parser.separator("Path:")
+          parser.on("--base-dir=DIR",
+                    "Use DIR as the base directory",
+                    "(#{Droonga::Path.base})") do |dir|
+            Droonga::Path.base = dir
+          end
+        end
+
         def bind_heartbeat_socket
           socket = UDPSocket.new(address_family)
           socket.bind(@host, @port)
@@ -159,7 +170,7 @@ module Droonga
         def run(command_line_arguments)
           parse_command_line_arguments!(command_line_arguments)
 
-          ENV[Droonga::Path::BASE_DIR_ENV_NAME] ||= Dir.pwd
+          ensure_path
 
           if @configuration.daemon?
             Process.daemon
@@ -177,6 +188,10 @@ module Droonga
           parser = OptionParser.new
           @configuration.add_command_line_options(parser)
           parser.parse!(command_line_arguments)
+        end
+
+        def ensure_path
+          Droonga::Path.base
         end
 
         def run_service(loop)
