@@ -76,7 +76,7 @@ module Droonga
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
         FileUtils.mkdir_p(list_file.parent.to_s)
-        File.open(list_file.to_s, "w") do |file|
+        list_file.open("w") do |file|
           file.write(file_contents)
         end
       end
