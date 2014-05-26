@@ -16,7 +16,7 @@
 require "fileutils"
 require "listen"
 
-require "droonga/base_path"
+require "droonga/path"
 require "droonga/loggable"
 require "droonga/live_nodes_list_loader"
 
@@ -65,7 +65,7 @@ module Droonga
     private
     def prepare_file_path
       path = ENV["DROONGA_LIVE_NODES_LIST"] || LIST_FILE_NAME
-      File.expand_path(path, Droonga.state_path)
+      File.expand_path(path, Droonga::Path.state)
     end
 
     def log_tag

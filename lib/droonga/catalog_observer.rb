@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/base_path"
+require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
 
@@ -61,7 +61,7 @@ module Droonga
 
     def catalog_path
       path = ENV["DROONGA_CATALOG"] || DEFAULT_CATALOG_PATH
-      File.expand_path(path, Droonga.base_path)
+      File.expand_path(path, Droonga::Path.base)
     end
 
     def catalog_updated?

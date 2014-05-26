@@ -19,7 +19,7 @@ require "ipaddr"
 require "fileutils"
 require "pathname"
 
-require "droonga/base_path"
+require "droonga/path"
 require "droonga/engine"
 require "droonga/serf"
 require "droonga/event_loop"
@@ -159,7 +159,7 @@ module Droonga
         def run(command_line_arguments)
           parse_command_line_arguments!(command_line_arguments)
 
-          ENV[Droonga::BASE_DIR_ENV_NAME] ||= Dir.pwd
+          ENV[Droonga::Path::BASE_DIR_ENV_NAME] ||= Dir.pwd
 
           if @configuration.daemon?
             Process.daemon

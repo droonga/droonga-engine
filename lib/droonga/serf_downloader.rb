@@ -21,7 +21,6 @@ require "faraday"
 require "faraday_middleware"
 require "archive/zip"
 
-require "droonga/base_path"
 require "droonga/loggable"
 
 module Droonga

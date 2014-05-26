@@ -18,7 +18,7 @@ require "pathname"
 require "json"
 require "fileutils"
 
-require "droonga/base_path"
+require "droonga/path"
 require "droonga/serf"
 require "droonga/live_nodes_list_observer"
 
@@ -69,7 +69,7 @@ module Droonga
       end
 
       def list_file
-        @list_file ||= Droonga.state_path + LiveNodesListObserver::LIST_FILE_NAME
+        @list_file ||= Droonga::Path.state + LiveNodesListObserver::LIST_FILE_NAME
       end
 
       def output_live_nodes

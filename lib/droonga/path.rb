@@ -16,15 +16,17 @@
 require "pathname"
 
 module Droonga
-  BASE_DIR_ENV_NAME = "DROONGA_BASE_DIR"
+  module Path
+    BASE_DIR_ENV_NAME = "DROONGA_BASE_DIR"
 
-  class << self
-    def base_path
-      @base_path ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd)
-    end
+    class << self
+      def base
+        @base ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd)
+      end
 
-    def state_path
-      base_path + "state"
+      def state
+        base + "state"
+      end
     end
   end
 end
