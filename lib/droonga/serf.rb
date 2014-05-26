@@ -22,7 +22,7 @@ module Droonga
   class Serf
     class << self
       def path
-        @path ||= Droonga::Path.base + "serf"
+        Droonga::Path.base + "serf"
       end
     end
 
