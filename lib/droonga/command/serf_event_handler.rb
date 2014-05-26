@@ -69,7 +69,7 @@ module Droonga
       end
 
       def list_file
-        @list_file ||= Droonga::Path.state + LiveNodesListObserver::LIST_FILE_NAME
+        Droonga::Path.state + LiveNodesListObserver::LIST_FILE_NAME
       end
 
       def output_live_nodes
