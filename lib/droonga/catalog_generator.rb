@@ -17,6 +17,13 @@ require "time"
 
 module Droonga
   class CatalogGenerator
+    DEFAULT_DATASET = "Default"
+    DEFAULT_HOSTS = ["127.0.0.1"]
+    DEFAULT_N_WORKERS = 4
+    DEFAULT_PLUGINS = ["groonga", "search", "crud", "dump"]
+    DEFAULT_PORT = 10031
+    DEFAULT_TAG = "droonga"
+
     def initialize
       @version = 2
       @effective_date = Time.now
@@ -51,11 +58,11 @@ module Droonga
       end
 
       def n_workers
-        @options[:n_workers] || 4
+        @options[:n_workers] || DEFAULT_N_WORKERS
       end
 
       def plugins
-        @options[:plugins] || ["groonga", "search", "crud", "dump"]
+        @options[:plugins] || DEFAULT_PLUGINS
       end
 
       def schema
@@ -87,7 +94,7 @@ module Droonga
 
     class Replicas
       def initialize(options={})
-        @hosts      = options[:hosts] || ["127.0.0.1"]
+        @hosts      = options[:hosts] || DEFAULT_HOSTS
         @port       = options[:port]
         @tag        = options[:tag]
         @n_slices   = options[:n_slices]
@@ -113,8 +120,8 @@ module Droonga
     class Replica
       def initialize(host, options={})
         @host       = host
-        @port       = options[:port]     || 10031
-        @tag        = options[:tag]      || "droonga"
+        @port       = options[:port]     || DEFAULT_PORT
+        @tag        = options[:tag]      || DEFAULT_TAG
         @n_slices   = options[:n_slices] || 1
 
         @n_volumes = 0
