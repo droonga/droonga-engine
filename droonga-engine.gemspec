@@ -40,7 +40,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "json"
   gem.add_dependency "cool.io"
   gem.add_dependency "serverengine"
-  gem.add_dependency "droonga-message-pack-packer"
+  gem.add_dependency "droonga-message-pack-packer", ">= 1.0.1"
   gem.add_dependency "listen", "~> 2.7"
   gem.add_dependency "faraday"
   gem.add_dependency "faraday_middleware"
