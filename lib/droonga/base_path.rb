@@ -24,7 +24,7 @@ module Droonga
     end
 
     def state_dir_path
-      @state_dir_path ||= base_path + "state"
+      base_path + "state"
     end
   end
 end
