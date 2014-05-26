@@ -22,6 +22,14 @@ require "droonga/live_nodes_list_loader"
 
 module Droonga
   class LiveNodesListObserver
+    class << self
+      FILE_NAME = "live-nodes.json"
+
+      def path
+        Path.state + FILE_NAME
+      end
+    end
+
     include Loggable
 
     attr_accessor :on_update
@@ -30,6 +38,7 @@ module Droonga
     end
 
     def start
+      path = self.class.path
       file_name = path.to_s
       directory = path.dirname.to_s
       FileUtils.mkdir_p(directory)
@@ -46,13 +55,8 @@ module Droonga
       @listener.stop
     end
 
-    LIST_FILE_NAME = "live-nodes.json"
-
-    def path
-      Droonga::Path.state + LIST_FILE_NAME
-    end
-
     def load_list!
+      path = self.class.path
       loader = LiveNodesListLoader.new(path)
       live_nodes = loader.load
       logger.info("loaded", :path => path.to_s, :live_nodes => live_nodes)

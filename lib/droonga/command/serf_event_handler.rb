@@ -68,15 +68,12 @@ module Droonga
         nodes
       end
 
-      def list_file
-        Droonga::Path.state + LiveNodesListObserver::LIST_FILE_NAME
-      end
-
       def output_live_nodes
+        list_path = LiveNodesListObserver.path
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
-        FileUtils.mkdir_p(list_file.parent.to_s)
-        list_file.open("w") do |file|
+        FileUtils.mkdir_p(list_path.parent.to_s)
+        list_path.open("w") do |file|
           file.write(file_contents)
         end
       end
