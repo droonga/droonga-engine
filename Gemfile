@@ -37,6 +37,13 @@ elsif ENV["TRAVIS"] == "true"
   end
 end
 
+droonga_message_pack_packer_dir = File.join(parent_dir, "droonga-messagep-pack-packer-ruby")
+if File.exist?(droonga_message_pack_packer_dir)
+  gem "droonga-messagep-pack-packer", :path => droonga_message_pack_packer_dir
+else
+  gem "droonga-messagep-pack-packer", :github => "droonga/droonga-messagep-pack-packer-ruby"
+end
+
 droonga_client_dir = File.join(parent_dir, "droonga-client-ruby")
 if File.exist?(droonga_client_dir)
   gem "droonga-client", :path => droonga_client_dir
