@@ -77,23 +77,27 @@ module Droonga
         end
 
         def transform_query(input_name, query)
-          output = query["output"]
-
-          # Skip reducing phase for a result with no output.
-          if output.nil? or
-              output["elements"].nil? or
-              (!output["elements"].include?("count") and
-              !output["elements"].include?("records"))
-            return
-          end
+          return unless need_reduce?(query)
 
           transformer = QueryTransformer.new(query)
-
           elements = transformer.mappers
           mapper = {}
           mapper["elements"] = elements unless elements.empty?
           reduce(input_name => { :reduce => transformer.reducers,
                                  :gather => mapper })
+        end
+
+        def need_reduce?(query)
+          output = query["output"]
+          return false if output.nil?
+
+          output_elements = output["elements"]
+          return false if output_elements.nil?
+
+          need_reduce_elements = ["count", "records"]
+          output_elements.any? do |element|
+            need_reduce_elements.include?(element)
+          end
         end
 
         class QueryTransformer
