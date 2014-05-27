@@ -27,7 +27,7 @@ module Droonga
             @result_name = @table + "_result"
 
             output_columns = select_request["output_columns"] || ""
-            attributes = output_columns.split(/, */)
+            attributes = output_columns.split(/\s*,\s*/)
             offset = (select_request["offset"] || "0").to_i
             limit = (select_request["limit"] || "10").to_i
 
