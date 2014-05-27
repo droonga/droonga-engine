@@ -101,8 +101,7 @@ def open_output(path)
   else
     # Don't output the file directly to prevent loading of incomplete file!
     path = Pathname(path)
-    temp_file = Tempfile.new(path.basename.to_s, path.parent.to_s)
-    File.open(temp_file, "w") do |output|
+    Tempfile.open(path.basename.to_s, path.parent.to_s, "w") do |output|
       yield(output)
     end
     File.rename(temp_file.path, path.to_s)
