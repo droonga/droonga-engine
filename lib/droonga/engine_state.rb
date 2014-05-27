@@ -31,6 +31,7 @@ module Droonga
     attr_reader :internal_name
     attr_reader :forwarder
     attr_reader :replier
+    attr_accessor :on_finish
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
@@ -39,6 +40,7 @@ module Droonga
       @current_id = 0
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
+      @on_finish = nil
     end
 
     def start
@@ -86,6 +88,13 @@ module Droonga
 
     def unregister_session(id)
       @sessions.delete(id)
+      unless have_session?
+        @on_finish.call if @on_finish
+      end
+    end
+
+    def have_session?
+      not @sessions.empty?
     end
 
     private

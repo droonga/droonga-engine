@@ -59,14 +59,33 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
+    def stop_graceful
+      logger.trace("stop_graceful: start")
+      @catalog_observer.stop
+      @live_nodes_list_observer.stop
+      on_finish = lambda do
+        output_last_processed_timestamp
+        @dispatcher.shutdown
+        @state.shutdown
+        yield
+      end
+      if @state.have_session?
+        @state.on_finish = on_finish
+      else
+        on_finish.call
+      end
+      logger.trace("stop_graceful: done")
+    end
+
+    # It may be called after stop_graceful.
+    def stop_immediately
+      logger.trace("stop_immediately: start")
       output_last_processed_timestamp
       @catalog_observer.stop
       @live_nodes_list_observer.stop
       @dispatcher.shutdown
       @state.shutdown
-      logger.trace("shutdown: done")
+      logger.trace("stop_immediately: done")
     end
 
     def process(message)
