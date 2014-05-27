@@ -29,6 +29,7 @@
   "dataset": "Default",
   "body": {
     "table": "Memos",
-    "output_columns": "_key, created_at"
+    "output_columns": "_key, created_at",
+    "sortby": "_key"
   }
 }
