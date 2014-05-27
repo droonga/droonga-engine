@@ -5,6 +5,13 @@
   "body": {
     "keys": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "_key",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "1.1"
@@ -19,6 +26,13 @@
     },
     "titles": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "title",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "Groonga storage engine"

@@ -663,6 +663,7 @@ module Droonga
 
       def output_target_attributes
         attributes = @request.output["attributes"]
+        attributes = expand_attributes(attributes)
         normalize_target_attributes(attributes)
       end
 
@@ -673,6 +674,31 @@ module Droonga
           formatter = SimpleRecordsFormatter.new
         end
         formatter.format(output_target_attributes, @result.records, output_limit, output_offset)
+      end
+
+      def expand_attributes(attributes, domain = @result.records)
+        expanded_attributes = []
+        attributes.each do |attribute|
+          if attribute.is_a?(String)
+            source = attribute
+          else
+            source = attribute["source"]
+          end
+          if source == "*"
+            real_table = domain
+            loop do
+              next_domain = real_table.domain
+              break unless next_domain.is_a?(Groonga::Table)
+              real_table = next_domain
+            end
+            real_table.columns.each do |column|
+              expanded_attributes << column.local_name
+            end
+          else
+            expanded_attributes << attribute
+          end
+        end
+        expanded_attributes
       end
 
       def normalize_target_attributes(attributes, domain = @result.records)

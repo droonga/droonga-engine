@@ -94,7 +94,7 @@ module Droonga
           output_elements = output["elements"]
           return false if output_elements.nil?
 
-          need_reduce_elements = ["count", "records"]
+          need_reduce_elements = ["count", "attributes", "records"]
           output_elements.any? do |element|
             need_reduce_elements.include?(element)
           end
@@ -127,6 +127,7 @@ module Droonga
             calculate_offset_and_limit!
             build_count_mapper_and_reducer!
             build_elapsed_time_mapper_and_reducer!
+            build_attributes_mapper_and_reducer!
             build_records_mapper_and_reducer!
           end
 
@@ -266,6 +267,18 @@ module Droonga
 
             @reducers["elapsedTime"] = {
               "type" => "sum",
+            }
+          end
+
+          def build_attributes_mapper_and_reducer!
+            return unless @output["elements"].include?("attributes")
+
+            @reducers["attributes"] = {
+              "type" => "or",
+            }
+
+            @mappers["attributes"] = {
+              "names" => output_attribute_names,
             }
           end
 

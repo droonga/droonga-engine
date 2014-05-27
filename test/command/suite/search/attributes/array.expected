@@ -5,6 +5,13 @@
   "body": {
     "result": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "section-id",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         {
           "section-id": "1.1"

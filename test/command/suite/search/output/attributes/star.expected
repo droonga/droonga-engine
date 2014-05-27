@@ -3,28 +3,23 @@
   "statusCode": 200,
   "type": "search.result",
   "body": {
-    "documents": {
-      "count": 2,
+    "memos": {
       "attributes": [
         {
-          "name": "_key",
-          "type": "ShortText",
+          "name": "content",
+          "type": "Text",
           "vector": false
         },
         {
-          "name": "_nsubrecs",
-          "type": "Int32",
+          "name": "created_at",
+          "type": "Time",
           "vector": false
         }
       ],
       "records": [
         [
-          "Groonga",
-          3
-        ],
-        [
-          "Mroonga",
-          2
+          "I started Droonga. It is very fun!",
+          "2014-05-27T08:45:25.000000Z"
         ]
       ]
     }

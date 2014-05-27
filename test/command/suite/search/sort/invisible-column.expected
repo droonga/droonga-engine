@@ -5,6 +5,13 @@
   "body": {
     "result": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "title",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "Groonga library"

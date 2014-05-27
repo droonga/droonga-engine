@@ -5,6 +5,13 @@
   "body": {
     "result": {
       "count": 1,
+      "attributes": [
+        {
+          "name": "title",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "Groonga storage engine"

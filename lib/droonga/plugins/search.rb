@@ -76,6 +76,28 @@ module Droonga
             end
           end
 
+          attributes_mapper = elements["attributes"]
+          if attributes_mapper and value["attributes"]
+            attributes = value["attributes"]
+            output_attributes = []
+            attributes_mapper["names"].each do |name|
+              if name == "*"
+                attributes.each do |attribute|
+                  next if attribute["name"].start_with?("_")
+                  output_attributes << attribute
+                end
+              else
+                attributes.each do |attribute|
+                  if attribute["name"] == name
+                    output_attributes << attribute
+                    break
+                  end
+                end
+              end
+            end
+            value["attributes"] = output_attributes
+          end
+
           records_mapper = elements["records"]
           if records_mapper and value["records"]
             if records_mapper["no_output"]
@@ -99,8 +121,14 @@ module Droonga
               complex_item
             end
           else
-            items.collect do |item|
-              item[0...attributes.size]
+            # FIXME: Compare with "attributes" value from "search" not
+            # gather parameter like the following.
+            if attributes.include?("*")
+              items
+            else
+              items.collect do |item|
+                item[0...attributes.size]
+              end
             end
           end
         end

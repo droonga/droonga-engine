@@ -14,7 +14,30 @@
           0
         ],
         [
-
+          [
+            "_id",
+            "UInt32"
+          ],
+          [
+            "_key",
+            "ShortText"
+          ],
+          [
+            "age",
+            "Int32"
+          ],
+          [
+            "birthday",
+            "Time"
+          ],
+          [
+            "email",
+            "ShortText"
+          ],
+          [
+            "name",
+            "ShortText"
+          ]
         ]
       ]
     ]

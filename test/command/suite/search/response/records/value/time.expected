@@ -5,6 +5,18 @@
   "body": {
     "result": {
       "count": 2,
+      "attributes": [
+        {
+          "name": "_key",
+          "type": "ShortText",
+          "vector": false
+        },
+        {
+          "name": "start",
+          "type": "Time",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "Groonga Night 3",

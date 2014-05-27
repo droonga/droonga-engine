@@ -5,6 +5,18 @@
   "body": {
     "result": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "_key",
+          "type": "ShortText",
+          "vector": false
+        },
+        {
+          "name": "title",
+          "type": "ShortText",
+          "vector": false
+        }
+      ],
       "records": [
         [
           "1.1",

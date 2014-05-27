@@ -5,6 +5,24 @@
   "body": {
     "result": {
       "count": 9,
+      "attributes": [
+        {
+          "name": "section-id",
+          "type": "ShortText",
+          "vector": false
+        },
+        {
+          "name": "label",
+          "type": "ShortText",
+          "vector": false
+        },
+        {
+          "name": "fixed-number"
+        },
+        {
+          "name": "fixed-string"
+        }
+      ],
       "records": [
         {
           "section-id": "1.1",
