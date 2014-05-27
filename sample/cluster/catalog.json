@@ -2,7 +2,7 @@
   "version": 2,
   "effectiveDate": "2013-09-01T00:00:00Z",
   "datasets": {
-    "Droonga": {
+    "Default": {
       "nWorkers": 2,
       "plugins": ["groonga", "search", "crud"],
       "schema": {
