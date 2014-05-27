@@ -30,10 +30,6 @@ require "droonga/plugin_loader"
 module Droonga
   module Command
     module DroongaEngine
-      module Signals
-        include ServerEngine::Daemon::Signals
-      end
-
       class SupervisorConfiguration
         DEFAULT_HOST = Socket.gethostname
         DEFAULT_PORT = 10031
@@ -194,54 +190,9 @@ module Droonga
           Droonga::Path.base
         end
 
-        def run_service(loop)
-          service_runner = ServiceRunner.new(loop, @configuration)
-          service_runner.run
-          service_runner
-        end
-
-        def run_serf(loop)
-          serf = Serf.new(loop, @configuration.engine_name)
-          serf.start
-          serf
-        end
-
         def run_main_loop
-          raw_loop = Coolio::Loop.default
-
-          serf = nil
-          service_runner = nil
-          trap(:INT) do
-            serf.shutdown if serf
-            service_runner.stop_immediately if service_runner
-          end
-          trap(Signals::GRACEFUL_STOP) do
-            serf.shutdown if serf
-            service_runner.stop_graceful if service_runner
-          end
-          trap(Signals::IMMEDIATE_STOP) do
-            serf.shutdown if serf
-            service_runner.stop_immediately if service_runner
-          end
-          trap(Signals::GRACEFUL_RESTART) do
-            old_service_runner = service_runner
-            service_runner = run_service(raw_loop)
-            service_runner.on_ready = lambda do
-              old_service_runner.stop_graceful
-            end
-          end
-          trap(Signals::IMMEDIATE_RESTART) do
-            old_service_runner = service_runner
-            service_runner = run_service(raw_loop)
-            old_service_runner.stop_immediately
-          end
-
-          serf = run_serf(raw_loop)
-          service_runner = run_service(raw_loop)
-          raw_loop.run
-          serf.shutdown if serf.running?
-
-          service_runner.success?
+          main_loop = MainLoop.new(@configuration)
+          main_loop.run
         end
 
         def open_log_file
@@ -268,6 +219,82 @@ module Droonga
           else
             yield
           end
+        end
+      end
+
+      class MainLoop
+        def initialize(configuration)
+          @configuration = configuration
+          @loop = Coolio::Loop.default
+        end
+
+        def run
+          @serf = run_serf
+          @service_runner = run_service
+
+          trap_signals
+          @loop.run
+          @serf.shutdown if @serf.running?
+
+          @service_runner.success?
+        end
+
+        private
+        def trap_signals
+          trap(:TERM) do
+            stop_graceful
+            trap(:TERM, "DEFAULT")
+          end
+          trap(:INT) do
+            stop_immediately
+            trap(:INT, "DEFAULT")
+          end
+          trap(:QUIT) do
+            stop_immediately
+            trap(:QUIT, "DEFAULT")
+          end
+          trap(:USR1) do
+            restart_graceful
+          end
+          trap(:HUP) do
+            restart_immediately
+          end
+        end
+
+        def stop_graceful
+          @serf.shutdown
+          @service_runner.stop_graceful
+        end
+
+        def stop_immediately
+          @serf.shutdown
+          @service_runner.stop_immediately
+        end
+
+        def restart_graceful
+          old_service_runner = @service_runner
+          @service_runner = run_service
+          @service_runner.on_ready = lambda do
+            old_service_runner.stop_graceful
+          end
+        end
+
+        def restart_immediately
+          old_service_runner = @service_runner
+          @service_runner = run_service
+          old_service_runner.stop_immediately
+        end
+
+        def run_service
+          service_runner = ServiceRunner.new(@loop, @configuration)
+          service_runner.run
+          service_runner
+        end
+
+        def run_serf
+          serf = Serf.new(@loop, @configuration.engine_name)
+          serf.start
+          serf
         end
       end
 
