@@ -74,11 +74,11 @@ module Droonga
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
         # Don't output the file directly to prevent loading of incomplete file!
-        temp_file = Tempfile.open(list_path.basename.to_s, list_path.parent.to_s, "w") do |output|
+        Tempfile.open(list_path.basename.to_s, list_path.parent.to_s, "w") do |output|
           output.write(file_contents)
-          output.path
+          output.flush
+          File.rename(output.path, list_path.to_s)
         end
-        File.rename(temp_file, list_path.to_s)
       end
     end
   end
