@@ -329,7 +329,7 @@ module Droonga
                   }
                 when Hash
                   attribute["label"] = key
-              attribute
+                  attribute
                 end
               end
             else
