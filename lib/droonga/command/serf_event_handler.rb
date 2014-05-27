@@ -17,6 +17,7 @@ require "optparse"
 require "pathname"
 require "json"
 require "fileutils"
+require "tempfile"
 
 require "droonga/path"
 require "droonga/serf"
@@ -72,10 +73,12 @@ module Droonga
         list_path = LiveNodesListObserver.path
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
-        FileUtils.mkdir_p(list_path.parent.to_s)
-        list_path.open("w") do |file|
-          file.write(file_contents)
+        # Don't output the file directly to prevent loading of incomplete file!
+        temp_file = Tempfile.open(list_path.basename.to_s, list_path.parent.to_s, "w") do |output|
+          output.write(file_contents)
+          output.path
         end
+        File.rename(temp_file, list_path.to_s)
       end
     end
   end
