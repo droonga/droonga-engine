@@ -28,8 +28,8 @@ module Droonga
   class Engine
     include Loggable
 
-    LAST_PROCESSED_TIMESTAMP = "last_processed_timestamp"
-    EFFECTIVE_MESSAGE_TIMESTAMP = "effective_message_timestamp"
+    LAST_PROCESSED_TIMESTAMP = "last-processed-timestamp"
+    EFFECTIVE_MESSAGE_TIMESTAMP = "effective-message-timestamp"
 
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
