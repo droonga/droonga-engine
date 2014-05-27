@@ -25,7 +25,7 @@ require "droonga/engine/version"
 require "droonga/catalog_generator"
 
 generator = Droonga::CatalogGenerator.new
-current_dataset = nil
+current_dataset = {}
 datasets = {
   Droonga::CatalogGenerator::DEFAULT_DATASET => current_dataset
 }
