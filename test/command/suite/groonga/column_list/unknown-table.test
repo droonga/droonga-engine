@@ -1,6 +1,6 @@
 {
   "type": "column_list",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "Unknown"
   }

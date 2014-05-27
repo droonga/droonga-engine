@@ -1,7 +1,7 @@
 #@include fixture/user-table.jsons
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table"  : "User",
     "key"    : "key",
@@ -11,7 +11,7 @@
 }
 {
   "type": "delete",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table"  : "User",
     "filter" : "_key @^ \"key\""

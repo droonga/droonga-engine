@@ -1,7 +1,7 @@
 #@include fixture/user-table.jsons
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "unknown-source": {

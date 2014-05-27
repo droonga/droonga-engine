@@ -3,7 +3,7 @@
 #@disable-logging
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Droonga is fun",
@@ -14,7 +14,7 @@
 }
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Ruby is also fun",
@@ -26,7 +26,7 @@
 #@enable-logging
 {
   "type": "select",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "output_columns": "_key, created_at"

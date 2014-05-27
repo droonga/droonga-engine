@@ -1,6 +1,6 @@
 {
   "type": "table_create",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "name"  : "User",
     "flags" : "TABLE_PAT_KEY"
@@ -8,7 +8,7 @@
 }
 {
   "type": "delete",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "User",
     "key"   : "key",

@@ -1,7 +1,7 @@
 #@require-catalog-version 2
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Products",
     "key": "Groonga",
@@ -12,7 +12,7 @@
 }
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Products",
     "key": "Rroonga",
@@ -23,7 +23,7 @@
 }
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Products",
     "key": "Ruby",
@@ -34,7 +34,7 @@
 }
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "products": {

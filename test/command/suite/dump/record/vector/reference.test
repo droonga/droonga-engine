@@ -2,7 +2,7 @@
 #@disable-logging
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -17,5 +17,5 @@
 #@enable-logging
 {
   "type": "dump",
-  "dataset": "Droonga"
+  "dataset": "Default"
 }

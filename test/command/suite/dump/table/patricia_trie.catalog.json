@@ -1,6 +1,6 @@
 {
   "datasets": {
-    "Droonga": {
+    "Default": {
       "schema": {
         "Memos": {
           "type": "PatriciaTrie",

@@ -1,6 +1,6 @@
 {
   "type": "delete",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "Unknown"
   }

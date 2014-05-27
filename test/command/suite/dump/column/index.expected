@@ -1,16 +1,16 @@
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
@@ -21,7 +21,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -31,7 +31,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "content",
@@ -42,7 +42,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Terms",
@@ -54,7 +54,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Terms",
     "name": "Memos__key_content",
@@ -74,12 +74,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -89,7 +89,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "content",
@@ -100,7 +100,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Terms",
@@ -112,7 +112,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Terms",
     "name": "Memos__key_content",
@@ -132,12 +132,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -147,7 +147,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "content",
@@ -158,7 +158,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Terms",
@@ -170,7 +170,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Terms",
     "name": "Memos__key_content",
@@ -190,6 +190,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }

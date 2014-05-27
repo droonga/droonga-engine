@@ -1,7 +1,7 @@
 #@require-catalog-version 2
 #@disable-logging
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -12,7 +12,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -23,7 +23,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -34,7 +34,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -45,7 +45,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -56,7 +56,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -67,7 +67,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -78,7 +78,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -89,7 +89,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -102,7 +102,7 @@
 #@enable-logging
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "Groonga": {

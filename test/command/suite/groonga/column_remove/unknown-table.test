@@ -1,6 +1,6 @@
 {
   "type": "column_remove",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "Unknown"
   }

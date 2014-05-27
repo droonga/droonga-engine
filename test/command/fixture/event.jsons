@@ -1,7 +1,7 @@
 #@disable-logging
 {
   "type": "table_create",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "name"  : "Event",
     "flags" : "TABLE_HASH_KEY"
@@ -9,7 +9,7 @@
 }
 {
   "type": "column_create",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "Event",
     "name"  : "start",
@@ -17,7 +17,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Event",
@@ -28,7 +28,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Event",

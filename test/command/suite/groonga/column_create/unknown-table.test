@@ -1,6 +1,6 @@
 {
   "type": "column_create",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table" : "Unknown"
   }

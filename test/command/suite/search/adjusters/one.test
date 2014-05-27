@@ -3,7 +3,7 @@
 #@disable-logging
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Droonga is fun.",
@@ -19,7 +19,7 @@
 }
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Groonga is fast!",
@@ -36,7 +36,7 @@
 #@enable-logging
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "memos": {

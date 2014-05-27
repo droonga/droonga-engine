@@ -4,6 +4,6 @@
   "type": "unknown-type.result",
   "body": {
     "name": "UnknownType",
-    "message": "[Droonga] Handler not found for the type: <unknown-type>"
+    "message": "[Default] Handler not found for the type: <unknown-type>"
   }
 }

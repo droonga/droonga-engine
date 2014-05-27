@@ -1,16 +1,16 @@
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
@@ -21,7 +21,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Memos",
@@ -31,12 +31,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Memos",
@@ -46,12 +46,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Memos",
@@ -61,6 +61,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }

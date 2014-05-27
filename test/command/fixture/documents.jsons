@@ -1,6 +1,6 @@
 #@disable-logging
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "table_create",
   "body": {
     "default_tokenizer": "TokenBigram",
@@ -11,7 +11,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "table_create",
   "body": {
     "name": "Documents",
@@ -20,7 +20,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "table_create",
   "body": {
     "name": "Sections",
@@ -29,7 +29,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "column_create",
   "body": {
     "table": "Sections",
@@ -39,7 +39,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "column_create",
   "body": {
     "table": "Sections",
@@ -49,7 +49,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "column_create",
   "body": {
     "table": "Sections",
@@ -59,7 +59,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "column_create",
   "body": {
     "table": "Bigram",
@@ -70,7 +70,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "column_create",
   "body": {
     "table": "Bigram",
@@ -81,7 +81,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Documents",
@@ -89,7 +89,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -102,7 +102,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -115,7 +115,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -128,7 +128,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -141,7 +141,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -154,7 +154,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -167,7 +167,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -180,7 +180,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",
@@ -193,7 +193,7 @@
   }
 }
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Sections",

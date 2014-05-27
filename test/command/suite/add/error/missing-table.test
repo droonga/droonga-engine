@@ -1,7 +1,7 @@
 #@include fixture/user-table.jsons
 {
   "type": "add",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "key": "key",
     "values": {

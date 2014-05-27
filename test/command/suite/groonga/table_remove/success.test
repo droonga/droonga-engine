@@ -1,7 +1,7 @@
 #@include fixture/user-table.jsons
 {
   "type": "table_remove",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "name"  : "User"
   }

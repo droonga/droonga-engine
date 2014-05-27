@@ -1,16 +1,16 @@
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
@@ -21,7 +21,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Array",
     "name": "Logs"
@@ -30,12 +30,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Array",
     "name": "Logs"
@@ -44,12 +44,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Array",
     "name": "Logs"
@@ -58,6 +58,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }

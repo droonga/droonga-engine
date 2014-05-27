@@ -1,6 +1,6 @@
 {
   "datasets": {
-    "Droonga": {
+    "Default": {
       "fact": "Memos",
       "schema": {
         "Memos": {

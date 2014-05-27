@@ -9,7 +9,7 @@
     }
   },
   "datasets": {
-    "Droonga": {
+    "Default": {
       "workers": 4,
       "plugins": ["groonga", "crud", "search"],
       "number_of_replicas": 2,

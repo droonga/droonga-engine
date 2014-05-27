@@ -1,7 +1,7 @@
 #@include fixture/event.jsons
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "result": {

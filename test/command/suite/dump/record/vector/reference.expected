@@ -1,16 +1,16 @@
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.start"
 }
 {
@@ -21,7 +21,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -31,7 +31,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "tags",
@@ -45,7 +45,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Tags",
@@ -55,7 +55,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Users",
@@ -65,7 +65,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -80,12 +80,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -95,7 +95,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "tags",
@@ -109,7 +109,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Tags",
@@ -119,7 +119,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Users",
@@ -129,7 +129,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -144,12 +144,12 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -159,7 +159,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "name": "tags",
@@ -173,7 +173,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "PatriciaTrie",
     "name": "Tags",
@@ -183,7 +183,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "type": "Hash",
     "name": "Users",
@@ -193,7 +193,7 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -208,6 +208,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "dump.end"
 }

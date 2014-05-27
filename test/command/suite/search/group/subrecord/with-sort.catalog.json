@@ -1,6 +1,6 @@
 {
   "datasets": {
-    "Droonga": {
+    "Default": {
       "fact": "Comments",
       "schema": {
         "Threads": {

@@ -1,6 +1,6 @@
 #@require-catalog-version 2
 {
-  "dataset": "Droonga",
+  "dataset": "Default",
   "type": "add",
   "body": {
     "table": "Memos",
@@ -16,7 +16,7 @@
 }
 {
   "type": "search",
-  "dataset": "Droonga",
+  "dataset": "Default",
   "body": {
     "queries": {
       "documents": {
