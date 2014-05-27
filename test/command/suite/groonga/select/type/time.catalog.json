@@ -1,0 +1,19 @@
+{
+  "datasets": {
+    "Droonga": {
+      "fact": "Memos",
+      "schema": {
+        "Memos": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "created_at": {
+              "type": "Scalar",
+              "valueType": "Time"
+            }
+          }
+        }
+      }
+    }
+  }
+}

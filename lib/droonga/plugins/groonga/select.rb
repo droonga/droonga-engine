@@ -196,7 +196,7 @@ module Droonga
           def convert_search_result(result)
             count      = result["count"]
             attributes = convert_attributes(result["attributes"])
-            records    = result["records"] || []
+            records    = convert_records(attributes, result["records"] || [])
             [[count], attributes, *records]
           end
 
@@ -206,6 +206,20 @@ module Droonga
               name = attribute["name"]
               type = attribute["type"]
               [name, type]
+            end
+          end
+
+          def convert_records(attributes, records)
+            records.collect do |record|
+              record.collect.each_with_index do |value, i|
+                name, type = attributes[i]
+                case type
+                when "Time"
+                  normalize_time(value).to_f
+                else
+                  value
+                end
+              end
             end
           end
         end

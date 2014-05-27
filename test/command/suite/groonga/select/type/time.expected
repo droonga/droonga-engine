@@ -1,0 +1,37 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "select.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    [
+      [
+        [
+          2
+        ],
+        [
+          [
+            "_key",
+            "ShortText"
+          ],
+          [
+            "created_at",
+            "Time"
+          ]
+        ],
+        [
+          "Droonga is fun",
+          1401170395.0
+        ],
+        [
+          "Ruby is also fun",
+          1401341365.0
+        ]
+      ]
+    ]
+  ]
+}
