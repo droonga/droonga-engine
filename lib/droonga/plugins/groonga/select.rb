@@ -196,12 +196,8 @@ module Droonga
           def convert_search_result(result)
             count      = result["count"]
             attributes = convert_attributes(result["attributes"])
-            records    = result["records"]
-            if records.nil? or records.empty?
-              [[count], attributes]
-            else
-              [[count], attributes, records]
-            end
+            records    = result["records"] || []
+            [[count], attributes, *records]
           end
 
           def convert_attributes(attributes)
