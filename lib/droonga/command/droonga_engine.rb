@@ -22,6 +22,7 @@ require "coolio"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/service_control_protocol"
 
 module Droonga
   module Command
@@ -293,6 +294,8 @@ module Droonga
       end
 
       class ServiceRunner
+        include ServiceControlProtocol
+
         def initialize(raw_loop, configuration)
           @raw_loop = raw_loop
           @configuration = configuration
@@ -337,11 +340,11 @@ module Droonga
         end
 
         def stop_graceful
-          @control_write_out.write("stop-graceful\n")
+          @control_write_out.write(Messages::STOP_GRACEFUL)
         end
 
         def stop_immediately
-          @control_write_out.write("stop-immediately\n")
+          @control_write_out.write(Messages::STOP_IMMEDIATELY)
         end
 
         def success?
@@ -371,9 +374,9 @@ module Droonga
             # TODO: should buffer data to handle half line received case
             data.each_line do |line|
               case line
-              when "ready\n"
+              when Messages::READY
                 on_ready
-              when "finish\n"
+              when Messages::FINISH
                 on_finish
               end
             end

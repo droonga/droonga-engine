@@ -17,6 +17,7 @@ require "optparse"
 
 require "coolio"
 
+require "droonga/service_control_protocol"
 require "droonga/engine"
 require "droonga/fluent_message_receiver"
 require "droonga/internal_fluent_message_receiver"
@@ -32,6 +33,7 @@ module Droonga
       end
 
       include Loggable
+      include ServiceControlProtocol
 
       def initialize
         @engine_name = nil
@@ -55,7 +57,7 @@ module Droonga
           logger.exception("failed to run services", $!)
         ensure
           unless @control_write_closed
-            control_write_io.write("finish\n")
+            control_write_io.write(Messages::FINISH)
             control_write_io.close
           end
         end
@@ -161,9 +163,9 @@ module Droonga
           # TODO: should buffer data to handle half line received case
           data.each_line do |line|
             case line
-            when "stop-graceful\n"
+            when Messages::STOP_GRACEFUL
               stop_graceful
-            when "stop-immediately\n"
+            when Messages::STOP_IMMEDIATELY
               stop_immediately
             end
           end
@@ -196,7 +198,7 @@ module Droonga
         end
         @loop.attach(@control_write)
 
-        @control_write.write("ready\n")
+        @control_write.write(Messages::READY)
       end
 
       def shutdown_control_io
