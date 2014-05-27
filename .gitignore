@@ -4,3 +4,4 @@
 /.yardoc/
 /pkg/
 /sample/cluster/0*
+/sample/cluster/state/
