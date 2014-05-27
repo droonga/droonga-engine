@@ -10,6 +10,23 @@
   "type": "search.result",
   "body": {
     "documents": {
+      "attributes": [
+        {
+          "name": "_key",
+          "type": "ShortText",
+          "vector": false
+        },
+        {
+          "name": "content",
+          "type": "Text",
+          "vector": false
+        },
+        {
+          "name": "categories",
+          "type": "ShortText",
+          "vector": true
+        }
+      ],
       "records": [
         [
           "Groonga newbie",
