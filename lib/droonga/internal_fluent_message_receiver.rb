@@ -14,6 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "socket"
+require "ipaddr"
 
 require "droonga/fluent_message_receiver"
 
