@@ -61,7 +61,7 @@ module Droonga
       end
 
       def ensure_path
-        Droonga::Path.base
+        Path.base
       end
 
       def run_main_loop
@@ -204,8 +204,8 @@ module Droonga
           parser.separator("Path:")
           parser.on("--base-dir=DIR",
                     "Use DIR as the base directory",
-                    "(#{Droonga::Path.base})") do |dir|
-            Droonga::Path.base = dir
+                    "(#{Path.base})") do |dir|
+            Path.base = dir
           end
         end
 
