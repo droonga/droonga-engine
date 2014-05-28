@@ -164,7 +164,7 @@ module Droonga
           data.each_line do |line|
             case line
             when Messages::STOP_GRACEFUL
-              stop_graceful
+              stop_gracefully
             when Messages::STOP_IMMEDIATELY
               stop_immediately
             end
@@ -244,17 +244,17 @@ module Droonga
         @engine.process(message)
       end
 
-      def stop_graceful
+      def stop_gracefully
         return if @stopping
         @stopping = true
         shutdown_receiver
-        @engine.stop_graceful do
+        @engine.stop_gracefully do
           shutdown_control_io
           shutdown_internal_message_receiver
         end
       end
 
-      # It may be called after stop_graceful.
+      # It may be called after stop_gracefully.
       def stop_immediately
         shutdown_control_io
         shutdown_receiver if @receiver

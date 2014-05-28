@@ -31,9 +31,9 @@ module Droonga
       Droonga.logger.trace("#{log_tag}: after_run: done")
     end
 
-    def stop(stop_graceful)
+    def stop(stop_gracefully)
       Droonga.logger.trace("#{log_tag}: stop: start")
-      super(stop_graceful)
+      super(stop_gracefully)
       Droonga.logger.trace("#{log_tag}: stop: done")
     end
 

@@ -239,7 +239,7 @@ module Droonga
         private
         def trap_signals
           trap(:TERM) do
-            stop_graceful
+            stop_gracefully
             trap(:TERM, "DEFAULT")
           end
           trap(:INT) do
@@ -258,11 +258,11 @@ module Droonga
           end
         end
 
-        def stop_graceful
+        def stop_gracefully
           @loop_breaker.signal
           @loop_breaker.detach
           @serf.shutdown
-          @service_runner.stop_graceful
+          @service_runner.stop_gracefully
         end
 
         def stop_immediately
@@ -277,7 +277,7 @@ module Droonga
           old_service_runner = @service_runner
           @service_runner = run_service
           @service_runner.on_ready = lambda do
-            old_service_runner.stop_graceful
+            old_service_runner.stop_gracefully
           end
         end
 
@@ -347,7 +347,7 @@ module Droonga
           attach_control_read_in(control_read_in)
         end
 
-        def stop_graceful
+        def stop_gracefully
           @control_write_out.write(Messages::STOP_GRACEFUL)
         end
 

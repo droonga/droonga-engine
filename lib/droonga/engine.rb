@@ -59,8 +59,8 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def stop_graceful
-      logger.trace("stop_graceful: start")
+    def stop_gracefully
+      logger.trace("stop_gracefully: start")
       @catalog_observer.stop
       @live_nodes_list_observer.stop
       on_finish = lambda do
@@ -74,10 +74,10 @@ module Droonga
       else
         on_finish.call
       end
-      logger.trace("stop_graceful: done")
+      logger.trace("stop_gracefully: done")
     end
 
-    # It may be called after stop_graceful.
+    # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
       output_last_processed_timestamp
