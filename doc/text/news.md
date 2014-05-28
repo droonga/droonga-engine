@@ -13,6 +13,9 @@
    * Column values of `Time` type clumns are returned as float numbers correctly.
    * The message structure of results becomes same to Groonga.
      In previous version, records are wrongly wrapped in an array.
+ * Improve features of the `select` command..
+   * The request parameter `"attributes"` for `"elements"` in `"output"` is now available.
+   * The special value `"*"` for `"attributes"` in `"output"` is now available, to export all columns.
 
 ## 1.0.2: 2014-04-29
 
