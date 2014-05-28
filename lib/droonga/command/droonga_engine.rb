@@ -281,7 +281,12 @@ module Droonga
           old_service_runner = @service_runner
           @service_runner = run_service
           @service_runner.on_ready = lambda do
+            @service_runner.on_failure = nil
             old_service_runner.stop_gracefully
+          end
+          @service_runner.on_failure = lambda do
+            @service_runner.on_failure = nil
+            @service_runner = old_service_runner
           end
         end
 
@@ -321,10 +326,16 @@ module Droonga
           @raw_loop = raw_loop
           @configuration = configuration
           @success = false
+          @on_ready = nil
+          @on_failure = nil
         end
 
         def on_ready=(callback)
           @on_ready = callback
+        end
+
+        def on_failure=(callback)
+          @on_failure = callback
         end
 
         def run
@@ -377,11 +388,16 @@ module Droonga
           @on_ready.call if @on_ready
         end
 
+        def on_failure
+          @on_failure.call if @on_failure
+        end
+
         def on_finish
           _, status = Process.waitpid2(@pid)
           @success = status.success?
           @control_write_out.close
           @control_read_in.close
+          on_failure unless success?
         end
 
         def attach_control_write_out(control_write_out)
