@@ -15,7 +15,7 @@
 
 require "droonga/path"
 require "droonga/loggable"
-require "droonga/catalog_observer"
+require "droonga/catalog_loader"
 require "droonga/serf_downloader"
 
 module Droonga
@@ -97,8 +97,8 @@ module Droonga
     end
 
     def detect_other_hosts
-      catalog_observer = Droonga::CatalogObserver.new(@loop)
-      catalog = catalog_observer.catalog
+      loader = CatalogLoader.new(Path.catalog.to_s)
+      catalog = loader.load
       other_nodes = catalog.all_nodes.reject do |node|
         node == @name
       end

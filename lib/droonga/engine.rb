@@ -20,7 +20,7 @@ require "fileutils"
 require "droonga/engine/version"
 require "droonga/loggable"
 require "droonga/engine_state"
-require "droonga/catalog_observer"
+require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/live_nodes_list_observer"
 
@@ -33,13 +33,9 @@ module Droonga
 
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
-
-      @catalog_observer = Droonga::CatalogObserver.new(@state.loop)
-      @catalog_observer.on_reload = lambda do |catalog|
-        graceful_restart(catalog)
-        logger.info("restarted")
-      end
-
+      @catalog = load_catalog
+      @live_nodes = @catalog.all_nodes
+      @dispatcher = create_dispatcher
       @live_nodes_list_observer = LiveNodesListObserver.new
       @live_nodes_list_observer.on_update = lambda do |live_nodes|
         @live_nodes = live_nodes
@@ -51,17 +47,12 @@ module Droonga
       logger.trace("start: start")
       @state.start
       @live_nodes_list_observer.start
-      @catalog_observer.start
-      catalog = @catalog_observer.catalog
-      @live_nodes = catalog.all_nodes
-      @dispatcher = create_dispatcher(catalog)
       @dispatcher.start
       logger.trace("start: done")
     end
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @catalog_observer.stop
       @live_nodes_list_observer.stop
       on_finish = lambda do
         output_last_processed_timestamp
@@ -81,7 +72,6 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       output_last_processed_timestamp
-      @catalog_observer.stop
       @live_nodes_list_observer.stop
       @dispatcher.shutdown
       @state.shutdown
@@ -95,22 +85,20 @@ module Droonga
     end
 
     private
-    def create_dispatcher(catalog)
-      dispatcher = Dispatcher.new(@state, catalog)
-      dispatcher.live_nodes = @live_nodes
-      dispatcher
+    def load_catalog
+      catalog_path = Path.catalog
+      loader = CatalogLoader.new(catalog_path.to_s)
+      catalog = loader.load
+      logger.info("catalog loaded",
+                  :path  => catalog_path,
+                  :mtime => catalog_path.mtime)
+      catalog
     end
 
-    def graceful_restart(catalog)
-      logger.trace("graceful_restart: start")
-      old_dispatcher = @dispatcher
-      logger.trace("graceful_restart: creating new dispatcher")
-      new_dispatcher = create_dispatcher(catalog)
-      new_dispatcher.start
-      @dispatcher = new_dispatcher
-      logger.trace("graceful_restart: shutdown old dispatcher")
-      old_dispatcher.shutdown
-      logger.trace("graceful_restart: done")
+    def create_dispatcher
+      dispatcher = Dispatcher.new(@state, @catalog)
+      dispatcher.live_nodes = @live_nodes
+      dispatcher
     end
 
     def output_last_processed_timestamp

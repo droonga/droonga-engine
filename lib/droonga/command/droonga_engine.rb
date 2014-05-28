@@ -22,6 +22,7 @@ require "coolio"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/catalog_observer"
 require "droonga/service_control_protocol"
 
 module Droonga
@@ -226,6 +227,7 @@ module Droonga
         def run
           @serf = run_serf
           @service_runner = run_service
+          @catalog_observer = run_catalog_observer
           @loop_breaker = Coolio::AsyncWatcher.new
           @loop.attach(@loop_breaker)
 
@@ -262,6 +264,7 @@ module Droonga
           @loop_breaker.signal
           @loop_breaker.detach
           @serf.shutdown
+          @catalog_observer.stop
           @service_runner.stop_gracefully
         end
 
@@ -269,6 +272,7 @@ module Droonga
           @loop_breaker.signal
           @loop_breaker.detach
           @serf.shutdown
+          @catalog_observer.stop
           @service_runner.stop_immediately
         end
 
@@ -298,6 +302,15 @@ module Droonga
           serf = Serf.new(@loop, @configuration.engine_name)
           serf.start
           serf
+        end
+
+        def run_catalog_observer
+          catalog_observer = CatalogObserver.new(@loop)
+          catalog_observer.on_change = lambda do
+            restart_graceful
+          end
+          catalog_observer.start
+          catalog_observer
         end
       end
 
