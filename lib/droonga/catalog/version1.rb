@@ -370,7 +370,6 @@ module Droonga
                     raise UnknownFarmForPartition.new(name, partition, @path)
                   end
                   directory_name = $POSTMATCH
-                  p [valid_farms_matcher, partition, directory_name]
                   do_validation do
                     if directory_name.nil? or directory_name.empty?
                       message = "\"#{partition}\" has no database name. " +
