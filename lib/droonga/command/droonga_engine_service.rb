@@ -51,10 +51,12 @@ module Droonga
         PluginLoader.load_all
 
         control_write_io = IO.new(@control_write_fd)
+        success = true
         begin
           run_services
         rescue
           logger.exception("failed to run services", $!)
+          success = false
         ensure
           unless @control_write_closed
             control_write_io.write(Messages::FINISH)
@@ -62,7 +64,7 @@ module Droonga
           end
         end
 
-        true
+        success
       end
 
       private
