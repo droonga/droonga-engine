@@ -49,7 +49,7 @@ module Droonga
           @handler_runner.process(message)
           #XXX Workaround to restart system by any schema change.
           #    This should be done more smartly...
-          FileUtils.touch(Path.catalog.to_s)
+          FileUtils.touch(Path.catalog.to_s) if synchronous
         else
           @job_pusher.push(message)
         end
