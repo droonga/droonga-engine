@@ -39,7 +39,7 @@ module Droonga
 
     def start
       path = self.class.path
-      file_name = path.to_s
+      file_name = path.expand_path.to_s
       directory = path.dirname.to_s
       FileUtils.mkdir_p(directory)
       @listener = Listen.to(directory) do |modified, added, removed|

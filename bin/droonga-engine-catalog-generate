@@ -100,7 +100,7 @@ def open_output(path)
     yield($stdout)
   else
     # Don't output the file directly to prevent loading of incomplete file!
-    path = Pathname(path)
+    path = Pathname(path).expand_path
     Tempfile.open(path.basename.to_s, path.parent.to_s, "w") do |output|
       yield(output)
       output.flush
