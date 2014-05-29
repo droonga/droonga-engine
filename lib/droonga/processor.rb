@@ -15,6 +15,7 @@
 
 require "droonga/loggable"
 require "droonga/handler_runner"
+require "fileutils"
 
 module Droonga
   class Processor
@@ -46,6 +47,9 @@ module Droonga
         synchronous = @handler_runner.prefer_synchronous?(type)
         if @n_workers.zero? or synchronous
           @handler_runner.process(message)
+          #XXX Workaround to restart system by any schema change.
+          #    This should be done more smartly...
+          FileUtils.touch(Path.catalog.to_s)
         else
           @job_pusher.push(message)
         end
