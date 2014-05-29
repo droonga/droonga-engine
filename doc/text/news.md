@@ -17,6 +17,8 @@
  * Improve features of the `select` command..
    * The request parameter `"attributes"` for `"elements"` in `"output"` is now available.
    * The special value `"*"` for `"attributes"` in `"output"` is now available, to export all columns.
+ * Server process does shutdown/restart gracefully.
+ * Restart itself automatically when the `catalog.json` is updated.
 
 ## 1.0.2: 2014-04-29
 
