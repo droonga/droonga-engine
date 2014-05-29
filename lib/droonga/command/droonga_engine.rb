@@ -74,7 +74,8 @@ module Droonga
       def open_log_file
         if @configuration.log_file
           File.open(@configuration.log_file, "a") do |file|
-            @log_output = file
+            $stdout.reopen(file)
+            $stderr.reopen(file)
             yield
           end
         else
@@ -360,10 +361,6 @@ module Droonga
             control_write_in => control_write_in,
             control_read_out => control_read_out,
           }
-          if @log_output
-            options[:out] = @log_output
-            options[:err] = @log_output
-          end
           @pid = spawn(env, *command_line, options)
           control_write_in.close
           control_read_out.close
