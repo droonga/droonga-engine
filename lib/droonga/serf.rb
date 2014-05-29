@@ -46,7 +46,7 @@ module Droonga
       @pid = run("agent",
                  "-node", @name,
                  "-bind", extract_host(@name),
-                 "-event-handler", "#{$0}-serf-event-handler",
+                 "-event-handler", "droonga-engine-serf-event-handler",
                  *retry_joins)
       logger.trace("start: done")
     end

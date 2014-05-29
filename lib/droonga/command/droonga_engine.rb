@@ -64,6 +64,14 @@ module Droonga
 
       def ensure_path
         Path.base
+        unless $0 == File.basename($0)
+          droonga_engine_bin_path = File.expand_path(File.dirname($0))
+          new_paths = [
+            droonga_engine_bin_path,
+            ENV["PATH"],
+          ]
+          ENV["PATH"] = new_paths.join(File::PATH_SEPARATOR)
+        end
       end
 
       def run_main_loop
@@ -185,7 +193,7 @@ module Droonga
           end
           parser.on("--log-file=FILE",
                     "Output logs to FILE") do |file|
-            @log_file = file
+            @log_file = File.expand_path(file)
           end
         end
 
@@ -198,7 +206,7 @@ module Droonga
           end
           parser.on("--pid-file=FILE",
                     "Put PID to the FILE") do |file|
-            @pid_file = file
+            @pid_file = File.expand_path(file)
           end
         end
 
@@ -208,7 +216,7 @@ module Droonga
           parser.on("--base-dir=DIR",
                     "Use DIR as the base directory",
                     "(#{Path.base})") do |dir|
-            Path.base = dir
+            Path.base = File.expand_path(dir)
           end
         end
 
@@ -348,7 +356,7 @@ module Droonga
           command_line = [
             RbConfig.ruby,
             "-S",
-            "#{$0}-service",
+            "droonga-engine-service",
             "--listen-fd", listen_fd.to_s,
             "--heartbeat-fd", heartbeat_fd.to_s,
             "--control-read-fd", control_write_in.fileno.to_s,
