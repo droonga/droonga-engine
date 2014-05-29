@@ -42,7 +42,7 @@ module Droonga
       def run(command_line_arguments)
         parse_command_line_arguments!(command_line_arguments)
 
-        ensure_path
+        setup_path
 
         if @configuration.daemon?
           Process.daemon
@@ -62,8 +62,8 @@ module Droonga
         parser.parse!(command_line_arguments)
       end
 
-      def ensure_path
-        Path.base
+      def setup_path
+        Path.setup
         unless $0 == File.basename($0)
           droonga_engine_bin_path = File.expand_path(File.dirname($0))
           new_paths = [

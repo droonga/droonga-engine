@@ -20,6 +20,11 @@ module Droonga
     BASE_DIR_ENV_NAME = "DROONGA_BASE_DIR"
 
     class << self
+      def setup
+        base_dir = ENV[BASE_DIR_ENV_NAME] || Dir.pwd
+        ENV[BASE_DIR_ENV_NAME] = File.expand_path(base_dir)
+      end
+
       def base
         @base ||= Pathname.new(ENV[BASE_DIR_ENV_NAME] || Dir.pwd).expand_path
       end
