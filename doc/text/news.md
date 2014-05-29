@@ -1,6 +1,6 @@
 # News
 
-## 1.0.3: 2014-05-29 (planned)
+## 1.0.3: 2014-05-29
 
  * Alive monitoring (based on [Serf](http://serfdom.io/)) lands.
    Now, nodes in a cluster observe each other, and the cluster keeps working, even if one of replicas is dead.
