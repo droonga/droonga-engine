@@ -290,7 +290,6 @@ module Droonga
           old_service_runner = @service_runner
           @service_runner = run_service
           @service_runner.on_ready = lambda do
-            @serf.restart if @serf.running?
             @service_runner.on_failure = nil
             old_service_runner.stop_gracefully
           end
@@ -304,7 +303,6 @@ module Droonga
           @loop_breaker.signal
           old_service_runner = @service_runner
           @service_runner = run_service
-          @serf.restart if @serf.running?
           old_service_runner.stop_immediately
         end
 

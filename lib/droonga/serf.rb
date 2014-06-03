@@ -63,11 +63,6 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
-    def restart
-      shutdown
-      start
-    end
-
     private
     def ensure_serf
       @serf = find_system_serf
