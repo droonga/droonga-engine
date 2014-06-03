@@ -24,6 +24,7 @@ require "droonga/path"
 require "droonga/serf"
 require "droonga/catalog_observer"
 require "droonga/service_control_protocol"
+require "droonga/line_buffer"
 
 module Droonga
   module Command
@@ -412,9 +413,9 @@ module Droonga
 
         def attach_control_read_in(control_read_in)
           @control_read_in = Coolio::IO.new(control_read_in)
+          line_buffer = LineBuffer.new
           on_read = lambda do |data|
-            # TODO: should buffer data to handle half line received case
-            data.each_line do |line|
+            line_buffer.feed(data) do |line|
               case line
               when Messages::READY
                 on_ready

@@ -18,6 +18,7 @@ require "optparse"
 require "coolio"
 
 require "droonga/service_control_protocol"
+require "droonga/line_buffer"
 require "droonga/engine"
 require "droonga/fluent_message_receiver"
 require "droonga/internal_fluent_message_receiver"
@@ -162,8 +163,8 @@ module Droonga
         @control_read = Coolio::IO.new(IO.new(@control_read_fd))
         @control_read_fd = nil
         on_read = lambda do |data|
-          # TODO: should buffer data to handle half line received case
-          data.each_line do |line|
+          line_buffer = LineBuffer.new
+          line_buffer.feed(data) do |line|
             case line
             when Messages::STOP_GRACEFUL
               stop_gracefully
