@@ -19,6 +19,7 @@ require "ipaddr"
 require "fileutils"
 
 require "coolio"
+require "sigdump"
 
 require "droonga/path"
 require "droonga/serf"
@@ -267,6 +268,9 @@ module Droonga
           end
           trap(:HUP) do
             restart_immediately
+          end
+          trap(:USR2) do
+            Sigdump.dump
           end
         end
 
