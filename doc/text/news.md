@@ -1,5 +1,9 @@
 # News
 
+## 1.0.4: 2014-06-29 (planned)
+
+ * New command (and plugin) [`status`](http://droonga.org/reference/1.0.4/commands/status/) is now available.
+
 ## 1.0.3: 2014-05-29
 
  * Alive monitoring (based on [Serf](http://serfdom.io/)) lands.
