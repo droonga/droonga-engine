@@ -20,7 +20,7 @@ module Droonga
     DEFAULT_DATASET = "Default"
     DEFAULT_HOSTS = ["127.0.0.1"]
     DEFAULT_N_WORKERS = 4
-    DEFAULT_PLUGINS = ["groonga", "search", "crud", "dump"]
+    DEFAULT_PLUGINS = ["groonga", "search", "crud", "dump", "status"]
     DEFAULT_PORT = 10031
     DEFAULT_TAG = "droonga"
 
