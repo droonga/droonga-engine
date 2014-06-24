@@ -21,7 +21,6 @@ require "tempfile"
 
 require "droonga/path"
 require "droonga/serf"
-require "droonga/file_observer"
 
 module Droonga
   module Command
