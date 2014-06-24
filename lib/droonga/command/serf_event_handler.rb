@@ -72,6 +72,7 @@ module Droonga
         list_path = Path.live_nodes
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
+        FileUtils.mkdir_p(list_path.parent.to_s)
         # Don't output the file directly to prevent loading of incomplete file!
         Tempfile.open(list_path.basename.to_s, list_path.parent.to_s, "w") do |output|
           output.write(file_contents)
