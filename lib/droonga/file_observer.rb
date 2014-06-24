@@ -21,17 +21,21 @@ require "droonga/path"
 require "droonga/loggable"
 
 module Droonga
-  class CatalogObserver
+  class FileObserver
     include Loggable
 
     CHECK_INTERVAL = 1
 
     attr_accessor :on_change
 
-    def initialize(loop)
+    def initialize(loop, path)
       @loop = loop
-      @path = Path.catalog
-      @mtime = @path.mtime
+      @path = path
+      if @path.exist?
+        @mtime = @path.mtime
+      else
+        @mtime = nil
+      end
       @on_change = nil
     end
 
@@ -55,11 +59,11 @@ module Droonga
 
     private
     def updated?
-      @path.mtime > @mtime
+      @path.exist? and @path.mtime > @mtime
     end
 
     def log_tag
-      "catalog-observer"
+      "file-observer"
     end
   end
 end

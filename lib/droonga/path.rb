@@ -38,6 +38,10 @@ module Droonga
         base + "state"
       end
 
+      def live_nodes
+        state + "live-nodes.json"
+      end
+
       def catalog
         base_file_name = ENV["DROONGA_CATALOG"] || "catalog.json"
         Pathname.new(base_file_name).expand_path(base)

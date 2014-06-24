@@ -21,7 +21,7 @@ require "tempfile"
 
 require "droonga/path"
 require "droonga/serf"
-require "droonga/live_nodes_list_observer"
+require "droonga/file_observer"
 
 module Droonga
   module Command
@@ -70,7 +70,7 @@ module Droonga
       end
 
       def output_live_nodes
-        list_path = LiveNodesListObserver.path
+        list_path = Path.live_nodes
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
         # Don't output the file directly to prevent loading of incomplete file!

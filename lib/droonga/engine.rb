@@ -22,7 +22,7 @@ require "droonga/loggable"
 require "droonga/engine_state"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
-require "droonga/live_nodes_list_observer"
+require "droonga/file_observer"
 
 module Droonga
   class Engine
@@ -36,9 +36,9 @@ module Droonga
       @catalog = load_catalog
       @live_nodes = @catalog.all_nodes
       @dispatcher = create_dispatcher
-      @live_nodes_list_observer = LiveNodesListObserver.new
-      @live_nodes_list_observer.on_update = lambda do |live_nodes|
-        @live_nodes = live_nodes
+      @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes)
+      @live_nodes_list_observer.on_change = lambda do
+        @live_nodes = load_live_nodes
         @dispatcher.live_nodes = live_nodes if @dispatcher
       end
     end
@@ -95,6 +95,16 @@ module Droonga
       catalog
     end
 
+    def load_live_nodes
+      path = Path.live_nodes
+      loader = LiveNodesListLoader.new(path)
+      live_nodes = loader.load
+      logger.info("live-nodes loaded",
+                  :path  => path,
+                  :mtime => path.mtime)
+      live_nodes
+    end
+
     def create_dispatcher
       dispatcher = Dispatcher.new(@state, @catalog)
       dispatcher.live_nodes = @live_nodes
@@ -102,6 +112,7 @@ module Droonga
     end
 
     def output_last_processed_timestamp
+      FileUtils.mkdir_p(File.dirname(last_processed_timestamp_file))
       File.open(last_processed_timestamp_file, "w") do |file|
         file.write(@last_processed_timestamp)
       end

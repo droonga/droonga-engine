@@ -23,7 +23,7 @@ require "sigdump"
 
 require "droonga/path"
 require "droonga/serf"
-require "droonga/catalog_observer"
+require "droonga/file_observer"
 require "droonga/service_control_protocol"
 require "droonga/line_buffer"
 
@@ -324,7 +324,7 @@ module Droonga
         end
 
         def run_catalog_observer
-          catalog_observer = CatalogObserver.new(@loop)
+          catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
             restart_graceful
           end
