@@ -40,7 +40,7 @@ module Droonga
       @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes)
       @live_nodes_list_observer.on_change = lambda do
         @live_nodes = load_live_nodes
-        @dispatcher.live_nodes = live_nodes if @dispatcher
+        @dispatcher.live_nodes = @live_nodes if @dispatcher
       end
     end
 
