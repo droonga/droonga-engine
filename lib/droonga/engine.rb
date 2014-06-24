@@ -23,6 +23,7 @@ require "droonga/engine_state"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
+require "droonga/live_nodes_list_loader"
 
 module Droonga
   class Engine
