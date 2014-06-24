@@ -59,7 +59,8 @@ module Droonga
 
     private
     def updated?
-      @path.exist? and @path.mtime > @mtime
+      return false unless @path.exist?
+      @mtime.nil? or @path.mtime > @mtime
     end
 
     def log_tag
