@@ -42,6 +42,14 @@ module Droonga
         state + "live-nodes.json"
       end
 
+      def last_processed_timestamp
+        state + "last-processed.timestamp"
+      end
+
+      def effective_message_timestamp
+        state + "effective-message.timestamp"
+      end
+
       def catalog
         base_file_name = ENV["DROONGA_CATALOG"] || "catalog.json"
         Pathname.new(base_file_name).expand_path(base)

@@ -29,9 +29,6 @@ module Droonga
   class Engine
     include Loggable
 
-    LAST_PROCESSED_TIMESTAMP = "last-processed.timestamp"
-    EFFECTIVE_MESSAGE_TIMESTAMP = "effective-message.timestamp"
-
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
       @catalog = load_catalog
@@ -113,14 +110,11 @@ module Droonga
     end
 
     def output_last_processed_timestamp
-      FileUtils.mkdir_p(File.dirname(last_processed_timestamp_file))
-      File.open(last_processed_timestamp_file, "w") do |file|
+      path = Path.last_processed_timestamp
+      FileUtils.mkdir_p(path.dirname.to_s)
+      path.open("w") do |file|
         file.write(@last_processed_timestamp)
       end
-    end
-
-    def last_processed_timestamp_file
-      @last_processed_timestamp_file ||= File.join(Droonga::Path.state, LAST_PROCESSED_TIMESTAMP)
     end
 
     def effective_message?(message)
@@ -130,23 +124,20 @@ module Droonga
       message_timestamp = Time.parse(message["date"])
       return false if effective_timestamp >= message_timestamp
 
-      FileUtils.rm(effective_message_timestamp_file)
+      FileUtils.rm(Path.effective_timestamp.to_s)
       true
     end
 
     def effective_message_timestamp
-      return nil unless File.exist?(effective_message_timestamp_file)
+      path = Path.effective_message_timestamp
+      return nil unless path.exist?
 
-      timestamp = File.read(effective_message_timestamp_file)
+      timestamp = path.read
       begin
         Time.parse(timestamp)
       rescue ArgumentError
         nil
       end
-    end
-
-    def effective_message_timestamp_file
-      @effective_message_timestamp_file ||= File.join(Droonga::Path.state, EFFECTIVE_MESSAGE_TIMESTAMP)
     end
 
     def log_tag
