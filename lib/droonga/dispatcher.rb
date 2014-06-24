@@ -51,7 +51,7 @@ module Droonga
     def initialize(engine_state, catalog)
       @engine_state = engine_state
       @catalog = catalog
-      @live_nodes = catalog.all_nodes
+      @live_nodes = all_nodes
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
                        :dispatcher => self)
@@ -208,6 +208,10 @@ module Droonga
 
     def local?(route)
       @engine_state.local_route?(route)
+    end
+
+    def all_nodes
+      @catalog.all_nodes
     end
 
     private
