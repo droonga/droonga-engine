@@ -132,7 +132,7 @@ module Droonga
         end
 
         def log_level
-          ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default_label
+          ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
         end
 
         def daemon?

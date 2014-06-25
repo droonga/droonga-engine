@@ -49,12 +49,12 @@ module Droonga
           LABELS[level]
         end
 
-        def default
-          WARN
+        def value(label)
+          LABELS.index(label.to_s)
         end
 
-        def default_label
-          label(default)
+        def default
+          ENV["DROONGA_LOG_LEVEL"] || label(WARN)
         end
       end
     end
@@ -73,7 +73,7 @@ module Droonga
     def initialize(options={})
       @output = options[:output] || self.class.default_output
       @tag = options[:tag]
-      self.level = ENV["DROONGA_LOG_LEVEL"] || Level.default_label
+      self.level = options[:level] || Level.default
     end
 
     def level
@@ -81,7 +81,11 @@ module Droonga
     end
 
     def level=(level)
-      @level = Level::LABELS.index(level.to_s)
+      if level.is_a?(Numeric)
+        @level = level
+      else
+        @level = Level.value(level)
+      end
     end
 
     def trace(message, data={})

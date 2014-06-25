@@ -13,10 +13,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "English"
+
 require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
 require "droonga/serf_downloader"
+require "droonga/line_buffer"
 
 module Droonga
   class Serf
@@ -31,7 +34,7 @@ module Droonga
     def initialize(loop, name)
       @loop = loop
       @name = name
-      @pid = nil
+      @agent = nil
     end
 
     def start
@@ -43,23 +46,24 @@ module Droonga
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
-      @pid = run("agent",
-                 "-node", @name,
-                 "-bind", extract_host(@name),
-                 "-event-handler", "droonga-engine-serf-event-handler",
-                 *retry_joins)
+      @agent = run("agent",
+                   "-node", @name,
+                   "-bind", extract_host(@name),
+                   "-event-handler", "droonga-engine-serf-event-handler",
+                   "-log-level", log_level,
+                   *retry_joins)
       logger.trace("start: done")
     end
 
     def running?
-      not @pid.nil?
+      @agent and @agent.running?
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      Process.waitpid(run("leave"))
-      Process.waitpid(@pid)
-      @pid = nil
+      run("leave").shutdown
+      @agent.shutdown
+      @agent = nil
       logger.trace("shutdown: done")
     end
 
@@ -85,11 +89,27 @@ module Droonga
     end
 
     def run(command, *options)
-      spawn(@serf, command, "-rpc-addr", rpc_address, *options)
+      process = SerfProcess.new(@loop, @serf, command,
+                                "-rpc-addr", rpc_address,
+                                *options)
+      process.start
+      process
     end
 
     def extract_host(node_name)
       node_name.split(":").first
+    end
+
+    def log_level
+      level = Logger::Level.default
+      case level
+      when "trace", "debug", "info", "warn"
+        level
+      when "error", "fatal"
+        "err"
+      else
+        level # Or error?
+      end
     end
 
     def rpc_address
@@ -109,6 +129,118 @@ module Droonga
 
     def log_tag
       "serf"
+    end
+
+    class SerfProcess
+      include Loggable
+
+      def initialize(loop, serf, command, *options)
+        @loop = loop
+        @serf = serf
+        @command = command
+        @options = options
+        @pid = nil
+      end
+
+      def start
+        capture_output do |output_write, error_write|
+          env = {}
+          spawn_options = {
+            :out => output_write,
+            :err => error_write,
+          }
+          @pid = spawn(env, @serf, @command, *@options, spawn_options)
+        end
+      end
+
+      def shutdown
+        return if @pid.nil?
+        Process.waitpid(@pid)
+        @output_io.close
+        @error_io.close
+        @pid = nil
+      end
+
+      def running?
+        not @pid.nil?
+      end
+
+      private
+      def capture_output
+        result = nil
+        output_read, output_write = IO.pipe
+        error_read, error_write = IO.pipe
+
+        begin
+          result = yield(output_write, error_write)
+        rescue
+          output_read.close  unless output_read.closed?
+          output_write.close unless output_write.closed?
+          error_read.close   unless error_read.closed?
+          error_write.close  unless error_write.closed?
+          raise
+        end
+
+        output_line_buffer = LineBuffer.new
+        on_read_output = lambda do |data|
+          on_standard_output(output_line_buffer, data)
+        end
+        @output_io = Coolio::IO.new(output_read)
+        @output_io.on_read do |data|
+          on_read_output.call(data)
+        end
+        @loop.attach(@output_io)
+
+        error_line_buffer = LineBuffer.new
+        on_read_error = lambda do |data|
+          on_error_output(error_line_buffer, data)
+        end
+        @error_io = Coolio::IO.new(error_read)
+        @error_io.on_read do |data|
+          on_read_error.call(data)
+        end
+        @loop.attach(@error_io)
+
+        result
+      end
+
+      def on_standard_output(line_buffer, data)
+        line_buffer.feed(data) do |line|
+          line = line.chomp
+          case line
+          when /\A==> /
+            content = $POSTMATCH
+            logger.info(content)
+          when /\A    /
+            content = $POSTMATCH
+            case content
+            when /\A(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2}) \[(\w+)\] /
+              year, month, day = $1, $2, $3
+              hour, minute, second = $4, $5, $6
+              level = $7
+              content = $POSTMATCH
+              logger.send(level.downcase, content)
+            else
+              logger.info(content)
+            end
+          else
+            logger.info(line)
+          end
+        end
+      end
+
+      def on_error_output(line_buffer, data)
+        line_buffer.feed(data) do |line|
+          line = line.chomp
+          logger.error(line.gsub(/\A==> /, ""))
+        end
+      end
+
+      def log_tag
+        tag = "serf"
+        tag << "[#{@pid}]" if @pid
+        tag
+      end
     end
   end
 end
