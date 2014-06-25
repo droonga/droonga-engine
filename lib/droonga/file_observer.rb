@@ -40,7 +40,7 @@ module Droonga
     end
 
     def start
-      @watcher = Cool.io::TimerWatcher.new(CHECK_INTERVAL, true)
+      @watcher = Coolio::TimerWatcher.new(CHECK_INTERVAL, true)
       on_timer = lambda do
         if updated?
           @mtime = @path.mtime
