@@ -16,7 +16,6 @@
 require "groonga"
 
 require "droonga/loggable"
-require "droonga/forwarder"
 require "droonga/handler_message"
 require "droonga/handler_messenger"
 require "droonga/step_runner"
@@ -36,13 +35,11 @@ module Droonga
 
     def start
       logger.trace("start: start")
-      @forwarder.start
       logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      @forwarder.shutdown
       close_database if @database
       logger.trace("shutdown: done")
     end
@@ -81,7 +78,7 @@ module Droonga
       logger.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                      "#{@options[:plugins].join(", ")}")
       @step_runner = StepRunner.new(nil, @options[:plugins] || [])
-      @forwarder = Forwarder.new(@loop)
+      @forwarder = @options[:forwarder]
     end
 
     def close_database

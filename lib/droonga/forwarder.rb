@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "droonga/loggable"
+require "droonga/path"
 require "droonga/event_loop"
 require "droonga/fluent_message_sender"
 
@@ -48,6 +49,26 @@ module Droonga
       arguments = destination["arguments"]
       output(receiver, message, command, arguments)
       logger.trace("forward: done")
+    end
+
+    def resume
+      return unless Path.buffer.exist?
+      Pathname.glob("#{Path.buffer}/*") do |path|
+        next unless path.directory?
+        next if path.glob("*").zero?
+
+        destination = path.basename.to_s
+        next if @senders.key?(destination)
+
+        components = destination.split(":")
+        port = components.pop.to_i
+        next if port.zero?
+        host = components.join(":")
+
+        sender = create_sender(host, port)
+        sender.resume
+        @senders[destination] = sender
+      end
     end
 
     private

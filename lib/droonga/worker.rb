@@ -22,8 +22,10 @@ module Droonga
     def initialize
       @raw_loop = Coolio::Loop.new
       @loop = EventLoop.new(@raw_loop)
+      @forwarder = Forwarder.new(@loop)
       @handler_runner = HandlerRunner.new(@loop,
-                                          config.merge(:dispatcher => nil))
+                                          config.merge(:dispatcher => nil,
+                                                       :forwarder => @forwarder))
       receive_socket_path = config[:job_receive_socket_path]
       @job_receiver = JobReceiver.new(@loop, receive_socket_path) do |message|
         process(message)
@@ -32,10 +34,12 @@ module Droonga
 
     def run
       Droonga.logger.trace("#{log_tag}: run: start")
+      @forwarder.start
       @handler_runner.start
       @job_receiver.start
       @raw_loop.run
       @handler_runner.shutdown
+      @forwarder.shutdown
       Droonga.logger.trace("#{log_tag}: run: done")
     end
 

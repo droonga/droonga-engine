@@ -15,6 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "fileutils"
 require "thread"
 
 require "cool.io"
@@ -22,6 +23,7 @@ require "cool.io"
 require "droonga/message-pack-packer"
 
 require "droonga/loggable"
+require "droonga/buffered_tcp_socket"
 
 module Droonga
   class FluentMessageSender
@@ -32,19 +34,15 @@ module Droonga
       @host = host
       @port = port
       @socket = nil
-      @buffer = []
-      @write_mutex = Mutex.new
     end
 
     def start
       logger.trace("start: start")
-      start_writer
       logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      shutdown_writer
       shutdown_socket
       logger.trace("shutdown: done")
     end
@@ -53,14 +51,14 @@ module Droonga
       logger.trace("send: start")
       fluent_message = [tag, Time.now.to_i, data]
       packed_fluent_message = MessagePackPacker.pack(fluent_message)
-      @write_mutex.synchronize do
-        @buffer << packed_fluent_message
-        unless @signaling
-          @signaling = true
-          @writer.signal
-        end
-      end
+      connect unless connected?
+      @socket.write(packed_fluent_message)
       logger.trace("send: done")
+    end
+
+    def resume
+      connect
+      @socket.resume
     end
 
     private
@@ -85,7 +83,9 @@ module Droonga
         @socket = nil
       end
 
-      @socket = Coolio::TCPSocket.connect(@host, @port)
+      data_directory = Path.buffer + "#{@host}:#{@port}"
+      FileUtils.mkdir_p(data_directory.to_s)
+      @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
       @socket.on_write_complete do
         log_write_complete.call
       end
@@ -106,31 +106,6 @@ module Droonga
     def shutdown_socket
       return unless connected?
       @socket.close unless @socket.closed?
-    end
-
-    def start_writer
-      @writer = Coolio::AsyncWatcher.new
-      @signaling = false
-
-      on_signal = lambda do
-        @write_mutex.synchronize do
-          @signaling = false
-          connect unless connected?
-          @buffer.each do |data|
-            @socket.write(data)
-          end
-          @buffer.clear
-        end
-      end
-      @writer.on_signal do
-        on_signal.call
-      end
-
-      @loop.attach(@writer)
-    end
-
-    def shutdown_writer
-      @writer.detach
     end
 
     def log_tag

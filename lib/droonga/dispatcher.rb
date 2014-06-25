@@ -50,15 +50,16 @@ module Droonga
 
     def initialize(engine_state, catalog)
       @engine_state = engine_state
+      @forwarder = @engine_state.forwarder
+      @replier = @engine_state.replier
       @catalog = catalog
       @live_nodes = all_nodes
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
-                       :dispatcher => self)
+                       :dispatcher => self,
+                       :forwarder  => @forwarder)
       @collector_runners = create_collector_runners
       @step_runners = create_step_runners
-      @forwarder = @engine_state.forwarder
-      @replier = @engine_state.replier
     end
 
     def start

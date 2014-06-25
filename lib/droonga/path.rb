@@ -54,6 +54,10 @@ module Droonga
         base_file_name = ENV["DROONGA_CATALOG"] || "catalog.json"
         Pathname.new(base_file_name).expand_path(base)
       end
+
+      def buffer
+        state + "buffer"
+      end
     end
   end
 end
