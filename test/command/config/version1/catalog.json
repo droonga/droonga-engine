@@ -11,7 +11,7 @@
   "datasets": {
     "Default": {
       "workers": 4,
-      "plugins": ["groonga", "crud", "search"],
+      "plugins": ["groonga", "crud", "search", "dump", "system"],
       "number_of_replicas": 2,
       "number_of_partitions": 3,
       "partition_key": "_key",
@@ -48,7 +48,7 @@
     },
     "Watch": {
       "workers": 4,
-      "plugins": ["groonga", "watch", "search", "crud"],
+      "plugins": ["groonga", "watch", "search", "crud", "dump", "system"],
       "number_of_replicas": 1,
       "number_of_partitions": 1,
       "partition_key": "_key",
