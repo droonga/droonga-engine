@@ -13,9 +13,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "droonga/plugins/status"
+require "droonga/plugins/system"
 
-class StatusHandlerTest < Test::Unit::TestCase
+class SystemStatusHandlerTest < Test::Unit::TestCase
   def setup
     setup_handler
   end
@@ -31,10 +31,10 @@ class StatusHandlerTest < Test::Unit::TestCase
     @dispatcher = StubDispatcher.new
     @messenger.dispatcher = @dispatcher
     @loop = nil
-    @handler = Droonga::Plugins::Status::Handler.new("name",
-                                                     @worker.context,
-                                                     @messenger,
-                                                     @loop)
+    @handler = Droonga::Plugins::System::StatusHandler.new("name",
+                                                           @worker.context,
+                                                           @messenger,
+                                                           @loop)
   end
 
   def teardown_handler

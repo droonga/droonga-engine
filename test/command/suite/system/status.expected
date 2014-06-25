@@ -1,7 +1,7 @@
 {
   "inReplyTo": "request-id",
   "statusCode": 200,
-  "type": "status.result",
+  "type": "system.status.result",
   "body": {
     "nodes": {
       "127.0.0.1:23003/droonga": {

@@ -17,11 +17,11 @@ require "droonga/plugin"
 
 module Droonga
   module Plugins
-    module Status
+    module System
       extend Plugin
       register("status")
 
-      class Handler < Droonga::Handler
+      class StatusHandler < Droonga::Handler
         action.synchronous = true
 
         def handle(message)
@@ -42,8 +42,8 @@ module Droonga
       end
 
       define_single_step do |step|
-        step.name = "status"
-        step.handler = Handler
+        step.name = "system.status"
+        step.handler = StatusHandler
         step.collector = Collectors::Or
       end
     end

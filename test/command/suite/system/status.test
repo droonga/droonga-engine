@@ -1,5 +1,5 @@
 {
-  "type": "status",
+  "type": "system.status",
   "dataset": "Default",
   "body": {}
 }
