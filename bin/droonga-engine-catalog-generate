@@ -101,6 +101,7 @@ def open_output(path)
   else
     # Don't output the file directly to prevent loading of incomplete file!
     path = Pathname(path).expand_path
+    FileUtils.mkdir_p(path.dirname.to_s)
     Tempfile.open(path.basename.to_s, path.dirname.to_s, "w") do |output|
       yield(output)
       output.flush
