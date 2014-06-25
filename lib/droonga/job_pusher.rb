@@ -57,6 +57,12 @@ module Droonga
       logger.trace("push: done")
     end
 
+    def broadcast(message)
+      logger.trace("broadcast start")
+      @job_queue.broadcast(message)
+      logger.trace("broadcast done")
+    end
+
     private
     def log_tag
       "job_pusher"
@@ -101,6 +107,12 @@ module Droonga
             @buffers << job
             worker.write(@buffers.shift)
           end
+        end
+      end
+
+      def broadcast(message)
+        @workers.each do |worker|
+          worker.write(message.to_msgpack)
         end
       end
 

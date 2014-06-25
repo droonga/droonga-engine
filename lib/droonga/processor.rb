@@ -15,7 +15,6 @@
 
 require "droonga/loggable"
 require "droonga/handler_runner"
-require "fileutils"
 
 module Droonga
   class Processor
@@ -47,9 +46,9 @@ module Droonga
         synchronous = @handler_runner.prefer_synchronous?(type)
         if @n_workers.zero? or synchronous
           @handler_runner.process(message)
-          #XXX Workaround to restart system by any schema change.
-          #    This should be done more smartly...
-          FileUtils.touch(Path.catalog.to_s) if synchronous
+          if synchronous
+            @job_pusher.broadcast(database_reopen_message)
+          end
         else
           @job_pusher.push(message)
         end
@@ -60,6 +59,12 @@ module Droonga
     end
 
     private
+    def database_reopen_message
+      {
+        "type" => "database.reopen",
+      }
+    end
+
     def log_tag
       "processor"
     end

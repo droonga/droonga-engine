@@ -43,11 +43,7 @@ module Droonga
     def shutdown
       logger.trace("shutdown: start")
       @forwarder.shutdown
-      if @database
-        @database.close
-        @context.close
-        @database = @context = nil
-      end
+      close_database if @database
       logger.trace("shutdown: done")
     end
 
@@ -62,12 +58,17 @@ module Droonga
     def process(message)
       logger.trace("process: start")
       type = message["type"]
-      handler_class = find_handler_class(type)
-      if handler_class.nil?
-        logger.trace("process: done: no handler: <#{type}>")
-        return
+      if type == "database.reopen"
+        handler_class = nil
+        reopen
+      else
+        handler_class = find_handler_class(type)
+        if handler_class.nil?
+          logger.trace("process: done: no handler: <#{type}>")
+          return
+        end
+        process_type(handler_class, type, message)
       end
-      process_type(handler_class, type, message)
       logger.trace("process: done: <#{type}>",
                    :handler => handler_class)
     end
@@ -75,13 +76,28 @@ module Droonga
     private
     def prepare
       if @database_name and !@database_name.empty?
-        @context = Groonga::Context.new
-        @database = @context.open_database(@database_name)
+        open_database
       end
       logger.debug("#{self.class.name}: activating plugins for the dataset \"#{@dataset_name}\": " +
                      "#{@options[:plugins].join(", ")}")
       @step_runner = StepRunner.new(nil, @options[:plugins] || [])
       @forwarder = Forwarder.new(@loop)
+    end
+
+    def close_database
+      @database.close
+      @context.close
+      @database = @context = nil
+    end
+
+    def open_database
+      @context = Groonga::Context.new
+      @database = @context.open_database(@database_name)
+    end
+
+    def reopen
+      close_database
+      open_database
     end
 
     def find_handler_class(type)
