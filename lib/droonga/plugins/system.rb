@@ -19,7 +19,7 @@ module Droonga
   module Plugins
     module System
       extend Plugin
-      register("status")
+      register("system")
 
       class StatusHandler < Droonga::Handler
         action.synchronous = true
