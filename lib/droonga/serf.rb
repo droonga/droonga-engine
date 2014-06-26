@@ -27,6 +27,22 @@ module Droonga
       def path
         Droonga::Path.base + "serf"
       end
+
+      def port_file
+        Droonga::Path.state + "serf_port"
+      end
+
+      def default_port
+        7373
+      end
+
+      def dump_source_port
+        7374
+      end
+
+      def dump_destination_port
+        7375
+      end
     end
 
     include Loggable
@@ -41,6 +57,8 @@ module Droonga
       logger.trace("start: start")
       ensure_serf
       ENV["SERF"] = @serf
+      @port = port
+      ENV["SERF_PORT"] = @port
       ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
@@ -113,7 +131,19 @@ module Droonga
     end
 
     def rpc_address
-      "#{extract_host(@name)}:7373"
+      "#{extract_host(@name)}:#{@port}"
+    end
+
+    def port
+      port_file = self.class.port_file
+      if port_file.exist?
+        contents = port_file.read
+        unless contents.empty?
+          return contents.to_i
+        end
+      end
+ 
+      self.class.default_port
     end
 
     def detect_other_hosts
