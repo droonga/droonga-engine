@@ -32,6 +32,8 @@ module Droonga
     attr_reader :forwarder
     attr_reader :replier
     attr_accessor :on_finish
+    attr_accessor :catalog
+    attr_accessor :live_nodes
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
@@ -42,6 +44,8 @@ module Droonga
       @forwarder.resume
       @replier = Replier.new(@forwarder)
       @on_finish = nil
+      @catalog = nil
+      @live_nodes = nil
     end
 
     def start
@@ -96,6 +100,14 @@ module Droonga
 
     def have_session?
       not @sessions.empty?
+    end
+
+    def all_nodes
+      @catalog.all_nodes
+    end
+
+    def live_nodes
+      @live_nodes || @catalog.all_nodes
     end
 
     private

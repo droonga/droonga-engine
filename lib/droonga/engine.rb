@@ -32,12 +32,11 @@ module Droonga
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
       @catalog = load_catalog
-      @live_nodes = @catalog.all_nodes
+      @state.catalog = @catalog
       @dispatcher = create_dispatcher
       @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes)
       @live_nodes_list_observer.on_change = lambda do
-        @live_nodes = load_live_nodes
-        @dispatcher.live_nodes = @live_nodes if @dispatcher
+        @state.live_nodes = load_live_nodes
       end
     end
 
@@ -104,9 +103,7 @@ module Droonga
     end
 
     def create_dispatcher
-      dispatcher = Dispatcher.new(@state, @catalog)
-      dispatcher.live_nodes = @live_nodes
-      dispatcher
+      Dispatcher.new(@state, @catalog)
     end
 
     def output_last_processed_timestamp
