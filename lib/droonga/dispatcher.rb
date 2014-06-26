@@ -46,14 +46,11 @@ module Droonga
       end
     end
 
-    attr_accessor :live_nodes
-
     def initialize(engine_state, catalog)
       @engine_state = engine_state
       @forwarder = @engine_state.forwarder
       @replier = @engine_state.replier
       @catalog = catalog
-      @live_nodes = all_nodes
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
                        :dispatcher => self,
@@ -174,7 +171,7 @@ module Droonga
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = dataset.get_routes(step, @live_nodes)
+          routes = dataset.get_routes(step, @state.live_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
@@ -209,10 +206,6 @@ module Droonga
 
     def local?(route)
       @engine_state.local_route?(route)
-    end
-
-    def all_nodes
-      @catalog.all_nodes
     end
 
     private
