@@ -58,7 +58,7 @@ module Droonga
       ensure_serf
       ENV["SERF"] = @serf
       @port = port
-      ENV["SERF_PORT"] = @port
+      ENV["SERF_PORT"] = "#{@port}"
       ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
