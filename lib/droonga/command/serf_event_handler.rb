@@ -74,7 +74,7 @@ module Droonga
 
           nodes[name] = {
             "serfAddress" => address,
-            "tags"        => parse_tags(tags),
+            "tags" => parse_tags(tags),
           }
         end
         nodes
