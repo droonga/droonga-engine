@@ -172,7 +172,7 @@ module Droonga
       id = @engine_state.generate_id
 
       one_way_steps = []
-      have_dead_nodes = not @engine_state.dead_nodes.empty?
+      have_dead_nodes = !@engine_state.dead_nodes.empty?
 
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
