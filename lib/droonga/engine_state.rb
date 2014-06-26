@@ -16,7 +16,6 @@
 require "English"
 
 require "coolio"
-require "digest/sha1"
 
 require "droonga/loggable"
 require "droonga/event_loop"
@@ -117,19 +116,11 @@ module Droonga
       @nodes_status = new_status
     end
 
-    def cluster_id
-      @cluster_id ||= prepare_cluster_id
-    end
-
     private
     def prepare_live_nodes
       @nodes_status.keys.select do |key|
         @nodes_status[key]["live"]
       end
-    end
-
-    def prepare_cluster_id
-      Digest::SHA1.hexdigest(all_nodes.join("\n"))
     end
 
     def log_tag
