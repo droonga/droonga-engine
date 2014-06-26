@@ -67,16 +67,6 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
-    def set_tag(key, value)
-      logger.trace("set_tag (#{key} = #{value})")
-      run("tags", "-set", "#{key}=#{value}")
-    end
-
-    def delete_tag(key)
-      logger.trace("delete_tag (#{key})")
-      run("tags", "-delete", key)
-    end
-
     private
     def ensure_serf
       @serf = find_system_serf
