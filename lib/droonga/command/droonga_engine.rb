@@ -323,6 +323,20 @@ module Droonga
           serf
         end
 
+        def restart_serf
+          @serf.shutdown if @serf
+          @serf = run_serf
+        end
+
+        def run_serf_port_observer
+          serf_port_observer = FileObserver.new(@loop, Serf.port_file)
+          serf_port_observer.on_change = lambda do
+            restart_serf
+          end
+          serf_port_observer.start
+          serf_port_observer
+        end
+
         def run_catalog_observer
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
