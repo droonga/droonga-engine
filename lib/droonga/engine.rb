@@ -24,6 +24,7 @@ require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
 require "droonga/nodes_status_loader"
+require "droonga/serf"
 
 module Droonga
   class Engine
