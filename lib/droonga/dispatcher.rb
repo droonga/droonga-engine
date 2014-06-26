@@ -174,7 +174,9 @@ module Droonga
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = dataset.get_routes(step, @engine_state.live_nodes)
+          target_nodes = nil
+          target_nodes = @engine_state.live_nodes unless write_step?(step)
+          routes = dataset.get_routes(step, target_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
@@ -209,6 +211,16 @@ module Droonga
 
     def local?(route)
       @engine_state.local_route?(route)
+    end
+
+    def write_step?(step)
+      step_runner = @step_runners[step["dataset"]]
+      return false unless step_runner
+
+      step_definition = step_runner.find(step["command"])
+      return false unless step_definition
+
+      step_definition.write?
     end
 
     private
