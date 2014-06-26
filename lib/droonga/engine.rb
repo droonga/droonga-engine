@@ -33,6 +33,10 @@ module Droonga
       @state = EngineState.new(loop, name, internal_name)
       @catalog = load_catalog
       @state.catalog = @catalog
+
+      serf = Serf.new(loop, name)
+      serf.set_tag("cluster_id", @state.cluster_id)
+
       @dispatcher = create_dispatcher
       @nodes_status_observer = FileObserver.new(loop, Path.nodes_status)
       @nodes_status_observer.on_change = lambda do
