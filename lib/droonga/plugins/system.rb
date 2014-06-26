@@ -25,9 +25,7 @@ module Droonga
         action.synchronous = true
 
         def handle(message)
-          dispatcher = @messenger.dispatcher
-
-          live_nodes = dispatcher.engine_state.live_nodes
+          live_nodes = @messenger.engine_state.live_nodes
           nodes = {}
           dispatcher.all_nodes.collect do |identifier|
             nodes[identifier] = {
