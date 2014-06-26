@@ -59,11 +59,11 @@ module Droonga
         members = `#{@serf} members -rpc-addr #{@serf_rpc_address}`
         members.each_line do |member|
           name, address, status, = member.strip.split(/\s+/)
-          next unless status == "alive"
-
-          nodes[name] = {
-            "serfAddress" => address,
-          }
+          if status == "alive"
+            nodes[name] = {
+              "serfAddress" => address,
+            }
+          end
         end
         nodes
       end
