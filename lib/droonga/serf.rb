@@ -69,12 +69,12 @@ module Droonga
 
     def set_tag(key, value)
       logger.trace("set_tag (#{key} = #{value})")
-      run("tags", "-set", "#{key}=#{value}")
+      run("tags", "-set", "#{key}=#{value}").shutdown
     end
 
     def delete_tag(key)
       logger.trace("delete_tag (#{key})")
-      run("tags", "-delete", key)
+      run("tags", "-delete", key).shutdown
     end
 
     private
