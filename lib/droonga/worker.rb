@@ -25,6 +25,7 @@ module Droonga
       @forwarder = Forwarder.new(@loop)
       @handler_runner = HandlerRunner.new(@loop,
                                           config.merge(:dispatcher => nil,
+                                                       :engine_state => nil,
                                                        :forwarder => @forwarder))
       receive_socket_path = config[:job_receive_socket_path]
       @job_receiver = JobReceiver.new(@loop, receive_socket_path) do |message|

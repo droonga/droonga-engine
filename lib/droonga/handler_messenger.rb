@@ -18,14 +18,15 @@ require "droonga/forwarder"
 
 module Droonga
   class HandlerMessenger
-    attr_reader :database_name, :dispatcher
+    attr_reader :database_name, :dispatcher, :engine_state
 
     def initialize(forwarder, message, options={})
       @forwarder = forwarder
       @message = message
       @options = options
       @replier = Replier.new(@forwarder)
-      @dispatcher = @options[:dispatcher]
+      @dispatcher = options[:dispatcher]
+      @engine_state = options[:engine_state]
       @database_name = options[:database]
     end
 

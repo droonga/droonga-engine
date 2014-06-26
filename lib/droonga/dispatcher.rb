@@ -55,6 +55,7 @@ module Droonga
       @catalog = catalog
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
+                       :engine_state => @engine_state,
                        :dispatcher => self,
                        :forwarder  => @forwarder)
       @collector_runners = create_collector_runners
