@@ -17,31 +17,26 @@ require "pathname"
 require "json"
 
 module Droonga
-  class LiveNodesListLoader
+  class NodesStatusLoader
     def initialize(path)
       @path = path
     end
 
     def load
-      list = parse
-      list.keys
-    end
-
-    private
-    def parse
-      return default_list unless @path.exist?
+      return default_status unless @path.exist?
 
       contents = @path.read
-      return default_list if contents.empty?
+      return default_status if contents.empty?
 
       begin
         JSON.parse(contents)
       rescue JSON::ParserError
-        default_list
+        default_status
       end
     end
 
-    def default_list
+    private
+    def default_status
       {}
     end
   end

@@ -33,7 +33,7 @@ module Droonga
     attr_reader :replier
     attr_accessor :on_finish
     attr_accessor :catalog
-    attr_accessor :live_nodes
+    attr_reader :nodes_status
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
@@ -45,7 +45,7 @@ module Droonga
       @replier = Replier.new(@forwarder)
       @on_finish = nil
       @catalog = nil
-      @live_nodes = nil
+      @nodes_status = nil
     end
 
     def start
@@ -107,10 +107,22 @@ module Droonga
     end
 
     def live_nodes
-      @live_nodes || @catalog.all_nodes
+      return @catalog.all_nodes unless @nodes_status
+      @live_nodes ||= prepare_live_nodes
+    end
+
+    def nodes_status=(new_status)
+      @live_nodes = nil
+      @nodes_status = new_status
     end
 
     private
+    def prepare_live_nodes
+      @nodes_status.keys.select do |key|
+        @nodes_status[key]["live"]
+      end
+    end
+
     def log_tag
       "engine_state"
     end
