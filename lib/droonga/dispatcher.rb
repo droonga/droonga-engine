@@ -170,26 +170,29 @@ module Droonga
 
     def dispatch_steps(steps)
       id = @engine_state.generate_id
-      destinations = {}
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          target_nodes = nil
-          target_nodes = @engine_state.live_nodes unless write_step?(step)
-          routes = dataset.get_routes(step, target_nodes)
+          routes = dataset.get_routes(step, @engine_state.live_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
         end
-        routes = step["routes"]
-        routes.each do |route|
+      end
+      dispatch_message = { "id" => id, "steps" => steps }
+      get_destinations(steps).each do |destination|
+        dispatch(dispatch_message, destination)
+      end
+    end
+
+    def get_destinations(steps)
+      destinations = {}
+      steps.each do |step|
+        step["routes"].each do |route|
           destinations[farm_path(route)] = true
         end
       end
-      dispatch_message = { "id" => id, "steps" => steps }
-      destinations.each_key do |destination|
-        dispatch(dispatch_message, destination)
-      end
+      destinations.keys
     end
 
     def process_local_message(local_message)
