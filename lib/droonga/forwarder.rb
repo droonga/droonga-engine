@@ -55,7 +55,7 @@ module Droonga
       return unless Path.buffer.exist?
       Pathname.glob("#{Path.buffer}/*") do |path|
         next unless path.directory?
-        next if Pathname.glob("#{path.to_s}/*").zero?
+        next if Pathname.glob("#{path.to_s}/*").empty?
 
         destination = path.basename.to_s
         next if @senders.key?(destination)
