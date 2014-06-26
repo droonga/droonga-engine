@@ -17,12 +17,12 @@ module Droonga
   module Test
     class StubHandlerMessenger
       attr_reader :values, :messages
-      attr_accessor :dispatcher
+      attr_accessor :engine_state
 
       def initialize
         @values = []
         @messages = []
-        @dispatcher = nil
+        @engine_state = nil
       end
 
       def emit(value)

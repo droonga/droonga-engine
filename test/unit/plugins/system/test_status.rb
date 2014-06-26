@@ -28,8 +28,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   def setup_handler
     @worker = StubWorker.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
-    @dispatcher = StubDispatcher.new
-    @messenger.dispatcher = @dispatcher
+    @messenger.engine_state = StubEngineState.new
     @loop = nil
     @handler = Droonga::Plugins::System::StatusHandler.new("name",
                                                            @worker.context,
@@ -46,7 +45,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     @handler.handle(message)
   end
 
-  class StubDispatcher
+  class StubEngineState
     def all_nodes
       [
         "127.0.0.1:10031/droonga",
