@@ -54,27 +54,15 @@ module Droonga
         end
       end
 
-      def parse_tags(tags)
-        parsed = {}
-        return parsed unless tags
-
-        tags.split(",").each do |tag|
-          key, value = tag.split("=")
-          parsed[key] = value
-        end
-        parsed
-      end
-
       def live_nodes
         nodes = {}
         members = `#{@serf} members -rpc-addr #{@serf_rpc_address}`
         members.each_line do |member|
-          name, address, status, tags, = member.strip.split(/\s+/)
+          name, address, status, = member.strip.split(/\s+/)
           next unless status == "alive"
 
           nodes[name] = {
             "serfAddress" => address,
-            "tags" => parse_tags(tags),
           }
         end
         nodes
