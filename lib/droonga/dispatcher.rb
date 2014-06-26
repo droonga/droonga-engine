@@ -46,6 +46,8 @@ module Droonga
       end
     end
 
+    attr_reader :engine_state
+
     def initialize(engine_state, catalog)
       @engine_state = engine_state
       @forwarder = @engine_state.forwarder
