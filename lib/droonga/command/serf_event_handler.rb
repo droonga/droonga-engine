@@ -33,11 +33,13 @@ module Droonga
 
       def initialize
         @serf = ENV["SERF"] || Serf.path
-        @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:7373"
+        @serf_port = ENV["SERF_PORT"] || Serf.default_port
+        @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:#{@serf_port}"
       end
 
       def run
         parse_event
+        process_event
 
         output_live_nodes
         true
@@ -46,11 +48,22 @@ module Droonga
       private
       def parse_event
         @event_name = ENV["SERF_EVENT"]
+        @payload = nil
         case @event_name
         when "user"
           @event_name += ":#{ENV["SERF_USER_EVENT"]}"
+          @payload = $stdin.gets
         when "query"
           @event_name += ":#{ENV["SERF_USER_QUERY"]}"
+          @payload = $stdin.gets
+        end
+      end
+
+      def process_event
+        if @event_name == "user:change_port" or
+           @event_name == "query:change_port"
+          serf_port = @payload.to_i
+          output_port_file(serf_port)
         end
       end
 
@@ -72,6 +85,14 @@ module Droonga
         path = Path.live_nodes
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
+        output(path, file_contents)
+      end
+
+      def output_port_file(port)
+        output(Serf.port_file, port)
+      end
+
+      def output(path, file_contents)
         FileUtils.mkdir_p(path.parent.to_s)
         # Don't output the file directly to prevent loading of incomplete file!
         Tempfile.open(path.basename.to_s, path.parent.to_s, "w") do |output|
