@@ -23,7 +23,7 @@ require "droonga/engine_state"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
-require "droonga/nodes_status_loader"
+require "droonga/live_nodes_list_loader"
 
 module Droonga
   class Engine
@@ -34,23 +34,23 @@ module Droonga
       @catalog = load_catalog
       @state.catalog = @catalog
       @dispatcher = create_dispatcher
-      @nodes_status_observer = FileObserver.new(loop, Path.nodes_status)
-      @nodes_status_observer.on_change = lambda do
-        @state.nodes_status = load_nodes_status
+      @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes)
+      @live_nodes_list_observer.on_change = lambda do
+        @state.live_nodes = load_live_nodes
       end
     end
 
     def start
       logger.trace("start: start")
       @state.start
-      @nodes_status_observer.start
+      @live_nodes_list_observer.start
       @dispatcher.start
       logger.trace("start: done")
     end
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @nodes_status_observer.stop
+      @live_nodes_list_observer.stop
       on_finish = lambda do
         output_last_processed_timestamp
         @dispatcher.shutdown
@@ -69,7 +69,7 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       output_last_processed_timestamp
-      @nodes_status_observer.stop
+      @live_nodes_list_observer.stop
       @dispatcher.shutdown
       @state.shutdown
       logger.trace("stop_immediately: done")
@@ -92,14 +92,14 @@ module Droonga
       catalog
     end
 
-    def load_nodes_status
-      path = Path.nodes_status
-      loader = NodesStatusLoader.new(path)
-      nodes_status = loader.load
-      logger.info("nodes-status loaded",
+    def load_live_nodes
+      path = Path.live_nodes
+      loader = LiveNodesListLoader.new(path)
+      live_nodes = loader.load
+      logger.info("live-nodes loaded",
                   :path  => path,
                   :mtime => path.mtime)
-      nodes_status
+      live_nodes
     end
 
     def create_dispatcher

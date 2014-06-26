@@ -39,7 +39,7 @@ module Droonga
       def run
         parse_event
 
-        output_nodes_status
+        output_live_nodes
         true
       end
 
@@ -65,24 +65,24 @@ module Droonga
         parsed
       end
 
-      def nodes_status
-        nodes_status = {}
+      def live_nodes
+        nodes = {}
         members = `#{@serf} members -rpc-addr #{@serf_rpc_address}`
         members.each_line do |member|
           name, address, status, tags, = member.strip.split(/\s+/)
-          nodes_status[name] = {
+          nodes[name] = {
             "serfAddress" => address,
             "live"        => status == "alive",
             "tags"        => parse_tags(tags),
           }
         end
-        nodes_status
+        nodes
       end
 
-      def output_nodes_status
-        path = Path.nodes_status
-        status = nodes_status
-        file_contents = JSON.pretty_generate(status)
+      def output_live_nodes
+        path = Path.live_nodes
+        nodes = live_nodes
+        file_contents = JSON.pretty_generate(nodes)
         FileUtils.mkdir_p(path.parent.to_s)
         # Don't output the file directly to prevent loading of incomplete file!
         Tempfile.open(path.basename.to_s, path.parent.to_s, "w") do |output|

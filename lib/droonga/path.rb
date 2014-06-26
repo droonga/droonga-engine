@@ -38,8 +38,8 @@ module Droonga
         base + "state"
       end
 
-      def nodes_status
-        state + "nodes-status.json"
+      def live_nodes
+        state + "live-nodes.json"
       end
 
       def last_processed_timestamp
