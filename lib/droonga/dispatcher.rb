@@ -171,7 +171,7 @@ module Droonga
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = dataset.get_routes(step, @state.live_nodes)
+          routes = dataset.get_routes(step, @engine_state.live_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
