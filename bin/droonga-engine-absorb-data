@@ -39,7 +39,7 @@ parser.on("--host=HOST",
 end
 parser.on("--port=PORT", Integer,
             "Port number of the soruce cluster to be connected.") do |port|
-  drndump_options += ["--port", port]
+  drndump_options += ["--port", port.to_s]
 end
 parser.on("--tag=TAG",
           "Tag name to be used to communicate with Droonga system.") do |tag|
@@ -62,8 +62,8 @@ parser.on("--receiver-host=HOST",
 end
 parser.on("--receiver-port=PORT", Integer,
           "Port number of this node to be received a response from the source cluster.") do |port|
-  drndump_options += ["--receiver-port", port]
-  droonga_request_options += ["--receiver-port", port]
+  drndump_options += ["--receiver-port", port.to_s]
+  droonga_request_options += ["--receiver-port", port.to_s]
 end
 
 parser.separator("")
