@@ -28,8 +28,8 @@ parser.version = Droonga::Engine::VERSION
 options.drndump = "drndump"
 drndump_options = []
 
-options.droonga_request = "droonga-request"
-droonga_request_options = []
+options.client = "droonga-request"
+client_options = []
 
 parser.separator("")
 parser.separator("Source:")
@@ -44,7 +44,7 @@ end
 parser.on("--tag=TAG",
           "Tag name to be used to communicate with Droonga system.") do |tag|
   drndump_options += ["--tag", tag]
-  droonga_request_options += ["--tag", tag]
+  client_options += ["--tag", tag]
 end
 
 parser.separator("")
@@ -55,7 +55,7 @@ parser.on("--destination-host=HOST",
 end
 parser.on("--destination-port=PORT", Integer,
           "Port number of this cluster to be connected.") do |port|
-  droonga_request_options += ["--port", port.to_s]
+  client_options += ["--port", port.to_s]
 end
 
 parser.separator("")
@@ -74,7 +74,7 @@ end
 parser.on("--receiver-port=PORT", Integer,
           "Port number of this node to be received a response from clusters.") do |port|
   drndump_options += ["--receiver-port", port.to_s]
-  droonga_request_options += ["--receiver-port", port.to_s]
+  client_options += ["--receiver-port", port.to_s]
 end
 
 parser.separator("")
@@ -83,22 +83,22 @@ parser.on("--drndump=PATH",
           "Path to the drndump command.") do |path|
   options.drndump = path
 end
-parser.on("--droonga-client=PATH",
-          "Path to the droonga-client command.") do |path|
+parser.on("--droonga-request=PATH",
+          "Path to the droonga-request command.") do |path|
   options.droonga_client = path
 end
 
 parser.parse!(ARGV)
 
 drndump_options += ["--receiver-host", options.destination_host]
-droonga_request_options += ["--host", options.destination_host]
-droonga_request_options += ["--receiver-host", options.destination_host]
+client_options += ["--host", options.destination_host]
+client_options += ["--receiver-host", options.destination_host]
 
 drndump_command_line = [options.drndump] + drndump_options
-droonga_request_command_line = [options.droonga_request] + droonga_request_options
+client_command_line = [options.client] + client_options
 
 Open3.popen3(*drndump_command_line) do |dump_in, dump_out, dump_error, dump_thread|
-  Open3.popen3(*droonga_request_command_line) do |client_in, client_out, client_error, client_thread|
+  Open3.popen3(*client_command_line) do |client_in, client_out, client_error, client_thread|
     dump_out.each do |dump|
       puts dump
       client_in.puts(dump)
