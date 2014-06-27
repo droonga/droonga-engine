@@ -68,7 +68,7 @@ end
 parser.parse!(ARGV)
 
 
-base_dir = options.base_dir || ENV[Droonga::Path::BASE_DIR_ENV_NAME]
+base_dir = options.base_dir || ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
 base_dir = Pathname(base_dir).expand_path
 ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
