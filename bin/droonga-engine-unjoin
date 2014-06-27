@@ -28,11 +28,7 @@ require "droonga/data_absorber"
 require "droonga/serf"
 
 options = OpenStruct.new
-options.base_dir    = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
-options.dataset     = "Default"
-options.port        = 10031
-options.tag         = "droonga"
-options.other_hosts = []
+options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
 
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
