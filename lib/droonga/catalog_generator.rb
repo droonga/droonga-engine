@@ -25,27 +25,21 @@ module Droonga
     DEFAULT_TAG = "droonga"
 
     class << self
-      def new(datasets_params=nil)
-        generator = super
-
-        if datasets_params
-          datasets_params.each do |name, params|
-            generator.add_dataset(name, params)
-          end
-        end
-
-        generator
-      end
-
       def generate(datasets_params)
         new(datasets_params).generate
       end
     end
 
-    def initialize
+    def initialize(datasets_params=nil)
       @version = 2
       @effective_date = Time.now
       @datasets = {}
+
+      if datasets_params
+        datasets_params.each do |name, params|
+          add_dataset(name, params)
+        end
+      end
     end
 
     def add_dataset(name, options)
