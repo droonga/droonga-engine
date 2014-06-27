@@ -75,6 +75,8 @@ module Droonga
           save_status(:role, @payload["role"])
         when "join"
           process_node_join
+        when "unjoin"
+          process_node_unjoin
         end
       end
 
