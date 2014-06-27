@@ -118,11 +118,9 @@ sleep(1) # wait for restart
 puts "Joining to the cluster..."
 
 name = "#{options.host}:#{options.port}/#{options.tag}"
-options.other_hosts.each do |host|
-  Serf.send_event(name, "join", "dataset" => options.dataset,
-                                "type" => "replica",
-                                "host" => options.host)
-end
+Serf.send_event(name, "join", "dataset" => options.dataset,
+                              "type" => "replica",
+                              "host" => options.host)
 
 puts "Done."
 
