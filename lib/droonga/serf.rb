@@ -45,7 +45,6 @@ module Droonga
       end
 
       def load_status
-        status_file = status_file
         if status_file.exist?
           contents = status_file.read
           unless contents.empty?
