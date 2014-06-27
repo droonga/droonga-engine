@@ -33,18 +33,13 @@ client_options = []
 
 parser.separator("")
 parser.separator("Source:")
-parser.on("--host=HOST",
+parser.on("--source-host=HOST",
           "Host name of the soruce cluster to be connected.") do |host|
   drndump_options += ["--host", host]
 end
-parser.on("--port=PORT", Integer,
+parser.on("--source-port=PORT", Integer,
           "Port number of the soruce cluster to be connected.") do |port|
   drndump_options += ["--port", port.to_s]
-end
-parser.on("--tag=TAG",
-          "Tag name to be used to communicate with Droonga system.") do |tag|
-  drndump_options += ["--tag", tag]
-  client_options += ["--tag", tag]
 end
 
 parser.separator("")
@@ -60,9 +55,15 @@ end
 
 parser.separator("")
 parser.separator("Data:")
+parser.on("--tag=TAG",
+          "Tag name to be used to communicate with Droonga system.") do |tag|
+  drndump_options += ["--tag", tag]
+  client_options += ["--tag", tag]
+end
 parser.on("--dataset=DATASET",
           "Dataset to be absorbed.") do |dataset|
   drndump_options += ["--dataset", dataset]
+  client_options += ["--tag", tag]
 end
 
 parser.separator("")
