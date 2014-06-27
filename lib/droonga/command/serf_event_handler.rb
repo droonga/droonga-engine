@@ -70,11 +70,10 @@ module Droonga
       end
 
       def process_event
-        if @event_sub_name == "change_role"
+        case @event_sub_name
+        when "change_role"
           save_status(:role, @payload["role"])
-        end
-
-        if @event_sub_name == "join"
+        when "join"
           process_node_join
         end
       end
@@ -88,13 +87,34 @@ module Droonga
 
         return unless @payload["type"] == "replica"
 
-        current_catalog = JSON.parse(Path.catalog.read)
-        current_params = CatalogGenerator.catalog_to_params(current_catalog)
         modifications = {
           dataset => {
             :add_replica_hosts => [host],
           },
         }
+        modify_catalog(modifications)
+      end
+
+      def process_node_unjoin
+        dataset = @payload["dataset"]
+        return unless dataset
+
+        host = @payload["host"]
+        return unless host
+
+        return unless @payload["type"] == "replica"
+
+        modifications = {
+          dataset => {
+            :remove_replica_hosts => [host],
+          },
+        }
+        modify_catalog(modifications)
+      end
+
+      def modify_catalog(modifications)
+        current_catalog = JSON.parse(Path.catalog.read)
+        current_params = CatalogGenerator.catalog_to_params(current_catalog)
         updated_params = CatalogGenerator.update_params(current_params,
                                                         modifications)
         updated_catalog = CatalogGenerator.generate(updated_params)
