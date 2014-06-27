@@ -71,3 +71,10 @@ if File.exist?(grn2drn_dir)
 else
   gem "grn2drn", :github => "droonga/grn2drn"
 end
+
+drndump_dir = File.join(parent_dir, "drndump")
+if File.exist?(drndump_dir)
+  gem "drndump", :path => drndump_dir
+else
+  gem "drndump", :github => "droonga/drndump"
+end

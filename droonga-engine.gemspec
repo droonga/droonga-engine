@@ -45,6 +45,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "faraday_middleware"
   gem.add_dependency "archive-zip"
   gem.add_dependency "sigdump"
+  gem.add_dependency "drndump"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "test-unit"
