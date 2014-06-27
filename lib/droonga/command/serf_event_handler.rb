@@ -21,6 +21,7 @@ require "tempfile"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/catalog_generator"
 require "droonga/safe_file_writer"
 
 module Droonga
@@ -73,6 +74,33 @@ module Droonga
            @event_name == "query:change_role"
           save_status(:role, @payload["role"])
         end
+
+        if @event_name == "user:join" or
+           @event_name == "query:join"
+          process_node_join
+        end
+      end
+
+      def process_node_join
+        dataset = @payload["dataset"]
+        return unless dataset
+
+        host = @payload["host"]
+        return unless host
+
+        return unless @payload["type"] == "replica"
+
+        current_catalog = JSON.parse(Path.catalog.read)
+        current_params = generator.catalog_to_params(current_catalog)
+        modifications = {
+          dataset => {
+            :add_replica_hosts => [host],
+          },
+        }
+        updated_params = CatalogGenerator.update_params(current_params,
+                                                        modifications)
+        updated_catalog = CatalogGenerator.generate(updated_params)
+        SafeFileWriter.write(Catalog.path, JSON.pretty_generate(updated_catalog))
       end
 
       def live_nodes
