@@ -24,7 +24,6 @@ require "droonga/engine/version"
 require "droonga/path"
 require "droonga/catalog_generator"
 require "droonga/safe_file_writer"
-require "droonga/data_absorber"
 require "droonga/serf"
 
 options = OpenStruct.new
