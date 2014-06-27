@@ -22,10 +22,9 @@ require "open3"
 require "droonga/engine/version"
 require "droonga/data_absorber"
 
-options = {
-  :drndump => "drndump",
-  :client  => "droonga-request",
-}
+options = OpenStruct.new
+options.drndump = "drndump"
+options.client  = "droonga-request"
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
@@ -33,62 +32,69 @@ parser.separator("")
 parser.separator("Source:")
 parser.on("--source-host=HOST",
           "Host name of the source cluster to be connected.") do |host|
-  options[:source_host] = host
+  options.source_host = host
 end
 parser.on("--source-port=PORT", Integer,
           "Port number of the source cluster to be connected.") do |port|
-  options[:port] = port
+  options.port = port
 end
 
 parser.separator("")
 parser.separator("Destination:")
 parser.on("--destination-host=HOST",
           "Host name of this cluster to be connected.") do |host|
-  options[:destination_host] = host
+  options.destination_host = host
 end
 parser.on("--destination-port=PORT", Integer,
           "Port number of this cluster to be connected.") do |port|
-  options[:port] = port
+  options.port = port
 end
 
 parser.separator("")
 parser.separator("Data:")
 parser.on("--tag=TAG",
           "Tag name to be used to communicate with Droonga system.") do |tag|
-  options[:tag] = tag
+  options.tag = tag
 end
 parser.on("--dataset=DATASET",
           "Dataset to be absorbed.") do |dataset|
-  options[:dataset] = dataset
+  options.dataset = dataset
 end
 
 parser.separator("")
 parser.separator("Droonga protocol:")
 parser.on("--receiver-host=HOST",
           "Host name of this node to be received a response from clusters.") do |host|
-  options[:destination_host] = host
+  options.destination_host = host
 end
 parser.on("--receiver-port=PORT", Integer,
           "Port number of this node to be received a response from clusters.") do |port|
-  options[:receiver_port] = port
+  options.receiver_port = port
 end
 
 parser.separator("")
 parser.separator("Commands:")
 parser.on("--drndump=PATH",
           "Path to the drndump command.",
-          "(#{options[:client]})") do |path|
-  options[:drndump] = path
+          "(#{options.client})") do |path|
+  options.drndump = path
 end
 parser.on("--droonga-request=PATH",
           "Path to the droonga-request command.",
-          "(#{options[:client]})") do |path|
-  options[:client] = path
+          "(#{options.client})") do |path|
+  options.client = path
 end
 
 parser.parse!(ARGV)
 
-Droonga::DataAbsorber.absorb(options) do |dump|
+Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
+                             :client           => options.client,
+                             :dataset          => options.dataset,
+                             :source_host      => options.replica_source_host,
+                             :destination_host => options.my_host,
+                             :port             => options.port,
+                             :tag              => options.tag,
+                             :receiver_port    => options.receiver_port) do |dump|
   puts dump
 end
 
