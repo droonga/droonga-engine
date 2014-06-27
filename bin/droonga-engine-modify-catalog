@@ -34,6 +34,7 @@ datasets = {
 options = OpenStruct.new
 options.source_path = "./catalog.json"
 options.output_path = "-"
+options.update      = false
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 parser.on("--source=PATH",
@@ -47,6 +48,11 @@ parser.on("--output=PATH",
           "\"-\" means the standard output.",
           "(#{options.output_path})") do |path|
   options.output_path = path
+end
+parser.on("--[no-]update",
+          "Update the source file itself, or not.",
+          "(#{options.update})") do |update|
+  options.update = update
 end
 parser.on("--dataset=NAME",
           "Add a dataset its name is NAME.",
@@ -63,6 +69,9 @@ parser.on("--remove-replica-hosts=NAME1,NAME2,...", Array,
 end
 parser.parse!(ARGV)
 
+if options.source_path != "-" and options.update
+  options.output_path = options.source_path
+end
 
 def load_source(path)
   source = nil
