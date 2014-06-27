@@ -110,6 +110,7 @@ puts "Restarting new replica..."
 
 final_params = Marshal.load(Marshal.dump(dataset_params))
 final_params[options.dataset][:hosts] += [options.my_host]
+final_params[options.dataset][:hosts].uniq!
 final_catalog = Droonga::CatalogGenerator.generate(final_params)
 Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(final_catalog))
 
