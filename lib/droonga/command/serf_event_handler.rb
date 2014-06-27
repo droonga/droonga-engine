@@ -93,13 +93,13 @@ module Droonga
         path = Path.live_nodes
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
-        Droonga::SafeFileWriter.write(path, file_contents)
+        SafeFileWriter.write(path, file_contents)
       end
 
       def save_status(key, value)
         status = Serf.load_status
         status[key] = value
-        Droonga::SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
+        SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
       end
     end
   end
