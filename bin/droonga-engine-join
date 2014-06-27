@@ -1,0 +1,129 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "ostruct"
+require "optparse"
+require "open3"
+require "json"
+require "pathname"
+
+require "droonga/engine/version"
+require "droonga/catalog_generator"
+require "droonga/safe_file_writer"
+require "droonga/data_absorber"
+
+options = OpenStruct.new
+options.dataset = "Default"
+options.port    = 10031
+options.tag     = "droonga"
+options.drndump = "drndump"
+options.client  = "client"
+
+parser = OptionParser.new
+parser.version = Droonga::Engine::VERSION
+
+parser.on("--base-dir=PATH",
+          "Path to the base directory the catalog.json is located in.") do |path|
+  options.base_dir = path
+end
+
+parser.separator("")
+parser.separator("Connections:")
+parser.on("--replica-source-host=HOST",
+          "Host name of the soruce cluster to be connected.") do |host|
+  options.replic_source_host = host
+end
+parser.on("--my-host=HOST",
+          "Host name of this node.") do |host|
+  options.my_host = host
+end
+
+parser.separator("")
+parser.separator("Commands:")
+parser.on("--drndump=PATH",
+          "Path to the drndump command.") do |path|
+  options.drndump = path
+end
+parser.on("--droonga-request=PATH",
+          "Path to the droonga-request command.") do |path|
+  options.client = path
+end
+
+parser.parse!(ARGV)
+
+
+base_dir = options.base_dir || ENV["DROONGA_BASE_DIR"]
+
+catalog_path = Pathname(base_dir).expand_path + "catalog.json"
+soruce_catalog = JSON.parse(catalog_path.read)
+
+
+generator = Droonga::CatalogGenerator.new
+dataset_params = generator.catalog_to_params(source_catalog)
+dataset_params.each do |name, dataset|
+  next unless dataset[:hosts].include?(options.replic_source_host)
+
+  options.dataset     = name
+  options.tag         = dataset[:tag]
+  options.port        = dataset[:port]
+  options.other_hosts = dataset[:hosts]
+end
+
+puts "Initializing new replica..."
+
+absorb_destination_params = Marshal.load(Marshal.dump(dataset_params))
+absorb_destination_params[options.dataset][:hosts] = [options.my_host]
+absorb_destination_catalog = Droonga::CatalogGenerator.generate(absorb_destination_params)
+Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(absorb_destination_catalog))
+
+sleep(1) # wait for restart
+
+puts "Duplicating replica..."
+
+Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
+                             :client           => options.client,
+                             :dataset          => options.dataset,
+                             :source_host      => options.replic_source_host,
+                             :destination_host => options.my_host,
+                             :port             => options.port,
+                             :tag              => options.tag) do |dump|
+  puts dump
+end
+
+sleep(1)
+
+puts "Restarting new replica..."
+
+final_params = Marshal.load(Marshal.dump(dataset_params))
+final_params[options.dataset][:hosts] += [options.my_host]
+final_catalog = Droonga::CatalogGenerator.generate(final_params)
+Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(final_catalog))
+
+sleep(1) # wait for restart
+
+puts "Joining to the cluster..."
+
+name = "#{options.host}:#{options.port}/#{options.tag}"
+options.other_hosts.each do |host|
+  Serf.send_event(name, "join", "dataset" => options.dataset,
+                                "type" => "replica",
+                                "host" => options.host)
+end
+
+puts "Done."
+
+exit 0
