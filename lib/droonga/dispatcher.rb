@@ -187,7 +187,9 @@ module Droonga
               one_way_step.delete("post")
               one_way_step.delete("outputs")
               one_way_steps << one_way_step
-              one_way_destinations += routes.collect(&:farm_path)
+              one_way_destinations += routes.collect do |route|
+                farm_path(route)
+              end
             end
           end
           routes = dataset.get_routes(step, @engine_state.live_nodes)
@@ -195,7 +197,9 @@ module Droonga
         else
           step["routes"] ||= [id]
         end
-        destinations += step["routes"].collect(&:farm_path)
+        destinations += step["routes"].collect do |route|
+          farm_path(route)
+        end
       end
 
       dispatch_message = { "id" => id, "steps" => steps }
