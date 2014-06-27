@@ -90,8 +90,8 @@ parser.parse!(ARGV)
 Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
                              :client           => options.client,
                              :dataset          => options.dataset,
-                             :source_host      => options.replica_source_host,
-                             :destination_host => options.my_host,
+                             :source_host      => options.source_host,
+                             :destination_host => options.destination_host,
                              :port             => options.port,
                              :tag              => options.tag,
                              :receiver_port    => options.receiver_port) do |dump|
