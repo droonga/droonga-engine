@@ -75,7 +75,7 @@ source_catalog = JSON.parse(catalog_path.read)
 generator = Droonga::CatalogGenerator.new
 dataset_params = generator.catalog_to_params(source_catalog)
 dataset_params.each do |name, dataset|
-  next unless dataset[:hosts].include?(options.replic_source_host)
+  next unless dataset[:hosts].include?(options.replica_source_host)
 
   options.dataset     = name
   options.tag         = dataset[:tag]
