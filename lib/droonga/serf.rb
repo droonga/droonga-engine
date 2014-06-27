@@ -58,13 +58,13 @@ module Droonga
 
       def send_event(name, event, payload)
         serf = new(nil, name)
-        serf.run("event", JSON.generate(payload))
+        serf.send_event(event, payload)
         serf.shutdown
       end
 
       def send_query(name, query, payload)
         serf = new(nil, name)
-        serf.run("query", JSON.generate(payload))
+        serf.send_query(query, payload)
         serf.shutdown
       end
     end
@@ -105,6 +105,14 @@ module Droonga
       @agent.shutdown
       @agent = nil
       logger.trace("shutdown: done")
+    end
+
+    def send_event(event, payload)
+      run("event", event, JSON.generate(payload))
+    end
+
+    def send_query(query, payload)
+      run("query", query, JSON.generate(payload))
     end
 
     private
