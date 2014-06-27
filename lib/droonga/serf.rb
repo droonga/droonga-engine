@@ -28,20 +28,32 @@ module Droonga
         Droonga::Path.base + "serf"
       end
 
-      def port_file
-        Droonga::Path.state + "serf_port"
+      def status_file
+        Droonga::Path.state + "status_file"
       end
 
-      def default_port
-        7946
+      ROLE = {
+        :default => {
+          :port => 7946,
+        },
+        :source => {
+          :port => 7947,
+        },
+        :destination => {
+          :port => 7948,
+        },
+      }
       end
 
-      def dump_source_port
-        7947
-      end
-
-      def dump_destination_port
-        7948
+      def load_status
+        status_file = status_file
+        if status_file.exist?
+          contents = status_file.read
+          unless contents.empty?
+            return JSON.parse(contents, :symbolize_names => true)
+          end
+        end
+        {}
       end
     end
 
@@ -132,16 +144,21 @@ module Droonga
       "#{extract_host(@name)}:7373"
     end
 
+    def status
+      @status ||= self.class.load_status
+    end
+
+    def role
+      return :default unless status[:role]
+
+      role = status[:role].to_sym
+      return :default unless self.class::ROLE.keys.include?(role)
+
+      role
+    end
+
     def port
-      port_file = self.class.port_file
-      if port_file.exist?
-        contents = port_file.read
-        unless contents.empty?
-          return contents.to_i
-        end
-      end
- 
-      self.class.default_port
+      self.class::ROLE[role][:port]
     end
 
     def detect_other_hosts

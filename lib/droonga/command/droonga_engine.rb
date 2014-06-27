@@ -237,7 +237,7 @@ module Droonga
 
         def run
           @serf = run_serf
-          @serf_port_observer = run_serf_port_observer
+          @serf_status_observer = run_serf_status_observer
           @service_runner = run_service
           @catalog_observer = run_catalog_observer
           @loop_breaker = Coolio::AsyncWatcher.new
@@ -279,7 +279,7 @@ module Droonga
           @loop_breaker.signal
           @loop_breaker.detach
           @serf.shutdown
-          @serf_port_observer.stop
+          @serf_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_gracefully
         end
@@ -288,7 +288,7 @@ module Droonga
           @loop_breaker.signal
           @loop_breaker.detach
           @serf.shutdown
-          @serf_port_observer.stop
+          @serf_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_immediately
         end
@@ -331,13 +331,13 @@ module Droonga
           @serf = run_serf
         end
 
-        def run_serf_port_observer
-          serf_port_observer = FileObserver.new(@loop, Serf.port_file)
-          serf_port_observer.on_change = lambda do
+        def run_serf_status_observer
+          serf_status_observer = FileObserver.new(@loop, Serf.status_file)
+          serf_status_observer.on_change = lambda do
             restart_serf
           end
-          serf_port_observer.start
-          serf_port_observer
+          serf_status_observer.start
+          serf_status_observer
         end
 
         def run_catalog_observer

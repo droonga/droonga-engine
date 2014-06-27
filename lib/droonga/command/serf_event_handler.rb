@@ -68,10 +68,9 @@ module Droonga
       end
 
       def process_event
-        if @event_name == "user:change_port" or
-           @event_name == "query:change_port"
-          serf_port = @payload["port"]
-          output_port_file(serf_port)
+        if @event_name == "user:change_role" or
+           @event_name == "query:change_role"
+          save_status(:role, @payload["role"])
         end
       end
 
@@ -96,8 +95,10 @@ module Droonga
         output(path, file_contents)
       end
 
-      def output_port_file(port)
-        output(Serf.port_file, port)
+      def save_status(key, value)
+        status = Serf.load_status
+        status[key] = value
+        output(Serf.status_file, JSON.pretty_generate(status))
       end
 
       def output(path, file_contents)
