@@ -59,6 +59,10 @@ parser.on("--dataset=NAME",
           "And set the NAME to the current dataset.") do |name|
   current_dataset = datasets[name] = {}
 end
+parser.on("--hosts=NAME1,NAME2,...", Array,
+          "Use given hosts as replicas for the current dataset.") do |hosts|
+  current_dataset[:hosts] = hosts
+end
 parser.on("--add-replica-hosts=NAME1,NAME2,...", Array,
           "Use given hosts to be added as replicas to the current dataset.") do |hosts|
   current_dataset[:add_replica_hosts] = hosts
@@ -103,7 +107,7 @@ def fill_dataset(options, source)
   end
   options[:tag]   = nodes.first[:tag]
   options[:port]  = nodes.first[:port].to_i
-  options[:hosts] = nodes.collect do |node|
+  options[:hosts] ||= nodes.collect do |node|
     node[:host]
   end
 
