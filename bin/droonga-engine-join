@@ -45,7 +45,7 @@ parser.separator("")
 parser.separator("Connections:")
 parser.on("--replica-source-host=HOST",
           "Host name of the soruce cluster to be connected.") do |host|
-  options.replic_source_host = host
+  options.replica_source_host = host
 end
 parser.on("--my-host=HOST",
           "Host name of this node.") do |host|
@@ -97,7 +97,7 @@ puts "Duplicating replica..."
 Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
                              :client           => options.client,
                              :dataset          => options.dataset,
-                             :source_host      => options.replic_source_host,
+                             :source_host      => options.replica_source_host,
                              :destination_host => options.my_host,
                              :port             => options.port,
                              :tag              => options.tag) do |dump|
