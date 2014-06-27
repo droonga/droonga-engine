@@ -172,8 +172,10 @@ module Droonga
       id = @engine_state.generate_id
 
       one_way_steps = []
+      one_way_destinations = []
       have_dead_nodes = !@engine_state.dead_nodes.empty?
 
+      destinations = []
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
@@ -183,6 +185,7 @@ module Droonga
               one_way_step = Marshal.load(Marshal.dump(step))
               one_way_step["routes"] = routes
               one_way_steps << one_way_step
+              one_way_destinations += routes.collect(&:farm_path)
             end
           end
           routes = dataset.get_routes(step, @engine_state.live_nodes)
@@ -190,30 +193,21 @@ module Droonga
         else
           step["routes"] ||= [id]
         end
+        destinations += step["routes"].collect(&:farm_path)
       end
 
       dispatch_message = { "id" => id, "steps" => steps }
-      get_destinations(steps).each do |destination|
+      destinations.uniq.each do |destination|
         dispatch(dispatch_message, destination)
       end
 
       unless one_way_steps.empty?
         dispatch_message = { "id" => @engine_state.generate_id,
                              "steps" => one_way_steps }
-        get_destinations(one_way_steps).each do |destination|
+        one_way_destinations.uniq.each do |destination|
           dispatch(dispatch_message, destination)
         end
       end
-    end
-
-    def get_destinations(steps)
-      destinations = {}
-      steps.each do |step|
-        step["routes"].each do |route|
-          destinations[farm_path(route)] = true
-        end
-      end
-      destinations.keys
     end
 
     def process_local_message(local_message)
