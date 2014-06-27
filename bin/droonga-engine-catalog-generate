@@ -42,23 +42,28 @@ parser.on("--output=PATH",
 end
 parser.on("--dataset=NAME",
           "Add a dataset its name is NAME.",
-          "And set the NAME to the current dataset.") do |name|
+          "And set the NAME to the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_DATASET})") do |name|
   current_dataset = datasets[name] = {}
 end
 parser.on("--n-workers=N", Integer,
-          "Use N workers for the current dataset.") do |n|
+          "Use N workers for the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_N_WORKERS})") do |n|
   current_dataset[:n_workers] = n
 end
 parser.on("--hosts=NAME1,NAME2,...", Array,
-          "Use given hosts for replicas of the current dataset.") do |hosts|
+          "Use given hosts for replicas of the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_HOSTS.join(",")})") do |hosts|
   current_dataset[:hosts] = hosts
 end
 parser.on("--port=PORT", Integer,
-          "Use the PORT as the port for the current dataset.") do |port|
+          "Use the PORT as the port for the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_PORT})") do |port|
   current_dataset[:port] = port
 end
 parser.on("--tag=TAG",
-          "Use the TAG as the tag for the current dataset.") do |tag|
+          "Use the TAG as the tag for the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_TAG})") do |tag|
   current_dataset[:tag] = tag
 end
 parser.on("--n-slices=N", Integer,
@@ -66,7 +71,8 @@ parser.on("--n-slices=N", Integer,
   current_dataset[:n_slices] = n
 end
 parser.on("--plugins=PLUGIN1,PLUGIN2,...", Array,
-          "Use PLUGINS for the current dataset.") do |plugins|
+          "Use PLUGINS for the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_PLUGINS.join(",")})") do |plugins|
   current_dataset[:plugins] = plugins
 end
 parser.on("--schema=PATH",

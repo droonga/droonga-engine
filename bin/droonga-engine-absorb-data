@@ -20,9 +20,11 @@ require "optparse"
 require "open3"
 
 require "droonga/engine/version"
+require "droonga/catalog_generator"
 require "droonga/data_absorber"
 
 options = OpenStruct.new
+options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
 options.drndump = "drndump"
 options.client  = "droonga-request"
 parser = OptionParser.new
@@ -86,6 +88,14 @@ parser.on("--droonga-request=PATH",
 end
 
 parser.parse!(ARGV)
+
+unless options.source_host
+  raise "You must specify the source host via --source-host option."
+end
+unless options.destination_host
+  raise "You must specify the destination host (this node) " +
+          "via --destination-host option."
+end
 
 Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
                              :client           => options.client,

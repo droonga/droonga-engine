@@ -55,7 +55,8 @@ parser.on("--[no-]update",
 end
 parser.on("--dataset=NAME",
           "Add a dataset its name is NAME.",
-          "And set the NAME to the current dataset.") do |name|
+          "And set the NAME to the current dataset.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_DATASET})") do |name|
   current_dataset = datasets[name] = {}
 end
 parser.on("--hosts=NAME1,NAME2,...", Array,
