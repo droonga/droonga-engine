@@ -3,6 +3,10 @@
 ## 1.0.4: 2014-06-29 (planned)
 
  * New command (and plugin) [`status`](http://droonga.org/reference/1.0.4/commands/status/) is now available.
+ * New command line tools are available.
+   * `droonga-engine-join` and `droonga-engine-unjoin` help you to modify cluster composition. See [the tutorial to add/remove replica](http://droonga.org/ja/tutorial/1.0.4/add-replica/).
+   * `droonga-engine-absorb-data` helps you to duplicate clusters. See [the tutorial for dump/restore](http://droonga.org/ja/tutorial/1.0.4/dump-restore/).
+   * `droonga-engine-catalog-modify` helps you to modify existing `catalog.json`.
 
 ## 1.0.3: 2014-05-29
 
