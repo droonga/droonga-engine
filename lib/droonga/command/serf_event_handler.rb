@@ -91,7 +91,7 @@ module Droonga
         return unless @payload["type"] == "replica"
 
         current_catalog = JSON.parse(Path.catalog.read)
-        current_params = generator.catalog_to_params(current_catalog)
+        current_params = CatalogGenerator.catalog_to_params(current_catalog)
         modifications = {
           dataset => {
             :add_replica_hosts => [host],
