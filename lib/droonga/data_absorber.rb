@@ -33,7 +33,6 @@ module Droonga
         client_options += ["--host", params[:destination_host]]
         client_options += ["--port", params[:port].to_s] if params[:port]
         client_options += ["--tag", params[:tag]] if params[:tag]
-        client_options += ["--dataset", params[:dataset]] if params[:dataset]
         client_options += ["--receiver-host", params[:destination_host]]
         client_options += ["--receiver-port", params[:receiver_port].to_s] if params[:receiver_port]
 
@@ -41,7 +40,9 @@ module Droonga
         client_command_line = [client] + client_options
 
         Open3.popen3(*drndump_command_line) do |dump_in, dump_out, dump_error, dump_thread|
+          dump_in.close
           Open3.popen3(*client_command_line) do |client_in, client_out, client_error, client_thread|
+            client_out.close
             dump_out.each do |dump|
               yield dump if block_given?
               client_in.puts(dump)
