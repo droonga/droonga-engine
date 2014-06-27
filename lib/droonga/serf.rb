@@ -15,6 +15,8 @@
 
 require "English"
 
+require "json"
+
 require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
@@ -52,6 +54,18 @@ module Droonga
           end
         end
         {}
+      end
+
+      def send_event(name, event, payload)
+        serf = new(nul, name)
+        serf.run("event", JSON.generate(payload))
+        serf.shutdown
+      end
+
+      def send_query(name, query, payload)
+        serf = new(nul, name)
+        serf.run("query", JSON.generate(payload))
+        serf.shutdown
       end
     end
 
