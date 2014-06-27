@@ -101,11 +101,8 @@ drndump_stdin, drndump_stdout, drndump_stderr = *Open3.popen3(*drndump_command_l
 droonga_request_stdin, droonga_request_stdout, droonga_request_stderr = *Open3.popen3(*droonga_request_command_line)
 
 drndump_stdout.each do |dump|
+  puts dump
   droonga_request_stdin.puts(dump)
-end
-
-droonga_request_stdout.each do |result|
-  puts result
 end
 
 exit 0
