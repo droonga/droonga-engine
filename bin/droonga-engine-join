@@ -122,7 +122,7 @@ puts "Joining to the cluster..."
 name = "#{options.my_host}:#{options.port}/#{options.tag}"
 Droonga::Serf.send_event(name, "join", "dataset" => options.dataset,
                                        "type"    => "replica",
-                                       "host"    => options.host)
+                                       "host"    => options.my_host)
 
 puts "Done."
 
