@@ -75,7 +75,7 @@ module Droonga
     private
     def output(receiver, message, command, arguments, options={})
       logger.trace("output: start")
-      if not receiver.is_a?(String) or not command.is_a?(String)
+      if not receiver.is_a?(String) or not command.is_a?(String))
         logger.trace("output: abort: invalid argument",
                      :receiver => receiver,
                      :command  => command)
