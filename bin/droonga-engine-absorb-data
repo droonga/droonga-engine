@@ -79,5 +79,11 @@ end
 
 parser.parse!(ARGV)
 
-puts Open3.pipeline([options.drndump] + drndump_options,
-                    [options.droonga_request] + droonga_request_options)
+drndump_command_line = [options.drndump] + drndump_options
+droonga_request_command_line = [options.droonga_request] + droonga_request_options
+Open3.pipeline_r(drndump_command_line,
+                 droonga_request_command_line) do |last_stdout, wait_threads|
+  puts last_stdout.read
+end
+
+exit 0
