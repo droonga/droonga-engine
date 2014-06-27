@@ -23,6 +23,18 @@ require "droonga/line_buffer"
 
 module Droonga
   class Serf
+    ROLE = {
+      :default => {
+        :port => 7946,
+      },
+      :source => {
+        :port => 7947,
+      },
+      :destination => {
+        :port => 7948,
+      },
+    }
+
     class << self
       def path
         Droonga::Path.base + "serf"
@@ -31,18 +43,6 @@ module Droonga
       def status_file
         Droonga::Path.state + "status_file"
       end
-
-      ROLE = {
-        :default => {
-          :port => 7946,
-        },
-        :source => {
-          :port => 7947,
-        },
-        :destination => {
-          :port => 7948,
-        },
-      }
 
       def load_status
         status_file = status_file
