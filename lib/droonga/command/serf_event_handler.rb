@@ -50,10 +50,10 @@ module Droonga
         @payload = nil
         case @event_name
         when "user"
-          @event_sub_name = ":#{ENV["SERF_USER_EVENT"]}"
+          @event_sub_name = ENV["SERF_USER_EVENT"]
           @payload = JSON.parse($stdin.gets)
         when "query"
-          @event_sub_name = ":#{ENV["SERF_USER_QUERY"]}"
+          @event_sub_name = ENV["SERF_USER_QUERY"]
           @payload = JSON.parse($stdin.gets)
         end
       end
