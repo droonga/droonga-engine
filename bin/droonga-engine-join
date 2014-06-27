@@ -31,7 +31,7 @@ options.dataset = "Default"
 options.port    = 10031
 options.tag     = "droonga"
 options.drndump = "drndump"
-options.client  = "client"
+options.client  = "droonga-request"
 
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
