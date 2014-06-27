@@ -96,9 +96,16 @@ droonga_request_options += ["--receiver-host", options.destination_host]
 
 drndump_command_line = [options.drndump] + drndump_options
 droonga_request_command_line = [options.droonga_request] + droonga_request_options
-Open3.pipeline_r(drndump_command_line,
-                 droonga_request_command_line) do |last_stdout, wait_threads|
-  puts last_stdout.read
+
+drndump_stdin, drndump_stdout, drndump_stderr = *Open3.popen3(*drndump_command_line)
+droonga_request_stdin, droonga_request_stdout, droonga_request_stderr = *Open3.popen3(*droonga_request_command_line)
+
+drndump_stdout.each do |dump|
+  droonga_request_stdin.puts(dump)
+end
+
+droonga_request_stdout.each do |result|
+  puts result
 end
 
 exit 0
