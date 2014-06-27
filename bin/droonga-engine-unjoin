@@ -37,9 +37,6 @@ parser.on("--base-dir=PATH",
           "(#{options.base_dir})") do |path|
   options.base_dir = path
 end
-
-parser.separator("")
-parser.separator("Connections:")
 parser.on("--replica-remove-host=HOST",
           "Host name of the replica removed from cluster.") do |host|
   options.replica_remove_host = host
