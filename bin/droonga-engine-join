@@ -31,6 +31,7 @@ options = OpenStruct.new
 options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
 options.drndump  = "drndump"
 options.client   = "droonga-request"
+options.copy     = true
 
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
@@ -39,6 +40,12 @@ parser.on("--base-dir=PATH",
           "Path to the base directory the catalog.json is located in.",
           "(#{options.base_dir})") do |path|
   options.base_dir = path
+end
+
+parser.on("--[no-]copy",
+          "Do or don't copy data from the source cluster.",
+          "(#{options.copy})") do |copy|
+  options.copy = copy
 end
 
 parser.separator("")
@@ -106,30 +113,30 @@ unless options.dataset
           "--replica-source-host option."
 end
 
-puts "Initializing new replica..."
+if options.copy
+  puts "Initializing replica..."
 
-destination_params = Marshal.load(Marshal.dump(dataset_params))
-destination_params[options.dataset][:hosts] = [options.my_host]
-destination_catalog = Droonga::CatalogGenerator.generate(destination_params)
-Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(destination_catalog))
+  destination_params = Marshal.load(Marshal.dump(dataset_params))
+  destination_params[options.dataset][:hosts] = [options.my_host]
+  destination_catalog = Droonga::CatalogGenerator.generate(destination_params)
+  Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(destination_catalog))
 
-sleep(1) # wait for restart
+  sleep(1) # wait for restart
 
-puts "Duplicating replica..."
-
-Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
-                             :client           => options.client,
-                             :dataset          => options.dataset,
-                             :source_host      => options.replica_source_host,
-                             :destination_host => options.my_host,
-                             :port             => options.port,
-                             :tag              => options.tag) do |dump|
-  puts dump
+  puts "Copying data..."
+  Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
+                               :client           => options.client,
+                               :dataset          => options.dataset,
+                               :source_host      => options.replica_source_host,
+                               :destination_host => options.my_host,
+                               :port             => options.port,
+                               :tag              => options.tag) do |dump|
+    puts dump
+  end
+  sleep(1)
 end
 
-sleep(1)
-
-puts "Restarting new replica..."
+puts "Restarting replica..."
 
 final_params = Marshal.load(Marshal.dump(dataset_params))
 final_params[options.dataset][:hosts] += [options.my_host]
