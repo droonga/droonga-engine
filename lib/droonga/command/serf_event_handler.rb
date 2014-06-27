@@ -120,7 +120,7 @@ module Droonga
         updated_params = CatalogGenerator.update_params(current_params,
                                                         modifications)
         updated_catalog = CatalogGenerator.generate(updated_params)
-        SafeFileWriter.write(Catalog.path, JSON.pretty_generate(updated_catalog))
+        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(updated_catalog))
       end
 
       def live_nodes
