@@ -54,10 +54,10 @@ module Droonga
         @payload = nil
         case @event_name
         when "user"
-          @event_name += ":#{ENV["SERF_USER_EVENT"]}"
+          @event_sub_name += ":#{ENV["SERF_USER_EVENT"]}"
           @payload = JSON.parse($stdin.gets)
         when "query"
-          @event_name += ":#{ENV["SERF_USER_QUERY"]}"
+          @event_sub_name += ":#{ENV["SERF_USER_QUERY"]}"
           @payload = JSON.parse($stdin.gets)
         end
       end
@@ -70,13 +70,11 @@ module Droonga
       end
 
       def process_event
-        if @event_name == "user:change_role" or
-           @event_name == "query:change_role"
+        if @event_sub_name == "change_role"
           save_status(:role, @payload["role"])
         end
 
-        if @event_name == "user:join" or
-           @event_name == "query:join"
+        if @event_sub_name == "join"
           process_node_join
         end
       end
