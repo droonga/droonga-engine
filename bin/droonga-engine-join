@@ -28,6 +28,7 @@ require "droonga/data_absorber"
 require "droonga/serf"
 
 options = OpenStruct.new
+options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
 options.dataset = "Default"
 options.port    = 10031
 options.tag     = "droonga"
@@ -38,7 +39,8 @@ parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
 parser.on("--base-dir=PATH",
-          "Path to the base directory the catalog.json is located in.") do |path|
+          "Path to the base directory the catalog.json is located in.",
+          "(#{options.base_dir})") do |path|
   options.base_dir = path
 end
 
@@ -67,8 +69,7 @@ end
 parser.parse!(ARGV)
 
 
-base_dir = options.base_dir || ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
-base_dir = Pathname(base_dir).expand_path
+base_dir = Pathname(options.base_dir).expand_path
 ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
 catalog_path = Droonga::Path.base + "catalog.json"
