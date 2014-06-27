@@ -53,6 +53,7 @@ module Droonga
       connect unless connected?
       @socket.write(packed_fluent_message)
       logger.trace("send: done")
+      end
     end
 
     def reserve_send(tag, data)
