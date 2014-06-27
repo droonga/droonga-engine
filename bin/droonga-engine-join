@@ -108,10 +108,10 @@ end
 
 puts "Initializing new replica..."
 
-absorb_destination_params = Marshal.load(Marshal.dump(dataset_params))
-absorb_destination_params[options.dataset][:hosts] = [options.my_host]
-absorb_destination_catalog = Droonga::CatalogGenerator.generate(absorb_destination_params)
-Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(absorb_destination_catalog))
+destination_params = Marshal.load(Marshal.dump(dataset_params))
+destination_params[options.dataset][:hosts] = [options.my_host]
+destination_catalog = Droonga::CatalogGenerator.generate(destination_params)
+Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(destination_catalog))
 
 sleep(1) # wait for restart
 
