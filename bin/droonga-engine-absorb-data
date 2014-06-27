@@ -24,42 +24,37 @@ require "droonga/catalog_generator"
 require "droonga/data_absorber"
 
 options = OpenStruct.new
-options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
 options.drndump = "drndump"
 options.client  = "droonga-request"
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
 parser.separator("")
-parser.separator("Source:")
+parser.separator("Connection:")
 parser.on("--source-host=HOST",
           "Host name of the source cluster to be connected.") do |host|
   options.source_host = host
 end
-parser.on("--source-port=PORT", Integer,
-          "Port number of the source cluster to be connected.") do |port|
-  options.port = port
-end
-
-parser.separator("")
-parser.separator("Destination:")
 parser.on("--destination-host=HOST",
           "Host name of this cluster to be connected.") do |host|
   options.destination_host = host
 end
-parser.on("--destination-port=PORT", Integer,
-          "Port number of this cluster to be connected.") do |port|
+parser.on("--port=PORT", Integer,
+          "Port number of the source cluster to be connected.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_PORT})") do |port|
   options.port = port
 end
 
 parser.separator("")
 parser.separator("Data:")
 parser.on("--tag=TAG",
-          "Tag name to be used to communicate with Droonga system.") do |tag|
+          "Tag name to be used to communicate with Droonga system.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_TAG})") do |tag|
   options.tag = tag
 end
 parser.on("--dataset=DATASET",
-          "Dataset to be absorbed.") do |dataset|
+          "Dataset to be absorbed.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_DATASET})") do |dataset|
   options.dataset = dataset
 end
 
