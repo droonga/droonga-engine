@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "ostruct"
+require "optparse"
+require "open3"
+
+require "droonga/engine/version"
+
+options = OpenStruct.new
+parser = OptionParser.new
+parser.version = Droonga::Engine::VERSION
+
+options.drndump = "drndump"
+drndump_options = []
+
+options.droonga_request = "droonga-request"
+droonga_request_options = []
+
+parser.separator("")
+parser.separator("Source:")
+parser.on("--host=HOST",
+          "Host name of the soruce cluster to be connected.") do |host|
+  drndump_options += ["--host", host]
+end
+parser.on("--port=PORT", Integer,
+            "Port number of the soruce cluster to be connected.") do |port|
+  drndump_options += ["--port", port]
+end
+parser.on("--tag=TAG",
+          "Tag name to be used to communicate with Droonga system.") do |tag|
+  drndump_options += ["--tag", tag]
+end
+
+parser.separator("")
+parser.separator("Data:")
+parser.on("--dataset=DATASET",
+          "Dataset to be absorbed.") do |dataset|
+  drndump_options += ["--dataset", dataset]
+end
+
+parser.separator("")
+parser.separator("Droonga protocol:")
+parser.on("--receiver-host=HOST",
+          "Host name of this node to be received a response from the source cluster.") do |host|
+  drndump_options += ["--receiver-host", host]
+  droonga_request_options += ["--receiver-host", host]
+end
+parser.on("--receiver-port=PORT", Integer,
+          "Port number of this node to be received a response from the source cluster.") do |port|
+  drndump_options += ["--receiver-port", port]
+  droonga_request_options += ["--receiver-port", port]
+end
+
+parser.separator("")
+parser.separator("Commands:")
+parser.on("--drndump=PATH",
+          "Path to the drndump command.") do |path|
+  options.drndump = path
+end
+parser.on("--droonga-client=PATH",
+          "Path to the droonga-client command.") do |path|
+  options.droonga_client = path
+end
+
+parser.parse!(ARGV)
+
+puts Open3.pipeline([options.drndump] + drndump_options,
+                    [options.droonga_request] + droonga_request_options)
