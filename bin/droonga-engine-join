@@ -118,7 +118,7 @@ sleep(1) # wait for restart
 puts "Joining to the cluster..."
 
 name = "#{options.host}:#{options.port}/#{options.tag}"
-Serf.send_event(name, "join", "dataset" => options.dataset,
+Droonga::Serf.send_event(name, "join", "dataset" => options.dataset,
                               "type" => "replica",
                               "host" => options.host)
 
