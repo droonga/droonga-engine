@@ -23,6 +23,7 @@ require "pathname"
 
 require "droonga/engine/version"
 require "droonga/catalog_generator"
+require "droonga/safe_file_writer"
 
 generator = Droonga::CatalogGenerator.new
 current_dataset = {}
@@ -125,13 +126,8 @@ def open_output(path)
   if path == "-"
     yield($stdout)
   else
-    # Don't output the file directly to prevent loading of incomplete file!
-    path = Pathname(path).expand_path
-    FileUtils.mkdir_p(path.dirname.to_s)
-    Tempfile.open(path.basename.to_s, path.dirname.to_s, "w") do |output|
+    Droonga::SafeFileWriter.write(path) do |output|
       yield(output)
-      output.flush
-      File.rename(output.path, path.to_s)
     end
   end
 end

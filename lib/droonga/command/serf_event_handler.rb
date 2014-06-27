@@ -21,6 +21,7 @@ require "tempfile"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/safe_file_writer"
 
 module Droonga
   module Command
@@ -92,23 +93,13 @@ module Droonga
         path = Path.live_nodes
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
-        output(path, file_contents)
+        Droonga::SafeFileWriter.write(path, file_contents)
       end
 
       def save_status(key, value)
         status = Serf.load_status
         status[key] = value
-        output(Serf.status_file, JSON.pretty_generate(status))
-      end
-
-      def output(path, file_contents)
-        FileUtils.mkdir_p(path.parent.to_s)
-        # Don't output the file directly to prevent loading of incomplete file!
-        Tempfile.open(path.basename.to_s, path.parent.to_s, "w") do |output|
-          output.write(file_contents)
-          output.flush
-          File.rename(output.path, path.to_s)
-        end
+        Droonga::SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
       end
     end
   end
