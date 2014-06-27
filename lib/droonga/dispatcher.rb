@@ -171,27 +171,10 @@ module Droonga
     def dispatch_steps(steps)
       id = @engine_state.generate_id
 
-      one_way_steps = []
-      one_way_destinations = []
-      have_dead_nodes = !@engine_state.dead_nodes.empty?
-
       destinations = []
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          if have_dead_nodes and write_step?(step)
-            routes = dataset.get_routes(step, @engine_state.dead_nodes)
-            unless routes.empty?
-              one_way_step = Marshal.load(Marshal.dump(step))
-              one_way_step["routes"] = routes
-              one_way_step.delete("post")
-              one_way_step.delete("outputs")
-              one_way_steps << one_way_step
-              one_way_destinations += routes.collect do |route|
-                farm_path(route)
-              end
-            end
-          end
           routes = dataset.get_routes(step, @engine_state.live_nodes)
           step["routes"] = routes
         else
@@ -205,14 +188,6 @@ module Droonga
       dispatch_message = { "id" => id, "steps" => steps }
       destinations.uniq.each do |destination|
         dispatch(dispatch_message, destination)
-      end
-
-      unless one_way_steps.empty?
-        dispatch_message = { "id" => @engine_state.generate_id,
-                             "steps" => one_way_steps }
-        one_way_destinations.uniq.each do |destination|
-          dispatch(dispatch_message, destination)
-        end
       end
     end
 
