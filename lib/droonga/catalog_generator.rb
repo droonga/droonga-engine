@@ -28,6 +28,23 @@ module Droonga
       def generate(datasets_params)
         new(datasets_params).generate
       end
+
+      def update_params(base_params, modifications)
+        params = Marshal.load(Marshal.dump(base_params))
+        modifications.each do |name, modification|
+          dataset = params[name]
+          dataset[:hosts] = modification[:hosts] if modification[:hosts]
+
+            if modification[:add_replica_hosts]
+              dataset[:hosts] += modification[:add_replica_hosts]
+              dataset[:hosts].uniq!
+            end
+            if modification[:remove_replica_hosts]
+              dataset[:hosts] -= modification[:remove_replica_hosts]
+            end
+        end
+        params
+      end
     end
 
     def initialize(datasets_params=nil)

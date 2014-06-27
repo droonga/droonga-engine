@@ -89,22 +89,9 @@ def load_source(path)
 end
 
 source_catalog = load_source(options.source_path)
-dataset_params = generator.catalog_to_params(source_catalog)
-datasets.each do |name, options|
-  dataset = dataset_params[name]
-
-  dataset[:hosts] = options[:hosts] if options[:hosts]
-
-  if options[:add_replica_hosts]
-    dataset[:hosts] += options[:add_replica_hosts]
-    dataset[:hosts].uniq!
-  end
-  if options[:remove_replica_hosts]
-    dataset[:hosts] -= options[:remove_replica_hosts]
-  end
-
-  generator.add_dataset(name, dataset)
-end
+source_params = generator.catalog_to_params(source_catalog)
+modified_params = Droonga::CatalogGenerator.update_params(source_params, datasets)
+modified_catalog = Droonga::CatalogGenerator.generate(modified_params)
 
 def open_output(path)
   if path == "-"
@@ -118,5 +105,5 @@ end
 
 catalog = generator.generate
 open_output(options.output_path) do |output|
-  output.puts(JSON.pretty_generate(catalog))
+  output.puts(JSON.pretty_generate(modified_catalog))
 end
