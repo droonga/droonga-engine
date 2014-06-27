@@ -85,54 +85,25 @@ def load_source(path)
     source_path = Pathname(path)
     source = source_path.read
   end
-  JSON.parse(source)
+  catalog = JSON.parse(source)
 end
 
-ADDRESS_MATCHER = /\A(.*):(\d+)\/([^\.]+)\.(.+)\z/
-def fill_dataset(options, source)
-  options[:n_workers] = source["nWorkers"]
-  options[:n_slices]  = source["replicas"].first["slices"].size
-  options[:plugins]   = source["plugins"]
-  options[:schema]    = source["schema"] if source["schema"]
-  options[:fact]      = source["fact"] if source["fact"]
+source_catalog = load_source(options.source_path)
+dataset_params = generator.catalog_to_params(source_catalog)
+datasets.each do |name, options|
+  dataset = dataset_params[name]
 
-  nodes = source["replicas"].collect do |replica|
-    ADDRESS_MATCHER =~ replica["slices"].first["volume"]["address"]
-    {
-      :host => $1,
-      :port => $2.to_i,
-      :tag  => $3,
-      :path => $4,
-    }
-  end
-  options[:tag]   = nodes.first[:tag]
-  options[:port]  = nodes.first[:port].to_i
-  options[:hosts] ||= nodes.collect do |node|
-    node[:host]
-  end
+  dataset[:hosts] = options[:hosts] if options[:hosts]
 
   if options[:add_replica_hosts]
-    options[:hosts] += options[:add_replica_hosts]
-    options[:hosts].uniq!
+    dataset[:hosts] += options[:add_replica_hosts]
+    dataset[:hosts].uniq!
   end
   if options[:remove_replica_hosts]
-    options[:hosts] -= options[:remove_replica_hosts]
+    dataset[:hosts] -= options[:remove_replica_hosts]
   end
-end
 
-source = load_source(options.source_path)
-datasets.each do |name, dataset|
-  source_dataset = source["datasets"][name]
-  fill_dataset(dataset, source_dataset)
-end
-
-if datasets[Droonga::CatalogGenerator::DEFAULT_DATASET].empty?
-  datasets.delete(Droonga::CatalogGenerator::DEFAULT_DATASET)
-end
-
-
-datasets.each do |name, options|
-  generator.add_dataset(name, options)
+  generator.add_dataset(name, dataset)
 end
 
 def open_output(path)

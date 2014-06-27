@@ -159,5 +159,48 @@ module Droonga
         @weight ||= 100 / @n_slices
       end
     end
+
+    public
+    class << self
+      def catalog_to_params(catalog)
+        new.catalog_to_params(catalog)
+      end
+    end
+
+    def catalog_to_params(catalog)
+      datasets = {}
+      catalog["datasets"].each do |name, dataset|
+        datasets[name] = dataset_to_params(dataset)
+      end
+      datasets
+    end
+
+    private
+    ADDRESS_MATCHER = /\A(.*):(\d+)\/([^\.]+)\.(.+)\z/
+
+    def dataset_to_params(dataset)
+      params = {}
+      params[:n_workers] = dataset["nWorkers"]
+      params[:n_slices]  = dataset["replicas"].first["slices"].size
+      params[:plugins]   = dataset["plugins"]
+      params[:schema]    = dataset["schema"] if dataset["schema"]
+      params[:fact]      = dataset["fact"] if dataset["fact"]
+
+      nodes = dataset["replicas"].collect do |replica|
+        ADDRESS_MATCHER =~ replica["slices"].first["volume"]["address"]
+        {
+          :host => $1,
+          :port => $2.to_i,
+          :tag  => $3,
+          :path => $4,
+        }
+      end
+      params[:tag]   = nodes.first[:tag]
+      params[:port]  = nodes.first[:port].to_i
+      params[:hosts] = nodes.collect do |node|
+        node[:host]
+      end
+      params
+    end
   end
 end
