@@ -85,6 +85,8 @@ end
 
 parser.parse!(ARGV)
 
-Droonga::DataAbsorber.absorb(options)
+Droonga::DataAbsorber.absorb(options) do |dump|
+  puts dump
+end
 
 exit 0
