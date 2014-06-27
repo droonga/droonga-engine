@@ -51,8 +51,18 @@ parser.parse!(ARGV)
 base_dir = Pathname(options.base_dir).expand_path
 ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
-catalog_path = Droonga::Path.base + "catalog.json"
+catalog_path = Droonga::Path.catalog
+unless catalog_path.exist?
+  raise "Cannot load 'catalog.json'. You must specify correct path " +
+          "to the base directory via --base-dir option."
+end
 source_catalog = JSON.parse(catalog_path.read)
+
+
+unless options.replica_remove_host
+  raise "You must specify the host name or the IP address of a node to " +
+          "be removed from the cluster via --replica-remove-host option."
+end
 
 
 generator = Droonga::CatalogGenerator.new
@@ -64,6 +74,12 @@ dataset_params.each do |name, dataset|
   options.tag         = dataset[:tag]
   options.port        = dataset[:port]
   options.other_hosts = dataset[:hosts]
+end
+
+unless options.dataset
+  raise "Specified host #{options.replica_remove_host} is not a member of "+
+          "the cluster. You must specify correct host via --replica-remove-host " +
+          "option."
 end
 
 sleep(1) # wait for restart
