@@ -47,7 +47,8 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      output(receiver, message, command, arguments)
+      reserve = destination["reserve"]
+      output(receiver, message, command, arguments, :reserve => reserve)
       logger.trace("forward: done")
     end
 
@@ -72,7 +73,7 @@ module Droonga
     end
 
     private
-    def output(receiver, message, command, arguments)
+    def output(receiver, message, command, arguments, options={})
       logger.trace("output: start")
       if not receiver.is_a?(String) or not command.is_a?(String))
         logger.trace("output: abort: invalid argument",
@@ -103,7 +104,11 @@ module Droonga
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       logger.trace("output: post: start: #{log_info}")
-      sender.send(output_tag, message)
+      if options[:reserve]
+        sender.reserve_send(output_tag, message)
+      else
+        sender.send(output_tag, message)
+      end
       logger.trace("output: post: done: #{log_info}")
       logger.trace("output: done")
     end

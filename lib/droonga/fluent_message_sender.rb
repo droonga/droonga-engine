@@ -47,18 +47,21 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
-    def send(tag, data, options={})
+    def send(tag, data)
       logger.trace("send: start")
-      fluent_message = [tag, Time.now.to_i, data]
-      packed_fluent_message = MessagePackPacker.pack(fluent_message)
+      packed_fluent_message = create_packed_fluent_message(tag, data)
       connect unless connected?
-      if options[:reserve]
-        @socket.reserve_write(packed_fluent_message)
-        logger.trace("send: reserved")
-      else
-        @socket.write(packed_fluent_message)
-        logger.trace("send: done")
+      @socket.write(packed_fluent_message)
+      logger.trace("send: done")
       end
+    end
+
+    def reserve_send(tag, data)
+      logger.trace("reserve_send: start")
+      packed_fluent_message = create_packed_fluent_message(tag, data)
+      connect unless connected?
+      @socket.reserve_write(packed_fluent_message)
+      logger.trace("reserve_send: done")
     end
 
     def resume
@@ -111,6 +114,11 @@ module Droonga
     def shutdown_socket
       return unless connected?
       @socket.close unless @socket.closed?
+    end
+
+    def create_packed_fluent_message(tag, data)
+      fluent_message = [tag, Time.now.to_i, data]
+      MessagePackPacker.pack(fluent_message)
     end
 
     def log_tag
