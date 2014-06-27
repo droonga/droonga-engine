@@ -33,8 +33,7 @@ module Droonga
 
       def initialize
         @serf = ENV["SERF"] || Serf.path
-        @serf_port = ENV["SERF_PORT"] || Serf.default_port
-        @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:#{@serf_port}"
+        @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:7373"
         @serf_name = ENV["SERF_SELF_NAME"]
       end
 

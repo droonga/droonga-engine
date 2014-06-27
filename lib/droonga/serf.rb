@@ -33,15 +33,15 @@ module Droonga
       end
 
       def default_port
-        7373
+        7946
       end
 
       def dump_source_port
-        7374
+        7947
       end
 
       def dump_destination_port
-        7375
+        7948
       end
     end
 
@@ -57,8 +57,6 @@ module Droonga
       logger.trace("start: start")
       ensure_serf
       ENV["SERF"] = @serf
-      @port = port
-      ENV["SERF_PORT"] = "#{@port}"
       ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
@@ -66,7 +64,7 @@ module Droonga
       end
       @agent = run("agent",
                    "-node", @name,
-                   "-bind", extract_host(@name),
+                   "-bind", "#{extract_host(@name)}:#{port}",
                    "-event-handler", "droonga-engine-serf-event-handler",
                    "-log-level", log_level,
                    *retry_joins)
@@ -131,7 +129,7 @@ module Droonga
     end
 
     def rpc_address
-      "#{extract_host(@name)}:#{@port}"
+      "#{extract_host(@name)}:7373"
     end
 
     def port
