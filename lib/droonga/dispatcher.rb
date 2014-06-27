@@ -162,9 +162,11 @@ module Droonga
       if local?(destination)
         process_internal_message(message)
       else
+        only_reserve = @engine_state.dead_nodes.include?(destination)
         @forwarder.forward(@message.merge("body" => message),
                            "type" => "dispatcher",
-                           "to"   => destination)
+                           "to"   => destination,
+                           "reserve" => only_reserve)
       end
     end
 
