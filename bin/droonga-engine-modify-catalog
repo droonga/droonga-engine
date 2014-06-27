@@ -1,0 +1,142 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "ostruct"
+require "optparse"
+require "json"
+require "tempfile"
+require "pathname"
+
+require "droonga/engine/version"
+require "droonga/catalog_generator"
+
+generator = Droonga::CatalogGenerator.new
+current_dataset = {}
+datasets = {
+  Droonga::CatalogGenerator::DEFAULT_DATASET => current_dataset
+}
+
+options = OpenStruct.new
+options.source_path = "./catalog.json"
+options.output_path = "-"
+parser = OptionParser.new
+parser.version = Droonga::Engine::VERSION
+parser.on("--source=PATH",
+          "Path to an existing catalog.json.",
+          "\"-\" means the standard input.",
+          "(#{options.source_path})") do |path|
+  options.source_path = path
+end
+parser.on("--output=PATH",
+          "Output catalog.json to PATH.",
+          "\"-\" means the standard output.",
+          "(#{options.output_path})") do |path|
+  options.output_path = path
+end
+parser.on("--dataset=NAME",
+          "Add a dataset its name is NAME.",
+          "And set the NAME to the current dataset.") do |name|
+  current_dataset = datasets[name] = {}
+end
+parser.on("--add-replica-hosts=NAME1,NAME2,...", Array,
+          "Use given hosts to be added as replicas to the current dataset.") do |hosts|
+  current_dataset[:add_replica_hosts] = hosts
+end
+parser.on("--remove-replica-hosts=NAME1,NAME2,...", Array,
+          "Use given hosts to be removed as replicas from the current dataset.") do |hosts|
+  current_dataset[:remove_replica_hosts] = hosts
+end
+parser.parse!(ARGV)
+
+
+def load_source(path)
+  source = nil
+  if path == "-"
+    source = $stdin.read
+  else
+    source_path = Pathname(path)
+    source = source_path.read
+  end
+  JSON.parse(source)
+end
+
+ADDRESS_MATCHER = /\A(.*):(\d+)\/([^\.]+)\.(.+)\z/
+def fill_dataset(options, source)
+  options[:n_workers] = source["nWorkers"]
+  options[:n_slices]  = source["replicas"].first["slices"].size
+  options[:plugins]   = source["plugins"]
+  options[:schema]    = source["schema"] if source["schema"]
+  options[:fact]      = source["fact"] if source["fact"]
+
+  nodes = source["replicas"].collect do |replica|
+    ADDRESS_MATCHER =~ replica["slices"].first["volume"]["address"]
+    {
+      :host => $1,
+      :port => $2.to_i,
+      :tag  => $3,
+      :path => $4,
+    }
+  end
+  options[:tag]   = nodes.first[:tag]
+  options[:port]  = nodes.first[:port].to_i
+  options[:hosts] = nodes.collect do |node|
+    node[:host]
+  end
+
+  if options[:add_replica_hosts]
+    options[:hosts] += options[:add_replica_hosts]
+    options[:hosts].uniq!
+  end
+  if options[:remove_replica_hosts]
+    options[:hosts] -= options[:remove_replica_hosts]
+  end
+end
+
+source = load_source(options.source_path)
+datasets.each do |name, dataset|
+  source_dataset = source["datasets"][name]
+  fill_dataset(dataset, source_dataset)
+end
+
+if datasets[Droonga::CatalogGenerator::DEFAULT_DATASET].empty?
+  datasets.delete(Droonga::CatalogGenerator::DEFAULT_DATASET)
+end
+
+
+datasets.each do |name, options|
+  generator.add_dataset(name, options)
+end
+
+def open_output(path)
+  if path == "-"
+    yield($stdout)
+  else
+    # Don't output the file directly to prevent loading of incomplete file!
+    path = Pathname(path).expand_path
+    FileUtils.mkdir_p(path.dirname.to_s)
+    Tempfile.open(path.basename.to_s, path.dirname.to_s, "w") do |output|
+      yield(output)
+      output.flush
+      File.rename(output.path, path.to_s)
+    end
+  end
+end
+
+catalog = generator.generate
+open_output(options.output_path) do |output|
+  output.puts(JSON.pretty_generate(catalog))
+end
