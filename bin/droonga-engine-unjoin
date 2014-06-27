@@ -47,10 +47,6 @@ parser.on("--replica-remove-host=HOST",
           "Host name of the replica removed from cluster.") do |host|
   options.replica_remove_host = host
 end
-parser.on("--my-host=HOST",
-          "Host name of this node.") do |host|
-  options.my_host = host
-end
 
 parser.parse!(ARGV)
 
