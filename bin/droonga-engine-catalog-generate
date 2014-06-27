@@ -18,7 +18,6 @@
 require "ostruct"
 require "optparse"
 require "json"
-require "tempfile"
 require "pathname"
 
 require "droonga/engine/version"
