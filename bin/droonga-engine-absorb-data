@@ -76,11 +76,13 @@ end
 parser.separator("")
 parser.separator("Commands:")
 parser.on("--drndump=PATH",
-          "Path to the drndump command.") do |path|
+          "Path to the drndump command.",
+          "(#{options[:client]})") do |path|
   options[:drndump] = path
 end
 parser.on("--droonga-request=PATH",
-          "Path to the droonga-request command.") do |path|
+          "Path to the droonga-request command.",
+          "(#{options[:client]})") do |path|
   options[:client] = path
 end
 
