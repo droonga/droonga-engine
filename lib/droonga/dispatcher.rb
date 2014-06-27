@@ -184,6 +184,8 @@ module Droonga
             unless routes.empty?
               one_way_step = Marshal.load(Marshal.dump(step))
               one_way_step["routes"] = routes
+              one_way_step.delete("post")
+              one_way_step.delete("outputs")
               one_way_steps << one_way_step
               one_way_destinations += routes.collect(&:farm_path)
             end
