@@ -43,7 +43,6 @@ module Droonga
           :port => 7948,
         },
       }
-      end
 
       def load_status
         status_file = status_file
