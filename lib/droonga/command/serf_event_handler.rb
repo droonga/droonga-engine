@@ -35,12 +35,14 @@ module Droonga
         @serf = ENV["SERF"] || Serf.path
         @serf_port = ENV["SERF_PORT"] || Serf.default_port
         @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:#{@serf_port}"
+        @serf_name = ENV["SERF_SELF_NAME"]
       end
 
       def run
         parse_event
-        process_event
+        return true unless event_for_me?
 
+        process_event
         output_live_nodes
         true
       end
@@ -52,17 +54,24 @@ module Droonga
         case @event_name
         when "user"
           @event_name += ":#{ENV["SERF_USER_EVENT"]}"
-          @payload = $stdin.gets
+          @payload = JSON.parse($stdin.gets)
         when "query"
           @event_name += ":#{ENV["SERF_USER_QUERY"]}"
-          @payload = $stdin.gets
+          @payload = JSON.parse($stdin.gets)
         end
+      end
+
+      def event_for_me?
+        return true unless @payload
+        return true unless @payload["node"]
+
+        @payload["node"] == @serf_name
       end
 
       def process_event
         if @event_name == "user:change_port" or
            @event_name == "query:change_port"
-          serf_port = @payload.to_i
+          serf_port = @payload["port"]
           output_port_file(serf_port)
         end
       end
