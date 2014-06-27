@@ -20,6 +20,7 @@ require "optparse"
 require "open3"
 
 require "droonga/engine/version"
+require "droonga/data_absorber"
 
 options = {
   :drndump => "drndump",
