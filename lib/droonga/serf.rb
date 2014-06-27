@@ -16,6 +16,7 @@
 require "English"
 
 require "json"
+require "coolio"
 
 require "droonga/path"
 require "droonga/loggable"
