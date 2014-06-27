@@ -82,7 +82,7 @@ def load_source(path)
   if path == "-"
     source = $stdin.read
   else
-    source_path = Pathname(path)
+    source_path = Pathname(path).expand_path
     source = source_path.read
   end
   catalog = JSON.parse(source)
