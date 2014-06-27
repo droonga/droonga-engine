@@ -34,11 +34,11 @@ client_options = []
 parser.separator("")
 parser.separator("Source:")
 parser.on("--source-host=HOST",
-          "Host name of the soruce cluster to be connected.") do |host|
+          "Host name of the source cluster to be connected.") do |host|
   drndump_options += ["--host", host]
 end
 parser.on("--source-port=PORT", Integer,
-          "Port number of the soruce cluster to be connected.") do |port|
+          "Port number of the source cluster to be connected.") do |port|
   drndump_options += ["--port", port.to_s]
 end
 
