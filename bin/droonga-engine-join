@@ -22,6 +22,7 @@ require "json"
 require "pathname"
 
 require "droonga/engine/version"
+require "droonga/path"
 require "droonga/catalog_generator"
 require "droonga/safe_file_writer"
 require "droonga/data_absorber"
@@ -67,9 +68,11 @@ end
 parser.parse!(ARGV)
 
 
-base_dir = options.base_dir || ENV["DROONGA_BASE_DIR"]
+base_dir = options.base_dir || ENV[Droonga::Path::BASE_DIR_ENV_NAME]
+base_dir = Pathname(base_dir).expand_path
+ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
-catalog_path = Pathname(base_dir).expand_path + "catalog.json"
+catalog_path = Droonga::Path.base + "catalog.json"
 source_catalog = JSON.parse(catalog_path.read)
 
 
