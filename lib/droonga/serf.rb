@@ -147,12 +147,13 @@ module Droonga
     end
 
     def role
-      return :default unless status[:role]
-
-      role = status[:role].to_sym
-      return :default unless self.class::ROLE.keys.include?(role)
-
-      role
+      if status[:role]
+        role = status[:role].to_sym
+        if self.class::ROLE.keys.include?(role)
+          return role
+        end
+      end
+      :default
     end
 
     def port
