@@ -20,6 +20,7 @@ module Droonga
     DEFAULT_DATASET = "Default"
     DEFAULT_HOSTS = ["127.0.0.1"]
     DEFAULT_N_WORKERS = 4
+    DEFAULT_N_SLICES = 1
     DEFAULT_PLUGINS = ["groonga", "search", "crud", "dump", "system"]
     DEFAULT_PORT = 10031
     DEFAULT_TAG = "droonga"
@@ -151,7 +152,7 @@ module Droonga
         @host       = host
         @port       = options[:port]     || DEFAULT_PORT
         @tag        = options[:tag]      || DEFAULT_TAG
-        @n_slices   = options[:n_slices] || 1
+        @n_slices   = options[:n_slices] || DEFAULT_N_SLICES
 
         @n_volumes = 0
       end

@@ -67,7 +67,8 @@ parser.on("--tag=TAG",
   current_dataset[:tag] = tag
 end
 parser.on("--n-slices=N", Integer,
-          "Use N slices for each replica.") do |n|
+          "Use N slices for each replica.",
+          "(#{Droonga::CatalogGenerator::DEFAULT_N_SLICES})") do |n|
   current_dataset[:n_slices] = n
 end
 parser.on("--plugins=PLUGIN1,PLUGIN2,...", Array,
