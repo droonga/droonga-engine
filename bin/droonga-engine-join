@@ -104,7 +104,7 @@ options.port = dataset.port
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
 
 puts "Joining new replica to the cluster..."
-Droonga::Serf.send_event(options.joining_node, "join",
+Droonga::Serf.send_query(options.joining_node, "join",
                          "source" => options.replica_source_host,
                          "copy"   => options.copy)
 

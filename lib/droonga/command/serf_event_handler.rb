@@ -136,7 +136,7 @@ module Droonga
         sleep(1) # wait for restart
 
         source_node  = "#{source}:#{port}/#{tag}"
-        Serf.send_event(source_node, "add_replicas",
+        Serf.send_query(source_node, "add_replicas",
                         "dataset" => dataset,
                         "hosts"   => [host])
       end
