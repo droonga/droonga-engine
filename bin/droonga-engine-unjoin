@@ -37,7 +37,7 @@ parser.on("--base-dir=PATH",
           "(#{options.base_dir})") do |path|
   options.base_dir = path
 end
-parser.on("--replica-remove-host=HOST",
+parser.on("--host=HOST",
           "Host name of the replica removed from cluster.") do |host|
   options.replica_remove_host = host
 end
@@ -53,48 +53,37 @@ unless catalog_path.exist?
   raise "Cannot load 'catalog.json'. You must specify correct path " +
           "to the base directory via --base-dir option."
 end
-source_catalog = JSON.parse(catalog_path.read)
-
 
 unless options.replica_remove_host
   raise "You must specify the host name or the IP address of a node to " +
           "be removed from the cluster via --replica-remove-host option."
 end
 
-
+source_catalog = JSON.parse(catalog_path.read)
 generator = Droonga::CatalogGenerator.new
-dataset_params = generator.catalog_to_params(source_catalog)
-dataset_params.each do |name, dataset|
-  next unless dataset[:hosts].include?(options.replica_remove_host)
+generator.load(source_catalog)
 
-  options.dataset     = name
-  options.tag         = dataset[:tag]
-  options.port        = dataset[:port]
-  options.other_hosts = dataset[:hosts]
-end
-
-unless options.dataset
+dataset = generator.dataset_for_host(options.replica_remove_host)
+unless dataset
   raise "Specified host #{options.replica_remove_host} is not a member of "+
           "the cluster. You must specify correct host via --replica-remove-host " +
           "option."
 end
 
-sleep(1) # wait for restart
+options.dataset     = dataset.name
+options.tag         = dataset.tag
+options.port        = dataset.port
+options.other_hosts = dataset.hosts
 
-puts "Unjoining from the cluster..."
+remaining_host = options.other_hosts.first || options.replica_remove_host
+options.remaining_node = "#{remaining_host}:#{options.port}/#{options.tag}"
 
-rpc_host = options.other_hosts.first || options.replica_remove_host
-name = "#{rpc_host}:#{options.port}/#{options.tag}"
-Droonga::Serf.send_event(name, "unjoin", "dataset" => options.dataset,
-                                         "type"    => "replica",
-                                         "host"    => options.replica_remove_host)
 
-puts "Restarting replica..."
+puts "Unjoining replica from the cluster..."
 
-final_params = Marshal.load(Marshal.dump(dataset_params))
-final_params[options.dataset][:hosts] -= [options.replica_remove_host]
-final_catalog = Droonga::CatalogGenerator.generate(final_params)
-Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(final_catalog))
+Droonga::Serf.send_event(options.remaining_node, "remove_replicas",
+                         "dataset" => options.dataset,
+                         "hosts"   => [options.replica_remove_host]))
 
 puts "Done."
 
