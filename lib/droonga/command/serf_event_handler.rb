@@ -69,39 +69,56 @@ module Droonga
         case @event_sub_name
         when "change_role"
           save_status(:role, @payload["role"])
-        when "join"
-          process_node_join
-        when "unjoin" # TODO: Is "unjoin" clear word? How about "leave"?
-          process_node_unjoin
+        when "set_replicas"
+          set_replicas
+        when "add_replicas"
+          add_replicas
+        when "remove_replicas"
+          remove_replicas
         end
       end
 
-      def process_node_join
+      def given_hosts
+        hosts = @payload["hosts"]
+        return nil unless hosts
+        hosts = [hosts] if hosts.is_a?(String)
+        hosts
+      end
+
+      def set_replicas
         dataset = @payload["dataset"]
         return unless dataset
 
-        host = @payload["host"]
-        return unless host
-
-        return unless @payload["type"] == "replica"
+        hosts = given_hosts
+        return unless hosts
 
         modify_catalog do |generator|
-          generator.datasets[dataset].replicas.hosts << host
+          generator.datasets[dataset].replicas.hosts = hosts
+        end
+      end
+
+      def add_replicas
+        dataset = @payload["dataset"]
+        return unless dataset
+
+        hosts = given_hosts
+        return unless hosts
+
+        modify_catalog do |generator|
+          generator.datasets[dataset].replicas.hosts += hosts
           generator.datasets[dataset].replicas.hosts.uniq!
         end
       end
 
-      def process_node_unjoin
+      def remove_replica
         dataset = @payload["dataset"]
         return unless dataset
 
-        host = @payload["host"]
-        return unless host
-
-        return unless @payload["type"] == "replica"
+        hosts = given_hosts
+        return unless hosts
 
         modify_catalog do |generator|
-          generator.datasets[dataset].replicas.hosts -= [host]
+          generator.datasets[dataset].replicas.hosts -= hosts
         end
       end
 
