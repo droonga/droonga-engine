@@ -191,18 +191,27 @@ module Droonga
       end
 
       def absorb_data
-        dataset = @payload["dataset"]
-        return unless dataset
+        return unless event_for_me?
 
         soruce = @payload["soruce"]
         return unless soruce
 
-        current_catalog = JSON.parse(Path.catalog.read)
-        generator = CatalogGenerator.new
-        generator.load(current_catalog)
+        dataset_name = @payload["dataset"]
+        port         = @payload["port"]
+        tag          = @payload["port"]
 
-        port = @payload["port"] || generator.datasets[dataset].replicas.port
-        tag  = @payload["tag"]  || generator.datasets[dataset].replicas.tag
+        if dataset_name.nil? or port.nil? or tag.nil?
+          current_catalog = JSON.parse(Path.catalog.read)
+          generator = CatalogGenerator.new
+          generator.load(current_catalog)
+
+          dataset = generator.dataset_for_host(soruce)
+          return unless dataset
+
+          dataset_name = dataset.name
+          port = dataset.replicas.port
+          tag  = dataset.replicas.tag
+        end
 
         DataAbsorber.absorb(:dataset          => dataset,
                             :source_host      => source,
