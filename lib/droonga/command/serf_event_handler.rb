@@ -18,6 +18,7 @@ require "json"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/catalog_generator"
+require "droonga/data_absorber"
 require "droonga/safe_file_writer"
 
 module Droonga
@@ -75,7 +76,13 @@ module Droonga
           add_replicas
         when "remove_replicas"
           remove_replicas
+        when "absorb_data"
+          absorb_data
         end
+      end
+
+      def host
+        @serf_name.split(":").first
       end
 
       def given_hosts
@@ -128,6 +135,28 @@ module Droonga
         generator.load(current_catalog)
         yield(generator)
         SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.catalog))
+      end
+
+      def absorb_data
+        dataset = @payload["dataset"]
+        return unless dataset
+
+        soruce = @payload["soruce"]
+        return unless soruce
+
+        current_catalog = JSON.parse(Path.catalog.read)
+        generator = CatalogGenerator.new
+        generator.load(current_catalog)
+
+        port = @payload["port"] || generator.datasets[dataset].replicas.port
+        tag  = @payload["tag"]  || generator.datasets[dataset].replicas.tag
+
+        DataAbsorber.absorb(:dataset          => dataset,
+                            :source_host      => source,
+                            :destination_host => host,
+                            :port             => port,
+                            :tag              => tag)
+        #TODO: how to notify that this process is successfully finished for other nodes?
       end
 
       def live_nodes
