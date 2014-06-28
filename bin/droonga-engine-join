@@ -155,4 +155,4 @@ Droonga::Serf.send_event(name, "join", "dataset" => options.dataset,
 
 puts "Done."
 
-exit 0
+exit(true)

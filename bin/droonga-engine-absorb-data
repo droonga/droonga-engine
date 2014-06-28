@@ -103,4 +103,4 @@ Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
   puts dump
 end
 
-exit 0
+exit(true)

@@ -98,4 +98,4 @@ Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(final_catalog))
 
 puts "Done."
 
-exit 0
+exit(true)
