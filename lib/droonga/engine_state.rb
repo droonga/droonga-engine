@@ -33,7 +33,7 @@ module Droonga
     attr_reader :replier
     attr_accessor :on_finish
     attr_accessor :catalog
-    attr_accessor :dead_nodes
+    attr_writer :dead_nodes
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
