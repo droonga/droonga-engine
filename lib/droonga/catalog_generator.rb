@@ -29,7 +29,7 @@ module Droonga
       def generate(datasets_params)
         generator = new
         datasets_params.each do |name, params|
-          add_dataset(name, params)
+          generator.add_dataset(name, params)
         end
         generator.generate
       end
