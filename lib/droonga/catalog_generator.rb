@@ -83,12 +83,12 @@ module Droonga
         end
 
         if modification[:add_replica_hosts]
-          dataset.hosts += modification[:add_replica_hosts]
-          dataset.hosts.uniq!
+          replicas.hosts += modification[:add_replica_hosts]
+          replicas.hosts.uniq!
         end
 
         if modification[:remove_replica_hosts]
-          dataset.hosts -= modification[:remove_replica_hosts]
+          replicas.hosts -= modification[:remove_replica_hosts]
         end
       end
     end
