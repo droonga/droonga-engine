@@ -85,7 +85,7 @@ def load_source(path)
     source_path = Pathname(path).expand_path
     source = source_path.read
   end
-  catalog = JSON.parse(source)
+  JSON.parse(source)
 end
 
 source_catalog = load_source(options.source_path)
