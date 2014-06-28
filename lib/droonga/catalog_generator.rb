@@ -78,8 +78,8 @@ module Droonga
 
         replicas = dataset.replicas
 
-        if modification[:hosts]
-          replicas.hosts = modification[:hosts]
+        if modification[:replica_hosts]
+          replicas.hosts = modification[:replica_hosts]
         end
 
         if modification[:add_replica_hosts]

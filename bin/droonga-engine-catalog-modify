@@ -59,9 +59,9 @@ parser.on("--dataset=NAME",
           "(#{Droonga::CatalogGenerator::DEFAULT_DATASET})") do |name|
   current_dataset = datasets[name] = {}
 end
-parser.on("--hosts=NAME1,NAME2,...", Array,
+parser.on("--replica-hosts=NAME1,NAME2,...", Array,
           "Use given hosts as replicas for the current dataset.") do |hosts|
-  current_dataset[:hosts] = hosts
+  current_dataset[:replica_hosts] = hosts
 end
 parser.on("--add-replica-hosts=NAME1,NAME2,...", Array,
           "Use given hosts to be added as replicas to the current dataset.") do |hosts|
