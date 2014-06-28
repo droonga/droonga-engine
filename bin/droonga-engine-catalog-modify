@@ -90,6 +90,9 @@ end
 
 source_catalog = load_source(options.source_path)
 source_params = generator.catalog_to_params(source_catalog)
+# TODO: Reduce too much class method calls. It is not object oriented
+# programming style. It just uses class as a namespace. It is
+# procedure based programming style.
 modified_params = Droonga::CatalogGenerator.update_params(source_params, datasets)
 modified_catalog = Droonga::CatalogGenerator.generate(modified_params)
 
