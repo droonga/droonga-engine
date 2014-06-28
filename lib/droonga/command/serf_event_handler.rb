@@ -98,6 +98,7 @@ module Droonga
 
       def join
         type = @payload["type"]
+        puts "type = #{type}"
         case type
         when "replica"
           join_as_replica
@@ -108,14 +109,17 @@ module Droonga
         source = @payload["source"]
         return unless source
 
+        puts "source  = #{source}"
+
         generator = create_current_catalog_generator
-        dataset = generator.dataset_for_host(source)
+        dataset = generator.dataset_for_host(source) ||
+                    generator.dataset_for_host(host)
         return unless dataset
 
         dataset_name = dataset.name
-        tag          = dataset.tag
-        port         = dataset.port
-        other_hosts  = dataset.hosts
+        tag          = dataset.replicas.tag
+        port         = dataset.replicas.port
+        other_hosts  = dataset.replicas.hosts
 
         puts "dataset = #{dataset_name}"
         puts "port    = #{port}"
