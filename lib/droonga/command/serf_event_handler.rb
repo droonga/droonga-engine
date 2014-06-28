@@ -71,7 +71,7 @@ module Droonga
           save_status(:role, @payload["role"])
         when "join"
           process_node_join
-        when "unjoin"
+        when "unjoin" # TODO: Is "unjoin" clear word? How about "leave"?
           process_node_unjoin
         end
       end
