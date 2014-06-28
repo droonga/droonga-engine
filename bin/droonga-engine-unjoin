@@ -83,7 +83,7 @@ puts "Unjoining replica from the cluster..."
 
 Droonga::Serf.send_query(options.remaining_node, "remove_replicas",
                          "dataset" => options.dataset,
-                         "hosts"   => [options.replica_remove_host]))
+                         "hosts"   => [options.replica_remove_host])
 
 puts "Done."
 
