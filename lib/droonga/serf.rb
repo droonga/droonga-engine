@@ -69,6 +69,8 @@ module Droonga
     include Loggable
 
     def initialize(loop, name)
+      # TODO: Don't allow nil for loop. It reduces nil checks and
+      # simplifies source code.
       @loop = loop
       @name = name
       @agent = nil
@@ -254,6 +256,8 @@ module Droonga
         @output_io.on_read do |data|
           on_read_output.call(data)
         end
+        # TODO: Don't allow nil for loop. It reduces nil checks and
+        # simplifies source code.
         @loop.attach(@output_io) if @loop
 
         error_line_buffer = LineBuffer.new
@@ -264,6 +268,8 @@ module Droonga
         @error_io.on_read do |data|
           on_read_error.call(data)
         end
+        # TODO: Don't allow nil for loop. It reduces nil checks and
+        # simplifies source code.
         @loop.attach(@error_io) if @loop
 
         result
