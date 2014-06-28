@@ -117,7 +117,13 @@ module Droonga
         port         = dataset.port
         other_hosts  = dataset.hosts
 
+        puts "dataset = #{dataset_name}"
+        puts "port    = #{port}"
+        puts "tag     = #{tag}"
+
         if @payload["copy"]
+          puts "starting to copy data from #{source}"
+
           modify_catalog do |modifier|
             modifier.datasets[dataset].replicas.hosts = [host]
           end
@@ -131,11 +137,15 @@ module Droonga
           sleep(1)
         end
 
+        puts "joining to the cluster: update myself"
+
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts += other_hosts
           modifier.datasets[dataset].replicas.hosts.uniq!
         end
         sleep(1) # wait for restart
+
+        puts "joining to the cluster: update others"
 
         source_node  = "#{source}:#{port}/#{tag}"
         Serf.send_query(source_node, "add_replicas",
@@ -150,6 +160,8 @@ module Droonga
         hosts = given_hosts
         return unless hosts
 
+        puts "new replicas: #{hosts.join(",")}"
+
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts = hosts
         end
@@ -161,6 +173,8 @@ module Droonga
 
         hosts = given_hosts
         return unless hosts
+
+        puts "adding replicas: #{hosts.join(",")}"
 
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts += hosts
@@ -174,6 +188,8 @@ module Droonga
 
         hosts = given_hosts
         return unless hosts
+
+        puts "removing replicas: #{hosts.join(",")}"
 
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts -= hosts
