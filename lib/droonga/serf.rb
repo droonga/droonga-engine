@@ -290,13 +290,24 @@ module Droonga
               hour, minute, second = $4, $5, $6
               level = $7
               content = $POSTMATCH
-              logger.send(level.downcase, content)
+              level = normalize_level(level)
+              logger.send(level, content)
             else
               logger.info(content)
             end
           else
             logger.info(line)
           end
+        end
+      end
+
+      def normalize_level(level)
+        level = level.downcase
+        case level
+        when "err"
+          "error"
+        else
+          level
         end
       end
 
