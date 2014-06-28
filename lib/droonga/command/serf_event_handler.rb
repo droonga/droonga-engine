@@ -198,6 +198,8 @@ module Droonga
         source = @payload["source"]
         return unless source
 
+        puts "start to absorb data from #{soruce}"
+
         dataset_name = @payload["dataset"]
         port         = @payload["port"]
         tag          = @payload["tag"]
@@ -214,6 +216,10 @@ module Droonga
           port = dataset.replicas.port
           tag  = dataset.replicas.tag
         end
+
+        puts "dataset = #{dataset}"
+        puts "port    = #{port}"
+        puts "tag     = #{tag}"
 
         DataAbsorber.absorb(:dataset          => dataset,
                             :source_host      => source,
