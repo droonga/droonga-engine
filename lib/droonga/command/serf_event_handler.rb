@@ -178,6 +178,9 @@ module Droonga
         hosts = given_hosts
         return unless hosts
 
+        hosts -= [host]
+        return if hosts.empty?
+
         puts "adding replicas: #{hosts.join(",")}"
 
         modify_catalog do |modifier|
