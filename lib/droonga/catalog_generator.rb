@@ -25,6 +25,8 @@ module Droonga
     DEFAULT_PORT = 10031
     DEFAULT_TAG = "droonga"
 
+    attr_reader :datasets
+
     class << self
       def generate(datasets_params)
         generator = new
@@ -32,23 +34,6 @@ module Droonga
           generator.add_dataset(name, params)
         end
         generator.generate
-      end
-
-      def update_params(base_params, modifications)
-        params = Marshal.load(Marshal.dump(base_params))
-        modifications.each do |name, modification|
-          dataset = params[name]
-          dataset[:hosts] = modification[:hosts] if modification[:hosts]
-
-          if modification[:add_replica_hosts]
-            dataset[:hosts] += modification[:add_replica_hosts]
-            dataset[:hosts].uniq!
-          end
-          if modification[:remove_replica_hosts]
-            dataset[:hosts] -= modification[:remove_replica_hosts]
-          end
-        end
-        params
       end
     end
 
@@ -70,6 +55,44 @@ module Droonga
       }
     end
 
+    def load(catalog)
+      catalog["datasets"].each do |name, dataset|
+        add_dataset(name, dataset_to_params(dataset))
+      end
+      self
+    end
+
+    def dataset_for_host(host)
+      @datasets.each do |name, dataset|
+        if dataset.replicas.hosts.include?(host)
+          return dataset
+        end
+      end
+      nil
+    end
+
+    def modify(dataset_modifications)
+      dataset_modifications.each do |name, modification|
+        dataset = @datasets[name]
+        next unless dataset
+
+        replicas = dataset.replicas
+
+        if modification[:hosts]
+          replicas.hosts = modification[:hosts]
+        end
+
+        if modification[:add_replica_hosts]
+          dataset.hosts += modification[:add_replica_hosts]
+          dataset.hosts.uniq!
+        end
+
+        if modification[:remove_replica_hosts]
+          dataset.hosts -= modification[:remove_replica_hosts]
+        end
+      end
+    end
+
     private
     def catalog_datasets
       catalog_datasets = {}
@@ -80,6 +103,8 @@ module Droonga
     end
 
     class Dataset
+      attr_reader :name
+
       def initialize(name, options)
         @name = name
         @options = options
@@ -103,7 +128,7 @@ module Droonga
 
       def replicas
         return @options[:replicas] if @options[:replicas]
-        @generated_replicas ||= Replicas.new(@options).to_json
+        @generated_replicas ||= Replicas.new(@options)
       end
 
       def to_catalog
@@ -111,7 +136,7 @@ module Droonga
           "nWorkers" => n_workers,
           "plugins"  => plugins,
           "schema"   => schema,
-          "replicas" => replicas,
+          "replicas" => replicas.to_json,
         }
         catalog["fact"] = fact if fact
         catalog
@@ -121,6 +146,9 @@ module Droonga
     end
 
     class Replicas
+      attr_accessor :hosts
+      attr_reader :port, :tag, :n_slices
+
       def initialize(options={})
         @hosts      = options[:hosts] || DEFAULT_HOSTS
         @port       = options[:port]
@@ -188,22 +216,6 @@ module Droonga
       end
     end
 
-    public
-    class << self
-      def catalog_to_params(catalog)
-        new.catalog_to_params(catalog)
-      end
-    end
-
-    def catalog_to_params(catalog)
-      datasets = {}
-      catalog["datasets"].each do |name, dataset|
-        datasets[name] = dataset_to_params(dataset)
-      end
-      datasets
-    end
-
-    private
     ADDRESS_MATCHER = /\A(.*):(\d+)\/([^\.]+)\.(.+)\z/
 
     def dataset_to_params(dataset)
