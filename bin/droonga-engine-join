@@ -93,6 +93,11 @@ unless dataset
           "--replica-source-host option."
 end
 
+if generator.dataset_for_host(options.joining_host)
+  raise "The joining node is already a member of the cluster. " +
+          "You cannot join a member twice."
+end
+
 options.tag  = dataset.tag
 options.port = dataset.port
 
