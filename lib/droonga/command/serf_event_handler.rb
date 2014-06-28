@@ -217,11 +217,11 @@ module Droonga
           tag  = dataset.replicas.tag
         end
 
-        puts "dataset = #{dataset}"
+        puts "dataset = #{dataset_name}"
         puts "port    = #{port}"
         puts "tag     = #{tag}"
 
-        DataAbsorber.absorb(:dataset          => dataset,
+        DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
