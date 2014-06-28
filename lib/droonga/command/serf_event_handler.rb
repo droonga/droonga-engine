@@ -189,7 +189,7 @@ module Droonga
         end
       end
 
-      def remove_replica
+      def remove_replicas
         dataset = @payload["dataset"]
         return unless dataset
 
