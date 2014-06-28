@@ -86,7 +86,6 @@ end
 generator = Droonga::CatalogGenerator.new
 generator.load(source_catalog)
 
-
 dataset = generator.dataset_for_host(options.replica_source_host)
 unless dataset
   raise "Specified source host #{options.replica_source_host} is not a " +
@@ -94,48 +93,15 @@ unless dataset
           "--replica-source-host option."
 end
 
-options.dataset     = dataset.name
-options.tag         = dataset.tag
-options.port        = dataset.port
-options.other_hosts = dataset.hosts
+options.tag  = dataset.tag
+options.port = dataset.port
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
-options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
-
-if options.copy
-  puts "Initializing new replica..."
-
-  Droonga::Serf.send_event(options.joining_node, "set_replicas",
-                           "dataset" => options.dataset,
-                           "hosts"   => [options.joining_host])
-
-  sleep(1) # wait for restart
-
-  puts "Copying data..."
-#TODO: currently there is no way to wait the absorb command is successfully finished via serf...
-#
-#  Droonga::Serf.send_event(options.joining_node, "absorb_data",
-#                           "source"  => options.replica_source_host,
-#                           "dataset" => options.dataset,
-#                           "port"    => options.port,
-#                           "tag"     => options.tag)
-  Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
-                               :source_host      => options.replica_source_host,
-                               :destination_host => options.joining_host,
-                               :port             => options.port,
-                               :tag              => options.tag) do |dump|
-    puts dump
-  end
-  sleep(1)
-end
 
 puts "Joining new replica to the cluster..."
-Droonga::Serf.send_event(options.joining_node, "add_replicas",
-                         "dataset" => options.dataset,
-                         "hosts"   => options.other_hosts)
-Droonga::Serf.send_event(options.source_node, "add_replicas",
-                         "dataset" => options.dataset,
-                         "hosts"   => [options.joining_host])
+Droonga::Serf.send_event(options.joining_node, "join",
+                         "source" => options.replica_source_host,
+                         "copy"   => options.copy)
 
 puts "Done."
 
