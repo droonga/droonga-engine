@@ -129,7 +129,7 @@ module Droonga
           puts "starting to copy data from #{source}"
 
           modify_catalog do |modifier|
-            modifier.datasets[dataset].replicas.hosts = [host]
+            modifier.datasets[dataset_name].replicas.hosts = [host]
           end
           sleep(1) # wait for restart
 
