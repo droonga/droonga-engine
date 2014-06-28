@@ -27,7 +27,11 @@ module Droonga
 
     class << self
       def generate(datasets_params)
-        new(datasets_params).generate
+        generator = new
+        datasets_params.each do |name, params|
+          add_dataset(name, params)
+        end
+        generator.generate
       end
 
       def update_params(base_params, modifications)
@@ -48,16 +52,10 @@ module Droonga
       end
     end
 
-    def initialize(datasets_params=nil)
+    def initialize
       @version = 2
       @effective_date = Time.now
       @datasets = {}
-
-      if datasets_params
-        datasets_params.each do |name, params|
-          add_dataset(name, params)
-        end
-      end
     end
 
     def add_dataset(name, options)
