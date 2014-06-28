@@ -1,6 +1,6 @@
 # News
 
-## 1.0.4: 2014-06-29 (planned)
+## 1.0.4: 2014-06-29
 
  * New command (and plugin) [`status`](http://droonga.org/reference/1.0.4/commands/status/) is now available.
  * New command line tools are available.
