@@ -72,7 +72,7 @@ module Droonga
           query = @queries[name]
           return true if query["groupBy"]
           name = query["source"]
-          return false unless @queries.keys.include?(name)
+          return false unless @queries.key?(name)
           unifiable?(name)
         end
 
