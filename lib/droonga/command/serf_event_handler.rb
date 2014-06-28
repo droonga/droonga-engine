@@ -133,7 +133,7 @@ module Droonga
           end
           sleep(1) # wait for restart
 
-          DataAbsorber.absorb(:dataset          => dataset,
+          DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source,
                               :destination_host => host,
                               :port             => port,
