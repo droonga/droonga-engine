@@ -50,26 +50,13 @@ end
 
 parser.separator("")
 parser.separator("Connections:")
+parser.on("--host=HOST",
+          "Host name of the node to be joined.") do |host|
+  options.joining_host = host
+end
 parser.on("--replica-source-host=HOST",
           "Host name of the soruce cluster to be connected.") do |host|
   options.replica_source_host = host
-end
-parser.on("--my-host=HOST",
-          "Host name of this node.") do |host|
-  options.my_host = host
-end
-
-parser.separator("")
-parser.separator("Commands:")
-parser.on("--drndump=PATH",
-          "Path to the drndump command.",
-          "(#{options.drndump})") do |path|
-  options.drndump = path
-end
-parser.on("--droonga-request=PATH",
-          "Path to the droonga-request command.",
-          "(#{options.client})") do |path|
-  options.client = path
 end
 
 parser.parse!(ARGV)
@@ -86,13 +73,13 @@ end
 source_catalog = JSON.parse(catalog_path.read)
 
 
+unless options.joining_host
+  raise "You must specify the host name or the IP address of the node " +
+          "to be joined via --host option."
+end
 unless options.replica_source_host
   raise "You must specify the host name or the IP address of a node " +
            "of an existing cluster via --replica-source-host option."
-end
-unless options.my_host
-  raise "You must specify the host name or the IP address of this node " +
-          "via --my-host option."
 end
 
 
@@ -112,21 +99,29 @@ options.tag         = dataset.tag
 options.port        = dataset.port
 options.other_hosts = dataset.hosts
 
-if options.copy
-  puts "Initializing replica..."
+options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
+options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
 
-  dataset.replicas.hosts = [options.my_host]
-  destination_catalog = generator.catalog
-  Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(destination_catalog))
+if options.copy
+  puts "Initializing new replica..."
+
+  Droonga::Serf.send_event(options.joining_node, "set_replicas",
+                           "dataset" => options.dataset,
+                           "hosts"   => [options.joining_host])
 
   sleep(1) # wait for restart
 
   puts "Copying data..."
-  Droonga::DataAbsorber.absorb(:drndump          => options.drndump,
-                               :client           => options.client,
-                               :dataset          => options.dataset,
+#TODO: currently there is no way to wait the absorb command is successfully finished via serf...
+#
+#  Droonga::Serf.send_event(options.joining_node, "absorb_data",
+#                           "source"  => options.replica_source_host,
+#                           "dataset" => options.dataset,
+#                           "port"    => options.port,
+#                           "tag"     => options.tag)
+  Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
                                :source_host      => options.replica_source_host,
-                               :destination_host => options.my_host,
+                               :destination_host => options.joining_host,
                                :port             => options.port,
                                :tag              => options.tag) do |dump|
     puts dump
@@ -134,21 +129,13 @@ if options.copy
   sleep(1)
 end
 
-puts "Restarting replica..."
-
-dataset.replicas.hosts = options.other_hosts + [options.my_host]
-dataset.replicas.hosts.uniq!
-final_catalog = generator.catalog
-Droonga::SafeFileWriter.write(catalog_path, JSON.pretty_generate(final_catalog))
-
-sleep(1) # wait for restart
-
-puts "Joining to the cluster..."
-
-name = "#{options.my_host}:#{options.port}/#{options.tag}"
-Droonga::Serf.send_event(name, "join", "dataset" => options.dataset,
-                                       "type"    => "replica",
-                                       "host"    => options.my_host)
+puts "Joining new replica to the cluster..."
+Droonga::Serf.send_event(options.joining_node, "add_replicas",
+                         "dataset" => options.dataset,
+                         "hosts"   => options.other_hosts)
+Droonga::Serf.send_event(options.source_node, "add_replicas",
+                         "dataset" => options.dataset,
+                         "hosts"   => [options.joining_host])
 
 puts "Done."
 
