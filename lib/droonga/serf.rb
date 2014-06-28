@@ -170,7 +170,7 @@ module Droonga
     def role
       if status[:role]
         role = status[:role].to_sym
-        if self.class::ROLE.keys.include?(role)
+        if self.class::ROLE.key?(role)
           return role
         end
       end
