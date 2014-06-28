@@ -104,7 +104,7 @@ module Droonga
 
       def join_as_replica
         source = @payload["source"]
-        return unless soruce
+        return unless source
 
         generator = create_current_catalog_generator
         dataset = generator.dataset_for_host(source)
@@ -193,8 +193,8 @@ module Droonga
       def absorb_data
         return unless event_for_me?
 
-        soruce = @payload["soruce"]
-        return unless soruce
+        source = @payload["source"]
+        return unless source
 
         dataset_name = @payload["dataset"]
         port         = @payload["port"]
@@ -205,7 +205,7 @@ module Droonga
           generator = CatalogGenerator.new
           generator.load(current_catalog)
 
-          dataset = generator.dataset_for_host(soruce)
+          dataset = generator.dataset_for_host(source)
           return unless dataset
 
           dataset_name = dataset.name
