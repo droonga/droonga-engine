@@ -144,8 +144,8 @@ module Droonga
         puts "joining to the cluster: update myself"
 
         modify_catalog do |modifier|
-          modifier.datasets[dataset].replicas.hosts += other_hosts
-          modifier.datasets[dataset].replicas.hosts.uniq!
+          modifier.datasets[dataset_name].replicas.hosts += other_hosts
+          modifier.datasets[dataset_name].replicas.hosts.uniq!
         end
         sleep(1) # wait for restart
 
@@ -153,7 +153,7 @@ module Droonga
 
         source_node  = "#{source}:#{port}/#{tag}"
         Serf.send_query(source_node, "add_replicas",
-                        "dataset" => dataset,
+                        "dataset" => dataset_name,
                         "hosts"   => [host])
       end
 
@@ -203,7 +203,7 @@ module Droonga
       def modify_catalog
         generator = create_current_catalog_generator
         yield(generator)
-        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.catalog))
+        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.generate))
       end
 
       def create_current_catalog_generator
