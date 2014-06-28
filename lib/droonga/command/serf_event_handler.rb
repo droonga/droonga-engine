@@ -85,12 +85,10 @@ module Droonga
 
         return unless @payload["type"] == "replica"
 
-        modifications = {
-          dataset => {
-            :add_replica_hosts => [host],
-          },
-        }
-        modify_catalog(modifications)
+        modify_catalog do |generator|
+          generator.datasets[dataset].replicas.hosts << host
+          generator.datasets[dataset].replicas.hosts.uniq!
+        end
       end
 
       def process_node_unjoin
@@ -102,21 +100,17 @@ module Droonga
 
         return unless @payload["type"] == "replica"
 
-        modifications = {
-          dataset => {
-            :remove_replica_hosts => [host],
-          },
-        }
-        modify_catalog(modifications)
+        modify_catalog do |generator|
+          generator.datasets[dataset].replicas.hosts -= [host]
+        end
       end
 
-      def modify_catalog(modifications)
+      def modify_catalog
         current_catalog = JSON.parse(Path.catalog.read)
-        current_params = CatalogGenerator.catalog_to_params(current_catalog)
-        updated_params = CatalogGenerator.update_params(current_params,
-                                                        modifications)
-        updated_catalog = CatalogGenerator.generate(updated_params)
-        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(updated_catalog))
+        generator = CatalogGenerator.new
+        generator.load(current_catalog)
+        yield(generator)
+        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.catalog))
       end
 
       def live_nodes
