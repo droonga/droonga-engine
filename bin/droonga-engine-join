@@ -98,8 +98,8 @@ if generator.dataset_for_host(options.joining_host)
           "You cannot join a member twice."
 end
 
-options.tag  = dataset.tag
-options.port = dataset.port
+options.tag  = dataset.replicas.tag
+options.port = dataset.replicas.port
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
 

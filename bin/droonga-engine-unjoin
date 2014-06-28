@@ -71,9 +71,9 @@ unless dataset
 end
 
 options.dataset     = dataset.name
-options.tag         = dataset.tag
-options.port        = dataset.port
-options.other_hosts = dataset.hosts
+options.tag         = dataset.replicas.tag
+options.port        = dataset.replicas.port
+options.other_hosts = dataset.replicas.hosts
 
 remaining_host = options.other_hosts.first || options.replica_remove_host
 options.remaining_node = "#{remaining_host}:#{options.port}/#{options.tag}"
