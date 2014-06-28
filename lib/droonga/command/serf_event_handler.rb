@@ -249,7 +249,6 @@ module Droonga
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag)
-        #TODO: how to notify that this process is successfully finished for other nodes?
       end
 
       def live_nodes
