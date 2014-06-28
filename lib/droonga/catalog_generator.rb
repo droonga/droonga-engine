@@ -36,13 +36,13 @@ module Droonga
           dataset = params[name]
           dataset[:hosts] = modification[:hosts] if modification[:hosts]
 
-            if modification[:add_replica_hosts]
-              dataset[:hosts] += modification[:add_replica_hosts]
-              dataset[:hosts].uniq!
-            end
-            if modification[:remove_replica_hosts]
-              dataset[:hosts] -= modification[:remove_replica_hosts]
-            end
+          if modification[:add_replica_hosts]
+            dataset[:hosts] += modification[:add_replica_hosts]
+            dataset[:hosts].uniq!
+          end
+          if modification[:remove_replica_hosts]
+            dataset[:hosts] -= modification[:remove_replica_hosts]
+          end
         end
         params
       end
