@@ -198,7 +198,7 @@ module Droonga
         source = @payload["source"]
         return unless source
 
-        puts "start to absorb data from #{soruce}"
+        puts "start to absorb data from #{source}"
 
         dataset_name = @payload["dataset"]
         port         = @payload["port"]
