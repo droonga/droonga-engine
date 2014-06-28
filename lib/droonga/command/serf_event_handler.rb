@@ -198,7 +198,7 @@ module Droonga
 
         dataset_name = @payload["dataset"]
         port         = @payload["port"]
-        tag          = @payload["port"]
+        tag          = @payload["tag"]
 
         if dataset_name.nil? or port.nil? or tag.nil?
           current_catalog = JSON.parse(Path.catalog.read)
