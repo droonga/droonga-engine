@@ -14,6 +14,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 require "json"
+require "open3"
 
 require "droonga/path"
 require "droonga/serf"
@@ -184,7 +185,8 @@ module Droonga
         catalog = response.body
 
         Serf.send_query(source_node, "unpublish_catalog",
-                        "node" => source_node)
+                        "node" => source_node,
+                        "port" => port)
 
         JSON.parse(catalog)
       end
@@ -193,11 +195,20 @@ module Droonga
         port = @payload["port"]
         return unless port
 
-        # TODO: implement me!
+        system("droonga-engine-data-publisher",
+                 "--base-dir", Path.base.to_s,
+                 "--port", port.to_s,
+                 "--published-file", Path.catalog.to_s)
       end
 
       def unpublish_catalog
-        # TODO: implement me!
+        port = @payload["port"]
+        return unless port
+
+        published_dir = Path.published(port)
+        pid_file = published_dir + ".pid"
+
+        Process.kill("INT", pid_file.read.to_i)
       end
 
       def set_replicas

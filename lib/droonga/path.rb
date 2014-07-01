@@ -55,6 +55,10 @@ module Droonga
         Pathname.new(base_file_name).expand_path(base)
       end
 
+      def published(suffix)
+        base + "published-#{suffix}"
+      end
+
       def buffer
         state + "buffer"
       end
