@@ -53,7 +53,7 @@ include WEBrick
 published_dir = Droonga::Path.published(options.port)
 FileUtils.mkdir_p(published_dir.to_s)
 published_file = Pathname(options.published_file).expand_path
-File.copy(published_file.to_s, published_dir + published_file.basename)
+FileUtils.copy(published_file.to_s, published_dir + published_file.basename)
 File.open(published_dir + ".pid", "w") do |file|
   file.puts(Process.pid)
 end
