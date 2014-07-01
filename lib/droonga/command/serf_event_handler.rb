@@ -195,10 +195,14 @@ module Droonga
         port = @payload["port"]
         return unless port
 
-        system("droonga-engine-data-publisher",
-                 "--base-dir", Path.base.to_s,
-                 "--port", port.to_s,
-                 "--published-file", Path.catalog.to_s)
+        env = {}
+        publisher_command_line = [
+          "droonga-engine-data-publisher",
+            "--base-dir", Path.base.to_s,
+            "--port", port.to_s,
+            "--published-file", Path.catalog.to_s
+        ]
+        spawn(env, *publisher_command_line)
       end
 
       def unpublish_catalog
