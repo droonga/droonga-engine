@@ -102,12 +102,13 @@ options.tag  = dataset.replicas.tag
 options.port = dataset.replicas.port
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
+options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
 
 puts "Joining new replica to the cluster..."
 Droonga::Serf.send_query(options.joining_node, "join",
                          "node"   => options.joining_node,
                          "type"   => "replica",
-                         "source" => options.replica_source_host,
+                         "source" => options.source_node,
                          "copy"   => options.copy)
 
 puts "Done."
