@@ -547,22 +547,22 @@ module Droonga
             variable.value = record
             expression.execute
           else
-            value = record[attribute[:source]]
-            one_record_value(value)
+            column_value = record[attribute[:source]]
+            format_column_value(column_value)
           end
         end
       end
 
-      def one_record_value(value)
-        case value
+      def format_column_value(column_value)
+        case column_value
         when Groonga::Record
-          value.record_id
+          column_value.record_id
         when Array
-          value.collect do |one_value|
-            one_record_value(one_value)
+          column_value.collect do |sub_column_value|
+            format_column_value(sub_column_value)
           end
         else
-          value
+          column_value
         end
       end
 
