@@ -47,19 +47,24 @@ module Droonga
     end
 
     def on_writable
-      begin
+      until @_write_buffer.empty?
         chunk = @_write_buffer.shift
-        written_size = @_io.write(chunk.data)
-        if written_size == chunk.data.bytesize
-          chunk.written
-        else
-          chunk.written_partial(written_size)
+        begin
+          written_size = @_io.write_nonblock(chunk.data)
+          if written_size == chunk.data.bytesize
+            chunk.written
+          else
+            chunk.written_partial(written_size)
+            @_write_buffer.unshift(chunk)
+            break
+          end
+        rescue Errno::EINTR
           @_write_buffer.unshift(chunk)
+          return
+        rescue SystemCallError, IOError, SocketError
+          @_write_buffer.unshift(chunk)
+          return close
         end
-      rescue Errno::EINTR
-        return
-      rescue SystemCallError, IOError, SocketError
-        return close
       end
 
       if @_write_buffer.empty?
