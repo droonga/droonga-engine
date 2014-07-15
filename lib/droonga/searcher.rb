@@ -529,6 +529,21 @@ module Droonga
     end
 
     module RecordsFormattable
+      def format(output_target_attributes, records, output_limit, output_offset)
+        cursor_options = {
+          :offset => output_offset,
+          :limit => output_limit
+        }
+        formatted_records = nil
+        records.open_cursor(cursor_options) do |cursor|
+          formatted_records = cursor.collect do |record|
+            format_record(output_target_attributes, record)
+          end
+        end
+        formatted_records
+      end
+
+      private
       def record_value(record, attribute)
         if attribute[:source] == "_subrecs"
           if record.table.is_a?(Groonga::Array)
@@ -565,25 +580,12 @@ module Droonga
           column_value
         end
       end
-
-      def format(output_target_attributes, records, output_limit, output_offset)
-        cursor_options = {
-          :offset => output_offset,
-          :limit => output_limit
-        }
-        formatted_records = nil
-        records.open_cursor(cursor_options) do |cursor|
-          formatted_records = cursor.collect do |record|
-            format_record(output_target_attributes, record)
-          end
-        end
-        formatted_records
-      end
     end
 
     class SimpleRecordsFormatter
       include RecordsFormattable
 
+      private
       def format_record(attributes, record)
         attributes.collect do |attribute|
           record_value(record, attribute)
@@ -594,6 +596,7 @@ module Droonga
     class ComplexRecordsFormatter
       include RecordsFormattable
 
+      private
       def format_record(attributes, record)
         values = {}
         attributes.each do |attribute|
