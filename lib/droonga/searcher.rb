@@ -559,7 +559,7 @@ module Droonga
           value.record_id
         when Array
           value.collect do |one_value|
-            one_record_value(value)
+            one_record_value(one_value)
           end
         else
           value
