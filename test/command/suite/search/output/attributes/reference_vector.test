@@ -1,0 +1,32 @@
+# -*- js -*-
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "key": "Droonga is fun",
+    "values": {
+      "content": "I started Droonga. It is very fun!",
+      "tags": ["Droonga", "Fun"]
+    }
+  }
+}
+#@enable-logging
+{
+  "type": "search",
+  "dataset": "Default",
+  "body": {
+    "queries": {
+      "memos": {
+        "source": "Memos",
+        "output": {
+          "elements": ["attributes", "records"],
+          "attributes": ["_key", "tags"],
+          "limit": 10
+        }
+      }
+    }
+  }
+}

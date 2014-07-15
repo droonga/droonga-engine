@@ -1,0 +1,27 @@
+{
+  "datasets": {
+    "Default": {
+      "fact": "Memos",
+      "schema": {
+        "Tags": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText"
+        },
+        "Memos": {
+          "type": "Hash",
+          "keyType": "ShortText",
+          "columns": {
+            "content": {
+              "type": "Scalar",
+              "valueType": "Text"
+            },
+            "tags": {
+              "type": "Vector",
+              "valueType": "Tags"
+            }
+          }
+        }
+      }
+    }
+  }
+}
