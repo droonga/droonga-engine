@@ -31,7 +31,11 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
-  "type": "dump.end"
+  "body": {
+    "type": "Array",
+    "name": "Logs"
+  },
+  "type": "dump.table"
 }
 {
   "inReplyTo": "request-id",
@@ -50,11 +54,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
-  "body": {
-    "type": "Array",
-    "name": "Logs"
-  },
-  "type": "dump.table"
+  "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",

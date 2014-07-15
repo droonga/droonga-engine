@@ -33,17 +33,11 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "body": {
-    "table": "Memos",
-    "name": "title",
-    "type": "Scalar",
-    "valueType": "ShortText"
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
   },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "type": "dump.end"
+  "type": "dump.table"
 }
 {
   "inReplyTo": "request-id",
@@ -69,17 +63,13 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
-  "type": "dump.end"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
   "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
+    "table": "Memos",
+    "name": "title",
+    "type": "Scalar",
+    "valueType": "ShortText"
   },
-  "type": "dump.table"
+  "type": "dump.column"
 }
 {
   "inReplyTo": "request-id",
@@ -91,6 +81,16 @@
     "valueType": "ShortText"
   },
   "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",

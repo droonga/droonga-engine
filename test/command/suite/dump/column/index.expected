@@ -33,12 +33,21 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "body": {
-    "table": "Memos",
-    "name": "content",
-    "type": "Scalar",
-    "valueType": "ShortText"
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
   },
-  "type": "dump.column"
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
 }
 {
   "inReplyTo": "request-id",
@@ -51,6 +60,103 @@
     "normalizer": "NormalizerAuto"
   },
   "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
 }
 {
   "inReplyTo": "request-id",
@@ -80,113 +186,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "content",
-    "type": "Scalar",
-    "valueType": "ShortText"
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "PatriciaTrie",
-    "name": "Terms",
-    "keyType": "ShortText",
-    "tokenizer": "TokenBigram",
-    "normalizer": "NormalizerAuto"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Terms",
-    "name": "Memos__key_content",
-    "type": "Index",
-    "valueType": "Memos",
-    "indexOptions": {
-      "section": true,
-      "weight": true,
-      "position": true,
-      "sources": [
-        "_key",
-        "content"
-      ]
-    }
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
   "type": "dump.end"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "content",
-    "type": "Scalar",
-    "valueType": "ShortText"
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "PatriciaTrie",
-    "name": "Terms",
-    "keyType": "ShortText",
-    "tokenizer": "TokenBigram",
-    "normalizer": "NormalizerAuto"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Terms",
-    "name": "Memos__key_content",
-    "type": "Index",
-    "valueType": "Memos",
-    "indexOptions": {
-      "section": true,
-      "weight": true,
-      "position": true,
-      "sources": [
-        "_key",
-        "content"
-      ]
-    }
-  },
-  "type": "dump.column"
 }
 {
   "inReplyTo": "request-id",

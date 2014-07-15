@@ -33,15 +33,41 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "body": {
-    "table": "Memos",
-    "name": "tags",
-    "type": "Vector",
-    "valueType": "Tags",
-    "vectorOptions": {
-      "weight": false
-    }
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
   },
-  "type": "dump.column"
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Tags",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Tags",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
 }
 {
   "inReplyTo": "request-id",
@@ -62,6 +88,98 @@
     "keyType": "ShortText"
   },
   "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "Hash",
+    "name": "Users",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "type": "Hash",
+    "name": "Users",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "tags",
+    "type": "Vector",
+    "valueType": "Tags",
+    "vectorOptions": {
+      "weight": false
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "tags",
+    "type": "Vector",
+    "valueType": "Tags",
+    "vectorOptions": {
+      "weight": false
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "name": "tags",
+    "type": "Vector",
+    "valueType": "Tags",
+    "vectorOptions": {
+      "weight": false
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga newbie",
+    "values": {
+      "tags": [
+        "Groonga",
+        "column store"
+      ]
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga newbie",
+    "values": {
+      "tags": [
+        "Groonga",
+        "column store"
+      ]
+    }
+  },
+  "type": "dump.record"
 }
 {
   "inReplyTo": "request-id",
@@ -86,125 +204,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "tags",
-    "type": "Vector",
-    "valueType": "Tags",
-    "vectorOptions": {
-      "weight": false
-    }
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "PatriciaTrie",
-    "name": "Tags",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Users",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "key": "Groonga newbie",
-    "values": {
-      "tags": [
-        "Groonga",
-        "column store"
-      ]
-    }
-  },
-  "type": "dump.record"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
   "type": "dump.end"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "tags",
-    "type": "Vector",
-    "valueType": "Tags",
-    "vectorOptions": {
-      "weight": false
-    }
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "PatriciaTrie",
-    "name": "Tags",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "Hash",
-    "name": "Users",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "key": "Groonga newbie",
-    "values": {
-      "tags": [
-        "Groonga",
-        "column store"
-      ]
-    }
-  },
-  "type": "dump.record"
 }
 {
   "inReplyTo": "request-id",
