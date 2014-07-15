@@ -548,12 +548,21 @@ module Droonga
             expression.execute
           else
             value = record[attribute[:source]]
-            if value.is_a?(Groonga::Record)
-              value.record_id
-            else
-              value
-            end
+            one_record_value(value)
           end
+        end
+      end
+
+      def one_record_value(value)
+        case value
+        when Groonga::Record
+          value.record_id
+        when Array
+          value.collect do |one_value|
+            one_record_value(value)
+          end
+        else
+          value
         end
       end
 
