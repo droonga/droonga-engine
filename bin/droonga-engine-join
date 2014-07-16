@@ -32,6 +32,8 @@ options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
 options.drndump  = "drndump"
 options.client   = "droonga-request"
 options.copy     = true
+options.port     = Droonga::CatalogGenerator::DEFAULT_PORT
+options.tag      = Droonga::CatalogGenerator::DEFAULT_TAG
 
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
@@ -57,6 +59,16 @@ end
 parser.on("--replica-source-host=HOST",
           "Host name of the soruce cluster to be connected.") do |host|
   options.replica_source_host = host
+end
+parser.on("--port=PORT", Integer,
+          "Port number of the source cluster to be connected.",
+          "(#{options.port})") do |port|
+  options.port = port
+end
+parser.on("--tag=TAG",
+          "Tag name of the soruce cluster to be connected.",
+          "(#{options.tag})") do |tag|
+  options.tag = tag
 end
 
 parser.parse!(ARGV)
@@ -87,12 +99,7 @@ generator = Droonga::CatalogGenerator.new
 generator.load(source_catalog)
 
 dataset = generator.dataset_for_host(options.replica_source_host)
-unless dataset
-  raise "Specified source host #{options.replica_source_host} is not a " +
-          "member of the cluster. You must specify correct host via " +
-          "--replica-source-host option."
-end
-
+if dataset
 if generator.dataset_for_host(options.joining_host)
   raise "The joining node is already a member of the cluster. " +
           "You cannot join a member twice."
@@ -100,6 +107,7 @@ end
 
 options.tag  = dataset.replicas.tag
 options.port = dataset.replicas.port
+end
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
 options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
