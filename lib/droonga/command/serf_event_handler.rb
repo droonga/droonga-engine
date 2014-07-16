@@ -174,6 +174,7 @@ module Droonga
         Serf.send_query(source_node, "publish_catalog",
                         "node" => source_node,
                         "port" => port)
+        sleep(3) # wait until the HTTP server becomes ready
 
         url = "http://#{source_host}:#{port}/catalog.json"
         connection = Faraday.new(url) do |builder|
