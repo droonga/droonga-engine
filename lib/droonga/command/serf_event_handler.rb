@@ -175,7 +175,7 @@ module Droonga
                         "node" => source_node,
                         "port" => port)
 
-        url = "http://#{source_host}:#{port}/"
+        url = "http://#{source_host}:#{port}/catalog.json"
         connection = Faraday.new(url) do |builder|
           builder.response(:follow_redirects)
           builder.adapter(Faraday.default_adapter)
