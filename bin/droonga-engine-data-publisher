@@ -61,7 +61,7 @@ end
 server = HTTPServer.new(:Port => options.port,
                         :DocumentRoot => published_dir)
 
-trap("INT") do
+trap("INT", "TERM") do
   server.shutdown
   FileUtils.rm_rf(published_dir.to_s)
 end
