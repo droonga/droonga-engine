@@ -162,18 +162,18 @@ module Droonga
         puts "joining to the cluster: update others"
 
         source_node  = "#{source_host}:#{port}/#{tag}"
-        Serf.send_query(source_node, "add_replicas",
-                        "dataset" => dataset_name,
-                        "hosts"   => [host])
+        run_remote_command(source_node, "add_replicas",
+                           "dataset" => dataset_name,
+                           "hosts"   => [host])
       end
 
       def fetch_catalog(source_node)
         source_host = source_node.split(":").first
         port = 10032 + rand(10000)
 
-        Serf.send_query(source_node, "publish_catalog",
-                        "node" => source_node,
-                        "port" => port)
+        run_remote_command(source_node, "publish_catalog",
+                           "node" => source_node,
+                           "port" => port)
         sleep(3) # wait until the HTTP server becomes ready
 
         url = "http://#{source_host}:#{port}"
@@ -184,9 +184,9 @@ module Droonga
         response = connection.get("/catalog.json")
         catalog = response.body
 
-        Serf.send_query(source_node, "unpublish_catalog",
-                        "node" => source_node,
-                        "port" => port)
+        run_remote_command(source_node, "unpublish_catalog",
+                           "node" => source_node,
+                           "port" => port)
 
         JSON.parse(catalog)
       end
@@ -332,6 +332,14 @@ module Droonga
         status = Serf.load_status
         status[key] = value
         SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
+      end
+
+      def run_remote_command(node, command, options={})
+        puts "remote command: #{command} on #{node}"
+        result = Serf.send_query(node, command, options)
+        puts result[:output]
+        puts result[:error] unless result[:error].empty?
+        result
       end
     end
   end

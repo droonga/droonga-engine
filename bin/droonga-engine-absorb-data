@@ -71,12 +71,14 @@ end
 destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 
 puts "Absorbing data..."
-Droonga::Serf.send_query(destination_node, "absorb_data",
-                         "node"    => destination_node,
-                         "source"  => options.source_host,
-                         "port"    => options.port,
-                         "tag"     => options.tag,
-                         "dataset" => options.dataset)
+result = Droonga::Serf.send_query(destination_node, "absorb_data",
+                                  "node"    => destination_node,
+                                  "source"  => options.source_host,
+                                  "port"    => options.port,
+                                  "tag"     => options.tag,
+                                  "dataset" => options.dataset)
+puts result[:output]
+puts result[:error] unless result[:error].empty?
 puts "Done."
 
 exit(true)
