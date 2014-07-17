@@ -205,14 +205,12 @@ module Droonga
         @port       = options[:port]     || DEFAULT_PORT
         @tag        = options[:tag]      || DEFAULT_TAG
         @n_slices   = options[:n_slices] || DEFAULT_N_SLICES
-
-        @n_volumes = 0
       end
 
       def to_catalog
         slices = []
-        @n_slices.times do
-          slices << catalog_slice
+        @n_slices.times do |i|
+          slices << catalog_slice(i)
         end
         {
           "dimension" => "_key",
@@ -222,9 +220,8 @@ module Droonga
       end
 
       private
-      def catalog_slice
-        name = sprintf('%03d', @n_volumes)
-        @n_volumes += 1
+      def catalog_slice(nth_slice)
+        name = "%03d" % nth_slice
         {
           "weight" => weight,
           "volume" => {
