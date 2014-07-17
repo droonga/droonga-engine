@@ -314,7 +314,7 @@ module Droonga
         nodes = {}
         raw_members = `#{@serf} members -rpc-addr #{@serf_rpc_address} -format json`
         members = JSON.parse(raw_members)
-        members["members"].each_line do |member|
+        members["members"].each do |member|
           if member["status"] == "alive"
             nodes[member["name"]] = {
               "serfAddress" => member["addr"],
