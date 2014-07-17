@@ -136,7 +136,7 @@ module Droonga
           "nWorkers" => n_workers,
           "plugins"  => plugins,
           "schema"   => schema,
-          "replicas" => replicas.to_json,
+          "replicas" => replicas.to_catalog,
         }
         catalog["fact"] = fact if fact
         catalog
@@ -156,20 +156,15 @@ module Droonga
         @n_slices   = options[:n_slices]
       end
 
-      def to_json
-        @json ||= generate_json
-      end
-
-      private
-      def generate_json
-        replicas = []
+      def to_catalog
+        catalog_replicas = []
         @hosts.each do |host|
           replica = Replica.new(host, :port => @port,
                                       :tag => @tag,
                                       :n_slices => @n_slices)
-          replicas << replica.to_json
+          catalog_replicas << replica.to_catalog
         end
-        replicas
+        catalog_replicas
       end
     end
 
@@ -183,15 +178,10 @@ module Droonga
         @n_volumes = 0
       end
 
-      def to_json
-        @json ||= generate_json
-      end
-
-      private
-      def generate_json
+      def to_catalog
         slices = []
-        @n_slices.times do |index|
-          slices << generate_slice
+        @n_slices.times do
+          slices << catalog_slice
         end
         {
           "dimension" => "_key",
@@ -200,7 +190,8 @@ module Droonga
         }
       end
 
-      def generate_slice
+      private
+      def catalog_slice
         name = sprintf('%03d', @n_volumes)
         @n_volumes += 1
         {
