@@ -3,5 +3,6 @@
 /doc/
 /.yardoc/
 /pkg/
-/sample/cluster/0*
-/sample/cluster/state/
+/sample/cluster/0/
+/sample/cluster/1/
+/sample/cluster/2/

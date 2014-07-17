@@ -1,0 +1,145 @@
+# -*- ruby -*-
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+require "pathname"
+require "json"
+
+base_dir_path = Pathname.new(__FILE__).dirname
+top_dir_path = base_dir_path.parent.parent
+bin_dir_path = top_dir_path + "bin"
+lib_dir_path = top_dir_path + "lib"
+
+$LOAD_PATH.unshift(lib_dir_path.to_s)
+
+class DroongaEngine
+  include Rake::DSL
+
+  class << self
+    def host(node_id)
+      "127.0.#{200 + node_id}.1"
+    end
+
+    def port
+      22000
+    end
+  end
+
+  def initialize(base_dir_path, node_id)
+    @base_dir_path = base_dir_path
+    @node_id = node_id
+    @pid = nil
+  end
+
+  def setup(node_ids)
+    rm_rf(working_dir_path.to_s)
+    mkdir_p(working_dir_path.to_s)
+    generate_catalog(node_ids)
+  end
+
+  def start
+    @pid = spawn("droonga-engine",
+                 "--base-dir", working_dir_path.to_s,
+                 "--host", host,
+                 "--port", self.class.port.to_s)
+  end
+
+  def stop
+    Process.kill(:TERM, @pid)
+    Process.waitpid(@pid)
+    @pid = nil
+  end
+
+  def host
+    self.class.host(@node_id)
+  end
+
+  private
+  def working_dir_path
+    @base_dir_path + @node_id.to_s
+  end
+
+  def catalog_path
+    working_dir_path + "catalog.json"
+  end
+
+  def generate_catalog(node_ids)
+    hosts = node_ids.collect do |node_id|
+      self.class.host(node_id)
+    end
+    sh("droonga-engine-catalog-generate",
+       "--output", catalog_path.to_s,
+       "--n-workers", "3",
+       "--hosts", hosts.join(","),
+       "--port", self.class.port.to_s)
+  end
+end
+
+namespace :droonga do
+  node_ids = [0, 1, 2]
+
+  namespace :prepare do
+    task :path do
+      paths = [
+        bin_dir_path.to_s,
+        ENV["PATH"],
+      ].compact
+      ENV["PATH"] = paths.join(File::PATH_SEPARATOR)
+    end
+
+    task :load_path do
+      load_paths = [
+        lib_dir_path.to_s,
+        ENV["RUBYLIB"],
+      ].compact
+      ENV["RUBYLIB"] = load_paths.join(File::PATH_SEPARATOR)
+    end
+  end
+
+  task :prepare => ["prepare:path", "prepare:load_path"]
+
+  desc "Set up Droonga cluster."
+  task :setup => :prepare do
+    node_ids.each do |node_id|
+      engine = DroongaEngine.new(base_dir_path, node_id)
+      engine.setup(node_ids)
+    end
+  end
+
+  desc "Run Droonga cluster."
+  task :run => :prepare do
+    processes = []
+    begin
+      node_ids.each do |node_id|
+        engine = DroongaEngine.new(base_dir_path, node_id)
+        engine.start
+        processes << engine
+        host = engine.host
+        port = DroongaEngine.port
+        puts("#{host}:#{port}/droonga")
+      end
+      front_node_id = node_ids.first
+      $stdin.gets
+    ensure
+      stop_threads = processes.collect do |process|
+        Thread.new do
+          process.stop
+        end
+      end
+      stop_threads.each(&:join)
+    end
+  end
+end
