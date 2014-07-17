@@ -58,7 +58,11 @@ module Droonga
         next if Pathname.glob("#{path.to_s}/*").empty?
 
         destination = path.basename.to_s
-        next if @senders.key?(destination)
+        sender = @senders[destination]
+        if sender
+          sender.resume
+          next
+        end
 
         components = destination.split(":")
         port = components.pop.to_i
