@@ -38,7 +38,10 @@ module Droonga
 
       def run
         parse_event
-        return true unless event_for_me?
+        unless event_for_me?
+          puts " => ignoring event not for me"
+          return true
+        end
 
         process_event
         output_live_nodes
