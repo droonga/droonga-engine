@@ -33,7 +33,7 @@ module Droonga
 
     def download
       detect_platform
-      version = "0.6.0"
+      version = "0.6.3"
       url_base = "https://dl.bintray.com/mitchellh/serf"
       base_name = "#{version}_#{@os}_#{@architecture}.zip"
       connection = Faraday.new(url_base) do |builder|
