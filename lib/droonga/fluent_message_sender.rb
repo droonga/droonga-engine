@@ -56,7 +56,7 @@ module Droonga
     end
 
     def resume
-      connect
+      connect unless connected?
       @socket.resume
     end
 
