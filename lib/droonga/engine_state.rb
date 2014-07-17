@@ -46,6 +46,7 @@ module Droonga
       @on_finish = nil
       @catalog = nil
       @live_nodes = nil
+      @dead_nodes = nil
     end
 
     def start
