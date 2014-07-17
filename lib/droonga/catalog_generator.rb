@@ -15,6 +15,8 @@
 
 require "time"
 
+require "droonga/catalog/dataset"
+
 module Droonga
   class CatalogGenerator
     DEFAULT_DATASET = "Default"
