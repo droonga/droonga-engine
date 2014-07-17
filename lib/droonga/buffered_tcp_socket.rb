@@ -34,15 +34,10 @@ module Droonga
     end
 
     def write(data)
-      reserve_write(data)
-      schedule_write
-      data.bytesize
-    end
-
-    def reserve_write(data)
       chunk = Chunk.new(@data_directory, data, Time.now, 0)
       chunk.buffering
       @_write_buffer << chunk
+      schedule_write
       data.bytesize
     end
 

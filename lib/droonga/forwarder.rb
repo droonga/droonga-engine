@@ -47,8 +47,7 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      reserve = destination["reserve"]
-      output(receiver, message, command, arguments, :reserve => reserve)
+      output(receiver, message, command, arguments)
       logger.trace("forward: done")
     end
 
@@ -104,11 +103,7 @@ module Droonga
       output_tag = "#{tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       logger.trace("output: post: start: #{log_info}")
-      if options[:reserve]
-        sender.reserve_send(output_tag, message)
-      else
-        sender.send(output_tag, message)
-      end
+      sender.send(output_tag, message)
       logger.trace("output: post: done: #{log_info}")
       logger.trace("output: done")
     end
