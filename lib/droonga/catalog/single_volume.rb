@@ -18,20 +18,49 @@ module Droonga
     class SingleVolume
       def initialize(data)
         @data = data
+        parse_address
       end
 
       def address
         @data["address"]
       end
 
+      def host
+        @host
+      end
+
+      def port
+        @port
+      end
+
+      def tag
+        @tag
+      end
+
+      def name
+        @name
+      end
+
       def node
-        ip_address_and_port, path = address.split("/")
-        tag = path.split(".").first
-        "#{ip_address_and_port}/#{tag}"
+        "#{host}:#{port}/#{tag}"
       end
 
       def all_nodes
         @all_nodes ||= [node]
+      end
+
+      private
+      def parse_address
+        if /\A(.+):(\d+)\/([^.]+)\.(.+)\z/ =~ address
+          @host = $1
+          @port = $2.to_i
+          @tag = $3
+          @name = $4
+        else
+          format = "${host_name}:${port_number}/${tag}.${name}"
+          message = "volume address must be <#{format}> format: <#{address}>"
+          raise ArgumentError, message
+        end
       end
     end
   end
