@@ -54,7 +54,8 @@ class DroongaEngine
     @pid = spawn("droonga-engine",
                  "--base-dir", working_dir_path.to_s,
                  "--host", host,
-                 "--port", self.class.port.to_s)
+                 "--port", self.class.port.to_s,
+                 "--pid-file", pid_file_path.to_s)
   end
 
   def stop
@@ -74,6 +75,10 @@ class DroongaEngine
 
   def catalog_path
     working_dir_path + "catalog.json"
+  end
+
+  def pid_file_path
+    working_dir_path + "droonga-engine.pid"
   end
 
   def generate_catalog(node_ids)
