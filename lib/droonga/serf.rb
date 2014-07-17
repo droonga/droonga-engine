@@ -141,7 +141,6 @@ module Droonga
     def run(command, *options)
       process = SerfProcess.new(@loop, @serf, command,
                                 "-rpc-addr", rpc_address,
-                                "-format", "json",
                                 *options)
       process.start
       process
