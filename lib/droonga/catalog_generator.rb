@@ -127,8 +127,7 @@ module Droonga
       end
 
       def replicas
-        return @options[:replicas] if @options[:replicas]
-        @generated_replicas ||= Replicas.new(@options)
+        @replicas ||= create_replicas
       end
 
       def to_catalog
@@ -143,6 +142,16 @@ module Droonga
       end
 
       private
+      def create_replicas
+        catalog_replicas = @options[:replicas]
+        if catalog_replicas
+          replicas = Replicas.new
+          replicas.load(catalog_replicas)
+          replicas
+        else
+          Replicas.new(@options)
+        end
+      end
     end
 
     class Replicas
@@ -154,6 +163,20 @@ module Droonga
         @port       = options[:port]
         @tag        = options[:tag]
         @n_slices   = options[:n_slices]
+      end
+
+      def load(catalog_replicas)
+        dataset = Catalog::Dataset.new("temporary",
+                                       "replicas" => catalog_replicas)
+        collection_volume = dataset.replicas.first
+        slices = collection_volume.slices
+        @hosts = slices.collect do |slice|
+          slice.volume.host
+        end
+        @n_slices = slices.size
+        single_volume = slices.first.volume
+        @port = single_volume.port
+        @tag = single_volume.tag
       end
 
       def to_catalog

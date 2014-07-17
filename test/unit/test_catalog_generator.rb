@@ -90,4 +90,31 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       assert_equal("Entries", generate["datasets"]["Droonga"]["fact"])
     end
   end
+
+  class ReplicasTest < self
+    def test_raw
+      replicas = [
+        {
+          "dimension" => "_key",
+          "slicer" => "hash",
+          "slices" => [
+            {
+              "volume" => {
+                "address" => "127.0.0.1:10031/droonga.000",
+              },
+              "weight" => 100,
+            },
+          ],
+        },
+      ]
+      @generator.add_dataset("Droonga", :replicas => replicas)
+      dataset = {
+        "nWorkers" => 4,
+        "plugins" => ["groonga", "search", "crud", "dump", "system"],
+        "schema" => {},
+        "replicas" => replicas,
+      }
+      assert_equal(dataset, generate["datasets"]["Droonga"])
+    end
+  end
 end
