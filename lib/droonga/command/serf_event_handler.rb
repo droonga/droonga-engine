@@ -169,7 +169,7 @@ module Droonga
 
         logger.info("joining to the cluster: update others")
 
-        source_node  = "#{source}:#{port}/#{tag}"
+        source_node  = "#{source_host}:#{port}/#{tag}"
         Serf.send_query(source_node, "add_replicas",
                         "dataset" => dataset_name,
                         "hosts"   => [host])
