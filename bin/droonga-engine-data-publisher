@@ -59,7 +59,8 @@ File.open(published_dir + ".pid", "w") do |file|
 end
 
 server = HTTPServer.new(:Port => options.port,
-                        :DocumentRoot => published_dir)
+                        :DocumentRoot => published_dir,
+                        :ServerType => WEBrick::Daemon)
 
 trap("INT", "TERM") do
   server.shutdown
