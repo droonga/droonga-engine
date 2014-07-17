@@ -118,7 +118,7 @@ result = Droonga::Serf.send_query(options.joining_node, "join",
                                   "type"   => "replica",
                                   "source" => options.source_node,
                                   "copy"   => options.copy)
-puts result[:output]
+puts result[:result]
 puts result[:error] unless result[:error].empty?
 puts "Done."
 

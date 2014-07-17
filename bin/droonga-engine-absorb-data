@@ -77,7 +77,7 @@ result = Droonga::Serf.send_query(destination_node, "absorb_data",
                                   "port"    => options.port,
                                   "tag"     => options.tag,
                                   "dataset" => options.dataset)
-puts result[:output]
+puts result[:result]
 puts result[:error] unless result[:error].empty?
 puts "Done."
 

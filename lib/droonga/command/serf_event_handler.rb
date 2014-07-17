@@ -312,12 +312,12 @@ module Droonga
 
       def live_nodes
         nodes = {}
-        members = `#{@serf} members -rpc-addr #{@serf_rpc_address}`
-        members.each_line do |member|
-          name, address, status, = member.strip.split(/\s+/)
-          if status == "alive"
-            nodes[name] = {
-              "serfAddress" => address,
+        raw_members = `#{@serf} members -rpc-addr #{@serf_rpc_address} -format json`
+        members = JSON.parse(raw_members)
+        members["members"].each_line do |member|
+          if member["status"] == "alive"
+            nodes[member["name"]] = {
+              "serfAddress" => member["addr"],
             }
           end
         end

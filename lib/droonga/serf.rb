@@ -141,6 +141,7 @@ module Droonga
     def run(command, *options)
       process = SerfProcess.new(@loop, @serf, command,
                                 "-rpc-addr", rpc_address,
+                                "-format", "json",
                                 *options)
       process.start
       process
@@ -149,6 +150,7 @@ module Droonga
     def run_once(command, *options)
       process = SerfProcess.new(@loop, @serf, command,
                                 "-rpc-addr", rpc_address,
+                                "-format", "json",
                                 *options)
       process.run_once
     end
@@ -243,7 +245,7 @@ module Droonga
       def run_once
         stdout, stderror, status = Open3.capture3(@serf, @command, *@options)
         {
-          :output => stdout,
+          :result => JSON.parse(stdout),
           :error  => stderror,
           :status => status,
         }
