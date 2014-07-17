@@ -17,6 +17,7 @@ require "English"
 
 require "json"
 require "coolio"
+require "open3"
 
 require "droonga/path"
 require "droonga/loggable"
@@ -108,12 +109,12 @@ module Droonga
 
     def send_event(event, payload)
       ensure_serf
-      run("event", event, JSON.generate(payload)).shutdown
+      run_once("event", event, JSON.generate(payload))
     end
 
     def send_query(query, payload)
       ensure_serf
-      run("query", query, JSON.generate(payload)).shutdown
+      run_once("query", query, JSON.generate(payload))
     end
 
     private
@@ -143,6 +144,13 @@ module Droonga
                                 *options)
       process.start
       process
+    end
+
+    def run_once(command, *options)
+      process = SerfProcess.new(@loop, @serf, command,
+                                "-rpc-addr", rpc_address,
+                                *options)
+      process.run_once
     end
 
     def extract_host(node_name)
@@ -230,6 +238,15 @@ module Droonga
 
       def running?
         not @pid.nil?
+      end
+
+      def run_once
+        stdout, stderror, status = Open3.capture3(@serf, @command, *@options)
+        {
+          :output => stdout,
+          :error  => stderror,
+          :status => status,
+        }
       end
 
       private
