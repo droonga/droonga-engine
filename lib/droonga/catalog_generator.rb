@@ -56,8 +56,8 @@ module Droonga
     end
 
     def load(catalog)
-      catalog["datasets"].each do |name, dataset|
-        add_dataset(name, dataset_to_params(dataset))
+      catalog["datasets"].each do |name, catalog_dataset|
+        load_dataset(name, catalog_dataset)
       end
       self
     end
@@ -100,6 +100,16 @@ module Droonga
         catalog_datasets[name] = dataset.to_catalog
       end
       catalog_datasets
+    end
+
+    def load_dataset(name, catalog_dataset)
+      options = {}
+      options[:n_workers] = catalog_dataset["nWorkers"]
+      options[:plugins]   = catalog_dataset["plugins"]
+      options[:schema]    = catalog_dataset["schema"]
+      options[:fact]      = catalog_dataset["fact"]
+      options[:replicas]  = catalog_dataset["replicas"]
+      add_dataset(name, options)
     end
 
     class Dataset
@@ -228,17 +238,6 @@ module Droonga
       def weight
         @weight ||= 100 / @n_slices
       end
-    end
-
-    def dataset_to_params(dataset)
-      params = {}
-      params[:n_workers] = dataset["nWorkers"]
-      params[:n_slices]  = dataset["replicas"].first["slices"].size
-      params[:plugins]   = dataset["plugins"]
-      params[:schema]    = dataset["schema"] if dataset["schema"]
-      params[:fact]      = dataset["fact"] if dataset["fact"]
-      params[:replicas]  = dataset["replicas"]
-      params
     end
   end
 end
