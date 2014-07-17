@@ -112,8 +112,10 @@ module Droonga
     end
 
     def live_nodes=(nodes)
+      old_live_nodes = @live_nodes
       @live_nodes = nodes
       @dead_nodes = all_nodes - @live_nodes
+      @forwarder.resume if old_live_nodes != @live_nodes
       @live_nodes
     end
 
