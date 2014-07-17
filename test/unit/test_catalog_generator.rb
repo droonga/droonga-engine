@@ -89,10 +89,41 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       @generator.add_dataset("Droonga", :fact => "Entries")
       assert_equal("Entries", generate["datasets"]["Droonga"]["fact"])
     end
+
+    class LoadTest < self
+      def test_replicas
+        dataset = {
+          "nWorkers" => 4,
+          "plugins" => ["groonga", "search", "crud", "dump", "system"],
+          "schema" => [],
+          "replicas" => [
+            {
+              "dimension" => "_key",
+              "slicer" => "hash",
+              "slices" => [
+                {
+                  "volume" => {
+                    "address" => "127.0.0.1:10031/droonga.000",
+                  },
+                  "weight" => 100,
+                },
+              ],
+            },
+          ],
+        }
+        catalog = {
+          "datasets" => {
+            "Default" => dataset,
+          }
+        }
+        @generator.load(catalog)
+        assert_equal(dataset, generate["datasets"]["Default"])
+      end
+    end
   end
 
   class ReplicasTest < self
-    def test_raw
+    def test_catalog
       replicas = [
         {
           "dimension" => "_key",

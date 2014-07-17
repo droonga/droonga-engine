@@ -230,8 +230,6 @@ module Droonga
       end
     end
 
-    ADDRESS_MATCHER = /\A(.*):(\d+)\/([^\.]+)\.(.+)\z/
-
     def dataset_to_params(dataset)
       params = {}
       params[:n_workers] = dataset["nWorkers"]
@@ -239,21 +237,7 @@ module Droonga
       params[:plugins]   = dataset["plugins"]
       params[:schema]    = dataset["schema"] if dataset["schema"]
       params[:fact]      = dataset["fact"] if dataset["fact"]
-
-      nodes = dataset["replicas"].collect do |replica|
-        ADDRESS_MATCHER =~ replica["slices"].first["volume"]["address"]
-        {
-          :host => $1,
-          :port => $2.to_i,
-          :tag  => $3,
-          :path => $4,
-        }
-      end
-      params[:tag]   = nodes.first[:tag]
-      params[:port]  = nodes.first[:port].to_i
-      params[:hosts] = nodes.collect do |node|
-        node[:host]
-      end
+      params[:replicas]  = dataset["replicas"]
       params
     end
   end
