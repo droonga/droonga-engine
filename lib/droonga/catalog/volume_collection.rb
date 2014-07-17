@@ -47,7 +47,7 @@ module Droonga
         when :random
           [volumes.sample]
         when :all
-          volumes
+          @volumes
         else
           super
         end
