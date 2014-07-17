@@ -176,12 +176,12 @@ module Droonga
                         "port" => port)
         sleep(3) # wait until the HTTP server becomes ready
 
-        url = "http://#{source_host}:#{port}/catalog.json"
+        url = "http://#{source_host}:#{port}"
         connection = Faraday.new(url) do |builder|
           builder.response(:follow_redirects)
           builder.adapter(Faraday.default_adapter)
         end
-        response = connection.get
+        response = connection.get("/catalog.json")
         catalog = response.body
 
         Serf.send_query(source_node, "unpublish_catalog",
