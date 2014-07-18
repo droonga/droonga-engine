@@ -60,6 +60,11 @@ parser.on("--replica-source-host=HOST",
           "Host name of the soruce cluster to be connected.") do |host|
   options.replica_source_host = host
 end
+parser.on("--dataset=DATASET",
+          "Tag dataset name of the cluster to be joined as a node.",
+          "(#{options.dataset})") do |dataset|
+  options.dataset = dataset
+end
 parser.on("--port=PORT", Integer,
           "Port number of the source cluster to be connected.",
           "(#{options.port})") do |port|
@@ -136,8 +141,8 @@ run_remote_command(options.joining_node, "join",
 
 puts "Update existing hosts in the cluster..."
 run_remote_command(options.source_node, "add_replicas",
-                   "dataset" => dataset_name,
-                   "hosts"   => [host])
+                   "dataset" => options.dataset,
+                   "hosts"   => [options.joining_host])
 
 run_remote_command(options.source_node, "unpublish_catalog",
                    "node" => options.source_node,
