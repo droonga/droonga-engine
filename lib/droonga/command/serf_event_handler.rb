@@ -120,7 +120,8 @@ module Droonga
 
         source_host = source_node.split(":").first
 
-        catalog = fetch_catalog(source_node)
+        fetch_port = @payload["fetch_port"]
+        catalog = fetch_catalog(source_node, fetch_port)
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||
                     generator.dataset_for_host(host)
@@ -160,24 +161,10 @@ module Droonga
           modifier.datasets[dataset_name].replicas.hosts += other_hosts
           modifier.datasets[dataset_name].replicas.hosts.uniq!
         end
-        sleep(1) # wait for restart
-
-        puts "joining to the cluster: update others"
-
-        source_node  = "#{source_host}:#{port}/#{tag}"
-        run_remote_command(source_node, "add_replicas",
-                           "dataset" => dataset_name,
-                           "hosts"   => [host])
       end
 
-      def fetch_catalog(source_node)
+      def fetch_catalog(source_node, port)
         source_host = source_node.split(":").first
-        port = 10032 + rand(10000)
-
-        run_remote_command(source_node, "publish_catalog",
-                           "node" => source_node,
-                           "port" => port)
-        sleep(3) # wait until the HTTP server becomes ready
 
         url = "http://#{source_host}:#{port}"
         connection = Faraday.new(url) do |builder|
@@ -186,10 +173,6 @@ module Droonga
         end
         response = connection.get("/catalog.json")
         catalog = response.body
-
-        run_remote_command(source_node, "unpublish_catalog",
-                           "node" => source_node,
-                           "port" => port)
 
         JSON.parse(catalog)
       end
@@ -335,14 +318,6 @@ module Droonga
         status = Serf.load_status
         status[key] = value
         SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
-      end
-
-      def run_remote_command(node, command, options={})
-        puts "remote command: #{command} on #{node}"
-        result = Serf.send_query(node, command, options)
-        puts result[:output]
-        puts result[:error] unless result[:error].empty?
-        result
       end
     end
   end
