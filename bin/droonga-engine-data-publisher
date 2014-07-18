@@ -58,7 +58,7 @@ FileUtils.copy(published_file.to_s, published_dir + published_file.basename)
 server = HTTPServer.new(:Port => options.port,
                         :DocumentRoot => published_dir)
 
-trap("INT", "TERM") do
+trap("INT") do
   server.shutdown
   FileUtils.rm_rf(published_dir.to_s)
 end
