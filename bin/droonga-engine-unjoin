@@ -79,13 +79,18 @@ remaining_host = options.other_hosts.first || options.replica_remove_host
 options.remaining_node = "#{remaining_host}:#{options.port}/#{options.tag}"
 
 
+def run_remote_command(target, command, options)
+  result = Droonga::Serf.send_query(target, command, options)
+  puts result[:result]
+  puts result[:error] unless result[:error].empty?
+end
+
+
 puts "Unjoining replica from the cluster..."
 
-result = Droonga::Serf.send_query(options.remaining_node, "remove_replicas",
-                                  "dataset" => options.dataset,
-                                  "hosts"   => [options.replica_remove_host])
-puts result[:result]
-puts result[:error] unless result[:error].empty?
+run_remote_command(options.remaining_node, "remove_replicas",
+                   "dataset" => options.dataset,
+                   "hosts"   => [options.replica_remove_host])
 
 puts "Done."
 

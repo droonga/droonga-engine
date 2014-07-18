@@ -70,15 +70,20 @@ end
 
 destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 
+def run_remote_command(target, command, options)
+  result = Droonga::Serf.send_query(target, command, options)
+  puts result[:result]
+  puts result[:error] unless result[:error].empty?
+end
+
+
 puts "Absorbing data..."
-result = Droonga::Serf.send_query(destination_node, "absorb_data",
-                                  "node"    => destination_node,
-                                  "source"  => options.source_host,
-                                  "port"    => options.port,
-                                  "tag"     => options.tag,
-                                  "dataset" => options.dataset)
-puts result[:result]
-puts result[:error] unless result[:error].empty?
+run_remote_command(destination_node, "absorb_data",
+                   "node"    => destination_node,
+                   "source"  => options.source_host,
+                   "port"    => options.port,
+                   "tag"     => options.tag,
+                   "dataset" => options.dataset)
 puts "Done."
 
 exit(true)
