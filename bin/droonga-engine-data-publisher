@@ -54,9 +54,6 @@ published_dir = Droonga::Path.published(options.port)
 FileUtils.mkdir_p(published_dir.to_s)
 published_file = Pathname(options.published_file).expand_path
 FileUtils.copy(published_file.to_s, published_dir + published_file.basename)
-File.open(published_dir + ".pid", "w") do |file|
-  file.puts(Process.pid)
-end
 
 server = HTTPServer.new(:Port => options.port,
                         :DocumentRoot => published_dir,
