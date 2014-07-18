@@ -190,6 +190,7 @@ module Droonga
         ]
         pid = spawn(env, *publisher_command_line)
         Process.detach(pid)
+        sleep(1) # wait until the directory is published
 
         published_dir = Path.published(port)
         pid_file = published_dir + ".pid"
