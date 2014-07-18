@@ -56,8 +56,7 @@ published_file = Pathname(options.published_file).expand_path
 FileUtils.copy(published_file.to_s, published_dir + published_file.basename)
 
 server = HTTPServer.new(:Port => options.port,
-                        :DocumentRoot => published_dir,
-                        :ServerType => WEBrick::Daemon)
+                        :DocumentRoot => published_dir)
 
 trap("INT", "TERM") do
   server.shutdown

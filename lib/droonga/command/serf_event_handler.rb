@@ -189,11 +189,12 @@ module Droonga
             "--published-file", Path.catalog.to_s
         ]
         pid = spawn(env, *publisher_command_line)
+        Process.detach(pid)
 
         published_dir = Path.published(port)
         pid_file = published_dir + ".pid"
 
-        File.open(pid_file, "w") do |file|
+        File.open(pid_file.to_s, "w") do |file|
           file.puts(pid)
         end
       end
