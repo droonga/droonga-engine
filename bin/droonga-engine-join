@@ -110,8 +110,9 @@ if dataset
             "You cannot join a member twice."
   end
 
-  options.tag  = dataset.replicas.tag
-  options.port = dataset.replicas.port
+  options.dataset = dataset.name
+  options.tag     = dataset.replicas.tag
+  options.port    = dataset.replicas.port
 end
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
