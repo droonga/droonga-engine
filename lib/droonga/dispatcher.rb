@@ -328,7 +328,8 @@ module Droonga
           (step["outputs"] || []).each do |output|
             descendants[output] = []
             @descendants[output].each do |index|
-              @steps[index]["n_of_expects"] += step["routes"].size
+              live_routes = @engine_state.remove_dead_routes(step["routes"])
+              @steps[index]["n_of_expects"] += live_routes.size
               descendants[output].concat(@steps[index]["routes"])
             end
           end

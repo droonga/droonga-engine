@@ -33,7 +33,6 @@ module Droonga
     attr_reader :replier
     attr_accessor :on_finish
     attr_accessor :catalog
-    attr_writer :dead_nodes
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
@@ -46,7 +45,7 @@ module Droonga
       @on_finish = nil
       @catalog = nil
       @live_nodes = nil
-      @dead_nodes = nil
+      @dead_nodes = []
     end
 
     def start
@@ -119,8 +118,10 @@ module Droonga
       @live_nodes
     end
 
-    def dead_nodes
-      @dead_nodes || []
+    def remove_dead_routes(routes)
+      routes.reject do |route|
+        @dead_nodes.include?(farm_path(route))
+      end
     end
 
     private
