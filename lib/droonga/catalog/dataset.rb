@@ -70,14 +70,14 @@ module Droonga
           volumes.each do |volume|
             slices = volume.select_slices
             slices.each do |slice|
-              routes << slice.volume.address
+              routes << slice.volume.address.to_s
             end
           end
         when "scatter"
           volumes = replicas.select(message["replica"].to_sym, live_nodes)
           volumes.each do |volume|
             slice = volume.choose_slice(message["record"])
-            routes << slice.volume.address
+            routes << slice.volume.address.to_s
           end
         end
         routes
