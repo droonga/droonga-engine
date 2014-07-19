@@ -49,7 +49,7 @@ module Droonga
     end
 
     def to_s
-      string = "#{@host}:#{@port}/#{@tag}"
+      string = node
       string << ".#{@name}" if @name
       string
     end
@@ -60,6 +60,10 @@ module Droonga
 
     def ==(other)
       other.is_a?(self.class) and to_a == other.to_a
+    end
+
+    def node
+      "#{@host}:#{@port}/#{@tag}"
     end
   end
 end

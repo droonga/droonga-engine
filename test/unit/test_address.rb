@@ -43,4 +43,11 @@ class AddressTest < Test::Unit::TestCase
                    parse("192.168.0.1:2929/droonga"))
     end
   end
+
+  class FormatterTest < self
+    def test_node
+      assert_equal("192.168.0.1:2929/droonga",
+                   address("192.168.0.1", 2929, "droonga", "000").node)
+    end
+  end
 end
