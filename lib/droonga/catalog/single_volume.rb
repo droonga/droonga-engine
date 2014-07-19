@@ -13,54 +13,23 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/address"
+
 module Droonga
   module Catalog
     class SingleVolume
+      attr_reader :address
       def initialize(data)
         @data = data
-        parse_address
-      end
-
-      def address
-        @data["address"]
-      end
-
-      def host
-        @host
-      end
-
-      def port
-        @port
-      end
-
-      def tag
-        @tag
-      end
-
-      def name
-        @name
+        @address = Address.parse(@data["address"])
       end
 
       def node
-        "#{host}:#{port}/#{tag}"
+        @address.node
       end
 
       def all_nodes
         @all_nodes ||= [node]
-      end
-
-      private
-      def parse_address
-        if /\A(.+):(\d+)\/([^.]+)\.(.+)\z/ =~ address
-          @host = $1
-          @port = $2.to_i
-          @tag = $3
-          @name = $4
-        else
-          format = "${host_name}:${port_number}/${tag}.${name}"
-          message = "volume address must be <#{format}> format: <#{address}>"
-          raise ArgumentError, message
-        end
       end
     end
   end

@@ -24,25 +24,16 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       @volume = Droonga::Catalog::SingleVolume.new(data)
     end
 
+    def address(host, port, tag, name)
+      Droonga::Address.new(:host => host,
+                           :port => port,
+                           :tag  => tag,
+                           :name => name)
+    end
+
     def test_address
-      assert_equal("127.0.0.1:10047/tag.000",
+      assert_equal(address("127.0.0.1", 10047, "tag", "000"),
                    @volume.address)
-    end
-
-    def test_host
-      assert_equal("127.0.0.1", @volume.host)
-    end
-
-    def test_port
-      assert_equal(10047, @volume.port)
-    end
-
-    def test_tag
-      assert_equal("tag", @volume.tag)
-    end
-
-    def test_name
-      assert_equal("000", @volume.name)
     end
 
     def test_node

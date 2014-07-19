@@ -86,7 +86,7 @@ class CatalogSliceTest < Test::Unit::TestCase
       }
       slice = create_slice(data)
       assert_equal("127.0.0.1:10047/volume.000",
-                   slice.volume.address)
+                   slice.volume.address.to_s)
     end
 
     def test_all_nodes

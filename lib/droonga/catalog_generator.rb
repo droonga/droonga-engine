@@ -183,12 +183,12 @@ module Droonga
         collection_volume = dataset.replicas.first
         slices = collection_volume.slices
         @hosts = slices.collect do |slice|
-          slice.volume.host
+          slice.volume.address.host
         end
         @n_slices = slices.size
-        single_volume = slices.first.volume
-        @port = single_volume.port
-        @tag = single_volume.tag
+        single_volume_address = slices.first.volume.address
+        @port = single_volume_address.port
+        @tag = single_volume_address.tag
       end
 
       def to_catalog

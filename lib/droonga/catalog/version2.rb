@@ -13,6 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+require "droonga/address"
 require "droonga/catalog/base"
 require "droonga/catalog/dataset"
 require "droonga/catalog/version2_validator"
@@ -30,9 +31,8 @@ module Droonga
         @datasets
       end
 
-      def slices(name)
+      def slices(node)
         device = "."
-        pattern = Regexp.new("^#{name}\.")
         results = {}
         @datasets.each do |dataset_name, dataset|
           n_workers = dataset.n_workers
@@ -40,8 +40,8 @@ module Droonga
           dataset.replicas.each do |volume|
             volume.slices.each do |slice|
               volume_address = slice.volume.address
-              if pattern =~ volume_address
-                path = File.join([device, $POSTMATCH, "db"])
+              if volume_address.node == node
+                path = File.join([device, volume_address.name, "db"])
                 path = File.expand_path(path, base_path)
                 options = {
                   :dataset => dataset_name,
@@ -49,7 +49,7 @@ module Droonga
                   :n_workers => n_workers,
                   :plugins => plugins
                 }
-                results[volume_address] = options
+                results[volume_address.to_s] = options
               end
             end
           end
