@@ -143,10 +143,10 @@ module Droonga
       else
         steps = message["steps"]
         if steps
-          session_planner = SessionPlanner.new(self, steps)
+          session_planner = SessionPlanner.new(@engine_state, steps)
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
-          session = session_planner.create_session(id, collector_runner)
+          session = session_planner.create_session(id, self, collector_runner)
           @engine_state.register_session(id, session)
         else
           logger.error("no steps error: id=#{id}, message=#{message}")
@@ -285,18 +285,18 @@ module Droonga
     class SessionPlanner
       attr_reader :steps
 
-      def initialize(dispatcher, steps)
-        @dispatcher = dispatcher
+      def initialize(engine_state, steps)
+        @engine_state = engine_state
         @steps = steps
       end
 
-      def create_session(id, collector_runner)
+      def create_session(id, dispatcher, collector_runner)
         resolve_descendants
         tasks = []
         inputs = {}
         @steps.each do |step|
           step["routes"].each do |route|
-            next unless @dispatcher.local?(route)
+            next unless @engine_state.local_route?(route)
             task = {
               "route" => route,
               "step" => step,
@@ -310,7 +310,7 @@ module Droonga
             end
           end
         end
-        Session.new(id, @dispatcher, collector_runner, tasks, inputs)
+        Session.new(id, dispatcher, collector_runner, tasks, inputs)
       end
 
       def resolve_descendants
