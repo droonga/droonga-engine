@@ -16,24 +16,30 @@
 require "droonga/address"
 
 class AddressTest < Test::Unit::TestCase
+  def address(host, port, tag, name)
+    Droonga::Address.new(:host => host,
+                         :port => port,
+                         :tag  => tag,
+                         :name => name)
+  end
+
   class ParseTest < self
     def parse(string)
-      address = Droonga::Address.parse(string)
-      address.to_a
+      Droonga::Address.parse(string)
     end
 
     def test_full
-      assert_equal(["192.168.0.1", 2929, "droonga", "name"],
+      assert_equal(address("192.168.0.1", 2929, "droonga", "name"),
                    parse("192.168.0.1:2929/droonga.name"))
     end
 
     def test_internal_name
-      assert_equal(["192.168.0.1", 2929, "droonga", "#1"],
+      assert_equal(address("192.168.0.1", 2929, "droonga", "#1"),
                    parse("192.168.0.1:2929/droonga.\#1"))
     end
 
     def test_no_name
-      assert_equal(["192.168.0.1", 2929, "droonga", nil],
+      assert_equal(address("192.168.0.1", 2929, "droonga", nil),
                    parse("192.168.0.1:2929/droonga"))
     end
   end
