@@ -93,14 +93,14 @@ module Droonga
       end
 
       def write_pid_file
-        if @configuration.pid_file
-          File.open(@configuration.pid_file, "w") do |file|
+        if @configuration.pid_file_path
+          @configuration.pid_file_path.open("w") do |file|
             file.puts(Process.pid)
           end
           begin
             yield
           ensure
-            FileUtils.rm_f(@configuration.pid_file)
+            FileUtils.rm_f(@configuration.pid_file_path.to_s)
           end
         else
           yield
@@ -111,14 +111,14 @@ module Droonga
         DEFAULT_HOST = Socket.gethostname
         DEFAULT_PORT = 10031
 
-        attr_reader :host, :port, :tag, :log_file, :pid_file
+        attr_reader :host, :port, :tag, :log_file, :pid_file_path
         def initialize
           @host = DEFAULT_HOST
           @port = DEFAULT_PORT
           @tag = "droonga"
           @log_file = nil
           @daemon = false
-          @pid_file = nil
+          @pid_file_path = nil
         end
 
         def engine_name
@@ -205,9 +205,9 @@ module Droonga
                     "Run as a daemon") do
             @daemon = true
           end
-          parser.on("--pid-file=FILE",
-                    "Put PID to the FILE") do |file|
-            @pid_file = File.expand_path(file)
+          parser.on("--pid-file=PATH",
+                    "Put PID to PATH") do |path|
+            @pid_file_path = File.expand_path(path)
           end
         end
 
