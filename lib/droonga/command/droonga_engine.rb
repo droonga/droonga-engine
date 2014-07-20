@@ -24,7 +24,7 @@ require "sigdump"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/file_observer"
-require "droonga/service_control_protocol"
+require "droonga/process_control_protocol"
 require "droonga/line_buffer"
 
 module Droonga
@@ -351,7 +351,7 @@ module Droonga
       end
 
       class ServiceRunner
-        include ServiceControlProtocol
+        include ProcessControlProtocol
 
         def initialize(raw_loop, configuration)
           @raw_loop = raw_loop

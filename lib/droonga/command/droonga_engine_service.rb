@@ -17,7 +17,7 @@ require "optparse"
 
 require "coolio"
 
-require "droonga/service_control_protocol"
+require "droonga/process_control_protocol"
 require "droonga/line_buffer"
 require "droonga/engine"
 require "droonga/fluent_message_receiver"
@@ -34,7 +34,7 @@ module Droonga
       end
 
       include Loggable
-      include ServiceControlProtocol
+      include ProtocolControlProtocol
 
       def initialize
         @engine_name = nil
