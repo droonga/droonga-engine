@@ -13,11 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-require "serverengine"
-
 require "droonga/loggable"
-require "droonga/server"
-require "droonga/worker"
+require "droonga/supervisor"
 require "droonga/event_loop"
 require "droonga/job_pusher"
 require "droonga/processor"
@@ -32,7 +29,8 @@ module Droonga
       @loop = loop
       @options = options
       @n_workers = @options[:n_workers] || 0
-      @job_pusher = JobPusher.new(@loop, @options[:database])
+      @database_path = @options[:database]
+      @job_pusher = JobPusher.new(@loop, @database_path)
       @processor = Processor.new(@loop, @job_pusher, @options)
       @supervisor = nil
     end
@@ -41,7 +39,7 @@ module Droonga
       ensure_database
       @processor.start
       @job_pusher.start
-      start_supervisor if @n_workers > 0
+      start_supervisor
     end
 
     def shutdown
@@ -63,14 +61,13 @@ module Droonga
       enforce_umask
       context = Groonga::Context.new
       begin
-        database_path = @options[:database]
-        if File.exist?(database_path)
-          context.open_database(database_path) do
+        if File.exist?(@database_path)
+          context.open_database(@database_path) do
             apply_schema(context)
           end
         else
-          FileUtils.mkdir_p(File.dirname(database_path))
-          context.create_database(database_path) do
+          FileUtils.mkdir_p(File.dirname(@database_path))
+          context.create_database(@database_path) do
             apply_schema(context)
           end
         end
@@ -89,28 +86,21 @@ module Droonga
     end
 
     def start_supervisor
-      @supervisor = ServerEngine::Supervisor.new(Server, Worker) do
-        force_options = {
-          :worker_type   => "process",
-          :workers       => @options[:n_workers],
-          :log_level     => logger.level,
-          :server_process_name => "Server[#{@options[:database]}] #$0",
-          :worker_process_name => "Worker[#{@options[:database]}] #$0",
-          :job_receive_socket_path => @job_pusher.socket_path,
-          :job_pusher => @job_pusher,
-        }
-        @options.merge(force_options)
-      end
-      @supervisor_thread = Thread.new do
-        @supervisor.main
-      end
+      return if @n_workers.zero?
+
+      config = Supervisor::WorkerConfiguration.new
+      config.name = @options[:name]
+      config.dataset = @dataset
+      config.database_path = @database_path
+      config.plugins = @options[:plugins]
+      config.job_pusher = @job_pusher
+      @supervisor = Supervisor.new(@loop, @n_workers, config)
+      @supervisor.start
     end
 
     def shutdown_supervisor
       logger.trace("supervisor: shutdown: start")
-      @supervisor.stop(true)
-      logger.trace("supervisor: shutdown: stopped")
-      @supervisor_thread.join
+      @supervisor.stop_gracefully
       logger.trace("supervisor: shutdown: done")
     end
 
