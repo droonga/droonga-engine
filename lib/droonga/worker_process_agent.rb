@@ -33,8 +33,6 @@ module Droonga
     def start
       @loop.attach(@input)
       @loop.attach(@output)
-
-      @output.write(Messages::READY)
     end
 
     def stop
@@ -47,6 +45,10 @@ module Droonga
         @input, input = nil, @input
         input.close
       end
+    end
+
+    def ready
+      @output.write(Messages::READY)
     end
 
     def on_stop_gracefully=(callback)

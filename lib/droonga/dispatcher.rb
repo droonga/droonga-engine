@@ -63,6 +63,9 @@ module Droonga
     end
 
     def start
+      @farm.on_ready = lambda do
+        @engine_state.on_ready
+      end
       @farm.start
     end
 

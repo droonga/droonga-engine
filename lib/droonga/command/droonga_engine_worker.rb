@@ -216,6 +216,7 @@ module Droonga
           stop_immediately
         end
         @worker_process_agent.start
+        @worker_process_agent.ready
       end
 
       def stop_worker_process_agent

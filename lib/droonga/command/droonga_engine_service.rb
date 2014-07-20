@@ -140,6 +140,9 @@ module Droonga
 
       def run_engine
         @engine = Engine.new(@loop, @engine_name, @internal_engine_name)
+        @engine.on_ready = lambda do
+          @worker_process_agent.ready
+        end
         @engine.start
       end
 

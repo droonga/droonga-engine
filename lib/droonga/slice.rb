@@ -24,6 +24,7 @@ module Droonga
   class Slice
     include Loggable
 
+    attr_accessor :on_ready
     def initialize(dataset, loop, options={})
       @dataset = dataset
       @loop = loop
@@ -33,6 +34,7 @@ module Droonga
       @job_pusher = JobPusher.new(@loop, @database_path)
       @processor = Processor.new(@loop, @job_pusher, @options)
       @supervisor = nil
+      @on_ready = nil
     end
 
     def start
@@ -86,7 +88,10 @@ module Droonga
     end
 
     def start_supervisor
-      return if @n_workers.zero?
+      if @n_workers.zero?
+        on_ready
+        return
+      end
 
       config = Supervisor::WorkerConfiguration.new
       config.name = @options[:name]
@@ -95,6 +100,9 @@ module Droonga
       config.plugins = @options[:plugins]
       config.job_pusher = @job_pusher
       @supervisor = Supervisor.new(@loop, @n_workers, config)
+      @supervisor.on_ready = lambda do
+        on_ready
+      end
       @supervisor.start
     end
 
@@ -105,6 +113,10 @@ module Droonga
     end
 
     private
+    def on_ready
+      @on_ready.call if @on_ready
+    end
+
     def log_tag
       "slice"
     end

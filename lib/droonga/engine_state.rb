@@ -31,6 +31,7 @@ module Droonga
     attr_reader :internal_name
     attr_reader :forwarder
     attr_reader :replier
+    attr_writer :on_ready
     attr_accessor :on_finish
     attr_accessor :catalog
     def initialize(loop, name, internal_name)
@@ -42,6 +43,7 @@ module Droonga
       @forwarder = Forwarder.new(@loop)
       @forwarder.resume
       @replier = Replier.new(@forwarder)
+      @on_ready = nil
       @on_finish = nil
       @catalog = nil
       @live_nodes = nil
@@ -122,6 +124,10 @@ module Droonga
       routes.reject do |route|
         @dead_nodes.include?(farm_path(route))
       end
+    end
+
+    def on_ready
+      @on_ready.call if @on_ready
     end
 
     private

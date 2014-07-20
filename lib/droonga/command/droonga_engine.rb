@@ -112,6 +112,7 @@ module Droonga
         DEFAULT_PORT = 10031
 
         attr_reader :host, :port, :tag, :log_file, :pid_file_path
+        attr_reader :ready_notify_fd
         def initialize
           @host = DEFAULT_HOST
           @port = DEFAULT_PORT
@@ -119,6 +120,7 @@ module Droonga
           @log_file = nil
           @daemon = false
           @pid_file_path = nil
+          @ready_notify_fd = nil
         end
 
         def engine_name
@@ -150,6 +152,7 @@ module Droonga
           add_log_options(parser)
           add_process_options(parser)
           add_path_options(parser)
+          add_notification_options(parser)
         end
 
         def listen_socket
@@ -221,6 +224,15 @@ module Droonga
           end
         end
 
+        def add_notification_options(parser)
+          parser.separator("")
+          parser.separator("Notification:")
+          parser.on("--ready-notify-fd=FD", Integer,
+                    "Send 'ready' message to FD on ready") do |fd|
+            @ready_notify_fd = fd
+          end
+        end
+
         def bind_heartbeat_socket
           socket = UDPSocket.new(address_family)
           socket.bind(@host, @port)
@@ -238,6 +250,13 @@ module Droonga
           @serf = run_serf
           @serf_status_observer = run_serf_status_observer
           @service_runner = run_service
+          if @configuration.ready_notify_fd
+            @service_runner.on_ready = lambda do
+              output = IO.new(@configuration.ready_notify_fd)
+              output.puts("ready")
+              output.close
+            end
+          end
           @catalog_observer = run_catalog_observer
           @loop_breaker = Coolio::AsyncWatcher.new
           @loop.attach(@loop_breaker)

@@ -29,6 +29,7 @@ module Droonga
   class Engine
     include Loggable
 
+    attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
       @catalog = load_catalog
@@ -38,10 +39,14 @@ module Droonga
       @live_nodes_list_observer.on_change = lambda do
         @state.live_nodes = load_live_nodes
       end
+      @on_ready = nil
     end
 
     def start
       logger.trace("start: start")
+      @state.on_ready = lambda do
+        @on_ready.call if @on_ready
+      end
       @state.start
       @live_nodes_list_observer.start
       @dispatcher.start

@@ -20,15 +20,24 @@ module Droonga
   class Supervisor
     include Loggable
 
+    attr_writer :on_ready
     def initialize(loop, n_workers, config)
       @loop = loop
       @n_workers = n_workers
       @config = config
+      @on_ready = nil
     end
 
     def start
+      n_ready_workers = 0
       @worker_runners = @n_workers.times.collect do |i|
         worker_runner = WorkerRunner.new(@loop, i, @config)
+        worker_runner.on_ready = lambda do
+          n_ready_workers += 1
+          if n_ready_workers == @n_workers
+            @on_ready.call if @on_ready
+          end
+        end
         worker_runner.start
         # TODO: support auto re-run
         worker_runner

@@ -19,6 +19,7 @@ require "droonga/slice"
 
 module Droonga
   class Farm
+    attr_writer :on_ready
     def initialize(name, catalog, loop, options={})
       @name = name
       @catalog = catalog
@@ -36,7 +37,14 @@ module Droonga
     end
 
     def start
+      n_ready_slices = 0
       @slices.each_value do |slice|
+        slice.on_ready = lambda do
+          n_ready_slices += 1
+          if n_ready_slices == @slices.size
+            @on_ready.call if @on_ready
+          end
+        end
         slice.start
       end
     end
