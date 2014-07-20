@@ -24,8 +24,7 @@ require "sigdump"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/file_observer"
-require "droonga/process_control_protocol"
-require "droonga/line_buffer"
+require "droonga/process_supervisor"
 
 module Droonga
   module Command
@@ -351,8 +350,6 @@ module Droonga
       end
 
       class ServiceRunner
-        include ProcessControlProtocol
-
         def initialize(raw_loop, configuration)
           @raw_loop = raw_loop
           @configuration = configuration
@@ -394,16 +391,17 @@ module Droonga
           @pid = spawn(env, *command_line, options)
           control_write_in.close
           control_read_out.close
-          attach_control_write_out(control_write_out)
-          attach_control_read_in(control_read_in)
+          @supervisor = create_process_supervisor(control_read_in,
+                                                  control_write_out)
+          @supervisor.start
         end
 
         def stop_gracefully
-          @control_write_out.write(Messages::STOP_GRACEFUL)
+          @supervisor.stop_gracefully
         end
 
         def stop_immediately
-          @control_write_out.write(Messages::STOP_IMMEDIATELY)
+          @supervisor.stop_immediately
         end
 
         def success?
@@ -411,6 +409,17 @@ module Droonga
         end
 
         private
+        def create_process_supervisor(input, output)
+          supervisor = ProcessSupervisor.new(@raw_loop, input, output)
+          supervisor.on_ready = lambda do
+            on_ready
+          end
+          supervisor.on_finish = lambda do
+            on_finish
+          end
+          supervisor
+        end
+
         def on_ready
           @on_ready.call if @on_ready
         end
@@ -422,33 +431,8 @@ module Droonga
         def on_finish
           _, status = Process.waitpid2(@pid)
           @success = status.success?
-          @control_write_out.close
-          @control_read_in.close
+          @supervisor.stop
           on_failure unless success?
-        end
-
-        def attach_control_write_out(control_write_out)
-          @control_write_out = Coolio::IO.new(control_write_out)
-          @raw_loop.attach(@control_write_out)
-        end
-
-        def attach_control_read_in(control_read_in)
-          @control_read_in = Coolio::IO.new(control_read_in)
-          line_buffer = LineBuffer.new
-          on_read = lambda do |data|
-            line_buffer.feed(data) do |line|
-              case line
-              when Messages::READY
-                on_ready
-              when Messages::FINISH
-                on_finish
-              end
-            end
-          end
-          @control_read_in.on_read do |data|
-            on_read.call(data)
-          end
-          @raw_loop.attach(@control_read_in)
         end
       end
     end

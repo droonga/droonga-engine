@@ -17,8 +17,7 @@ require "optparse"
 
 require "coolio"
 
-require "droonga/process_control_protocol"
-require "droonga/line_buffer"
+require "droonga/worker_process_agent"
 require "droonga/engine"
 require "droonga/fluent_message_receiver"
 require "droonga/internal_fluent_message_receiver"
@@ -34,7 +33,6 @@ module Droonga
       end
 
       include Loggable
-      include ProcessControlProtocol
 
       def initialize
         @engine_name = nil
@@ -59,10 +57,7 @@ module Droonga
           logger.exception("failed to run services", $!)
           success = false
         ensure
-          unless @control_write_closed
-            control_write_io.write(Messages::FINISH)
-            control_write_io.close
-          end
+          shutdown_worker_process_agent
         end
 
         success
@@ -120,7 +115,7 @@ module Droonga
         run_internal_message_receiver
         run_engine
         run_receiver
-        run_control_io
+        run_worker_process_agent
         @loop.run
       end
 
@@ -159,60 +154,23 @@ module Droonga
         receiver.shutdown
       end
 
-      def run_control_io
-        @control_read = Coolio::IO.new(IO.new(@control_read_fd))
+      def run_worker_process_agent
+        input = IO.new(@control_read_fd)
         @control_read_fd = nil
-        on_read = lambda do |data|
-          line_buffer = LineBuffer.new
-          line_buffer.feed(data) do |line|
-            case line
-            when Messages::STOP_GRACEFUL
-              stop_gracefully
-            when Messages::STOP_IMMEDIATELY
-              stop_immediately
-            end
-          end
-        end
-        @control_read.on_read do |data|
-          on_read.call(data)
-        end
-        read_on_close = lambda do
-          if @control_read
-            @control_read = nil
-            stop_immediately
-          end
-        end
-        @control_read.on_close do
-          read_on_close.call
-        end
-        @loop.attach(@control_read)
-
-        @control_write = Coolio::IO.new(IO.new(@control_write_fd))
+        output = IO.new(@control_write_fd)
         @control_write_fd = nil
-        write_on_close = lambda do
-          if @control_write
-            @control_write = nil
-            stop_immediately
-          end
-          @control_write_closed = true
+        @worker_process_agent = WorkerProcessAgent.new(@loop, input, output)
+        @worker_process_agent.on_stop_gracefully = lambda do
+          stop_gracefully
         end
-        @control_write.on_close do
-          write_on_close.call
+        @worker_process_agent.on_stop_immediately = lambda do
+          stop_immediately
         end
-        @loop.attach(@control_write)
-
-        @control_write.write(Messages::READY)
+        @worker_process_agent.start
       end
 
-      def shutdown_control_io
-        if @control_write
-          @control_write, control_write = nil, @control_write
-          control_write.detach
-        end
-        if @control_read
-          @control_read, control_read = nil, @control_read
-          control_read.close
-        end
+      def shutdown_worker_process_agent
+        @worker_process_agent.stop
       end
 
       def create_receiver
@@ -252,14 +210,14 @@ module Droonga
         @stopping = true
         shutdown_receiver
         @engine.stop_gracefully do
-          shutdown_control_io
+          shutdown_worker_process_agent
           shutdown_internal_message_receiver
         end
       end
 
       # It may be called after stop_gracefully.
       def stop_immediately
-        shutdown_control_io
+        shutdown_worker_process_agent
         shutdown_receiver if @receiver
         shutdown_internal_message_receiver
         @engine.stop_immediately
