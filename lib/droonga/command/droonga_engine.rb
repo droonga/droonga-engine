@@ -250,13 +250,7 @@ module Droonga
           @serf = run_serf
           @serf_status_observer = run_serf_status_observer
           @service_runner = run_service
-          if @configuration.ready_notify_fd
-            @service_runner.on_ready = lambda do
-              output = IO.new(@configuration.ready_notify_fd)
-              output.puts("ready")
-              output.close
-            end
-          end
+          setup_initial_on_ready
           @catalog_observer = run_catalog_observer
           @loop_breaker = Coolio::AsyncWatcher.new
           @loop.attach(@loop_breaker)
@@ -269,6 +263,15 @@ module Droonga
         end
 
         private
+        def setup_initial_on_ready
+          return if @configuration.ready_notify_fd.nil?
+          @service_runner.on_ready = lambda do
+            output = IO.new(@configuration.ready_notify_fd)
+            output.puts("ready")
+            output.close
+          end
+        end
+
         def trap_signals
           trap(:TERM) do
             stop_gracefully
