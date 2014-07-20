@@ -18,6 +18,7 @@ require "droonga/single_step_definition"
 require "droonga/adapter"
 require "droonga/planner"
 require "droonga/handler"
+require "droonga/collector"
 require "droonga/collectors"
 
 module Droonga
