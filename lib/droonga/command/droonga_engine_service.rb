@@ -34,7 +34,7 @@ module Droonga
       end
 
       include Loggable
-      include ProtocolControlProtocol
+      include ProcessControlProtocol
 
       def initialize
         @engine_name = nil
