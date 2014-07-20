@@ -49,7 +49,7 @@ module Droonga
 
     private
     def log_tag
-      "[#{Process.pid}] supervisor"
+      "supervisor"
     end
 
     class WorkerConfiguration
@@ -154,7 +154,7 @@ module Droonga
 
       private
       def log_tag
-        "[#{Process.pid}] worker-runner"
+        "worker-runner"
       end
     end
   end

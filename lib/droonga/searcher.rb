@@ -139,7 +139,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] searcher"
+      "[#{Process.ppid}] searcher"
     end
 
     class QuerySorter
@@ -448,7 +448,7 @@ module Droonga
       end
 
       def log_tag
-        "[#{Process.ppid}][#{Process.pid}] query_searcher"
+        "[#{Process.ppid}] query_searcher"
       end
     end
 

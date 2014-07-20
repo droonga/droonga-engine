@@ -133,7 +133,7 @@ module Droonga
     end
 
     def build_log_line(level, message, data={})
-      line = "#{Time.now.iso8601}[#{Level.label(level)}]: "
+      line = "#{Time.now.iso8601}[#{Process.pid}][#{Level.label(level)}]: "
       line << "#{@tag}: " if @tag
       line << message
       data.each do |key, value|

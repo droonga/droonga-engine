@@ -279,7 +279,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] dispatcher"
+      "dispatcher"
     end
 
     class SessionPlanner

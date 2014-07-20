@@ -43,7 +43,7 @@ module Droonga
 
     private
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] replier"
+      "[#{Process.ppid}] replier"
     end
   end
 end

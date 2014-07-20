@@ -114,7 +114,7 @@ module Droonga
 
     private
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] handler_messenger"
+      "[#{Process.ppid}] handler_messenger"
     end
   end
 end

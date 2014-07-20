@@ -86,7 +86,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] watch_schema"
+      "[#{Process.ppid}] watch_schema"
     end
   end
 end

@@ -324,7 +324,7 @@ module Droonga
         end
 
         def log_tag
-          "[#{Process.ppid}][#{Process.pid}] dumper"
+          "[#{Process.ppid}] dumper"
         end
       end
 

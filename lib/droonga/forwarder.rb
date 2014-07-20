@@ -137,7 +137,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] forwarder"
+      "[#{Process.ppid}] forwarder"
     end
   end
 end

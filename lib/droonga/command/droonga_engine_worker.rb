@@ -224,7 +224,7 @@ module Droonga
       end
 
       def log_tag
-        "[#{Process.ppid}][#{Process.pid}] worker"
+        "[#{Process.ppid}] worker"
       end
     end
   end

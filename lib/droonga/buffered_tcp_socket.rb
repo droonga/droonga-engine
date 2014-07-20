@@ -83,7 +83,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] buffered-tcp-socket"
+      "[#{Process.ppid}] buffered-tcp-socket"
     end
 
     class Chunk

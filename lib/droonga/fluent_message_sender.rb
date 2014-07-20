@@ -113,7 +113,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}][#{Process.pid}] fluent-message-sender"
+      "[#{Process.ppid}] fluent-message-sender"
     end
   end
 end
