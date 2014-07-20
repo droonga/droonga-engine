@@ -110,7 +110,7 @@ module Droonga
 
     def exception(message, exception, data={})
       log(Level::ERROR,
-          "#{message}: #{exception.message}(#{exception.class})",
+          "#{message}: #{exception.class}: #{exception.message}",
           data)
       log_backtrace(Level::ERROR, exception.backtrace)
     end
