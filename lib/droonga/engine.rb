@@ -92,7 +92,7 @@ module Droonga
       loader = CatalogLoader.new(catalog_path.to_s)
       catalog = loader.load
       logger.info("catalog loaded",
-                  :path  => catalog_path,
+                  :path  => catalog_path.to_s,
                   :mtime => catalog_path.mtime)
       catalog
     end
@@ -102,7 +102,7 @@ module Droonga
       loader = LiveNodesListLoader.new(path)
       live_nodes = loader.load
       logger.info("live-nodes loaded",
-                  :path  => path,
+                  :path  => path.to_s,
                   :mtime => path.mtime)
       live_nodes
     end
