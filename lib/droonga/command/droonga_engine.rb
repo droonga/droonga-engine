@@ -207,7 +207,7 @@ module Droonga
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
-            @pid_file_path = File.expand_path(path)
+            @pid_file_path = Pathname.new(path).expand_path
           end
         end
 
