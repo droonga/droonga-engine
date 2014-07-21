@@ -57,9 +57,7 @@ module Droonga
     end
 
     def resume
-      return unless @buffering
       connect unless connected?
-      @socket.resume
     end
 
     private
@@ -88,6 +86,7 @@ module Droonga
         data_directory = Path.buffer + "#{@host}:#{@port}"
         FileUtils.mkdir_p(data_directory.to_s)
         @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
+        @socket.resume
       else
         @socket = Coolio::TCPSocket.connect(@host, @port)
       end
