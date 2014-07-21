@@ -32,6 +32,7 @@ module Droonga
 
     def start
       logger.trace("start: start")
+      resume
       logger.trace("start: done")
     end
 

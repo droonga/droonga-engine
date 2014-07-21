@@ -41,7 +41,6 @@ module Droonga
       @sessions = {}
       @current_id = 0
       @forwarder = Forwarder.new(@loop, :buffering => true)
-      @forwarder.resume
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
