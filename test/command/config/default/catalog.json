@@ -3,7 +3,7 @@
   "effectiveDate": "2014-02-28T00:00:00Z",
   "datasets": {
     "Default": {
-      "nWorkers": 4,
+      "nWorkers": 2,
       "plugins": ["groonga", "crud", "search", "dump", "system"],
       "replicas": [
         {
@@ -22,13 +22,6 @@
               "weight": 50,
               "volume": {
                 "address": "127.0.0.1:23003/droonga.001"
-              }
-            },
-            {
-              "label": "slice002",
-              "weight": 50,
-              "volume": {
-                "address": "127.0.0.1:23003/droonga.002"
               }
             }
           ]
@@ -49,32 +42,6 @@
               "weight": 50,
               "volume": {
                 "address": "127.0.0.1:23003/droonga.011"
-              }
-            },
-            {
-              "label": "slice012",
-              "weight": 50,
-              "volume": {
-                "address": "127.0.0.1:23003/droonga.012"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "Watch": {
-      "nWorkers": 4,
-      "plugins": ["groonga", "watch", "search", "crud"],
-      "replicas": [
-        {
-          "dimension": "_key",
-          "slicer": "hash",
-          "slices": [
-            {
-              "label": "slice100",
-              "weight": 50,
-              "volume": {
-                "address": "127.0.0.1:23003/droonga.watch"
               }
             }
           ]

@@ -1,3 +1,5 @@
+# -*- js -*-
+#@require-catalog-version 2
 {
   "type": "watch.subscribe",
   "dataset": "Watch",

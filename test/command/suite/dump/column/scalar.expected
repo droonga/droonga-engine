@@ -10,11 +10,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Default",
-  "type": "dump.start"
-}
-{
-  "inReplyTo": "request-id",
   "statusCode": 200,
   "type": "dump.result",
   "body": true
@@ -43,16 +38,6 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
     "table": "Memos",
     "name": "title",
     "type": "Scalar",
@@ -70,22 +55,6 @@
     "valueType": "ShortText"
   },
   "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "title",
-    "type": "Scalar",
-    "valueType": "ShortText"
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",

@@ -32,17 +32,6 @@
           "input": "nonexistent:Droonga"
         }
       }
-    },
-    "sources2": {
-      "statusCode": 400,
-      "body": {
-        "name": "SyntaxError",
-        "message": "Syntax error: syntax:<query> input:<nonexistent:Droonga>",
-        "detail": {
-          "syntax": "query",
-          "input": "nonexistent:Droonga"
-        }
-      }
     }
   }
 }

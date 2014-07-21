@@ -1,0 +1,23 @@
+{
+  "datasets": {
+    "Watch": {
+      "nWorkers": 2,
+      "plugins": ["groonga", "watch", "search", "crud"],
+      "replicas": [
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice100",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.watch"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

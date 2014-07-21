@@ -29,16 +29,6 @@
           "attribute": ","
         }
       }
-    },
-    "sources2": {
-      "statusCode": 400,
-      "body": {
-        "name": "InvalidAttribute",
-        "message": "Invalid attribute: <,>",
-        "detail": {
-          "attribute": ","
-        }
-      }
     }
   }
 }

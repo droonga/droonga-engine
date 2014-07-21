@@ -10,11 +10,6 @@
 }
 {
   "inReplyTo": "request-id",
-  "dataset": "Default",
-  "type": "dump.start"
-}
-{
-  "inReplyTo": "request-id",
   "statusCode": 200,
   "type": "dump.result",
   "body": true
@@ -43,16 +38,6 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "body": {
-    "type": "Hash",
-    "name": "Memos",
-    "keyType": "ShortText"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
     "type": "PatriciaTrie",
     "name": "Terms",
     "keyType": "ShortText",
@@ -72,29 +57,6 @@
     "normalizer": "NormalizerAuto"
   },
   "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "type": "PatriciaTrie",
-    "name": "Terms",
-    "keyType": "ShortText",
-    "tokenizer": "TokenBigram",
-    "normalizer": "NormalizerAuto"
-  },
-  "type": "dump.table"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Memos",
-    "name": "content",
-    "type": "Scalar",
-    "valueType": "ShortText"
-  },
-  "type": "dump.column"
 }
 {
   "inReplyTo": "request-id",
@@ -157,31 +119,6 @@
     }
   },
   "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "body": {
-    "table": "Terms",
-    "name": "Memos__key_content",
-    "type": "Index",
-    "valueType": "Memos",
-    "indexOptions": {
-      "section": true,
-      "weight": true,
-      "position": true,
-      "sources": [
-        "_key",
-        "content"
-      ]
-    }
-  },
-  "type": "dump.column"
-}
-{
-  "inReplyTo": "request-id",
-  "dataset": "Default",
-  "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",

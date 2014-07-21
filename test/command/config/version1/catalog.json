@@ -10,10 +10,10 @@
   },
   "datasets": {
     "Default": {
-      "workers": 4,
+      "workers": 2,
       "plugins": ["groonga", "crud", "search", "dump", "system"],
       "number_of_replicas": 2,
-      "number_of_partitions": 3,
+      "number_of_partitions": 2,
       "partition_key": "_key",
       "date_range": "infinity",
       "ring": {
@@ -34,20 +34,11 @@
               "127.0.0.1:23003/droonga.011"
             ]
           }
-        },
-        "127.0.0.1:23043": {
-          "weight": 50,
-          "partitions": {
-            "2013-09-01": [
-              "127.0.0.1:23003/droonga.020",
-              "127.0.0.1:23003/droonga.021"
-            ]
-          }
         }
       }
     },
     "Watch": {
-      "workers": 4,
+      "workers": 2,
       "plugins": ["groonga", "watch", "search", "crud", "dump", "system"],
       "number_of_replicas": 1,
       "number_of_partitions": 1,

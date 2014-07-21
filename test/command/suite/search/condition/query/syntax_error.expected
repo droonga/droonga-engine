@@ -32,17 +32,6 @@
           "input": "("
         }
       }
-    },
-    "sources2": {
-      "statusCode": 400,
-      "body": {
-        "name": "SyntaxError",
-        "message": "Syntax error: syntax:<query> input:<(>",
-        "detail": {
-          "syntax": "query",
-          "input": "("
-        }
-      }
     }
   }
 }
