@@ -20,6 +20,17 @@ require "droonga/error_messages"
 
 module Droonga
   module Plugins
+    # TODO: Implement it by superstep:
+    #  * Schema: Choose one slice in a replica.
+    #    Because all slices has the same schema.
+    #    (Should we add "select" type to Dataset#copmute_routes for the case?)
+    #  * Fact table: Choose all slices in a replica.
+    #    Because records for the fact table are distributed in all slices.
+    #    (Should we add "gather" type to Dataset#copmute_routes for the case?)
+    #  * Other tables: Choose one slice in a replica.
+    #    Because all slices has all records for other tables.
+    #    (Should we add "select" type to Dataset#copmute_routes for the case?)
+
     module Dump
       extend Plugin
       register("dump")
