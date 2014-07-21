@@ -66,7 +66,7 @@ module Droonga
           next
         end
 
-        chunk_loader = ChunkLoader.new(path)
+        chunk_loader = BufferedTCPSocket::ChunkLoader.new(path)
         unless chunk_loader.have_any_chunk?
           FileUtils.rm_rf(path.to_s)
           next
