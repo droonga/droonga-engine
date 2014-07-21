@@ -24,8 +24,9 @@ module Droonga
   class Forwarder
     include Loggable
 
-    def initialize(loop)
+    def initialize(loop, options={})
       @loop = loop
+      @buffering = options[:buffering]
       @senders = {}
     end
 
@@ -131,7 +132,10 @@ module Droonga
     end
 
     def create_sender(host, port)
-      sender = FluentMessageSender.new(@loop, host, port)
+      options = {
+        :buffering => @buffering,
+      }
+      sender = FluentMessageSender.new(@loop, host, port, options)
       sender.start
       sender
     end

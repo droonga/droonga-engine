@@ -29,11 +29,12 @@ module Droonga
   class FluentMessageSender
     include Loggable
 
-    def initialize(loop, host, port)
+    def initialize(loop, host, port, options={})
       @loop = loop
       @host = host
       @port = port
       @socket = nil
+      @buffering = options[:buffering]
     end
 
     def start
@@ -56,6 +57,7 @@ module Droonga
     end
 
     def resume
+      return unless @buffering
       connect unless connected?
       @socket.resume
     end
@@ -82,9 +84,13 @@ module Droonga
         @socket = nil
       end
 
-      data_directory = Path.buffer + "#{@host}:#{@port}"
-      FileUtils.mkdir_p(data_directory.to_s)
-      @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
+      if @buffering
+        data_directory = Path.buffer + "#{@host}:#{@port}"
+        FileUtils.mkdir_p(data_directory.to_s)
+        @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
+      else
+        @socket = Coolio::TCPSocket.connect(@host, @port)
+      end
       @socket.on_write_complete do
         log_write_complete.call
       end
