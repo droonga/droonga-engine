@@ -151,12 +151,6 @@ module Droonga
         @receiver.start
       end
 
-      def shutdown_receiver
-        return if @receiver.nil?
-        @receiver, receiver = nil, @receiver
-        receiver.shutdown
-      end
-
       def run_worker_process_agent
         input = IO.new(@control_read_fd)
         @control_read_fd = nil
@@ -211,7 +205,7 @@ module Droonga
       def stop_gracefully
         return if @stopping
         @stopping = true
-        shutdown_receiver
+        @receiver.stop_gracefully
         @engine.stop_gracefully do
           shutdown_worker_process_agent
           shutdown_internal_message_receiver
@@ -221,7 +215,7 @@ module Droonga
       # It may be called after stop_gracefully.
       def stop_immediately
         shutdown_worker_process_agent
-        shutdown_receiver if @receiver
+        @receiver.stop_immediately
         shutdown_internal_message_receiver
         @engine.stop_immediately
         @loop.stop

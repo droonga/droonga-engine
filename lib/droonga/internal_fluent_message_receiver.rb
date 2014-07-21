@@ -87,9 +87,10 @@ module Droonga
       logger.trace("start_heartbeat_socket: done")
     end
 
+    # TODO: Use stop_gracefully/stop_immediately interface
     def shutdown_message_receiver
       logger.trace("shutdown_message_receiver: start")
-      @message_receiver.shutdown
+      @message_receiver.stop_immediately
       logger.trace("shutdown_message_receiver: done")
     end
 

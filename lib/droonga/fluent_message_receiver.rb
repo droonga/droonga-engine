@@ -40,12 +40,18 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
-      shutdown_server
-      shutdown_clients
+    def stop_gracefully
+      logger.trace("stop_gracefully: start")
       shutdown_heartbeat_receiver
-      logger.trace("shutdown: done")
+      shutdown_server
+      logger.trace("stop_gracefully: done")
+    end
+
+    def stop_immediately
+      logger.trace("stop_immediately: start")
+      stop_gracefully
+      shutdown_clients
+      logger.trace("stop_immediately: done")
     end
 
     private
