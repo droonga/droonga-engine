@@ -257,7 +257,7 @@ module Droonga
 
           trap_signals
           @loop.run
-          @serf.shutdown if @serf.running?
+          @serf.stop if @serf.running?
 
           @service_runner.success?
         end
@@ -299,7 +299,7 @@ module Droonga
         def stop_gracefully
           @loop_breaker.signal
           @loop_breaker.detach
-          @serf.shutdown
+          @serf.stop
           @serf_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_gracefully
@@ -308,7 +308,7 @@ module Droonga
         def stop_immediately
           @loop_breaker.signal
           @loop_breaker.detach
-          @serf.shutdown
+          @serf.stop
           @serf_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_immediately
@@ -348,7 +348,7 @@ module Droonga
         end
 
         def restart_serf
-          @serf.shutdown if @serf
+          @serf.stop if @serf
           @serf = run_serf
         end
 

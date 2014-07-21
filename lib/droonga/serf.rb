@@ -99,12 +99,12 @@ module Droonga
       @agent and @agent.running?
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
-      run("leave").shutdown
-      @agent.shutdown
+    def stop
+      logger.trace("stop: start")
+      run("leave").stop
+      @agent.stop
       @agent = nil
-      logger.trace("shutdown: done")
+      logger.trace("stop: done")
     end
 
     def send_event(event, payload)
@@ -229,7 +229,7 @@ module Droonga
         end
       end
 
-      def shutdown
+      def stop
         return if @pid.nil?
         Process.waitpid(@pid)
         @output_io.close
