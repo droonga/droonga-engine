@@ -252,8 +252,7 @@ module Droonga
           @service_runner = run_service
           setup_initial_on_ready
           @catalog_observer = run_catalog_observer
-          @loop_breaker = Coolio::AsyncWatcher.new
-          @loop.attach(@loop_breaker)
+          @command_runner = run_command_runner
 
           trap_signals
           @loop.run
@@ -274,22 +273,22 @@ module Droonga
 
         def trap_signals
           trap(:TERM) do
-            stop_gracefully
+            @command_runner.push_command(:stop_gracefully)
             trap(:TERM, "DEFAULT")
           end
           trap(:INT) do
-            stop_immediately
+            @command_runner.push_command(:stop_immediately)
             trap(:INT, "DEFAULT")
           end
           trap(:QUIT) do
-            stop_immediately
+            @command_runner.push_cmmand(:stop_immediately)
             trap(:QUIT, "DEFAULT")
           end
           trap(:USR1) do
-            restart_graceful
+            @command_runner.push_command(:restart_graceful)
           end
           trap(:HUP) do
-            restart_immediately
+            @command_runner.push_command(:restart_immediately)
           end
           trap(:USR2) do
             Sigdump.dump
@@ -297,8 +296,7 @@ module Droonga
         end
 
         def stop_gracefully
-          @loop_breaker.signal
-          @loop_breaker.detach
+          @command_runner.stop
           @serf.stop
           @serf_status_observer.stop
           @catalog_observer.stop
@@ -306,8 +304,7 @@ module Droonga
         end
 
         def stop_immediately
-          @loop_breaker.signal
-          @loop_breaker.detach
+          @command_runner.stop
           @serf.stop
           @serf_status_observer.stop
           @catalog_observer.stop
@@ -368,6 +365,15 @@ module Droonga
           end
           catalog_observer.start
           catalog_observer
+        end
+
+        def run_command_runner
+          command_runner = CommandRunner.new(@loop)
+          command_runner.on_command = lambda do |command|
+            __send__(command)
+          end
+          command_runner.start
+          command_runner
         end
       end
 
@@ -455,6 +461,44 @@ module Droonga
           @success = status.success?
           @supervisor.stop
           on_failure unless success?
+        end
+      end
+
+      class CommandRunner
+        attr_writer :on_command
+        def initialize(loop)
+          @loop = loop
+          @commands = []
+          @on_command = nil
+        end
+
+        def start
+          @async_watcher = Coolio::AsyncWatcher.new
+          on_signal = lambda do
+            commands = @commands.uniq
+            @commands.clear
+            until commands.empty?
+              command = commands.shift
+              @on_command.call(command) if @on_command
+            end
+          end
+          @async_watcher.on_signal do
+            on_signal.call
+          end
+          @loop.attach(@async_watcher)
+        end
+
+        def stop
+          return if @async_watcher.nil?
+          @async_watcher.detach
+          @async_watcher = nil
+        end
+
+        def push_command(command)
+          return if @async_watcher.nil?
+          first_command_p = @commands.empty?
+          @commands << command
+          @async_watcher.signal if first_command_p
         end
       end
     end
