@@ -18,6 +18,7 @@
 require "droonga/loggable"
 require "droonga/path"
 require "droonga/event_loop"
+require "droonga/buffered_tcp_socket"
 require "droonga/fluent_message_sender"
 
 module Droonga
@@ -57,15 +58,17 @@ module Droonga
       return unless Path.buffer.exist?
       Pathname.glob("#{Path.buffer}/*") do |path|
         next unless path.directory?
-        if Pathname.glob("#{path.to_s}/*").empty?
-          FileUtils.rm_rf(path.to_s)
-          next
-        end
 
         destination = path.basename.to_s
         sender = @senders[destination]
         if sender
           sender.resume
+          next
+        end
+
+        chunk_loader = ChunkLoader.new(path)
+        unless chunk_loader.have_any_chunk?
+          FileUtils.rm_rf(path.to_s)
           next
         end
 

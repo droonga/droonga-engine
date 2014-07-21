@@ -77,16 +77,38 @@ module Droonga
     private
     def load_chunks
       FileUtils.mkdir_p(@data_directory.to_s)
-      Pathname.glob("#{@data_directory}/*.chunk").collect do |chunk_path|
-        Chunk.load(chunk_path)
-      end
+      chunk_loader = ChunkLoader.new(@data_directory)
+      chunk_loader.load
     end
 
     def log_tag
       "[#{Process.ppid}] buffered-tcp-socket"
     end
 
+    class ChunkLoader
+      def initialize(path)
+        @path = path
+      end
+
+      def have_any_chunk?
+        @path.opendir do |dir|
+          dir.each do |entry|
+            return true if entry.end_with?(Chunk::SUFFIX)
+          end
+        end
+        false
+      end
+
+      def load
+        Pathname.glob("#{@path}/*#{Chunk::SUFFIX}").collect do |chunk_path|
+          Chunk.load(chunk_path)
+        end
+      end
+    end
+
     class Chunk
+      SUFFIX = ".chunk"
+
       class << self
         def load(path)
           data_directory = path.dirname
