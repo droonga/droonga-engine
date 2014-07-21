@@ -18,7 +18,7 @@
 require "fileutils"
 require "thread"
 
-require "cool.io"
+require "coolio"
 
 require "droonga/message-pack-packer"
 
