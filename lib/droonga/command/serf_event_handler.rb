@@ -120,8 +120,10 @@ module Droonga
 
         source_host = source_node.split(":").first
 
-        fetch_port = @payload["fetch_port"]
-        catalog = fetch_catalog(source_node, fetch_port)
+        # fetch_port = @payload["fetch_port"]
+        # catalog = fetch_catalog(source_node, fetch_port)
+        catalog = JSON.parse(Path.catalog.read) #XXX workaround until "fetch" become available
+
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||
                     generator.dataset_for_host(host)
