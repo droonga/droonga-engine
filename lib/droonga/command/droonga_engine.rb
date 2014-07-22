@@ -244,6 +244,8 @@ module Droonga
         def initialize(configuration)
           @configuration = configuration
           @loop = Coolio::Loop.default
+          @loop_breaker = Coolio::AsyncWatcher.new
+          @loop_breaker.attach(@loop)
         end
 
         def run
