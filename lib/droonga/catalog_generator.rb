@@ -180,11 +180,11 @@ module Droonga
       def load(catalog_replicas)
         dataset = Catalog::Dataset.new("temporary",
                                        "replicas" => catalog_replicas)
+        @hosts = dataset.replicas.collect do |replica|
+          replica.slices.first.volume.address.host
+        end
         collection_volume = dataset.replicas.first
         slices = collection_volume.slices
-        @hosts = slices.collect do |slice|
-          slice.volume.address.host
-        end
         @n_slices = slices.size
         single_volume_address = slices.first.volume.address
         @port = single_volume_address.port
