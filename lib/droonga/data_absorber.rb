@@ -39,9 +39,9 @@ module Droonga
         drndump_command_line = [drndump] + drndump_options
         client_command_line = [client] + client_options
 
-        Open3.popen3(*drndump_command_line) do |dump_in, dump_out, dump_error, dump_thread|
+        Open3.popen3(*drndump_command_line, :pgroup => true) do |dump_in, dump_out, dump_error, dump_thread|
           dump_in.close
-          Open3.popen3(*client_command_line) do |client_in, client_out, client_error, client_thread|
+          Open3.popen3(*client_command_line, :pgroup => true) do |client_in, client_out, client_error, client_thread|
             client_out.close
             dump_out.each do |dump|
               yield dump if block_given?
