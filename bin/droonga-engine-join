@@ -124,13 +124,15 @@ def run_remote_command(target, command, options)
   puts result[:error] unless result[:error].empty?
 end
 
-
+=begin
+XXX disable fetching until it become working
 puts "Preparing to fetch cluster information..."
 publish_port = 10032 + rand(10000)
 run_remote_command(options.source_node, "publish_catalog",
                    "node" => options.source_node,
                    "port" => publish_port)
 sleep(3) # wait until the HTTP server becomes ready
+=end
 
 puts "Joining new replica to the cluster..."
 run_remote_command(options.joining_node, "join",
@@ -145,9 +147,12 @@ run_remote_command(options.source_node, "add_replicas",
                    "dataset" => options.dataset,
                    "hosts"   => [options.joining_host])
 
+=begin
+XXX disable fetching until it become working
 run_remote_command(options.source_node, "unpublish_catalog",
                    "node" => options.source_node,
                    "port" => publish_port)
+=end
 
 puts "Done."
 
