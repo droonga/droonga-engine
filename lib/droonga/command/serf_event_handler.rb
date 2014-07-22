@@ -208,8 +208,9 @@ module Droonga
 
         published_dir = Path.published(port)
         pid_file = published_dir + ".pid"
+        pid = pid_file.read.to_i
 
-        Process.kill("INT", pid_file.read.to_i)
+        Process.kill("INT", pid)
       end
 
       def set_replicas
