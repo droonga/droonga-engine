@@ -139,7 +139,7 @@ run_remote_command(options.joining_node, "join",
                    "node"   => options.joining_node,
                    "type"   => "replica",
                    "source" => options.source_node,
-                   "fetch_port" => publish_port,
+#                   "fetch_port" => publish_port,
                    "copy"   => options.copy)
 
 puts "Update existing hosts in the cluster..."
