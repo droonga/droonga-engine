@@ -62,10 +62,6 @@ module Droonga
         load_status[key]
       end
 
-      def send_event(name, event, payload)
-        new(nil, name).send_event(event, payload)
-      end
-
       def send_query(name, query, payload)
         new(nil, name).send_query(query, payload)
       end
@@ -113,18 +109,6 @@ module Droonga
       @agent.stop
       @agent = nil
       logger.trace("stop: done")
-    end
-
-    def send_event(event, payload)
-      ensure_serf
-      options = ["-format", "json"] + additional_options_from_payload(payload)
-      options += [event, JSON.generate(payload)]
-      result = run_once("event", *options)
-      if payload["node"]
-        responses = result[:result]["Responses"]
-        result[:response] = responses[payload["node"]]
-      end
-      result
     end
 
     def send_query(query, payload)
