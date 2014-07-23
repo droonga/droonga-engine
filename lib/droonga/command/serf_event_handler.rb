@@ -323,7 +323,7 @@ module Droonga
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag)
-        save_delete(:absorbing)
+        delete_status(:absorbing)
       end
 
       def live_nodes
