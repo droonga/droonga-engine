@@ -39,14 +39,11 @@ module Droonga
         drndump_command_line = [drndump] + drndump_options
         client_command_line = [client] + client_options
 
-        Open3.popen3(*drndump_command_line, :pgroup => true) do |dump_in, dump_out, dump_error, dump_thread|
-          dump_in.close
-          Open3.popen3(*client_command_line, :pgroup => true) do |client_in, client_out, client_error, client_thread|
-            client_out.close
-            dump_out.each do |part|
-              yield part if block_given?
-              client_in.puts(part)
-            end
+        env = {}
+        Open3.pipeline_r([env, *drndump_command_line],
+                         [env, *client_command_line]) do |last_stdout, thread|
+          last_stdout.each do |output|
+            yield output if block_given?
           end
         end
       end

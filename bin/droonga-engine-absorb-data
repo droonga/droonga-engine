@@ -101,7 +101,9 @@ else
                                :source_host      => options.source_host,
                                :destination_host => options.destination_host,
                                :port             => options.port,
-                               :tag              => options.tag)
+                               :tag              => options.tag) do |output|
+    puts output
+  end
 end
 puts "Done."
 
