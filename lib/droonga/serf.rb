@@ -118,7 +118,8 @@ module Droonga
       result = run_once("query", *options)
       if payload["node"]
         responses = result[:result]["Responses"]
-        result[:response] = responses[payload["node"]]
+        response = responses[payload["node"]]
+        result[:response] = JSON.parse(response)
       end
       result
     end
