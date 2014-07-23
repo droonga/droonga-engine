@@ -82,6 +82,8 @@ module Droonga
         case @event_sub_name
         when "change_role"
           save_status(:role, @payload["role"])
+        when "report_status"
+          report_status
         when "join"
           join
         when "set_replicas"
@@ -112,6 +114,10 @@ module Droonga
         return nil unless hosts
         hosts = [hosts] if hosts.is_a?(String)
         hosts
+      end
+
+      def report_status
+        puts status(@payload["key"])
       end
 
       def join
@@ -160,13 +166,13 @@ module Droonga
           end
           sleep(1) # wait for restart
 
-          Serf.set_tag(@serf_name, "absorbing", "true")
+          save_status("absorbing", true)
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag)
-          Serf.delete_tag(@serf_name, "absorbing")
+          delete_status("absorbing")
           sleep(1)
         end
 
@@ -311,13 +317,13 @@ module Droonga
         log("port    = #{port}")
         log("tag     = #{tag}")
 
-        Serf.set_tag(@serf_name, "absorbing", "true")
+        save_status("absorbing", true)
         DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag)
-        Serf.delete_tag(@serf_name, "absorbing")
+        save_delete("absorbing")
       end
 
       def live_nodes
@@ -331,9 +337,19 @@ module Droonga
         SafeFileWriter.write(path, file_contents)
       end
 
+      def status(key)
+        Serf.status(key)
+      end
+
       def save_status(key, value)
         status = Serf.load_status
         status[key] = value
+        SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
+      end
+
+      def delete_status(key)
+        status = Serf.load_status
+        status.delete(key)
         SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
       end
 

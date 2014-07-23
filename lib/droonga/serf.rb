@@ -58,6 +58,10 @@ module Droonga
         {}
       end
 
+      def status(key)
+        load_status[key]
+      end
+
       def send_event(name, event, payload)
         new(nil, name).send_event(event, payload)
       end
@@ -68,19 +72,6 @@ module Droonga
 
       def live_nodes(name)
         new(nil, name).live_nodes
-      end
-
-      def set_tag(node_name, tag_name, value)
-        new(nil, name).set_tag(tag_name, value)
-      end
-
-      def delete_tag(node_name, tag_name)
-        new(nil, name).delete_tag(tag_name)
-      end
-
-      def tag(node_name, tag_name)
-        node_info = live_nodes(node_name)[node_name]
-        node_info["tags"][tag_name]
       end
     end
 
@@ -136,16 +127,6 @@ module Droonga
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
       run_once("query", *options)
-    end
-
-    def set_tag(name, value="")
-      ensure_serf
-      run_once("tags", "-set", "#{name}=#{value}")
-    end
-
-    def delete_tag(name)
-      ensure_serf
-      run_once("tags", "-delete", name)
     end
 
     def live_nodes
