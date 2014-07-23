@@ -66,7 +66,7 @@ module Droonga
         new(nil, name).send_query(query, payload)
       end
 
-      def live_nodes(name=nil)
+      def live_nodes(name)
         new(nil, name).live_nodes
       end
     end

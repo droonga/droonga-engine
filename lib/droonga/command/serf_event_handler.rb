@@ -321,7 +321,7 @@ module Droonga
       end
 
       def live_nodes
-        Serf.live_nodes
+        Serf.live_nodes(@serf_name)
       end
 
       def output_live_nodes
