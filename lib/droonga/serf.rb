@@ -109,13 +109,15 @@ module Droonga
 
     def send_event(event, payload)
       ensure_serf
-      options = ["-format", "json", event] + options_from_payload(payload)
+      options = ["-format", "json"] + additional_options_from_payload(payload)
+      options += [event, JSON.generate(payload)]
       run_once("event", *options)
     end
 
     def send_query(query, payload)
       ensure_serf
-      options = ["-format", "json", query] + options_from_payload(payload)
+      options = ["-format", "json"] + additional_options_from_payload(payload)
+      options += [query, JSON.generate(payload)]
       run_once("query", *options)
     end
 
@@ -155,10 +157,10 @@ module Droonga
       process.run_once
     end
 
-    def options_from_payload(payload)
-      options = [JSON.generate(payload)]
+    def additional_options_from_payload(payload)
+      options = []
       if payload.is_a?(Hash) and payload.include?("node")
-        options = ["-node", payload["node"]] + options
+        options += ["-node", payload["node"]]
       end
       options
     end
