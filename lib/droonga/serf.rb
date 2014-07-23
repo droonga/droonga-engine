@@ -119,7 +119,15 @@ module Droonga
       if payload["node"]
         responses = result[:result]["Responses"]
         response = responses[payload["node"]]
-        result[:response] = JSON.parse(response)
+        if response.is_a?(String)
+          begin
+            result[:response] = JSON.parse(response)
+          rescue JSON::ParserError
+            result[:response] = response
+          end
+        else
+          result[:response] = response
+        end
       end
       result
     end
