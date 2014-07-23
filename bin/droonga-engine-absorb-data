@@ -29,7 +29,7 @@ options = OpenStruct.new
 options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
 options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
 options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
-options.remote  = false
+options.remote  = true
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
