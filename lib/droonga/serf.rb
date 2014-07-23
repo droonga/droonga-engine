@@ -138,6 +138,16 @@ module Droonga
       run_once("query", *options)
     end
 
+    def set_tag(name, value="")
+      ensure_serf
+      run_once("tags", "-set", "#{name}=#{value}")
+    end
+
+    def delete_tag(name)
+      ensure_serf
+      run_once("tags", "-delete", name)
+    end
+
     def live_nodes
       ensure_serf
       nodes = {}
