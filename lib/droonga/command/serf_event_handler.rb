@@ -164,7 +164,7 @@ module Droonga
           modify_catalog do |modifier|
             modifier.datasets[dataset_name].replicas.hosts = [host]
           end
-          sleep(1) # wait for restart
+          sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
 
           save_status(:absorbing, true)
           DataAbsorber.absorb(:dataset          => dataset_name,
