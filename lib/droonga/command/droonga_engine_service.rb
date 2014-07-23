@@ -113,9 +113,9 @@ module Droonga
         @loop = Coolio::Loop.default
 
         run_internal_message_receiver
+        run_worker_process_agent
         run_engine
         run_receiver
-        run_worker_process_agent
         @loop.run
       end
 
