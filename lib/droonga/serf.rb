@@ -70,6 +70,14 @@ module Droonga
         new(nil, name).live_nodes
       end
 
+      def set_tag(node_name, tag_name, value)
+        new(nil, name).set_tag(tag_name, value)
+      end
+
+      def delete_tag(node_name, tag_name)
+        new(nil, name).delete_tag(tag_name)
+      end
+
       def tag(node_name, tag_name)
         node_info = live_nodes(node_name)[node_name]
         node_info["tags"][tag_name]
