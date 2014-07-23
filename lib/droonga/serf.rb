@@ -119,14 +119,24 @@ module Droonga
       ensure_serf
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [event, JSON.generate(payload)]
-      run_once("event", *options)
+      result = run_once("event", *options)
+      if payload["node"]
+        responses = result[:result]["Responses"]
+        result[:response] = responses[payload["node"]]
+      end
+      result
     end
 
     def send_query(query, payload)
       ensure_serf
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
-      run_once("query", *options)
+      result = run_once("query", *options)
+      if payload["node"]
+        responses = result[:result]["Responses"]
+        result[:response] = responses[payload["node"]]
+      end
+      result
     end
 
     def live_nodes
