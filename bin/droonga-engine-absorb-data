@@ -99,6 +99,9 @@ if options.remote
                      "port"    => options.port,
                      "tag"     => options.tag,
                      "dataset" => options.dataset)
+  begin
+    sleep(3)
+  end while Droonga::Serf.tag(destination_node, "absorbing") == "true"
 else
   Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
                                :source_host      => options.source_host,
