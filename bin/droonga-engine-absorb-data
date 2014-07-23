@@ -82,6 +82,7 @@ def run_remote_command(target, command, options)
   result = Droonga::Serf.send_query(target, command, options)
   puts result[:result]
   puts result[:error] unless result[:error].empty?
+  result[:result]
 end
 
 puts "Start to absorb data from #{options.source_host}"
@@ -99,9 +100,15 @@ if options.remote
                      "port"    => options.port,
                      "tag"     => options.tag,
                      "dataset" => options.dataset)
-  begin
+  while true
     sleep(3)
-  end while Droonga::Serf.tag(destination_node, "absorbing") == "true"
+    result = run_remote_command(destination_node, "report_status",
+                                "node" => destination_node,
+                                "key" => "absorbing")
+    response = result["Responses"][destination_node]
+    absorbing = JSON.parse(response)["value"]
+    break unless absorbing
+  end
 else
   Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
                                :source_host      => options.source_host,
