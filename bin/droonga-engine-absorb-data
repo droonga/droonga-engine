@@ -97,16 +97,11 @@ else
   puts "dataset = #{options.dataset}"
   puts "port    = #{options.port}"
   puts "tag     = #{options.tag}"
-  count = 0
   Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
                                :source_host      => options.source_host,
                                :destination_host => options.destination_host,
                                :port             => options.port,
-                               :tag              => options.tag) do |dump|
-    count += 1
-    puts dump
-  end
-  puts "#{count} dump messages are successfully processed."
+                               :tag              => options.tag)
 end
 puts "Done."
 

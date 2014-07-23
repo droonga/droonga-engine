@@ -43,9 +43,9 @@ module Droonga
           dump_in.close
           Open3.popen3(*client_command_line, :pgroup => true) do |client_in, client_out, client_error, client_thread|
             client_out.close
-            dump_out.each do |dump|
-              yield dump if block_given?
-              client_in.puts(dump)
+            dump_out.each do |part|
+              yield part if block_given?
+              client_in.puts(part)
             end
           end
         end
