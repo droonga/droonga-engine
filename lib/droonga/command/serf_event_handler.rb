@@ -149,11 +149,15 @@ module Droonga
           end
           sleep(1) # wait for restart
 
+          count = 0
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
-                              :tag              => tag)
+                              :tag              => tag) do |dump|
+            count += 1
+          end
+          puts "#{count} dump messages are successfully processed."
           sleep(1)
         end
 
@@ -298,11 +302,15 @@ module Droonga
         puts "port    = #{port}"
         puts "tag     = #{tag}"
 
+        count = 0
         DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
-                            :tag              => tag)
+                            :tag              => tag) do |dump|
+          count += 1
+        end
+        puts "#{count} dump messages are successfully processed."
       end
 
       def live_nodes
