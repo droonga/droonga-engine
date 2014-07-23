@@ -115,7 +115,7 @@ module Droonga
 
     def send_query(query, payload)
       ensure_serf
-      options = ["-format", "json", event] + options_from_payload(payload)
+      options = ["-format", "json", query] + options_from_payload(payload)
       run_once("query", *options)
     end
 
