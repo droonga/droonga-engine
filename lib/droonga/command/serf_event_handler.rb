@@ -66,6 +66,8 @@ module Droonga
           @event_sub_name = ENV["SERF_QUERY_NAME"]
           @payload = JSON.parse($stdin.gets)
           log("event sub name = #{@event_sub_name}")
+        when "member-join", "member-leave", "member-update", "member-reap"
+          output_live_nodes
         end
       end
 
