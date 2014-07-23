@@ -65,6 +65,10 @@ module Droonga
       def send_query(name, query, payload)
         new(nil, name).send_query(query, payload)
       end
+
+      def live_nodes(name=nil)
+        new(nil, name).live_nodes
+      end
     end
 
     include Loggable
@@ -119,6 +123,21 @@ module Droonga
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
       run_once("query", *options)
+    end
+
+    def live_nodes
+      nodes = {}
+      result= run_once("members", "-format", "json")
+      members = result[:result]
+      members["members"].each do |member|
+        if member["status"] == "alive"
+          nodes[member["name"]] = {
+            "serfAddress" => member["addr"],
+            "tags"        => member["tags"],
+          }
+        end
+      end
+      nodes
     end
 
     private
