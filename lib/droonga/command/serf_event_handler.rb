@@ -158,11 +158,13 @@ module Droonga
           end
           sleep(1) # wait for restart
 
+          Serf.set_tag("absorbing", "true")
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag)
+          Serf.delete_tag("absorbing")
           sleep(1)
         end
 
@@ -307,11 +309,13 @@ module Droonga
         log("port    = #{port}")
         log("tag     = #{tag}")
 
+        Serf.set_tag("absorbing", "true")
         DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag)
+        Serf.delete_tag("absorbing")
       end
 
       def live_nodes
