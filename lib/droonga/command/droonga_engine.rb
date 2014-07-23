@@ -312,7 +312,6 @@ module Droonga
         end
 
         def restart_graceful
-          @loop_breaker.signal
           old_service_runner = @service_runner
           @service_runner = run_service
           @service_runner.on_ready = lambda do
@@ -326,7 +325,6 @@ module Droonga
         end
 
         def restart_immediately
-          @loop_breaker.signal
           old_service_runner = @service_runner
           @service_runner = run_service
           old_service_runner.stop_immediately
