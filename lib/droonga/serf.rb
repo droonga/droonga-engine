@@ -253,7 +253,7 @@ module Droonga
       end
 
       def run_once
-        stdout, stderror, status = Open3.capture3(@serf, @command, *@options)
+        stdout, stderror, status = Open3.capture3(@serf, @command, *@options, :pgroup => true)
         {
           :result => JSON.parse(stdout),
           :error  => stderror,
