@@ -109,12 +109,14 @@ module Droonga
 
     def send_event(event, payload)
       ensure_serf
-      run_once("event", event, JSON.generate(payload))
+      options = ["-format", "json"] + options_from_payload(payload)
+      run_once("event", event, *options)
     end
 
     def send_query(query, payload)
       ensure_serf
-      run_once("query", query, JSON.generate(payload))
+      options = ["-format", "json"] + options_from_payload(payload)
+      run_once("query", query, *options)
     end
 
     private
@@ -149,9 +151,16 @@ module Droonga
     def run_once(command, *options)
       process = SerfProcess.new(@loop, @serf, command,
                                 "-rpc-addr", rpc_address,
-                                "-format", "json",
                                 *options)
       process.run_once
+    end
+
+    def options_from_payload(payload)
+      options = [JSON.generate(payload)]
+      if payload.is_a?(Hash) and payload.include?("node")
+        options = ["-node", payload["node"]] + options
+      end
+      options
     end
 
     def extract_host(node_name)
