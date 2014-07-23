@@ -34,17 +34,22 @@ module Droonga
         @serf = ENV["SERF"] || Serf.path
         @serf_rpc_address = ENV["SERF_RPC_ADDRESS"] || "127.0.0.1:7373"
         @serf_name = ENV["SERF_SELF_NAME"]
+        @response = {
+          "log" => []
+        }
       end
 
       def run
         parse_event
         unless event_for_me?
-          puts " => ignoring event not for me"
+          log(" => ignoring event not for me")
+          output_response
           return true
         end
 
         process_event
         output_live_nodes
+        output_response
         true
       end
 
@@ -56,11 +61,11 @@ module Droonga
         when "user"
           @event_sub_name = ENV["SERF_USER_EVENT"]
           @payload = JSON.parse($stdin.gets)
-          puts "event sub name = #{@event_sub_name}"
+          log("event sub name = #{@event_sub_name}")
         when "query"
           @event_sub_name = ENV["SERF_QUERY_NAME"]
           @payload = JSON.parse($stdin.gets)
-          puts "event sub name = #{@event_sub_name}"
+          log("event sub name = #{@event_sub_name}")
         end
       end
 
@@ -92,6 +97,10 @@ module Droonga
         end
       end
 
+      def output_response
+        puts JSON.generate(@response)
+      end
+
       def host
         @serf_name.split(":").first
       end
@@ -105,7 +114,7 @@ module Droonga
 
       def join
         type = @payload["type"]
-        puts "type = #{type}"
+        log("type = #{type}")
         case type
         when "replica"
           join_as_replica
@@ -116,7 +125,7 @@ module Droonga
         source_node = @payload["source"]
         return unless source_node
 
-        puts "source_node  = #{source_node}"
+        log("source_node  = #{source_node}")
 
         source_host = source_node.split(":").first
 
@@ -137,12 +146,12 @@ module Droonga
         port         = dataset.replicas.port
         other_hosts  = dataset.replicas.hosts
 
-        puts "dataset = #{dataset_name}"
-        puts "port    = #{port}"
-        puts "tag     = #{tag}"
+        log("dataset = #{dataset_name}")
+        log("port    = #{port}")
+        log("tag     = #{tag}")
 
         if @payload["copy"]
-          puts "starting to copy data from #{source_host}"
+          log("starting to copy data from #{source_host}")
 
           modify_catalog do |modifier|
             modifier.datasets[dataset_name].replicas.hosts = [host]
@@ -157,11 +166,11 @@ module Droonga
                               :tag              => tag) do |dump|
             count += 1
           end
-          puts "#{count} dump messages are successfully processed."
+          log("#{count} dump messages are successfully processed")
           sleep(1)
         end
 
-        puts "joining to the cluster: update myself"
+        log("joining to the cluster: update myself")
 
         modify_catalog do |modifier|
           modifier.datasets[dataset_name].replicas.hosts += other_hosts
@@ -224,7 +233,7 @@ module Droonga
         hosts = given_hosts
         return unless hosts
 
-        puts "new replicas: #{hosts.join(",")}"
+        log("new replicas: #{hosts.join(",")}")
 
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts = hosts
@@ -241,7 +250,7 @@ module Droonga
         hosts -= [host]
         return if hosts.empty?
 
-        puts "adding replicas: #{hosts.join(",")}"
+        log("adding replicas: #{hosts.join(",")}")
 
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts += hosts
@@ -256,7 +265,7 @@ module Droonga
         hosts = given_hosts
         return unless hosts
 
-        puts "removing replicas: #{hosts.join(",")}"
+        log("removing replicas: #{hosts.join(",")}")
 
         modify_catalog do |modifier|
           modifier.datasets[dataset].replicas.hosts -= hosts
@@ -279,7 +288,7 @@ module Droonga
         source = @payload["source"]
         return unless source
 
-        puts "start to absorb data from #{source}"
+        log("start to absorb data from #{source}")
 
         dataset_name = @payload["dataset"]
         port         = @payload["port"]
@@ -298,9 +307,9 @@ module Droonga
           tag  = dataset.replicas.tag
         end
 
-        puts "dataset = #{dataset_name}"
-        puts "port    = #{port}"
-        puts "tag     = #{tag}"
+        log("dataset = #{dataset_name}")
+        log("port    = #{port}")
+        log("tag     = #{tag}")
 
         count = 0
         DataAbsorber.absorb(:dataset          => dataset_name,
@@ -310,7 +319,7 @@ module Droonga
                             :tag              => tag) do |dump|
           count += 1
         end
-        puts "#{count} dump messages are successfully processed."
+        log("#{count} dump messages are successfully processed")
       end
 
       def live_nodes
@@ -338,6 +347,10 @@ module Droonga
         status = Serf.load_status
         status[key] = value
         SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
+      end
+
+      def log(message)
+        @response["log"] << message
       end
     end
   end
