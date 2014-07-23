@@ -117,7 +117,7 @@ module Droonga
       end
 
       def report_status
-        puts status(@payload["key"])
+        @response["value"] = status(@payload["key"].to_sym)
       end
 
       def join
@@ -166,13 +166,13 @@ module Droonga
           end
           sleep(1) # wait for restart
 
-          save_status("absorbing", true)
+          save_status(:absorbing, true)
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag)
-          delete_status("absorbing")
+          delete_status(:absorbing)
           sleep(1)
         end
 
@@ -317,13 +317,13 @@ module Droonga
         log("port    = #{port}")
         log("tag     = #{tag}")
 
-        save_status("absorbing", true)
+        save_status(:absorbing, true)
         DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag)
-        save_delete("absorbing")
+        save_delete(:absorbing)
       end
 
       def live_nodes
