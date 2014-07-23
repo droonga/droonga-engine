@@ -69,6 +69,11 @@ module Droonga
       def live_nodes(name)
         new(nil, name).live_nodes
       end
+
+      def tag(node_name, tag_name)
+        node_info = live_nodes(node_name)[node_name]
+        node_info["tags"][tag_name]
+      end
     end
 
     include Loggable
