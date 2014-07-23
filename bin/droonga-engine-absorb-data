@@ -21,12 +21,15 @@ require "open3"
 
 require "droonga/engine/version"
 require "droonga/catalog_generator"
+require "droonga/path"
+require "droonga/data_absorber"
 require "droonga/serf"
 
 options = OpenStruct.new
 options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
 options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
 options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
+options.remote  = true
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
@@ -44,6 +47,11 @@ parser.on("--port=PORT", Integer,
           "Port number of the source cluster to be connected.",
           "(#{options.port})") do |port|
   options.port = port
+end
+parser.on("--[no-]remote",
+          "Run command in remote node or not.",
+          "(#{options.remote})") do |remote|
+  options.remote = remote
 end
 
 parser.separator("")
@@ -78,12 +86,28 @@ end
 
 
 puts "Absorbing data..."
+if options.remote
 run_remote_command(destination_node, "absorb_data",
                    "node"    => destination_node,
                    "source"  => options.source_host,
                    "port"    => options.port,
                    "tag"     => options.tag,
                    "dataset" => options.dataset)
+else
+  puts "dataset = #{options.dataset}"
+  puts "port    = #{options.port}"
+  puts "tag     = #{options.tag}"
+  count = 0
+  Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
+                               :source_host      => options.source_host,
+                               :destination_host => options.destination_host,
+                               :port             => options.port,
+                               :tag              => options.tag) do |dump|
+    count += 1
+    puts dump
+  end
+  puts "#{count} dump messages are successfully processed."
+end
 puts "Done."
 
 exit(true)
