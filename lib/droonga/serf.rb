@@ -126,6 +126,7 @@ module Droonga
     end
 
     def live_nodes
+      ensure_serf
       nodes = {}
       result= run_once("members", "-format", "json")
       members = result[:result]
