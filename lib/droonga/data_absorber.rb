@@ -35,11 +35,20 @@ module Droonga
         #      processed.
         client = params[:client] || "droonga-request"
         client_options = []
-        client_options += ["--host", params[:destination_host]]
-        client_options += ["--port", params[:port].to_s] if params[:port]
-        client_options += ["--tag", params[:tag]] if params[:tag]
-        client_options += ["--receiver-host", params[:destination_host]]
-        client_options += ["--receiver-port", params[:receiver_port].to_s] if params[:receiver_port]
+        if client.include?("droonga-request")
+          client_options += ["--host", params[:destination_host]]
+          client_options += ["--port", params[:port].to_s] if params[:port]
+          client_options += ["--tag", params[:tag]] if params[:tag]
+          client_options += ["--receiver-host", params[:destination_host]]
+          client_options += ["--receiver-port", params[:receiver_port].to_s] if params[:receiver_port]
+        elsif client.include?("droonga-send")
+          server = "droonga:#{params[:destination_host]}"
+          server = "#{server}:#{params[:port].to_s}" if params[:port]
+          server = "#{server}/#{params[:tag].to_s}" if params[:tag]
+          client_options += ["--server", server]
+        else
+          raise ArgumentError.new("Unknwon type client: #{client}")
+        end
 
         drndump_command_line = [drndump] + drndump_options
         client_command_line = [client] + client_options

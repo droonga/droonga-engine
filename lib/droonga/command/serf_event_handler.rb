@@ -322,7 +322,8 @@ module Droonga
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
-                            :tag              => tag)
+                            :tag              => tag,
+                            :client           => "droonga-send")
         delete_status(:absorbing)
       end
 
