@@ -28,6 +28,11 @@ module Droonga
         drndump_options += ["--receiver-host", params[:destination_host]]
         drndump_options += ["--receiver-port", params[:receiver_port].to_s] if params[:receiver_port]
 
+        #TODO: We should use droonga-send instead of droonga-request,
+        #      because droonga-request is too slow.
+        #      However, to do it, we have to implement an API to know
+        #      that all messages sent by droonga-send are completely
+        #      processed.
         client = params[:client] || "droonga-request"
         client_options = []
         client_options += ["--host", params[:destination_host]]
