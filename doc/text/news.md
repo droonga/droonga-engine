@@ -1,5 +1,13 @@
 # News
 
+## 1.0.5: 2014-07-29
+
+ * Restarts server processes more gracefully.
+ * Works with search results with vector reference column values correctly.
+ * Messages forwarded to other nodes are always buffered for now.
+ * Works again for the case: `nWorkers` == `0`
+ * droonga-engine-join: Works correctly and safely for databases with much records.
+
 ## 1.0.4: 2014-06-29
 
  * New command (and plugin) [`status`](http://droonga.org/reference/1.0.4/commands/status/) is now available.
