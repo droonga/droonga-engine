@@ -1,6 +1,6 @@
 # News
 
-## 1.0.5: 2014-07-29 (planned)
+## 1.0.5: 2014-07-29
 
  * Restarts server processes more gracefully.
  * Works with search results with vector reference column values correctly.
