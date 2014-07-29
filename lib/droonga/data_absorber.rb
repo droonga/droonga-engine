@@ -42,6 +42,13 @@ module Droonga
           client_options += ["--receiver-host", params[:destination_host]]
           client_options += ["--receiver-port", params[:receiver_port].to_s] if params[:receiver_port]
         elsif client.include?("droonga-send")
+          #XXX Don't use round-robin with multiple endpoints
+          #    even if there are too much data.
+          #    Schema and indexes must be sent to just one endpoint
+          #    to keep their order, but currently there is no way to
+          #    extract only schema and indexes via drndump.
+          #    So, we always use just one endpoint for now,
+          #    even if there are too much data.
           server = "droonga:#{params[:destination_host]}"
           server = "#{server}:#{params[:port].to_s}" if params[:port]
           server = "#{server}/#{params[:tag].to_s}" if params[:tag]
