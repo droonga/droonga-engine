@@ -41,7 +41,7 @@ module Sandbox
       FileUtils.mkdir_p(@base_temporary_directory.to_s)
     end
 
-    @temporary_directory = @base_temporary_directory + "fluent-plugin-droonga"
+    @temporary_directory = @base_temporary_directory + "droonga-engine"
     FileUtils.rm_rf(@temporary_directory.to_s)
     FileUtils.mkdir_p(@temporary_directory.to_s)
   end
