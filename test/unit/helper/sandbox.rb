@@ -28,6 +28,8 @@ module Sandbox
 
     @database_path = @temporary_directory + "database"
     @database = nil
+
+    ENV[Droonga::Path::BASE_DIR_ENV_NAME] = @temporary_directory.to_s
   end
 
   def setup_temporary_directory
