@@ -130,16 +130,19 @@ module Droonga
       end
 
       def join_as_replica
-        source_node = @payload["source"]
-        return unless source_node
+        source_node, source_node_port, source_node_dataset = @payload["source"], @payload["port"], @payload["dataset"]
+        return unless [source_node, source_node_port, source_node_dataset].all?
 
         log("source_node  = #{source_node}")
 
         source_host = source_node.split(":").first
 
-        # fetch_port = @payload["fetch_port"]
-        # catalog = fetch_catalog(source_node, fetch_port)
-        catalog = JSON.parse(Path.catalog.read) #XXX workaround until "fetch" become available
+        Droonga::Client.new(:host => source_node, :port => source_node_port, :tag => "droonga", :protocol => :droonga, :timeout => 1, :exit_on_responce => true, :receiver_host => "localhost", :receiver_port => 0, :report_request => false, :report_elapsed_time => true) do |client|
+          client.request({"dataset": source_node_dataset , type: "catalog.fetch"}) do |responce|
+            File.write(Path.catalog, responce)
+            catalog = JSON.parse(responce)
+          end
+        end
 
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||
