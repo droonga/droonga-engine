@@ -20,6 +20,7 @@ require "droonga/serf"
 require "droonga/catalog_generator"
 require "droonga/data_absorber"
 require "droonga/safe_file_writer"
+require "droonga/client"
 
 module Droonga
   module Command
@@ -132,16 +133,19 @@ module Droonga
       def join_as_replica
         source_node, source_node_port, source_node_dataset = @payload["source"], @payload["port"], @payload["dataset"]
         return unless [source_node, source_node_port, source_node_dataset].all?
-
+        
         log("source_node  = #{source_node}")
-
         source_host = source_node.split(":").first
-
-        Droonga::Client.new(:host => source_node, :port => source_node_port, :tag => "droonga", :protocol => :droonga, :timeout => 1, :exit_on_responce => true, :receiver_host => "localhost", :receiver_port => 0, :report_request => false, :report_elapsed_time => true) do |client|
-          client.request({"dataset": source_node_dataset , type: "catalog.fetch"}) do |responce|
+       
+        catalog = nil
+        Droonga::Client.open(:host => source_host, :port => source_node_port, :tag => "droonga", :protocol => :droonga, :timeout => 1, :receiver_host => "localhost", :receiver_port => 0) do |client|
+          STDERR.puts "start request"
+          client.request({"dataset" => source_node_dataset , :type => "catalog.fetch"}) do |responce|
+            STDERR.puts "write catalog to #{Path.catalog}"
             File.write(Path.catalog, responce)
             catalog = JSON.parse(responce)
-          end
+          end.wait
+          STDERR.puts "finish request"
         end
 
         generator = create_current_catalog_generator(catalog)
