@@ -131,17 +131,17 @@ module Droonga
       end
 
       def join_as_replica
-        source_node = @payload["source"]
-        source_node_port = @payload["port"]
-        source_node_dataset =  @payload["dataset"]
-        joining_node = @payload["node"]
-        tag = @payload["tag"]
-        dataset = @payload["dataset"]
+        source_node         = @payload["source"]
+        source_node_port    = @payload["port"]
+        source_node_dataset = @payload["dataset"]
+        joining_node        = @payload["node"]
+        tag                 = @payload["tag"]
+        dataset             = @payload["dataset"]
         return unless [source_node, source_node_port, source_node_dataset, joining_node, dataset].all?
         
         log("source_node  = #{source_node}")
 
-        source_host = source_node.split(":").first
+        source_host  = source_node.split(":").first
         joining_host = joining_node.split(":").first
 
         catalog = nil
