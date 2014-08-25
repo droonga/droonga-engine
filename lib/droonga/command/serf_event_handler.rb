@@ -145,12 +145,15 @@ module Droonga
         joining_host = joining_node.split(":").first
 
         catalog = nil
-        Droonga::Client.open(:host => source_host, :port => source_node_port,
-                             :tag => tag, :protocol => :droonga, :timeout => 1, 
-                             :receiver_host => joining_host, 
+        Droonga::Client.open(:host          => source_host,
+                             :port          => source_node_port,
+                             :tag           => tag,
+                             :protocol      => :droonga,
+                             :timeout       => 1,
+                             :receiver_host => joining_host,
                              :receiver_port => 0) do |client|
           request = client.request(:dataset => source_node_dataset , 
-                                   :type => "catalog.fetch") do |responce|
+                                   :type    => "catalog.fetch") do |responce|
             File.write(Path.catalog, JSON.generate(responce["body"]))
             catalog = responce["body"]
           end
