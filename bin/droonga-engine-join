@@ -39,14 +39,6 @@ options.tag      = Droonga::CatalogGenerator::DEFAULT_TAG
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 
-=begin
-parser.on("--base-dir=PATH",
-         "Path to the base directory the catalog.json is located in.",
-          "(#{options.base_dir})") do |path|
-  options.base_dir = path
-end
-=end
-
 parser.on("--[no-]copy",
           "Do or don't copy data from the source cluster.",
           "(#{options.copy})") do |copy|
@@ -85,15 +77,6 @@ parser.parse!(ARGV)
 base_dir = Pathname(options.base_dir).expand_path
 ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
-=begin
-catalog_path = Droonga::Path.catalog
-unless catalog_path.exist?
-  raise "Cannot load 'catalog.json'. You must specify correct path " +
-          "to the base directory via --base-dir option."
-end
-source_catalog = JSON.parse(catalog_path.read)
-=end
-
 unless options.joining_host
   raise "You must specify the host name or the IP address of the node " +
           "to be joined via --host option."
@@ -102,23 +85,6 @@ unless options.replica_source_host
   raise "You must specify the host name or the IP address of a node " +
            "of an existing cluster via --replica-source-host option."
 end
-
-=begin
-generator = Droonga::CatalogGenerator.new
-generator.load(source_catalog)
-
-dataset = generator.dataset_for_host(options.replica_source_host)
-if dataset
-  if generator.dataset_for_host(options.joining_host)
-    raise "The joining node is already a member of the cluster. " +
-            "You cannot join a member twice."
-  end
-
-  options.dataset = dataset.name
-  options.tag     = dataset.replicas.tag
-  options.port    = dataset.replicas.port
-end
-=end
 
 options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
 options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
@@ -137,6 +103,7 @@ run_remote_command(options.joining_node, "join",
                    "source" => options.source_node,
                    "port" => options.port,
                    "dataset" => options.dataset,
+                   "tag" => options.tag,
                    "copy"   => options.copy)
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 

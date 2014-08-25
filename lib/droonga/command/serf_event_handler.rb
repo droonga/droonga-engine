@@ -135,16 +135,22 @@ module Droonga
         source_node_port = @payload["port"]
         source_node_dataset =  @payload["dataset"]
         joining_node = @payload["node"]
+        tag = @payload["tag"]
         dataset = @payload["dataset"]
         return unless [source_node, source_node_port, source_node_dataset, joining_node, dataset].all?
         
         log("source_node  = #{source_node}")
+
         source_host = source_node.split(":").first
-        
         joining_host = joining_node.split(":").first
+
         catalog = nil
-        Droonga::Client.open(:host => source_host, :port => source_node_port, :tag => "droonga", :protocol => :droonga, :timeout => 1, :receiver_host => joining_host, :receiver_port => 0) do |client|
-          request = client.request(:dataset => source_node_dataset , :type => "catalog.fetch") do |responce|
+        Droonga::Client.open(:host => source_host, :port => source_node_port,
+                             :tag => tag, :protocol => :droonga, :timeout => 1, 
+                             :receiver_host => joining_host, 
+                             :receiver_port => 0) do |client|
+          request = client.request(:dataset => source_node_dataset , 
+                                   :type => "catalog.fetch") do |responce|
             File.write(Path.catalog, JSON.generate(responce["body"]))
             catalog = responce["body"]
           end
