@@ -137,8 +137,15 @@ module Droonga
         joining_node        = @payload["node"]
         tag                 = @payload["tag"]
         dataset             = @payload["dataset"]
-        return unless [source_node, source_node_port, source_node_dataset, joining_node, dataset].all?
-        
+        required_params = [
+          source_node,
+          source_node_port,
+          source_node_dataset,
+          joining_node,
+          dataset,
+        ]
+        return unless required_params.all?
+
         log("source_node  = #{source_node}")
 
         source_host  = source_node.split(":").first
