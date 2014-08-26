@@ -40,6 +40,10 @@ class CatalogGeneratorTest < Test::Unit::TestCase
     end
   end
 
+  def default_plugins
+    ["groonga", "search", "crud", "dump", "system", "catalog"]
+  end
+
   def test_default
     catalog = {
       "version" => 2,
@@ -55,7 +59,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       @generator.add_dataset("Droonga", {})
       dataset = {
         "nWorkers" => 4,
-        "plugins" => ["groonga", "search", "crud", "dump", "system", "catalog"],
+        "plugins" => default_plugins,
         "schema" => {},
         "replicas" => [
           {
@@ -94,7 +98,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       def test_replicas
         dataset = {
           "nWorkers" => 4,
-          "plugins" => ["groonga", "search", "crud", "dump", "system", "catalog"],
+          "plugins" => default_plugins,
           "schema" => [],
           "replicas" => [
             {
@@ -141,7 +145,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       @generator.add_dataset("Droonga", :replicas => replicas)
       dataset = {
         "nWorkers" => 4,
-        "plugins" => ["groonga", "search", "crud", "dump", "system", "catalog"],
+        "plugins" => default_plugins,
         "schema" => {},
         "replicas" => replicas,
       }
