@@ -94,7 +94,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       def test_replicas
         dataset = {
           "nWorkers" => 4,
-          "plugins" => ["groonga", "search", "crud", "dump", "system"],
+          "plugins" => ["groonga", "search", "crud", "dump", "system", "catalog"],
           "schema" => [],
           "replicas" => [
             {
