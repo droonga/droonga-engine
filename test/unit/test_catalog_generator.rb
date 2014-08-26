@@ -141,7 +141,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
       @generator.add_dataset("Droonga", :replicas => replicas)
       dataset = {
         "nWorkers" => 4,
-        "plugins" => ["groonga", "search", "crud", "dump", "system"],
+        "plugins" => ["groonga", "search", "crud", "dump", "system", "catalog"],
         "schema" => {},
         "replicas" => replicas,
       }
