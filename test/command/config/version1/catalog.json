@@ -11,7 +11,7 @@
   "datasets": {
     "Default": {
       "workers": 2,
-      "plugins": ["groonga", "crud", "search", "dump", "system"],
+      "plugins": ["groonga", "crud", "search", "dump", "system", "catalog"],
       "number_of_replicas": 2,
       "number_of_partitions": 2,
       "partition_key": "_key",
