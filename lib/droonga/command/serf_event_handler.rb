@@ -18,9 +18,9 @@ require "json"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/catalog_generator"
+require "droonga/catalog_fetcher"
 require "droonga/data_absorber"
 require "droonga/safe_file_writer"
-require "droonga/client"
 
 module Droonga
   module Command
@@ -147,11 +147,11 @@ module Droonga
         source_host  = source_node.split(":").first
         joining_host = joining_node.split(":").first
 
-        catalog = fetch_catalog(:dataset       => source_node_dataset,
-                                :host          => source_host,
-                                :port          => source_node_port,
-                                :tag           => tag,
-                                :receiver_host => joining_host)
+        catalog = CatalogFetcher.fetch(:dataset       => source_node_dataset,
+                                       :host          => source_host,
+                                       :port          => source_node_port,
+                                       :tag           => tag,
+                                       :receiver_host => joining_host)
         File.write(Path.catalog, JSON.generate(catalog))
 
         generator = create_current_catalog_generator(catalog)
@@ -195,29 +195,6 @@ module Droonga
           modifier.datasets[dataset_name].replicas.hosts += other_hosts
           modifier.datasets[dataset_name].replicas.hosts.uniq!
         end
-      end
-
-      def fetch_catalog(client_options={})
-        catalog = nil
-        default_options = {
-          :dataset       => CatalogGenerator::DEFAULT_DATASET,
-          :host          => "127.0.0.1",
-          :port          => CatalogGenerator::DEFAULT_PORT,
-          :tag           => CatalogGenerator::DEFAULT_TAG,
-          :protocol      => :droonga,
-          :timeout       => 1,
-          :receiver_host => "127.0.0.1",
-          :receiver_port => 0,
-        }
-        client_options = default_options.merge(client_options)
-        Droonga::Client.open(client_options) do |client|
-          request = client.request(:dataset => client_options[:dataset],
-                                   :type    => "catalog.fetch") do |responce|
-            catalog = responce["body"]
-          end
-          request.wait
-        end
-        catalog
       end
 
       def set_replicas
