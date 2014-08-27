@@ -67,20 +67,20 @@ end
 
 puts "Joining new replica to the cluster..."
 run_remote_command(joining_node, "join",
-                   "node"   => joining_node,
-                   "type"   => "replica",
-                   "source" => source_node,
-                   "port" => options[:port],
+                   "node"    => joining_node,
+                   "type"    => "replica",
+                   "source"  => source_node,
+                   "port"    => options[:port],
                    "dataset" => options[:dataset],
-                   "tag" => options[:tag],
-                   "copy"   => !options["no-copy"])
+                   "tag"     => options[:tag],
+                   "copy"    => !options["no-copy"])
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 
 while true
   sleep(3)
   response = run_remote_command(joining_node, "report_status",
                                 "node" => joining_node,
-                                "key" => "absorbing")
+                                "key"  => "absorbing")
   absorbing = response["value"]
   break unless absorbing
 end
