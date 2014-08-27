@@ -28,27 +28,27 @@ require "droonga/serf"
 
 options = nil
 begin
-  options = Slop.parse(:help => true) do |opt|
-    opt.on("no-copy", "Don\'t copy data from the source cluster.", 
-           :default => false)
+  options = Slop.parse(:help => true) do |option|
+    option.on("no-copy", "Don\'t copy data from the source cluster.",
+              :default => false)
 
-    opt.separator("Connections:")
-    opt.on(:host=, 
-           "Host name of the node to be joined.",
-           :required => true)
-    opt.on("replica-source-host=", 
-           "Host name of the soruce cluster to be connected.",
-           :required => true)
-    opt.on(:dataset=,
-           "Tag dataset name of the cluster to be joined as a node.",
-           :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
-    opt.on(:port=, 
-           "Port number of the source cluster to be connected.",
-           :as => Integer, 
-           :default => Droonga::CatalogGenerator::DEFAULT_PORT)
-    opt.on(:tag=, 
-           "Tag name of the soruce cluster to be connected.", 
-           :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+    option.separator("Connections:")
+    option.on(:host=,
+              "Host name of the node to be joined.",
+              :required => true)
+    option.on("replica-source-host=",
+              "Host name of the soruce cluster to be connected.",
+              :required => true)
+    option.on(:dataset=,
+              "Tag dataset name of the cluster to be joined as a node.",
+              :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
+    option.on(:port=,
+              "Port number of the source cluster to be connected.",
+              :as => Integer,
+              :default => Droonga::CatalogGenerator::DEFAULT_PORT)
+    option.on(:tag=,
+              "Tag name of the soruce cluster to be connected.",
+              :default => Droonga::CatalogGenerator::DEFAULT_TAG)
   end
 rescue Slop::MissingOptionError => e
   STDERR.puts e
