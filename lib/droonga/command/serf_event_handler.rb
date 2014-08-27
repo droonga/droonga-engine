@@ -147,21 +147,12 @@ module Droonga
         source_host  = source_node.split(":").first
         joining_host = joining_node.split(":").first
 
-        catalog = nil
-        Droonga::Client.open(:host          => source_host,
-                             :port          => source_node_port,
-                             :tag           => tag,
-                             :protocol      => :droonga,
-                             :timeout       => 1,
-                             :receiver_host => joining_host,
-                             :receiver_port => 0) do |client|
-          request = client.request(:dataset => source_node_dataset , 
-                                   :type    => "catalog.fetch") do |responce|
-            File.write(Path.catalog, JSON.generate(responce["body"]))
-            catalog = responce["body"]
-          end
-          request.wait
-        end
+        catalog = fetch_catalog(:dataset       => source_node_dataset,
+                                :host          => source_host,
+                                :port          => source_node_port,
+                                :tag           => tag,
+                                :receiver_host => joining_host)
+        File.write(Path.catalog, JSON.generate(catalog))
 
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||
@@ -206,18 +197,27 @@ module Droonga
         end
       end
 
-      def fetch_catalog(source_node, port)
-        source_host = source_node.split(":").first
-
-        url = "http://#{source_host}:#{port}"
-        connection = Faraday.new(url) do |builder|
-          builder.response(:follow_redirects)
-          builder.adapter(Faraday.default_adapter)
+      def fetch_catalog(client_options={})
+        catalog = nil
+        default_options = {
+          :dataset       => CatalogGenerator::DEFAULT_DATASET,
+          :host          => "127.0.0.1",
+          :port          => CatalogGenerator::DEFAULT_PORT,
+          :tag           => CatalogGenerator::DEFAULT_TAG,
+          :protocol      => :droonga,
+          :timeout       => 1,
+          :receiver_host => "127.0.0.1",
+          :receiver_port => 0,
+        }
+        client_options = default_options.merge(client_options)
+        Droonga::Client.open(client_options) do |client|
+          request = client.request(:dataset => client_options[:dataset],
+                                   :type    => "catalog.fetch") do |responce|
+            catalog = responce["body"]
+          end
+          request.wait
         end
-        response = connection.get("/catalog.json")
-        catalog = response.body
-
-        JSON.parse(catalog)
+        catalog
       end
 
       def set_replicas
