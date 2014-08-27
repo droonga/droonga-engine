@@ -129,16 +129,14 @@ module Droonga
       def join_as_replica
         source_node         = @payload["source"]
         source_node_port    = @payload["port"]
-        source_node_dataset = @payload["dataset"]
         joining_node        = @payload["node"]
         tag                 = @payload["tag"]
-        dataset             = @payload["dataset"]
+        dataset_name        = @payload["dataset"]
         required_params = [
           source_node,
           source_node_port,
-          source_node_dataset,
           joining_node,
-          dataset,
+          dataset_name,
         ]
         return unless required_params.all?
 
@@ -147,7 +145,7 @@ module Droonga
         source_host  = source_node.split(":").first
         joining_host = joining_node.split(":").first
 
-        catalog = CatalogFetcher.fetch(:dataset       => source_node_dataset,
+        catalog = CatalogFetcher.fetch(:dataset       => dataset_name,
                                        :host          => source_host,
                                        :port          => source_node_port,
                                        :tag           => tag,
