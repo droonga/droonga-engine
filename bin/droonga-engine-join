@@ -15,8 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "ostruct"
-require "optparse"
+require "slop"
 require "json"
 require "pathname"
 
@@ -27,67 +26,37 @@ require "droonga/safe_file_writer"
 require "droonga/data_absorber"
 require "droonga/serf"
 
-options = OpenStruct.new
-options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
-options.drndump  = "drndump"
-options.client   = "droonga-request"
-options.copy     = true
-options.dataset  = Droonga::CatalogGenerator::DEFAULT_DATASET
-options.port     = Droonga::CatalogGenerator::DEFAULT_PORT
-options.tag      = Droonga::CatalogGenerator::DEFAULT_TAG
+options = nil
+begin
+  options = Slop.parse(:help => true) do |option|
+    option.on("no-copy", "Don\'t copy data from the source cluster.",
+              :default => false)
 
-parser = OptionParser.new
-parser.version = Droonga::Engine::VERSION
-
-parser.on("--[no-]copy",
-          "Do or don't copy data from the source cluster.",
-          "(#{options.copy})") do |copy|
-  options.copy = copy
+    option.separator("Connections:")
+    option.on(:host=,
+              "Host name of the node to be joined.",
+              :required => true)
+    option.on("replica-source-host=",
+              "Host name of the soruce cluster to be connected.",
+              :required => true)
+    option.on(:dataset=,
+              "Tag dataset name of the cluster to be joined as a node.",
+              :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
+    option.on(:port=,
+              "Port number of the source cluster to be connected.",
+              :as => Integer,
+              :default => Droonga::CatalogGenerator::DEFAULT_PORT)
+    option.on(:tag=,
+              "Tag name of the soruce cluster to be connected.",
+              :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+  end
+rescue Slop::MissingOptionError => e
+  STDERR.puts e
+  exit -1
 end
 
-parser.separator("")
-parser.separator("Connections:")
-parser.on("--host=HOST",
-          "Host name of the node to be joined.") do |host|
-  options.joining_host = host
-end
-parser.on("--replica-source-host=HOST",
-          "Host name of the soruce cluster to be connected.") do |host|
-  options.replica_source_host = host
-end
-parser.on("--dataset=DATASET",
-          "Tag dataset name of the cluster to be joined as a node.",
-          "(#{options.dataset})") do |dataset|
-  options.dataset = dataset
-end
-parser.on("--port=PORT", Integer,
-          "Port number of the source cluster to be connected.",
-          "(#{options.port})") do |port|
-  options.port = port
-end
-parser.on("--tag=TAG",
-          "Tag name of the soruce cluster to be connected.",
-          "(#{options.tag})") do |tag|
-  options.tag = tag
-end
-
-parser.parse!(ARGV)
-
-
-base_dir = Pathname(options.base_dir).expand_path
-ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
-
-unless options.joining_host
-  raise "You must specify the host name or the IP address of the node " +
-          "to be joined via --host option."
-end
-unless options.replica_source_host
-  raise "You must specify the host name or the IP address of a node " +
-           "of an existing cluster via --replica-source-host option."
-end
-
-options.joining_node = "#{options.joining_host}:#{options.port}/#{options.tag}"
-options.source_node  = "#{options.replica_source_host}:#{options.port}/#{options.tag}"
+joining_node = "#{options[:host]}:#{options[:port]}/#{options[:tag]}"
+source_node  = "#{options["replica-source-host"]}:#{options[:port]}/#{options[:tag]}"
 
 def run_remote_command(target, command, options)
   result = Droonga::Serf.send_query(target, command, options)
@@ -97,29 +66,30 @@ def run_remote_command(target, command, options)
 end
 
 puts "Joining new replica to the cluster..."
-run_remote_command(options.joining_node, "join",
-                   "node"   => options.joining_node,
+run_remote_command(joining_node, "join",
+                   "node"   => joining_node,
                    "type"   => "replica",
-                   "source" => options.source_node,
-                   "port" => options.port,
-                   "dataset" => options.dataset,
-                   "tag" => options.tag,
-                   "copy"   => options.copy)
+                   "source" => source_node,
+                   "port" => options[:port],
+                   "dataset" => options[:dataset],
+                   "tag" => options[:tag],
+                   "copy"   => !options["no-copy"])
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 
 while true
   sleep(3)
-  response = run_remote_command(options.joining_node, "report_status",
-                                "node" => options.joining_node,
+  response = run_remote_command(joining_node, "report_status",
+                                "node" => joining_node,
                                 "key" => "absorbing")
   absorbing = response["value"]
   break unless absorbing
 end
 
 puts "Update existing hosts in the cluster..."
-run_remote_command(options.source_node, "add_replicas",
-                   "dataset" => options.dataset,
-                   "hosts"   => [options.joining_host])
+run_remote_command(source_node, "add_replicas",
+                   "dataset" => options[:dataset],
+                   "hosts"   => [options[:host]])
+
 
 puts "Done."
 

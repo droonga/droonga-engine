@@ -46,6 +46,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "sigdump"
   gem.add_dependency "droonga-client", ">= 0.1.9"
   gem.add_dependency "drndump"
+  gem.add_dependency "slop"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "test-unit"
