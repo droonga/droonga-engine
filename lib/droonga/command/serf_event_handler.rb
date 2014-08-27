@@ -150,7 +150,6 @@ module Droonga
                                        :port          => source_node_port,
                                        :tag           => tag,
                                        :receiver_host => joining_host)
-        File.write(Path.catalog, JSON.generate(catalog))
 
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||
@@ -160,7 +159,6 @@ module Droonga
         # restart self with the fetched catalog.
         SafeFileWriter.write(Path.catalog, JSON.pretty_generate(catalog))
 
-        dataset_name = dataset.name
         tag          = dataset.replicas.tag
         port         = dataset.replicas.port
         other_hosts  = dataset.replicas.hosts
