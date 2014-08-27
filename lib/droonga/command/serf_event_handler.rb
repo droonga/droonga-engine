@@ -95,10 +95,6 @@ module Droonga
           remove_replicas
         when "absorb_data"
           absorb_data
-        when "publish_catalog"
-          publish_catalog
-        when "unpublish_catalog"
-          unpublish_catalog
         end
       end
 
@@ -222,40 +218,6 @@ module Droonga
         catalog = response.body
 
         JSON.parse(catalog)
-      end
-
-      def publish_catalog
-        port = @payload["port"]
-        return unless port
-
-        env = {}
-        publisher_command_line = [
-          "droonga-engine-data-publisher",
-            "--base-dir", Path.base.to_s,
-            "--port", port.to_s,
-            "--published-file", Path.catalog.to_s
-        ]
-        pid = spawn(env, *publisher_command_line)
-        Process.detach(pid)
-        sleep(1) # wait until the directory is published
-
-        published_dir = Path.published(port)
-        pid_file = published_dir + ".pid"
-
-        File.open(pid_file.to_s, "w") do |file|
-          file.puts(pid)
-        end
-      end
-
-      def unpublish_catalog
-        port = @payload["port"]
-        return unless port
-
-        published_dir = Path.published(port)
-        pid_file = published_dir + ".pid"
-        pid = pid_file.read.to_i
-
-        Process.kill("INT", pid)
       end
 
       def set_replicas
