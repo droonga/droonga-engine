@@ -29,7 +29,7 @@ require "droonga/serf"
 options = nil
 begin
   options = Slop.parse(:help => true) do |opt|
-    opt.on("no-copy", "copy data from the source cluster.", 
+    opt.on("no-copy", "Don\'t copy data from the source cluster.", 
       :default => false)
 
     opt.separator("Connections:")
