@@ -285,8 +285,7 @@ module Droonga
 
       class SetReplicas < ModifyReplicasBase
         def process
-          return unless dataset
-          return unless hosts
+          return if dataset.nil? or hosts.nil?
 
           log("new replicas: #{hosts.join(",")}")
 
@@ -301,27 +300,25 @@ module Droonga
 
       class AddReplicas < ModifyReplicasBase
         def process
-          return unless dataset
-          return unless hosts
+          return if dataset.nil? or hosts.nil?
 
-          hosts -= [host]
-          return if hosts.empty?
+          added_hosts -= [host]
+          return if added_hosts.empty?
 
-          log("adding replicas: #{hosts.join(",")}")
+          log("adding replicas: #{added_hosts.join(",")}")
 
           CatalogModifier.modify do |modifier|
-            modifier.datasets[dataset].replicas.hosts += hosts
+            modifier.datasets[dataset].replicas.hosts += added_hosts
             modifier.datasets[dataset].replicas.hosts.uniq!
           end
 
-          Serf.join(@serf_name, *hosts)
+          Serf.join(@serf_name, *added_hosts)
         end
       end
 
       class RemoveReplicas < ModifyReplicasBase
         def process
-          return unless dataset
-          return unless hosts
+          return if dataset.nil? or hosts.nil?
 
           log("removing replicas: #{hosts.join(",")}")
 
