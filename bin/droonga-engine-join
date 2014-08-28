@@ -51,8 +51,8 @@ begin
               :default => Droonga::CatalogGenerator::DEFAULT_TAG)
   end
 rescue Slop::MissingOptionError => e
-  STDERR.puts e
-  exit -1
+  STDERR.puts(e)
+  exit(-1)
 end
 
 joining_node = "#{options[:host]}:#{options[:port]}/#{options[:tag]}"
@@ -65,7 +65,7 @@ def run_remote_command(target, command, options)
   result[:response]
 end
 
-puts "Joining new replica to the cluster..."
+puts("Joining new replica to the cluster...")
 run_remote_command(joining_node, "join",
                    "node"   => joining_node,
                    "type"   => "replica",
@@ -85,12 +85,12 @@ while true
   break unless absorbing
 end
 
-puts "Update existing hosts in the cluster..."
+puts("Update existing hosts in the cluster...")
 run_remote_command(source_node, "add_replicas",
                    "dataset" => options[:dataset],
                    "hosts"   => [options[:host]])
 
 
-puts "Done."
+puts("Done.")
 
 exit(true)
