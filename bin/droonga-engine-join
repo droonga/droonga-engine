@@ -51,7 +51,7 @@ begin
               :default => Droonga::CatalogGenerator::DEFAULT_TAG)
   end
 rescue Slop::MissingOptionError => e
-  STDERR.puts(e)
+  $stderr.puts(e)
   exit(false)
 end
 
