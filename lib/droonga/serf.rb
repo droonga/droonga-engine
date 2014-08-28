@@ -94,10 +94,12 @@ module Droonga
       logger.trace("stop: done")
     end
 
-    def join(host)
+    def join(*hosts)
       ensure_serf
-      node = "#{host}:#{port}"
-      result= run_once("join", node)
+      nodes = hosts.collect do |host|
+        "#{host}:#{port}"
+      end
+      result= run_once("join", nodes)
     end
 
     def send_query(query, payload)
