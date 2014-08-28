@@ -52,7 +52,7 @@ begin
   end
 rescue Slop::MissingOptionError => e
   STDERR.puts(e)
-  exit(-1)
+  exit(false)
 end
 
 joining_node = "#{options[:host]}:#{options[:port]}/#{options[:tag]}"
