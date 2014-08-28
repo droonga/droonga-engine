@@ -151,7 +151,8 @@ module Droonga
                                      :receiver_host => joining_host)
         catalog = fetcher.fetch(:dataset => dataset_name)
 
-        generator = create_current_catalog_generator(catalog)
+        generator = CatalogGenerator.new
+        generator.load(catalog)
         dataset = generator.dataset_for_host(source_host) ||
                     generator.dataset_for_host(host)
         return unless dataset
@@ -240,15 +241,11 @@ module Droonga
       end
 
       def modify_catalog
-        generator = create_current_catalog_generator
+        generator = CatalogGenerator.new
+        current_catalog = JSON.parse(Path.catalog.read)
+        generator.load(current_catalog)
         yield(generator)
         SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.generate))
-      end
-
-      def create_current_catalog_generator(current_catalog=nil)
-        current_catalog ||= JSON.parse(Path.catalog.read)
-        generator = CatalogGenerator.new
-        generator.load(current_catalog)
       end
 
       def absorb_data
