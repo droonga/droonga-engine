@@ -49,6 +49,10 @@ module Droonga
         new(nil, name).send_query(query, payload)
       end
 
+      def join(name, *hosts)
+        new(nil, name).join(*hosts)
+      end
+
       def live_nodes(name)
         new(nil, name).live_nodes
       end

@@ -168,6 +168,8 @@ module Droonga
             modifier.datasets[dataset_name].replicas.hosts += other_hosts
             modifier.datasets[dataset_name].replicas.hosts.uniq!
           end
+
+          Serf.join(*other_hosts)
         end
 
         def replica_hosts(catalog=nil)
@@ -291,6 +293,9 @@ module Droonga
           CatalogModifier.modify do |modifier|
             modifier.datasets[dataset].replicas.hosts = hosts
           end
+
+          Serf.join(*hosts)
+          #XXX Now we should restart serf agent to remove unjoined nodes from the list of members...
         end
       end
 
@@ -308,6 +313,8 @@ module Droonga
             modifier.datasets[dataset].replicas.hosts += hosts
             modifier.datasets[dataset].replicas.hosts.uniq!
           end
+
+          Serf.join(*hosts)
         end
       end
 
@@ -321,6 +328,8 @@ module Droonga
           CatalogModifier.modify do |modifier|
             modifier.datasets[dataset].replicas.hosts -= hosts
           end
+
+          #XXX Now we should restart serf agent to remove unjoined nodes from the list of members...
         end
       end
 
