@@ -44,7 +44,7 @@ module Droonga
 
       def run
         parse_event
-        unless event_for_me?
+        unless should_process?
           log(" => ignoring event not for me")
           output_response
           return true
@@ -74,11 +74,16 @@ module Droonga
         end
       end
 
-      def event_for_me?
-        return true unless @payload
-        return true unless @payload["node"]
+      def target_node
+        @payload && @payload["node"]
+      end
 
-        @payload["node"] == @serf_name
+      def for_me?
+        target_node == @serf_name
+      end
+
+      def should_process?
+        for_me? or @payload.nil? or not @payload.include?("node")
       end
 
       def process_event
