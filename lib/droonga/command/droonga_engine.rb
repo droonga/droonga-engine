@@ -24,6 +24,7 @@ require "sigdump"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
+require "droonga/node_status"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
 
@@ -246,7 +247,7 @@ module Droonga
 
         def run
           @serf = run_serf
-          @serf_status_observer = run_serf_status_observer
+          @node_status_observer = run_node_status_observer
           @service_runner = run_service
           setup_initial_on_ready
           @catalog_observer = run_catalog_observer
@@ -296,7 +297,7 @@ module Droonga
         def stop_gracefully
           @command_runner.stop
           @serf.stop
-          @serf_status_observer.stop
+          @node_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_gracefully
         end
@@ -304,7 +305,7 @@ module Droonga
         def stop_immediately
           @command_runner.stop
           @serf.stop
-          @serf_status_observer.stop
+          @node_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_immediately
         end
@@ -345,13 +346,13 @@ module Droonga
           @serf = run_serf
         end
 
-        def run_serf_status_observer
-          serf_status_observer = FileObserver.new(@loop, Serf.status_file)
-          serf_status_observer.on_change = lambda do
+        def run_node_status_observer
+          node_status_observer = FileObserver.new(@loop, NodeStatus.new.status_file)
+          node_status_observer.on_change = lambda do
             restart_serf
           end
-          serf_status_observer.start
-          serf_status_observer
+          node_status_observer.start
+          node_status_observer
         end
 
         def run_catalog_observer
