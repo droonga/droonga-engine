@@ -60,8 +60,8 @@ source_node  = "#{options["replica-source-host"]}:#{options[:port]}/#{options[:t
 
 def run_remote_command(target, command, options)
   result = Droonga::Serf.send_query(target, command, options)
-  puts result[:result]
-  puts result[:error] unless result[:error].empty?
+  puts(result[:result])
+  puts(result[:error]) unless result[:error].empty?
   result[:response]
 end
 
