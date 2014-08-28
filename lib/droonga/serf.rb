@@ -130,7 +130,7 @@ module Droonga
     def live_nodes
       ensure_serf
       nodes = {}
-      result= run_once("members", "-format", "json")
+      result = run_once("members", "-format", "json")
       members = result[:result]
       members["members"].each do |member|
         if member["status"] == "alive"
