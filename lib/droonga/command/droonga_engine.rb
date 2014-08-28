@@ -17,6 +17,7 @@ require "optparse"
 require "socket"
 require "ipaddr"
 require "fileutils"
+require "yaml"
 
 require "coolio"
 require "sigdump"
@@ -113,13 +114,24 @@ module Droonga
         attr_reader :host, :port, :tag, :log_file, :pid_file_path
         attr_reader :ready_notify_fd
         def initialize
-          @host = Address::DEFAULT_HOST
+          config = load_config
+
+          @host = config["host"] || Address::DEFAULT_HOST
           @port = Address::DEFAULT_PORT
           @tag = Address::DEFAULT_TAG
           @log_file = nil
           @daemon = false
           @pid_file_path = nil
           @ready_notify_fd = nil
+        end
+
+        def load_config
+          path = Droonga::Path.config
+          if File.exist?(path)
+            YAML.load_file(path)
+          else
+            {}
+          end
         end
 
         def engine_name
