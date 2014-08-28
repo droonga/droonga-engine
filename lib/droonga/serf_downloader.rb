@@ -77,7 +77,7 @@ module Droonga
       when /x86_64|x64/
         @architecture = "amd64"
       when /i\d86/
-        @architecture = "i386"
+        @architecture = "386"
       else
         raise "Unsupported architecture: #{RUBY_PLATFORM}"
       end
