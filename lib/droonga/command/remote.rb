@@ -70,15 +70,15 @@ module Droonga
 
       class ChangeRole < Base
         def process
-          node_status = NodeStatus.new
-          node_status.set(:role, @params["role"])
+          status = NodeStatus.new
+          status.set(:role, @params["role"])
         end
       end
 
       class ReportStatus < Base
         def process
-          node_status = NodeStatus.new
-          @response["value"] = node_status.get(@params["key"])
+          status = NodeStatus.new
+          @response["value"] = status.get(@params["key"])
         end
       end
 
