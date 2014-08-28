@@ -24,7 +24,6 @@ require "droonga/loggable"
 require "droonga/catalog_loader"
 require "droonga/node_status"
 require "droonga/serf_downloader"
-require "droonga/safe_file_writer"
 require "droonga/line_buffer"
 
 module Droonga
