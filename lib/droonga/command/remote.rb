@@ -302,7 +302,7 @@ module Droonga
         def process
           return if dataset.nil? or hosts.nil?
 
-          added_hosts -= [host]
+          added_hosts = hosts - [host]
           return if added_hosts.empty?
 
           log("adding replicas: #{added_hosts.join(",")}")
