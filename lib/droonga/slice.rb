@@ -24,7 +24,7 @@ module Droonga
   class Slice
     include Loggable
 
-    attr_accessor :on_ready
+    attr_writer :on_ready
     def initialize(dataset, loop, options={})
       @dataset = dataset
       @loop = loop

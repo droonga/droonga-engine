@@ -145,11 +145,11 @@ module Droonga
         source_host  = source_node.split(":").first
         joining_host = joining_node.split(":").first
 
-        catalog = CatalogFetcher.fetch(:dataset       => dataset_name,
-                                       :host          => source_host,
-                                       :port          => source_node_port,
-                                       :tag           => tag,
-                                       :receiver_host => joining_host)
+        fetcher = CatalogFetcher.new(:host          => source_host,
+                                     :port          => source_node_port,
+                                     :tag           => tag,
+                                     :receiver_host => joining_host)
+        catalog = fetcher.fetch(:dataset => dataset_name)
 
         generator = create_current_catalog_generator(catalog)
         dataset = generator.dataset_for_host(source_host) ||

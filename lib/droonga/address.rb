@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "socket"
+
 module Droonga
   class Address
     class << self
@@ -33,7 +35,7 @@ module Droonga
       end
     end
 
-    DEFAULT_HOST = "127.0.0.1"
+    DEFAULT_HOST = Socket.gethostname
     DEFAULT_PORT = 10031
     DEFAULT_TAG  = "droonga"
 

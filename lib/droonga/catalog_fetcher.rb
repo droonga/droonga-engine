@@ -13,42 +13,34 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "time"
-
-require "droonga/catalog_generator"
 require "droonga/client"
+
+require "droonga/address"
+require "droonga/catalog/dataset"
 
 module Droonga
   class CatalogFetcher
-    class << self
-      def fetch(client_options)
-        new(client_options).fetch
-      end
-    end
-
     def initialize(client_options)
       @client_options = default_options.merge(client_options)
     end
 
-    def fetch
-      catalog = nil
+    def fetch(options={})
+      message = {
+        "dataset" => options[:dataset] || Catalog::Dataset::DEFAULT_NAME,
+        "type"    => "catalog.fetch"
+      }
       Droonga::Client.open(@client_options) do |client|
-        request = client.request(:dataset => @client_options[:dataset],
-                                 :type    => "catalog.fetch") do |responce|
-          catalog = responce["body"]
-        end
-        request.wait
+        response = client.request(message)
+        response["body"]
       end
-      catalog
     end
 
     private
     def default_options
-      default_options = {
-        :dataset       => CatalogGenerator::DEFAULT_DATASET,
+      {
         :host          => "127.0.0.1",
-        :port          => CatalogGenerator::DEFAULT_PORT,
-        :tag           => CatalogGenerator::DEFAULT_TAG,
+        :port          => Address::DEFAULT_PORT,
+        :tag           => Address::DEFAULT_TAG,
         :protocol      => :droonga,
         :timeout       => 1,
         :receiver_host => "127.0.0.1",

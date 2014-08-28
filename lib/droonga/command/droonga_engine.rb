@@ -22,6 +22,7 @@ require "coolio"
 require "sigdump"
 
 require "droonga/path"
+require "droonga/address"
 require "droonga/serf"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
@@ -108,15 +109,12 @@ module Droonga
       end
 
       class Configuration
-        DEFAULT_HOST = Socket.gethostname
-        DEFAULT_PORT = 10031
-
         attr_reader :host, :port, :tag, :log_file, :pid_file_path
         attr_reader :ready_notify_fd
         def initialize
-          @host = DEFAULT_HOST
-          @port = DEFAULT_PORT
-          @tag = "droonga"
+          @host = Address::DEFAULT_HOST
+          @port = Address::DEFAULT_PORT
+          @tag = Address::DEFAULT_TAG
           @log_file = nil
           @daemon = false
           @pid_file_path = nil
