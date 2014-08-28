@@ -103,7 +103,7 @@ module Droonga
       nodes = hosts.collect do |host|
         "#{host}:#{port}"
       end
-      result= run_once("join", nodes)
+      run_once("join", nodes)
     end
 
     def send_query(query, payload)
