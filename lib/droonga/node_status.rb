@@ -19,24 +19,6 @@ require "droonga/safe_file_writer"
 
 module Droonga
   class NodeStatus
-    class << self
-      def have?(key)
-        new.have?(key)
-      end
-
-      def get(key)
-        new.get(key)
-      end
-
-      def set(key, value)
-        new.set(key, value)
-      end
-
-      def delete(key)
-        new.delete(key)
-      end
-    end
-
     def initialize
       @status = load
     end
