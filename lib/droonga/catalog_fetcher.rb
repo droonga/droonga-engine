@@ -24,8 +24,8 @@ module Droonga
 
     def fetch(options={})
       message = {
-        :dataset => options[:dataset] || CatalogGenerator::DEFAULT_DATASET,
-        :type    => "catalog.fetch"
+        "dataset" => options[:dataset] || CatalogGenerator::DEFAULT_DATASET,
+        "type"    => "catalog.fetch"
       }
       Droonga::Client.open(@client_options) do |client|
         response = client.request(message)
