@@ -247,7 +247,6 @@ module Droonga
 
         def run
           @serf = run_serf
-          @node_status_observer = run_node_status_observer
           @service_runner = run_service
           setup_initial_on_ready
           @catalog_observer = run_catalog_observer
@@ -297,7 +296,6 @@ module Droonga
         def stop_gracefully
           @command_runner.stop
           @serf.stop
-          @node_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_gracefully
         end
@@ -305,7 +303,6 @@ module Droonga
         def stop_immediately
           @command_runner.stop
           @serf.stop
-          @node_status_observer.stop
           @catalog_observer.stop
           @service_runner.stop_immediately
         end
@@ -341,25 +338,10 @@ module Droonga
           serf
         end
 
-        def restart_serf
-          @serf.stop if @serf
-          @serf = run_serf
-        end
-
-        def run_node_status_observer
-          node_status_observer = FileObserver.new(@loop, NodeStatus.new.status_file)
-          node_status_observer.on_change = lambda do
-            # restart_serf
-          end
-          node_status_observer.start
-          node_status_observer
-        end
-
         def run_catalog_observer
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
             restart_graceful
-            restart_serf
           end
           catalog_observer.start
           catalog_observer
