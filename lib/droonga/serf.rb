@@ -22,7 +22,9 @@ require "open3"
 require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
+require "droonga/node_status"
 require "droonga/serf_downloader"
+require "droonga/safe_file_writer"
 require "droonga/line_buffer"
 
 module Droonga
@@ -42,24 +44,6 @@ module Droonga
     class << self
       def path
         Droonga::Path.base + "serf"
-      end
-
-      def status_file
-        Droonga::Path.state + "status_file"
-      end
-
-      def load_status
-        if status_file.exist?
-          contents = status_file.read
-          unless contents.empty?
-            return JSON.parse(contents, :symbolize_names => true)
-          end
-        end
-        {}
-      end
-
-      def status(key)
-        load_status[key]
       end
 
       def send_query(name, query, payload)
@@ -212,13 +196,13 @@ module Droonga
       "#{extract_host(@name)}:7373"
     end
 
-    def status
-      @status ||= self.class.load_status
+    def node_status
+      @node_status ||= NodeStatus.new
     end
 
     def role
-      if status[:role]
-        role = status[:role].to_sym
+      if node_status.have?(:role)
+        role = node_status.get(:role).to_sym
         if self.class::ROLE.key?(role)
           return role
         end

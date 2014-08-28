@@ -17,6 +17,7 @@ require "json"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/node_status"
 require "droonga/catalog_generator"
 require "droonga/catalog_modifier"
 require "droonga/catalog_fetcher"
@@ -83,7 +84,7 @@ module Droonga
       def process_event
         case @event_sub_name
         when "change_role"
-          save_status(:role, @payload["role"])
+          NodeStatus.set(:role, @payload["role"])
         when "report_status"
           report_status
         when "join"
@@ -115,7 +116,7 @@ module Droonga
       end
 
       def report_status
-        @response["value"] = status(@payload["key"].to_sym)
+        @response["value"] = NodeStatus.get(@payload["key"])
       end
 
       def join
@@ -177,13 +178,14 @@ module Droonga
           end
           sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
 
-          save_status(:absorbing, true)
+          status = NodeStatus.new
+          status.set(:absorbing, true)
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag)
-          delete_status(:absorbing)
+          status.delete(:absorbing)
           sleep(1)
         end
 
@@ -268,14 +270,15 @@ module Droonga
         log("port    = #{port}")
         log("tag     = #{tag}")
 
-        save_status(:absorbing, true)
+        status = NodeStatus.new
+        status.set(:absorbing, true)
         DataAbsorber.absorb(:dataset          => dataset_name,
                             :source_host      => source,
                             :destination_host => host,
                             :port             => port,
                             :tag              => tag,
                             :client           => "droonga-send")
-        delete_status(:absorbing)
+        status.delete(:absorbing)
       end
 
       def live_nodes
@@ -287,22 +290,6 @@ module Droonga
         nodes = live_nodes
         file_contents = JSON.pretty_generate(nodes)
         SafeFileWriter.write(path, file_contents)
-      end
-
-      def status(key)
-        Serf.status(key)
-      end
-
-      def save_status(key, value)
-        status = Serf.load_status
-        status[key] = value
-        SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
-      end
-
-      def delete_status(key)
-        status = Serf.load_status
-        status.delete(key)
-        SafeFileWriter.write(Serf.status_file, JSON.pretty_generate(status))
       end
 
       def log(message)
