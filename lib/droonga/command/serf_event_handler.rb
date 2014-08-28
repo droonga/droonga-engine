@@ -18,6 +18,7 @@ require "json"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/catalog_generator"
+require "droonga/catalog_modifier"
 require "droonga/catalog_fetcher"
 require "droonga/data_absorber"
 require "droonga/safe_file_writer"
@@ -171,7 +172,7 @@ module Droonga
         if @payload["copy"]
           log("starting to copy data from #{source_host}")
 
-          modify_catalog do |modifier|
+          CatalogModifier.modify do |modifier|
             modifier.datasets[dataset_name].replicas.hosts = [host]
           end
           sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
@@ -188,7 +189,7 @@ module Droonga
 
         log("joining to the cluster: update myself")
 
-        modify_catalog do |modifier|
+        CatalogModifier.modify do |modifier|
           modifier.datasets[dataset_name].replicas.hosts += other_hosts
           modifier.datasets[dataset_name].replicas.hosts.uniq!
         end
@@ -203,7 +204,7 @@ module Droonga
 
         log("new replicas: #{hosts.join(",")}")
 
-        modify_catalog do |modifier|
+        CatalogModifier.modify do |modifier|
           modifier.datasets[dataset].replicas.hosts = hosts
         end
       end
@@ -220,7 +221,7 @@ module Droonga
 
         log("adding replicas: #{hosts.join(",")}")
 
-        modify_catalog do |modifier|
+        CatalogModifier.modify do |modifier|
           modifier.datasets[dataset].replicas.hosts += hosts
           modifier.datasets[dataset].replicas.hosts.uniq!
         end
@@ -235,17 +236,9 @@ module Droonga
 
         log("removing replicas: #{hosts.join(",")}")
 
-        modify_catalog do |modifier|
+        CatalogModifier.modify do |modifier|
           modifier.datasets[dataset].replicas.hosts -= hosts
         end
-      end
-
-      def modify_catalog
-        generator = CatalogGenerator.new
-        current_catalog = JSON.parse(Path.catalog.read)
-        generator.load(current_catalog)
-        yield(generator)
-        SafeFileWriter.write(Path.catalog, JSON.pretty_generate(generator.generate))
       end
 
       def absorb_data
