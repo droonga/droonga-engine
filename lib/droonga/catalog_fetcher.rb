@@ -18,20 +18,17 @@ require "droonga/client"
 
 module Droonga
   class CatalogFetcher
-    class << self
-      def fetch(client_options)
-        new(client_options).fetch
-      end
-    end
-
     def initialize(client_options)
       @client_options = default_options.merge(client_options)
     end
 
-    def fetch
+    def fetch(options={})
+      message = {
+        :dataset => options[:dataset] || CatalogGenerator::DEFAULT_DATASET,
+        :type    => "catalog.fetch"
+      }
       Droonga::Client.open(@client_options) do |client|
-        response = client.request(:dataset => @client_options[:dataset],
-                                  :type    => "catalog.fetch")
+        response = client.request(message)
         response["body"]
       end
     end
@@ -39,7 +36,6 @@ module Droonga
     private
     def default_options
       {
-        :dataset       => CatalogGenerator::DEFAULT_DATASET,
         :host          => "127.0.0.1",
         :port          => CatalogGenerator::DEFAULT_PORT,
         :tag           => CatalogGenerator::DEFAULT_TAG,
