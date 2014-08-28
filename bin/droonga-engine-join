@@ -70,9 +70,7 @@ run_remote_command(joining_node, "join",
                    "node"    => joining_node,
                    "type"    => "replica",
                    "source"  => source_node,
-                   "port"    => options[:port],
                    "dataset" => options[:dataset],
-                   "tag"     => options[:tag],
                    "copy"    => !options["no-copy"])
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 
