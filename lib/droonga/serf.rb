@@ -94,6 +94,12 @@ module Droonga
       logger.trace("stop: done")
     end
 
+    def join(host)
+      ensure_serf
+      node = "#{host}:#{port}"
+      result= run_once("join", node)
+    end
+
     def send_query(query, payload)
       ensure_serf
       options = ["-format", "json"] + additional_options_from_payload(payload)
