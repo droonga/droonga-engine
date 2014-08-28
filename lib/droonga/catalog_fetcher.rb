@@ -44,7 +44,7 @@ module Droonga
 
     private
     def default_options
-      default_options = {
+      {
         :dataset       => CatalogGenerator::DEFAULT_DATASET,
         :host          => "127.0.0.1",
         :port          => CatalogGenerator::DEFAULT_PORT,
