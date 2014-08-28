@@ -31,11 +31,9 @@ module Droonga
     def fetch
       catalog = nil
       Droonga::Client.open(@client_options) do |client|
-        request = client.request(:dataset => @client_options[:dataset],
-                                 :type    => "catalog.fetch") do |response|
-          catalog = response["body"]
-        end
-        request.wait
+        response = client.request(:dataset => @client_options[:dataset],
+                                  :type    => "catalog.fetch")
+        catalog = response["body"]
       end
       catalog
     end
