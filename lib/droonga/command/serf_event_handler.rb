@@ -26,13 +26,16 @@ module Droonga
         end
       end
 
+      def initialize
+        @payload = nil
+      end
+
       def run
         command_class = detect_command_class
         return true if command_class.nil?
 
         serf_name = ENV["SERF_SELF_NAME"]
-        payload = JSON.parse($stdin.gets)
-        command = command_class.new(serf_name, payload)
+        command = command_class.new(serf_name, @payload)
         command.process if command.should_process?
         output_response(command.response)
         true
@@ -42,8 +45,10 @@ module Droonga
       def detect_command_class
         case ENV["SERF_EVENT"]
         when "user"
+          @payload = JSON.parse($stdin.gets)
           detect_command_class_from_custom_event(ENV["SERF_USER_EVENT"])
         when "query"
+          @payload = JSON.parse($stdin.gets)
           detect_command_class_from_custom_event(ENV["SERF_QUERY_NAME"])
         when "member-join", "member-leave", "member-update", "member-reap"
           Remote::UpdateLiveNodes
