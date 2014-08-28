@@ -15,17 +15,18 @@
 
 require "time"
 
+require "droonga/address"
 require "droonga/catalog/dataset"
 
 module Droonga
   class CatalogGenerator
     DEFAULT_DATASET = "Default"
-    DEFAULT_HOSTS = ["127.0.0.1"]
+    DEFAULT_HOSTS = [Address::DEFAULT_HOST]
     DEFAULT_N_WORKERS = 4
     DEFAULT_N_SLICES = 1
     DEFAULT_PLUGINS = ["groonga", "search", "crud", "dump", "system", "catalog"]
-    DEFAULT_PORT = 10031
-    DEFAULT_TAG = "droonga"
+    DEFAULT_PORT = Address::DEFAULT_PORT
+    DEFAULT_TAG = Address::DEFAULT_TAG
 
     attr_reader :datasets
 

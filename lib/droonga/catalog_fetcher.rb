@@ -13,8 +13,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/catalog_generator"
 require "droonga/client"
+
+require "droonga/address"
+require "droonga/catalog_generator"
 
 module Droonga
   class CatalogFetcher
@@ -37,8 +39,8 @@ module Droonga
     def default_options
       {
         :host          => "127.0.0.1",
-        :port          => CatalogGenerator::DEFAULT_PORT,
-        :tag           => CatalogGenerator::DEFAULT_TAG,
+        :port          => Address::DEFAULT_PORT,
+        :tag           => Address::DEFAULT_TAG,
         :protocol      => :droonga,
         :timeout       => 1,
         :receiver_host => "127.0.0.1",
