@@ -134,7 +134,7 @@ module Droonga
         end
 
         def joining_host
-          @source_host ||= (joining_node =~ NODE_PATTERN && $1)
+          @joining_host ||= (joining_node =~ NODE_PATTERN && $1)
         end
 
         def port
