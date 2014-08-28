@@ -20,7 +20,7 @@ require "droonga/catalog/dataset"
 
 module Droonga
   class CatalogGenerator
-    DEFAULT_DATASET = "Default"
+    DEFAULT_DATASET = Catalog::Dataset::DEFAULT_NAME
     DEFAULT_HOSTS = [Address::DEFAULT_HOST]
     DEFAULT_N_WORKERS = 4
     DEFAULT_N_SLICES = 1

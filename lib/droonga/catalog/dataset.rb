@@ -20,6 +20,8 @@ require "droonga/catalog/volume_collection"
 module Droonga
   module Catalog
     class Dataset
+      DEFAULT_NAME = "Default"
+
       attr_reader :name
 
       def initialize(name, data)

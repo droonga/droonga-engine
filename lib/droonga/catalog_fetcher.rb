@@ -16,7 +16,7 @@
 require "droonga/client"
 
 require "droonga/address"
-require "droonga/catalog_generator"
+require "droonga/catalog/dataset"
 
 module Droonga
   class CatalogFetcher
@@ -26,7 +26,7 @@ module Droonga
 
     def fetch(options={})
       message = {
-        "dataset" => options[:dataset] || CatalogGenerator::DEFAULT_DATASET,
+        "dataset" => options[:dataset] || Catalog::Dataset::DEFAULT_NAME,
         "type"    => "catalog.fetch"
       }
       Droonga::Client.open(@client_options) do |client|
