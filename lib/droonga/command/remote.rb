@@ -332,16 +332,15 @@ module Droonga
 
       class UpdateLiveNodes < Base
         def process
-          def live_nodes
-            Serf.live_nodes(@serf_name)
-          end
+          path = Path.live_nodes
+          nodes = live_nodes
+          file_contents = JSON.pretty_generate(nodes)
+          SafeFileWriter.write(path, file_contents)
+        end
 
-          def output_live_nodes
-            path = Path.live_nodes
-            nodes = live_nodes
-            file_contents = JSON.pretty_generate(nodes)
-            SafeFileWriter.write(path, file_contents)
-          end
+        private
+        def live_nodes
+          Serf.live_nodes(@serf_name)
         end
       end
     end
