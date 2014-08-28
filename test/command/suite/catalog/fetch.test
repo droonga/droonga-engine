@@ -1,3 +1,4 @@
+#@require-catalog-version 2
 {
   "type": "catalog.fetch",
   "dataset": "Default",
