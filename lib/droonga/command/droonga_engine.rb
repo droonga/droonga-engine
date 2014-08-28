@@ -349,7 +349,7 @@ module Droonga
         def run_node_status_observer
           node_status_observer = FileObserver.new(@loop, NodeStatus.new.status_file)
           node_status_observer.on_change = lambda do
-            restart_serf
+            # restart_serf
           end
           node_status_observer.start
           node_status_observer
