@@ -74,6 +74,10 @@ module Droonga
       def buffer
         state + "buffer"
       end
+
+      def serf_event_handler_errors
+        state + "serf-event-handler-errors"
+      end
     end
   end
 end
