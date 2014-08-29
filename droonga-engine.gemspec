@@ -47,6 +47,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rroonga", ">= 4.0.1"
   gem.add_dependency "sigdump"
   gem.add_dependency "slop"
+  gem.add_dependency "sys-proctable"
   gem.add_development_dependency "kramdown"
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "packnga"
