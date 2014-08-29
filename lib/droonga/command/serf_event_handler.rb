@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "json"
+require "fileutils"
 
 require "droonga/command/remote"
 
@@ -42,6 +43,7 @@ module Droonga
       rescue Exception => exception
         #XXX Any exception blocks following serf operations.
         #    To keep it working, I rescue any exception for now.
+        FileUtils.mkdir_p(Path.serf_event_handler_errors)
         File.open(Path.serf_event_handler_error_file, "w") do |file|
           file.write(exception.inspect)
         end
