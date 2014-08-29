@@ -193,7 +193,7 @@ module Droonga
           fetcher = CatalogFetcher.new(:host          => source_host,
                                        :port          => port,
                                        :tag           => tag,
-                                       :receiver_host => joining_host)
+                                       :receiver_host => host)
           fetcher.fetch(:dataset => dataset_name)
         end
 
