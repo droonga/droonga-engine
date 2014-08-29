@@ -119,9 +119,10 @@ module Droonga
           @host = config["host"] || Address::DEFAULT_HOST
           @port = config["port"] || Address::DEFAULT_PORT
           @tag  = config["tag"]  || Address::DEFAULT_TAG
-          @log_file = nil
-          @daemon = false
-          @pid_file_path = nil
+
+          @log_file        = nil
+          @daemon          = false
+          @pid_file_path   = nil
           @ready_notify_fd = nil
 
           if have_config_file?
