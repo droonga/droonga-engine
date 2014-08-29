@@ -37,6 +37,8 @@ module Droonga
             "log" => []
           }
           @serf = Serf.new(nil, @serf_name)
+
+          log("params = #{params}")
         end
 
         def process
@@ -155,9 +157,10 @@ module Droonga
         def join_as_replica
           return unless valid_params?
 
-          log("source_node  = #{source_node}")
+          log("source_node = #{source_node}")
 
           other_hosts = replica_hosts
+          log("other_hosts = #{other_hosts}")
           return if other_hosts.empty?
 
           # restart self with the fetched catalog.
@@ -306,9 +309,8 @@ module Droonga
           return if dataset.nil? or hosts.nil?
 
           added_hosts = hosts - [host]
-          return if added_hosts.empty?
-
           log("adding replicas: #{added_hosts.join(",")}")
+          return if added_hosts.empty?
 
           CatalogModifier.modify do |modifier|
             modifier.datasets[dataset].replicas.hosts += added_hosts
