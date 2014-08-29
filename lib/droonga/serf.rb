@@ -44,10 +44,6 @@ module Droonga
       def path
         Droonga::Path.base + "serf"
       end
-
-      def send_query(name, query, payload)
-        new(nil, name).send_query(query, payload)
-      end
     end
 
     include Loggable

@@ -79,7 +79,8 @@ end
 destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 
 def run_remote_command(target, command, options)
-  result = Droonga::Serf.send_query(target, command, options)
+  serf = Serf.new(nil, target)
+  result = serf.send_query(command, options)
   puts result[:result]
   puts result[:error] unless result[:error].empty?
   result[:response]
