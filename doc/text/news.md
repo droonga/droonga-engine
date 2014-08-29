@@ -1,5 +1,15 @@
 # News
 
+## 1.0.6: 2014-08-29 (planned)
+
+ * A static configuration file to define default parameters (`host` and so on) is now available.
+   It must be placed into the directory same to `catalog.json`.
+   You don't have to run "droonga-engine" command with many options, anymore.
+ * `droonga-engine-join` now automatically fetches `catalog.json` from the specified source replica node.
+   Now you don't have to copy `catalog.json` from another node before you run `droonga-engine-join` anymore.
+ * A new `catalog` plugin is introduced as one of default plugins, to fetch `catalog.json` from existing cluster.
+   The list of plugins in your `catalog.json` must include it.
+
 ## 1.0.5: 2014-07-29
 
  * Restarts server processes more gracefully.
