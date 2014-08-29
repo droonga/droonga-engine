@@ -9,6 +9,8 @@
    Now you don't have to copy `catalog.json` from another node before you run `droonga-engine-join` anymore.
  * A new `catalog` plugin is introduced as one of default plugins, to fetch `catalog.json` from existing cluster.
    The list of plugins in your `catalog.json` must include it.
+ * `droonga-engine-stop`, a new command line utility to stop the service is available.
+   You don't need to send `SIGTERM` manually anymore.
 
 ## 1.0.5: 2014-07-29
 
