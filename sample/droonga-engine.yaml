@@ -1,0 +1,5 @@
+host:      192.168.0.10
+port:      10031
+tag:       droonga
+log_file:  droonga-engine.log
+log_level: info
