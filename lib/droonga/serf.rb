@@ -99,6 +99,7 @@ module Droonga
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
       result = run_once("query", *options)
+      result[:result] = JSON.parse(result[:result])
       if payload["node"]
         responses = result[:result]["Responses"]
         response = responses[payload["node"]]
@@ -119,6 +120,7 @@ module Droonga
       ensure_serf
       nodes = {}
       result = run_once("members", "-format", "json")
+      result[:result] = JSON.parse(result[:result])
       members = result[:result]
       members["members"].each do |member|
         if member["status"] == "alive"
@@ -265,7 +267,7 @@ module Droonga
       def run_once
         stdout, stderror, status = Open3.capture3(@serf, @command, *@options, :pgroup => true)
         {
-          :result => JSON.parse(stdout),
+          :result => stdout,
           :error  => stderror,
           :status => status,
         }
