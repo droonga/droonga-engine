@@ -54,6 +54,14 @@ module Droonga
         base + "droonga-engine.yaml"
       end
 
+      def default_pid_file
+        base + "droonga-engine.pid"
+      end
+
+      def default_log_file
+        base + "droonga-engine.log"
+      end
+
       def catalog
         base_file_name = ENV["DROONGA_CATALOG"] || "catalog.json"
         Pathname.new(base_file_name).expand_path(base)

@@ -117,18 +117,28 @@ module Droonga
           config = load_config
 
           @host = config["host"] || Address::DEFAULT_HOST
-          @port = Address::DEFAULT_PORT
-          @tag = Address::DEFAULT_TAG
+          @port = config["port"] || Address::DEFAULT_PORT
+          @tag  = config["tag"]  || Address::DEFAULT_TAG
           @log_file = nil
           @daemon = false
           @pid_file_path = nil
           @ready_notify_fd = nil
+
+          if have_config_file?
+            @daemon            = true
+            self.pid_file_path = config["pid_file"] || Path.default_pid_file
+            self.log_file      = config["log_file"] || Path.default_log_file
+            self.log_level     = config["log_level"] if config.include?("log_level")
+          end
+        end
+
+        def have_config_file?
+          File.exist?(Path.config)
         end
 
         def load_config
-          path = Droonga::Path.config
-          if File.exist?(path)
-            YAML.load_file(path)
+          if have_config_file?
+            YAML.load_file(Path.config)
           else
             {}
           end
@@ -145,6 +155,18 @@ module Droonga
 
         def log_level
           ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
+        end
+
+        def log_level=(level)
+          ENV["DROONGA_LOG_LEVEL"] = level
+        end
+
+        def log_file=(file)
+          @log_file = File.expand_path(file)
+        end
+
+        def pid_file_path=(path)
+          @pid_file_path = Pathname.new(path).expand_path
         end
 
         def daemon?
@@ -204,11 +226,11 @@ module Droonga
                     "The log level of the Droonga engine",
                     "[#{levels_label}]",
                     "(#{log_level})") do |level|
-            ENV["DROONGA_LOG_LEVEL"] = level
+            self.log_level = level
           end
           parser.on("--log-file=FILE",
                     "Output logs to FILE") do |file|
-            @log_file = File.expand_path(file)
+            self.log_file = file
           end
         end
 
@@ -221,7 +243,7 @@ module Droonga
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
-            @pid_file_path = Pathname.new(path).expand_path
+            self.pid_file_path = path
           end
         end
 
