@@ -74,6 +74,14 @@ module Droonga
       def serf_event_handler_errors
         state + "serf-event-handler-errors"
       end
+
+      def serf_event_handler_error_file
+        now = Time.now
+        name = sprintf("%04d-%02d-%02d_%02d-%02d-%02d.%d.error",
+                       now.year, now.month, now.day,
+                       now.hour, now.min, now.sec, now.nsec)
+        serf_event_handler_errors + name
+      end
     end
   end
 end

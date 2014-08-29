@@ -39,6 +39,13 @@ module Droonga
         command.process if command.should_process?
         output_response(command.response)
         true
+      rescue Exception => exception
+        #XXX Any exception blocks following serf operations.
+        #    To keep it working, I rescue any exception for now.
+        File.open(Path.serf_event_handler_error_file, "w") do |file|
+          file.write(exception.inspect)
+        end
+        true
       end
 
       private
