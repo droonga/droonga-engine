@@ -159,12 +159,14 @@ module Droonga
 
           log("source_node = #{source_node}")
 
+          @catalog = fetch_catalog
+
           other_hosts = replica_hosts
           log("other_hosts = #{other_hosts}")
           return if other_hosts.empty?
 
           # restart self with the fetched catalog.
-          SafeFileWriter.write(Path.catalog, JSON.pretty_generate(catalog))
+          SafeFileWriter.write(Path.catalog, JSON.pretty_generate(@catalog))
 
           absorb_data if should_absorb_data?
 
@@ -178,11 +180,9 @@ module Droonga
           @serf.join(*other_hosts)
         end
 
-        def replica_hosts(catalog=nil)
-          catalog ||= fetch_catalog
-
+        def replica_hosts
           generator = CatalogGenerator.new
-          generator.load(catalog)
+          generator.load(@catalog)
           dataset = generator.dataset_for_host(source_host) ||
                       generator.dataset_for_host(host)
           return [] unless dataset
