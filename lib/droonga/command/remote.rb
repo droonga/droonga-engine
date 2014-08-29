@@ -36,6 +36,7 @@ module Droonga
           @response  = {
             "log" => []
           }
+          @serf = Serf.new(nil, @serf_name)
         end
 
         def process
@@ -171,7 +172,7 @@ module Droonga
             modifier.datasets[dataset_name].replicas.hosts.uniq!
           end
 
-          Serf.join(@serf_name, *other_hosts)
+          @serf.join(*other_hosts)
         end
 
         def replica_hosts(catalog=nil)
@@ -295,7 +296,7 @@ module Droonga
             modifier.datasets[dataset].replicas.hosts = hosts
           end
 
-          Serf.join(@serf_name, *hosts)
+          @serf.join(*hosts)
           #XXX Now we should restart serf agent to remove unjoined nodes from the list of members...
         end
       end
@@ -314,7 +315,7 @@ module Droonga
             modifier.datasets[dataset].replicas.hosts.uniq!
           end
 
-          Serf.join(@serf_name, *added_hosts)
+          @serf.join(*added_hosts)
         end
       end
 
@@ -342,7 +343,7 @@ module Droonga
 
         private
         def live_nodes
-          Serf.live_nodes(@serf_name)
+          @serf.live_nodes
         end
       end
     end
