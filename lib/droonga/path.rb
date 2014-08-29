@@ -50,6 +50,10 @@ module Droonga
         state + "effective-message.timestamp"
       end
 
+      def config
+        base + "droonga-engine.yaml"
+      end
+
       def catalog
         base_file_name = ENV["DROONGA_CATALOG"] || "catalog.json"
         Pathname.new(base_file_name).expand_path(base)
