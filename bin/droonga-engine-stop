@@ -53,6 +53,7 @@ begin
     raise Failed.new("Not a droonga-engine process: PID <#{pid}> (#{process_info.cmdline})")
   end
 
+  puts "Sending SIGTERM to the process...";
   Process.kill(:TERM, pid)
 
 rescue Failed => error
