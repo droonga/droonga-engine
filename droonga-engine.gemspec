@@ -38,7 +38,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rroonga", ">= 4.0.1"
   gem.add_dependency "groonga-command-parser"
   gem.add_dependency "json"
-  gem.add_dependency "yaml"
   gem.add_dependency "cool.io"
   gem.add_dependency "droonga-message-pack-packer", ">= 1.0.1"
   gem.add_dependency "faraday"
