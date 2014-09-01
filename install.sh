@@ -14,3 +14,7 @@ cd $DROONGA_BASE_DIR
 droonga-engine-catalog-generate --output=./catalog.json
 echo "host: " > droonga-engine.yaml
 exit
+
+# set up service
+sudo cp droonga-engine /etc/init.d/droonga-engine
+sudo update-rc.d droonga-engine defaults
