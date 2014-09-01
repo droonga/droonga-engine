@@ -1,6 +1,6 @@
 DROONGA_BASE_DIR = $(HOME)/droonga
 
-# setups droonga-engine
+# sets up droonga-engine
 install:
 	sudo apt-get update
 	sudo apt-get -y upgrade
