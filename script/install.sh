@@ -12,13 +12,11 @@ sudo gem install droonga-engine
 USER=droonga-engine
 sudo useradd -m $USER
 
-login droonga-engine
-DROONGA_BASE_DIR=/home/droonga-engine/droonga
-mkdir $DROONGA_BASE_DIR
-cd $DROONGA_BASE_DIR
+DROONGA_BASE_DIR=/home/$USER/droonga
 droonga-engine-catalog-generate --output=./catalog.json
-echo "host: " > droonga-engine.yaml
-exit
+sudo mkdir $DROONGA_BASE_DIR
+sudo mv catalog.json droonga-engine.yaml $DROONGA_BASE_DIR
+sudo chown -R $USER.$USER $DROONGA_BASE_DIR
 
 # set up service
 sudo cp droonga-engine /etc/init.d/droonga-engine
