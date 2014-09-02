@@ -19,5 +19,5 @@ sudo mv catalog.json droonga-engine.yaml $DROONGA_BASE_DIR
 sudo chown -R $USER.$USER $DROONGA_BASE_DIR
 
 # set up service
-sudo cp droonga-engine /etc/init.d/droonga-engine
+sudo mv droonga-engine /etc/init.d/droonga-engine
 sudo update-rc.d droonga-engine defaults
