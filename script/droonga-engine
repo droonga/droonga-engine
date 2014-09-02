@@ -16,7 +16,7 @@ DESC="Droonga engine is a core component in Droonga system"
 NAME=droonga-engine
 DAEMON=`which droonga-engine`
 DROONGA_BASE_DIR=/home/droonga-engine/droonga
-DAEMON_ARGS="--daemon --log-file=$DROONGA_BASE_DIR/droonga-engine.log --pid-file=$DROONGA_BASE_DIR/droonga-engine.pid"
+DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
