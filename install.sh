@@ -8,7 +8,7 @@ sudo gem install droonga-engine
 adduser droonga-engine
 
 login droonga-engine
-DROONGA_BASE_DIR = /home/droonga-engine/droonga
+DROONGA_BASE_DIR=/home/droonga-engine/droonga
 mkdir $DROONGA_BASE_DIR
 cd $DROONGA_BASE_DIR
 droonga-engine-catalog-generate --output=./catalog.json
