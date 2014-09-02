@@ -4,6 +4,10 @@ sudo apt-get -y upgrade
 sudo apt-get install -y ruby ruby-dev build-essential
 sudo gem install droonga-engine
 
+# fetch files
+#SCRIPT_URL=https://raw.github.com/droonga/droonga-engine/script
+#curl -O $SCRIPT_URL/droonga-engine -O $SCRIPT_URL/droonga-engine.yaml
+
 # add droonga-engine user and create files
 adduser droonga-engine
 
