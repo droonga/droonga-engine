@@ -12,13 +12,14 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Droonga engine is a core component in Droonga system"
+DESC=""
 NAME=droonga-engine
-DAEMON=`which droonga-engine`
-DROONGA_BASE_DIR=/home/droonga-engine/droonga
+DAEMON=/usr/local/bin/droonga-engine
 DAEMON_ARGS=""
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/home/droonga-engine/droonga/droonga-engine.pid #TODO place of pid file is be     changed!
 SCRIPTNAME=/etc/init.d/$NAME
+
+export DROONGA_BASE_DIR=/home/droonga-engine/droonga
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
