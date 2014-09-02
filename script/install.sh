@@ -9,7 +9,8 @@ sudo gem install droonga-engine
 #curl -O $SCRIPT_URL/droonga-engine -O $SCRIPT_URL/droonga-engine.yaml
 
 # add droonga-engine user and create files
-adduser droonga-engine
+USER=droonga-engine
+sudo useradd -m $USER
 
 login droonga-engine
 DROONGA_BASE_DIR=/home/droonga-engine/droonga
