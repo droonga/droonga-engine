@@ -8,7 +8,7 @@ apt-get -y upgrade
 apt-get install -y ruby ruby-dev build-essential
 gem install droonga-engine --no-rdoc --no-ri
 
-SCRIPT_URL=https://raw.githubusercontent.com/droonga/droonga-engine/master/script
+SCRIPT_URL=https://raw.githubusercontent.com/droonga/droonga-engine/master/script/debian
 USER=droonga-engine
 DROONGA_BASE_DIR=/home/$USER/droonga
 
