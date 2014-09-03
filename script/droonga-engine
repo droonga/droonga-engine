@@ -14,12 +14,12 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC=""
 NAME=droonga-engine
-DAEMON=/usr/local/bin/droonga-engine
+DAEMON=/usr/local/bin/$NAME
 DAEMON_ARGS=""
-PIDFILE=/home/droonga-engine/droonga/droonga-engine.pid #TODO place of pid file is be     changed!
+PIDFILE=/home/droonga-engine/droonga/$NAME.pid #TODO place of pid file is be     changed!
 SCRIPTNAME=/etc/init.d/$NAME
 
-export DROONGA_BASE_DIR=/home/droonga-engine/droonga
+export DROONGA_BASE_DIR=/home/$NAME/droonga
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
