@@ -5,8 +5,8 @@ apt-get install -y ruby ruby-dev build-essential
 gem install droonga-engine
 
 # fetch files
-#SCRIPT_URL=https://raw.github.com/droonga/droonga-engine/script
-#curl -O $SCRIPT_URL/droonga-engine -O $SCRIPT_URL/droonga-engine.yaml
+SCRIPT_URL=https://raw.githubusercontent.com/droonga/droonga-engine/master/script
+curl -O $SCRIPT_URL/droonga-engine -O $SCRIPT_URL/droonga-engine.yaml
 
 # add droonga-engine user and create files
 USER=droonga-engine
