@@ -8,13 +8,17 @@ apt-get -y upgrade
 apt-get install -y ruby ruby-dev build-essential
 gem install droonga-engine
 
+exist_user() {
+  grep "^$1:" /etc/passwd > /dev/null
+}
+
 # fetch files
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/droonga-engine/master/script
 curl -O $SCRIPT_URL/droonga-engine -O $SCRIPT_URL/droonga-engine.yaml
 
 # add droonga-engine user and create files
 USER=droonga-engine
-useradd -m $USER
+exist_user $USER || useradd -m $USER
 
 DROONGA_BASE_DIR=/home/$USER/droonga
 droonga-engine-catalog-generate --output=./catalog.json
