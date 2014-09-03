@@ -248,6 +248,10 @@ module Droonga
                     "Run as a daemon") do
             @daemon = true
           end
+          parser.on("--no-daemon",
+                    "Run as a regular process") do
+            @daemon = false
+          end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
             self.pid_file_path = path
