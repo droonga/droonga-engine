@@ -1,3 +1,7 @@
+#
+# TODO: This script is specific to debian/ubuntu. This should be cross-platform.
+#
+
 # install droonga
 apt-get update
 apt-get -y upgrade
