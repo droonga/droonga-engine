@@ -1,0 +1,6 @@
+host:
+port:
+tag:
+daemon: true
+log_file: /home/droonga-engine/droonga/droonga-engine.log
+log_level: trace
