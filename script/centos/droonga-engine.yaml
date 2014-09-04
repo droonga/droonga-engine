@@ -1,5 +1,5 @@
-host:
-port:
-tag:
+host: 127.0.0.1
+port: 10031
+tag: droonga
 daemon: true
 log_file: droonga-engine.log
