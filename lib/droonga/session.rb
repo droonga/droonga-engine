@@ -13,8 +13,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/loggable"
+
 module Droonga
   class Session
+    include Loggable
+
     def initialize(id, dispatcher, collector_runner, tasks, inputs)
       @id = id
       @dispatcher = dispatcher
