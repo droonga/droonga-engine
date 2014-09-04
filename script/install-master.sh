@@ -51,6 +51,16 @@ install_master() {
   gem install "pkg/*.gem" --no-ri --no-rdoc
 }
 
+install_service_script() {
+  INSTALL_LOCATION=$1
+  PLATFORM=$2
+  DOWNLOAD_URL=$SCRIPT_URL/$PLATFORM/droonga-engine
+  if [ ! -e $INSTALL_LOCATION ]
+  then
+    curl -o $INSTALL_LOCATION $DOWNLOAD_URL
+  fi
+}
+
 install_in_debian() {
   apt-get update
   apt-get -y upgrade
@@ -63,8 +73,7 @@ install_in_debian() {
   setup_configuration_directory debian
 
   # register droogna-engine as a service
-  [ ! -e /etc/init.d/droonga-engine ] &&
-    curl -o /etc/init.d/droonga-engine $SCRIPT_URL/debian/droonga-engine
+  install_service_script /etc/init.d/droonga-engine debian
   update-rc.d droonga-engine defaults
 }
 
@@ -80,8 +89,7 @@ install_in_centos() {
   setup_configuration_directory centos
 
   # register droogna-engine as a service
-  [ ! -e /etc/rc.d/init.d/droonga-engine ] &&
-    curl -o /etc/rc.d/init.d/droonga-engine $SCRIPT_URL/centos/droonga-engine
+  install_service_script /etc/rc.d/init.d/droonga-engine centos
   /sbin/chkconfig --add droonga-engine
 }
 
