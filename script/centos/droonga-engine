@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+#	/etc/rc.d/init.d/droonga-engine
+#
+#	<Droonga engine is a core component in Droonga system>
+# chkconfig: 2345 20 80
+
+# Source function library.
+. /etc/init.d/functions
+
+NAME=droonga-engine
+DAEMON=/usr/local/bin/$NAME
+export DROONGA_BASE_DIR=/home/$NAME/droonga
+DAEMON_ARGS="--pid-file=$NAME"
+
+[ -x $DAEMON ] || exit 0
+
+start() {
+	echo -n "Starting $NAME: "
+  daemon $DAEMON $DAEMON_ARGS
+  RET_CODE=$?
+  touch /var/lock/subsys/$NAME
+	return $RET_CODE
+}
+
+stop() {
+	echo -n "Shutting down $NAME: "
+	killproc $DAEMON
+  RET_CODE=$?
+  rm -f /var/lock/subsys/$NAME
+	return $RET_CODE
+}
+
+case "$1" in
+    start)
+	start
+	;;
+    stop)
+	stop
+	;;
+    status)
+  status $NAME
+	;;
+    restart)
+    	stop
+	start
+	;;
+    *)
+	echo "Usage: $NAME {start|stop|status|reload|restart[|probe]"
+	exit 1
+	;;
+esac
+exit $?
