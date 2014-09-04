@@ -45,7 +45,7 @@ install_master() {
     bundle update
   fi
   bundle exec rake build
-  gem install "pkg/*.gem" --no-ri --no-rdoc 
+  gem install "pkg/*.gem" --no-ri --no-rdoc
 }
 
 install_in_debian() {
