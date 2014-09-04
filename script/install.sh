@@ -57,6 +57,6 @@ if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
 elif [ -e /etc/centos-release ]; then
   install_in_centos
 else
-  echo "This supports only debian, CentOS."
+  echo "Not supported platform. This script works only for Debian or CentOS."
   return 255
 fi
