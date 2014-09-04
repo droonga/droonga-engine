@@ -21,6 +21,10 @@ exist_user() {
   grep "^$1:" /etc/passwd > /dev/null
 }
 
+prepare_user() {
+  exist_user $USER || useradd -m $USER
+}
+
 setup_configuration_directory() {
   PLATFORM=$1
 
@@ -68,8 +72,7 @@ install_in_debian() {
   apt-get install -y ruby ruby-dev build-essential git
   install_master
 
-  # prepare the user
-  exist_user $USER || useradd -m $USER
+  prepare_user
 
   setup_configuration_directory debian
 
@@ -84,8 +87,7 @@ install_in_centos() {
   yum -y install ruby-devel git
   install_master
 
-  # prepare the user
-  exist_user $USER || useradd -m $USER
+  prepare_user
 
   setup_configuration_directory centos
 
