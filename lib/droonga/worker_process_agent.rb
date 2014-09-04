@@ -17,10 +17,12 @@ require "coolio"
 
 require "droonga/process_control_protocol"
 require "droonga/line_buffer"
+require "droonga/loggable"
 
 module Droonga
   class WorkerProcessAgent
     include ProcessControlProtocol
+    include Loggable
 
     def initialize(loop, input, output)
       @loop = loop
@@ -106,6 +108,10 @@ module Droonga
 
     def on_stop_immediately
       @on_stop_immediately.call if @on_stop_immediately
+    end
+
+    def log_tag
+      "worker_process_agent"
     end
   end
 end
