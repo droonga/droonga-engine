@@ -43,6 +43,7 @@ module Droonga
     def stop_gracefully
       logger.trace("stop_gracefully: start")
       shutdown_heartbeat_receiver
+      logger.trace("stop_gracefully: middle")
       shutdown_server
       logger.trace("stop_gracefully: done")
     end
@@ -88,7 +89,9 @@ module Droonga
     end
 
     def shutdown_server
+      logger.trace("shutdown_server: start")
       @server.close
+      logger.trace("shutdown_server: done")
     end
 
     def shutdown_clients

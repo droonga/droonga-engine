@@ -57,16 +57,18 @@ module Droonga
       logger.trace("stop_gracefully: start")
       @live_nodes_list_observer.stop
       on_finish = lambda do
+        logger.trace("stop_gracefully/on_finish: start")
         output_last_processed_timestamp
         @dispatcher.shutdown
         @state.shutdown
-        logger.trace("stop_gracefully/on_finish: start")
         yield
         logger.trace("stop_gracefully/on_finish: done")
       end
       if @state.have_session?
+        logger.trace("stop_gracefully/having sessions")
         @state.on_finish = on_finish
       else
+        logger.trace("stop_gracefully/no session")
         on_finish.call
       end
       logger.trace("stop_gracefully: done")
@@ -114,11 +116,13 @@ module Droonga
     end
 
     def output_last_processed_timestamp
+      logger.trace("output_last_processed_timestamp: start")
       path = Path.last_processed_timestamp
       FileUtils.mkdir_p(path.dirname.to_s)
       path.open("w") do |file|
         file.write(@last_processed_timestamp)
       end
+      logger.trace("output_last_processed_timestamp: done")
     end
 
     def effective_message?(message)
