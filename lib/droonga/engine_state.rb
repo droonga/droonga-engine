@@ -90,7 +90,7 @@ module Droonga
 
     def register_session(id, session)
       @sessions[id] = session
-      logger.trace("new session is registered. rest sessions=#{@sessions.size}")
+      logger.trace("new session #{id} is registered. rest sessions=#{@sessions.size}")
     end
 
     def unregister_session(id)
@@ -98,7 +98,7 @@ module Droonga
       unless have_session?
         @on_finish.call if @on_finish
       end
-      logger.trace("session is unregistered. rest sessions=#{@sessions.size}")
+      logger.trace("session #{id} is unregistered. rest sessions=#{@sessions.size}")
     end
 
     def have_session?
