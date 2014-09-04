@@ -33,11 +33,14 @@ module Droonga
     end
 
     def start
+      logger.trace("start: start")
       @loop.attach(@input)
       @loop.attach(@output)
+      logger.trace("start: done")
     end
 
     def stop
+      logger.trace("stop: start")
       if @output
         @output, output = nil, @output
         output.write(Messages::FINISH)
@@ -47,6 +50,7 @@ module Droonga
         @input, input = nil, @input
         input.close
       end
+      logger.trace("stop: done")
     end
 
     def ready
