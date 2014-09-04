@@ -37,12 +37,15 @@ install_master() {
   gem install bundler rroonga --no-ri --no-rdoc
   if [ -d droonga-engine ]
   then
+    cd droonga-engine
+    git stash save
+    git pull --rebase
+    git stash pop
+    bundle update
+  else
     git clone https://github.com/droonga/droonga-engine.git
     cd droonga-engine
     bundle install
-  else
-    cd droonga-engine
-    bundle update
   fi
   bundle exec rake build
   gem install "pkg/*.gem" --no-ri --no-rdoc
