@@ -54,7 +54,7 @@ install_in_debian() {
 install_in_centos() {
   yum update
   yum -y groupinstall development
-  yum -y install ruby-devel npm
+  yum -y install ruby-devel
   gem install droonga-engine --no-rdoc --no-ri
 
   # add droonga-engine user and create files
