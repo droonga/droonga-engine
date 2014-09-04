@@ -21,6 +21,18 @@ exist_user() {
   grep "^$1:" /etc/passwd > /dev/null
 }
 
+setup_configuration_directory() {
+  PLATFORM=$1
+
+  [ ! -e $DROONGA_BASE_DIR ] &&
+    mkdir $DROONGA_BASE_DIR
+  [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
+    droonga-engine-catalog-generate --output=$DROONGA_BASE_DIR/catalog.json
+  [ ! -e $DROONGA_BASE_DIR/droonga-engine.yaml ] &&
+    curl -o $DROONGA_BASE_DIR/droonga-engine.yaml $SCRIPT_URL/$PLATFORM/droonga-engine.yaml
+  chown -R $USER.$USER $DROONGA_BASE_DIR
+}
+
 install_in_debian() {
   # install droonga
   apt-get update
@@ -31,13 +43,7 @@ install_in_debian() {
   # add droonga-engine user and create files
   exist_user $USER || useradd -m $USER
 
-  [ ! -e $DROONGA_BASE_DIR ] &&
-    mkdir $DROONGA_BASE_DIR
-  [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
-    droonga-engine-catalog-generate --output=$DROONGA_BASE_DIR/catalog.json
-  [ ! -e $DROONGA_BASE_DIR/droonga-engine.yaml ] &&
-    curl -o $DROONGA_BASE_DIR/droonga-engine.yaml $SCRIPT_URL/debian/droonga-engine.yaml
-  chown -R $USER.$USER $DROONGA_BASE_DIR
+  setup_configuration_directory debian
 
   # set up service
   [ ! -e /etc/init.d/droonga-engine ] &&
@@ -54,13 +60,7 @@ install_in_centos() {
   # add droonga-engine user and create files
   exist_user $USER || useradd -m $USER
 
-  [ ! -e $DROONGA_BASE_DIR ] &&
-    mkdir $DROONGA_BASE_DIR
-  [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
-    droonga-engine-catalog-generate --output=$DROONGA_BASE_DIR/catalog.json
-  [ ! -e $DROONGA_BASE_DIR/droonga-engine.yaml ] &&
-    curl -o $DROONGA_BASE_DIR/droonga-engine.yaml $SCRIPT_URL/centos/droonga-engine.yaml
-  chown -R $USER.$USER $DROONGA_BASE_DIR
+  setup_configuration_directory centos
 
   [ ! -e /etc/rc.d/init.d/droonga-engine ] &&
     curl -o /etc/rc.d/init.d/droonga-engine $SCRIPT_URL/centos/droonga-engine
