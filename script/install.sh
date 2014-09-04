@@ -34,18 +34,17 @@ setup_configuration_directory() {
 }
 
 install_in_debian() {
-  # install droonga
   apt-get update
   apt-get -y upgrade
   apt-get install -y ruby ruby-dev build-essential
   gem install droonga-engine --no-rdoc --no-ri
 
-  # add droonga-engine user and create files
+  # prepare the user
   exist_user $USER || useradd -m $USER
 
   setup_configuration_directory debian
 
-  # set up service
+  # register droogna-engine as a service
   [ ! -e /etc/init.d/droonga-engine ] &&
     curl -o /etc/init.d/droonga-engine $SCRIPT_URL/debian/droonga-engine
   update-rc.d droonga-engine defaults
@@ -57,11 +56,12 @@ install_in_centos() {
   yum -y install ruby-devel
   gem install droonga-engine --no-rdoc --no-ri
 
-  # add droonga-engine user and create files
+  # prepare the user
   exist_user $USER || useradd -m $USER
 
   setup_configuration_directory centos
 
+  # register droogna-engine as a service
   [ ! -e /etc/rc.d/init.d/droonga-engine ] &&
     curl -o /etc/rc.d/init.d/droonga-engine $SCRIPT_URL/centos/droonga-engine
   /sbin/chkconfig --add droonga-engine
