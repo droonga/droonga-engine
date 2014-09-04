@@ -40,6 +40,7 @@ install_service_script() {
   if [ ! -e $INSTALL_LOCATION ]
   then
     curl -o $INSTALL_LOCATION $DOWNLOAD_URL
+    chmod +x $INSTALL_LOCATION
   fi
 }
 
