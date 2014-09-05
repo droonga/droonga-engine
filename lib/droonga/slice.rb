@@ -112,7 +112,6 @@ module Droonga
       logger.trace("supervisor: shutdown: done")
     end
 
-    private
     def on_ready
       @on_ready.call if @on_ready
     end
