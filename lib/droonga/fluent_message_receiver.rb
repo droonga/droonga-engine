@@ -55,6 +55,12 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    def shutdown_clients
+      @clients.dup.each do |client|
+        client.close
+      end
+    end
+
     private
     def start_heartbeat_receiver
       logger.trace("start_heartbeat_receiver: start")
@@ -77,6 +83,9 @@ module Droonga
         client = Client.new(connection) do |tag, time, record|
           @on_message.call(tag, time, record)
         end
+        client.on_close = lambda do
+          @clients.delete(client)
+        end
         @clients << client
       end
       @loop.attach(@server)
@@ -92,12 +101,6 @@ module Droonga
       logger.trace("shutdown_server: start")
       @server.close
       logger.trace("shutdown_server: done")
-    end
-
-    def shutdown_clients
-      @clients.each do |client|
-        client.close
-      end
     end
 
     def log_tag
@@ -155,15 +158,26 @@ module Droonga
     class Client
       include Loggable
 
+      attr_accessor :on_close
       def initialize(io, &on_message)
         @io = io
         @on_message = on_message
+        @on_close = nil
         @unpacker = MessagePack::Unpacker.new
+
         on_read = lambda do |data|
           feed(data)
         end
         @io.on_read do |data|
           on_read.call(data)
+        end
+
+        on_close = lambda do
+          @io = nil
+          @on_close.call if @on_close
+        end
+        @io.on_close do
+          on_close.call
         end
       end
 
