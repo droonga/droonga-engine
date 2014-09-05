@@ -22,7 +22,8 @@ exist_user() {
 }
 
 prepare_user() {
-  exist_user $USER || useradd -m $USER
+  id $USER
+  [ ! $? -eq 0 ] && useradd -m $USER
 }
 
 setup_configuration_directory() {
