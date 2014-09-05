@@ -58,7 +58,7 @@ module Droonga
           output.close
           on_finish.call do
             yield
-          emd
+          end
         end
       else
         on_finish.call

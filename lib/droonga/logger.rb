@@ -119,6 +119,7 @@ module Droonga
     def log(level, message, data)
       return unless target_level?(level)
       @output.print(build_log_line(level, message, data))
+      @output.flush
     end
 
     def log_backtrace(level, backtrace)

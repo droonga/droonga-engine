@@ -29,6 +29,7 @@ module Droonga
     end
 
     def start
+      logger.trace("start: start")
       n_ready_workers = 0
       @worker_runners = @n_workers.times.collect do |i|
         worker_runner = WorkerRunner.new(@loop, i, @config)
@@ -42,6 +43,7 @@ module Droonga
         # TODO: support auto re-run
         worker_runner
       end
+      logger.trace("start: done")
     end
 
     def stop_gracefully
@@ -155,10 +157,12 @@ module Droonga
       end
 
       def on_finish
+        logger.trace("on_finish: start")
         _, status = Process.waitpid2(@pid)
         @success = status.success?
         @supervisor.stop
         on_failure unless success?
+        logger.trace("on_finish: done")
       end
 
       private
