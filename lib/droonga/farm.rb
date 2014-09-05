@@ -62,14 +62,10 @@ module Droonga
       end
     end
 
-    def shutdown
-      threads = []
+    def stop_immediately
       @slices.each_value do |slice|
-        threads << Thread.new do
-          slice.shutdown
-        end
+        slice.stop_immediately
       end
-      threads.each(&:join)
     end
 
     def process(slice_name, message)

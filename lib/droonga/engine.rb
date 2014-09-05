@@ -80,7 +80,7 @@ module Droonga
       logger.trace("stop_immediately: start")
       output_last_processed_timestamp
       @live_nodes_list_observer.stop
-      @dispatcher.shutdown
+      @dispatcher.stop_immediately
       @state.shutdown
       logger.trace("stop_immediately: done")
     end

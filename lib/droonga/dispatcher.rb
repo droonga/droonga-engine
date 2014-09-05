@@ -81,8 +81,8 @@ module Droonga
       logger.trace("stop_gracefully: done")
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
+    def stop_immediately
+      logger.trace("stop_immediately: start")
       @collector_runners.each_value do |collector_runner|
         collector_runner.shutdown
       end
@@ -90,7 +90,7 @@ module Droonga
         adapter_runner.shutdown
       end
       @farm.shutdown
-      logger.trace("shutdown: done")
+      logger.trace("stop_immediately: done")
     end
 
     def process_message(message)

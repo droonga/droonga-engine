@@ -61,12 +61,12 @@ module Droonga
       logger.trace("stop_gracefully: done")
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
-      shutdown_supervisor if @supervisor
+    def stop_immediately
+      logger.trace("stop_immediately: start")
+      @supervisor.stop_immediately if @supervisor
       @job_pusher.shutdown
       @processor.shutdown
-      logger.trace("shutdown: done")
+      logger.trace("stop_immediately: done")
     end
 
     def process(message)
@@ -121,12 +121,6 @@ module Droonga
         on_ready
       end
       @supervisor.start
-    end
-
-    def shutdown_supervisor
-      logger.trace("supervisor: shutdown: start")
-      @supervisor.stop_gracefully
-      logger.trace("supervisor: shutdown: done")
     end
 
     def on_ready
