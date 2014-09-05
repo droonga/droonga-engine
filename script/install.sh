@@ -18,12 +18,13 @@ USER=droonga-engine
 DROONGA_BASE_DIR=/home/$USER/droonga
 
 exist_user() {
-  grep "^$1:" /etc/passwd > /dev/null
+  id "$1" > /dev/null 2>&1
 }
 
 prepare_user() {
-  id $USER
-  [ ! $? -eq 0 ] && useradd -m $USER
+  if ! exist_user $USER; then
+    useradd -m $USER
+  fi
 }
 
 setup_configuration_directory() {
