@@ -209,6 +209,7 @@ module Droonga
         @engine.stop_gracefully do
           shutdown_worker_process_agent
           shutdown_internal_message_receiver
+          logger.trace("loop watchers = #{@loop.watchers}")
         end
       end
 
