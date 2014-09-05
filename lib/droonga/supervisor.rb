@@ -46,8 +46,15 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
+      n_worker_runners = @worker_runners.size
+      n_done_worker_runners = 0
       @worker_runners.each do |worker_runner|
-        worker_runner.stop_gracefully
+        worker_runner.stop_gracefully do
+          n_done_worker_runners += 1
+          if n_done_worker_runners == n_worker_runners
+            yield if block_given?
+          end
+        end
       end
       logger.trace("stop_gracefully: done")
     end
@@ -89,6 +96,7 @@ module Droonga
         @config = config
         @on_ready = nil
         @on_failure = nil
+        @stop_gracefully_callback = nil
       end
 
       def start
@@ -119,9 +127,10 @@ module Droonga
         @supervisor.start
       end
 
-      def stop_gracefully
+      def stop_gracefully(&block)
         logger.trace("stop_gracefully: start")
         @supervisor.stop_gracefully
+        @stop_gracefully_callback = block
         logger.trace("stop_gracefully: done")
       end
 
@@ -163,6 +172,7 @@ module Droonga
         @success = status.success?
         @supervisor.stop
         on_failure unless success?
+        @stop_gracefully_callback.call if @stop_gracefully_callback
       end
 
       private
