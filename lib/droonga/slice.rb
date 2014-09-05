@@ -44,6 +44,23 @@ module Droonga
       start_supervisor
     end
 
+    def stop_gracefully
+      logger.trace("stop_gracefully: start")
+      on_finish = lambda do
+        @job_pusher.shutdown
+        @processor.shutdown
+        yield if block_given?
+      end
+      if @supervisor
+        @supervisor.stop_gracefully do
+          on_finish.call
+        end
+      else
+        on_finish.call
+      end
+      logger.trace("stop_gracefully: done")
+    end
+
     def shutdown
       logger.trace("shutdown: start")
       shutdown_supervisor if @supervisor
