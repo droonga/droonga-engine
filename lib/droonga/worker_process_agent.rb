@@ -46,7 +46,7 @@ module Droonga
       on_finish = lambda do
         n_rest_closes -= 1
         if n_rest_closes.zero?
-          block.call if block.given?
+          block.call unless block.nil?
           logger.trace("stop: done")
         end
       end
