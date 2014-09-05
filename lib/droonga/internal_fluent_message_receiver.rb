@@ -43,6 +43,7 @@ module Droonga
       shutdown_message_receiver
       shutdown_heartbeat_socket
       shutdown_listen_socket
+      yield
       logger.trace("shutdown: done")
     end
 

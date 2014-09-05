@@ -41,18 +41,32 @@ module Droonga
 
     def stop
       logger.trace("stop: start")
+
+      n_rest_closes = 2
+      on_finish = lambda do
+        n_rest_closes -= 1
+        if n_rest_closes.zero?
+          yield
+          logger.trace("stop: done")
+        end
+      end
+
       if @output
         @output, output = nil, @output
         output.write(Messages::FINISH)
         output.on_write_complete do
           output.close
+          on_finish.call
         end
+      else
+        on_finish.call
       end
+
       if @input
         @input, input = nil, @input
         input.close
       end
-      logger.trace("stop: done")
+      on_finish.call
     end
 
     def ready
