@@ -44,7 +44,9 @@ module Droonga
       if @output
         @output, output = nil, @output
         output.write(Messages::FINISH)
-        output.close
+        output.on_write_complete do
+          output.close
+        end
       end
       if @input
         @input, input = nil, @input
