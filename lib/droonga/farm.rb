@@ -49,6 +49,19 @@ module Droonga
       end
     end
 
+    def stop_gracefully
+      n_slices = @slices.size
+      n_done_slices = 0
+      @slices.each_value do |slice|
+        slice.stop_gracefully do
+          n_done_slices += 1
+          if n_done_slices == n_slices
+            yield if block_given?
+          end
+        end
+      end
+    end
+
     def shutdown
       threads = []
       @slices.each_value do |slice|
