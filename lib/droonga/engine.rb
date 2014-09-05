@@ -59,9 +59,10 @@ module Droonga
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         output_last_processed_timestamp
-        @dispatcher.shutdown
-        @state.shutdown
-        yield
+        @dispatcher.stop_gracefully do
+          @state.shutdown
+          yield
+        end
         logger.trace("stop_gracefully/on_finish: done")
       end
       if @state.have_session?
