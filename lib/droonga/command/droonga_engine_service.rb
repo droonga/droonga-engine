@@ -210,7 +210,6 @@ module Droonga
       end
 
       def stop_gracefully
-        logger.trace("stop_gracefully: start")
         return if @stopping
         @stopping = true
 
@@ -219,8 +218,6 @@ module Droonga
           n_rest_shutdowns -= 1
           if n_rest_shutdowns.zero?
             yield
-            logger.trace("stop_gracefully: done")
-            logger.trace("watchers = #{@loop.watchers.inspect}")
           end
         end
 
