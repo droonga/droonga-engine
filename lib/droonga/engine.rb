@@ -55,23 +55,13 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      n_rest_shutdowns = 2
       @live_nodes_list_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         output_last_processed_timestamp
-        on_completely_finish = lambda do
-          n_rest_shutdowns -= 1
-          if n_rest_shutdowns.zero?
-            yield
-          end
-        end
-        @dispatcher.shutdown do
-          on_completely_finish.call
-        end
-        @state.shutdown do
-          on_completely_finish.call
-        end
+        @dispatcher.shutdown
+        @state.shutdown
+        yield
         logger.trace("stop_gracefully/on_finish: done")
       end
       if @state.have_session?

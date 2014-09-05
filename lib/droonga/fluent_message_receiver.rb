@@ -42,30 +42,17 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      n_rest_shutdowns = 2
-      on_finish = lambda do
-        n_rest_shutdowns -= 1
-        if n_rest_shutdowns.zero?
-          yield
-          logger.trace("stop_gracefully: done")
-        end
-      end
-      shutdown_heartbeat_receiver do
-        on_finish.call
-      end
-      shutdown_server do
-        on_finish.call
-      end
+      shutdown_heartbeat_receiver
+      logger.trace("stop_gracefully: middle")
+      shutdown_server
+      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
       logger.trace("stop_immediately: start")
-      stop_gracefully do
-        shutdown_clients do
-          yield
-          logger.trace("stop_immediately: done")
-        end
-      end
+      stop_gracefully
+      shutdown_clients
+      logger.trace("stop_immediately: done")
     end
 
     private
@@ -78,10 +65,8 @@ module Droonga
 
     def shutdown_heartbeat_receiver
       logger.trace("shutdown_heartbeat_receiver: start")
-      @heartbeat_receiver.shutdown do
-        yield
-        logger.trace("shutdown_heartbeat_receiver: done")
-      end
+      @heartbeat_receiver.shutdown
+      logger.trace("shutdown_heartbeat_receiver: done")
     end
 
     def start_server
@@ -106,7 +91,6 @@ module Droonga
     def shutdown_server
       logger.trace("shutdown_server: start")
       @server.close
-      yield
       logger.trace("shutdown_server: done")
     end
 
@@ -114,7 +98,6 @@ module Droonga
       @clients.each do |client|
         client.close
       end
-      yield
     end
 
     def log_tag
@@ -143,7 +126,6 @@ module Droonga
       def shutdown
         @socket.close
         @watcher.detach
-        yield
       end
 
       private

@@ -133,14 +133,9 @@ module Droonga
       end
 
       def shutdown_internal_message_receiver
-        if @internal_message_receiver.nil?
-          yield
-          return
-        end
+        return if @internal_message_receiver.nil?
         @internal_message_receiver, receiver = nil, @internal_message_receiver
-        receiver.shutdown do
-          yield
-        end
+        receiver.shutdown
       end
 
       def run_engine
@@ -172,9 +167,7 @@ module Droonga
       end
 
       def shutdown_worker_process_agent
-        @worker_process_agent.stop do
-          yield
-        end
+        @worker_process_agent.stop
       end
 
       def create_receiver
@@ -212,25 +205,10 @@ module Droonga
       def stop_gracefully
         return if @stopping
         @stopping = true
-
-        n_rest_shutdowns = 3
-        on_finish = lambda do
-          n_rest_shutdowns -= 1
-          if n_rest_shutdowns.zero?
-            yield
-          end
-        end
-
-        @receiver.stop_gracefully do
-          on_finish.call
-        end
+        @receiver.stop_gracefully
         @engine.stop_gracefully do
-          shutdown_worker_process_agent do
-            on_finish.call
-          end
-          shutdown_internal_message_receiver do
-            on_finish.call
-          end
+          shutdown_worker_process_agent
+          shutdown_internal_message_receiver
         end
       end
 
