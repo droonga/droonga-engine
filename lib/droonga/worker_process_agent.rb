@@ -39,14 +39,14 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def stop
+    def stop(&block)
       logger.trace("stop: start")
 
       n_rest_closes = 2
       on_finish = lambda do
         n_rest_closes -= 1
         if n_rest_closes.zero?
-          yield
+          block.call if block.given?
           logger.trace("stop: done")
         end
       end
@@ -56,9 +56,7 @@ module Droonga
         output.write(Messages::FINISH)
         output.on_write_complete do
           output.close
-          on_finish.call do
-            yield
-          end
+          on_finish.call
         end
       else
         on_finish.call
