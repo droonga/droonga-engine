@@ -56,7 +56,9 @@ module Droonga
         output.write(Messages::FINISH)
         output.on_write_complete do
           output.close
-          on_finish.call
+          on_finish.call do
+            yield
+          emd
         end
       else
         on_finish.call
