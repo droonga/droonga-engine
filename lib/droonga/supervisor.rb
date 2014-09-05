@@ -45,9 +45,11 @@ module Droonga
     end
 
     def stop_gracefully
+      logger.trace("stop_gracefully: start")
       @worker_runners.each do |worker_runner|
         worker_runner.stop_gracefully
       end
+      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
@@ -118,7 +120,9 @@ module Droonga
       end
 
       def stop_gracefully
+        logger.trace("stop_gracefully: start")
         @supervisor.stop_gracefully
+        logger.trace("stop_gracefully: done")
       end
 
       def stop_immediately

@@ -204,12 +204,14 @@ module Droonga
 
       def stop_gracefully
         return if @stopping
+        logger.trace("stop_gracefully: start")
         @stopping = true
         @receiver.stop_gracefully
         @engine.stop_gracefully do
           shutdown_worker_process_agent
           shutdown_internal_message_receiver
           logger.trace("loop watchers = #{@loop.watchers}")
+          logger.trace("stop_gracefully: done")
         end
       end
 
