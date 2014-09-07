@@ -15,6 +15,7 @@
 
 NAME=droonga-engine
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/script
+REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
@@ -42,16 +43,16 @@ setup_configuration_directory() {
 
 install_master() {
   gem install bundler rroonga --no-ri --no-rdoc
-  if [ -d droonga-engine ]
+  if [ -d $NAME ]
   then
-    cd droonga-engine
+    cd $NAME
     git stash save
     git pull --rebase
     git stash pop
     bundle update
   else
-    git clone https://github.com/droonga/droonga-engine.git
-    cd droonga-engine
+    git clone $REPOSITORY_URL
+    cd $NAME
     bundle install
   fi
   bundle exec rake build
