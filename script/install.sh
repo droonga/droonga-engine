@@ -36,7 +36,7 @@ setup_configuration_directory() {
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
     droonga-engine-catalog-generate --output=$DROONGA_BASE_DIR/catalog.json
   [ ! -e $DROONGA_BASE_DIR/$NAME.yaml ] &&
-    curl -o $DROONGA_BASE_DIR/droonga-engine.yaml $SCRIPT_URL/$PLATFORM/$NAME.yaml
+    curl -o $DROONGA_BASE_DIR/$NAME.yaml $SCRIPT_URL/$PLATFORM/$NAME.yaml
   chown -R $USER.$USER $DROONGA_BASE_DIR
 }
 
