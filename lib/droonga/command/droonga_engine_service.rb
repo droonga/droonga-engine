@@ -211,8 +211,9 @@ module Droonga
           shutdown_worker_process_agent
           shutdown_internal_message_receiver
           @receiver.shutdown_clients
-          logger.trace("loop watchers = #{@loop.watchers}")
-          logger.trace("stop_gracefully: done")
+          logger.trace("stop_gracefully: done",
+                       :n_rest_watchers => @loop.watchers.size,
+                       :rest_watchers   => @loop.watchers)
         end
       end
 
