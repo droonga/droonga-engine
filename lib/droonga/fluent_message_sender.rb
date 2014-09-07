@@ -34,6 +34,7 @@ module Droonga
       @host = host
       @port = port
       @socket = nil
+      @packer = MessagePackPacker.new
       @buffering = options[:buffering]
     end
 
@@ -114,7 +115,10 @@ module Droonga
 
     def create_packed_fluent_message(tag, data)
       fluent_message = [tag, Time.now.to_i, data]
-      MessagePackPacker.pack(fluent_message)
+      @packer.pack(fluent_message)
+      packed_fluent_message = @packer.to_s
+      @packer.clear
+      packed_fluent_message
     end
 
     def log_tag
