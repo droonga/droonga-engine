@@ -44,7 +44,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "faraday"
   gem.add_dependency "faraday_middleware"
   gem.add_dependency "json"
-  gem.add_dependency "rroonga", ">= 4.0.1"
+  gem.add_dependency "rroonga", ">= 4.0.4"
   gem.add_dependency "sigdump"
   gem.add_dependency "slop"
   gem.add_dependency "sys-proctable"

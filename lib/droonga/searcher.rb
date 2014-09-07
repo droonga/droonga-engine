@@ -82,26 +82,14 @@ module Droonga
     def search(queries)
       outputs = nil
       logger.trace("search: start", :queries => queries)
-      # TODO: THIS IS JUST A WORKAROUND! We should remove it ASAP!
-      disable_gc do
-        @context.push_memory_pool do
-          outputs = process_queries(queries)
-        end
+      @context.push_memory_pool do
+        outputs = process_queries(queries)
       end
       logger.trace("search: done")
       return outputs
     end
 
     private
-    def disable_gc
-      GC.disable
-      begin
-        yield
-      ensure
-        GC.enable
-      end
-    end
-
     def process_queries(queries)
       logger.trace("process_queries: start")
       if queries.nil? or queries.empty?
