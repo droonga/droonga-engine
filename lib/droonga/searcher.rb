@@ -86,7 +86,7 @@ module Droonga
         outputs = process_queries(queries)
       end
       logger.trace("search: done")
-      return outputs
+      outputs
     end
 
     private
