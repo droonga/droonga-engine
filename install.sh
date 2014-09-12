@@ -13,10 +13,25 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Usage:
+#   Install a release version:
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo bash
+#   Install the latest revision from the repository:
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | INSTALL_VERSION=master sudo bash
+
 NAME=droonga-engine
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
+REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
+
+if [ "$INSTALL_VERSION" = "" ]; then
+  export INSTALL_VERSION=release
+fi
+
+exist_command() {
+  type "$1" > /dev/null 2>&1
+}
 
 exist_user() {
   id "$1" > /dev/null 2>&1
@@ -40,6 +55,45 @@ setup_configuration_directory() {
   chown -R $USER.$USER $DROONGA_BASE_DIR
 }
 
+install_rroonga() {
+  # Install Rroonga globally from a public gem, because custom build
+  # doesn't work as we expect for Droonga...
+  if exist_command grndump; then
+    current_version=$(grndump -v | cut -d " " -f 2)
+    version_matcher=$(cat droonga-engine.gemspec | \
+                      grep rroonga | \
+                      cut -d "," -f 2 | \
+                      cut -d '"' -f 2)
+    compared_version=$(echo "$version_matcher" | \
+                       cut -d " " -f 2)
+    operator=$(echo "$version_matcher" | cut -d " " -f 1)
+    compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
+    if [ $compare_result = "true" ]; then return 0; fi
+  fi
+  gem install rroonga --no-ri --no-rdoc
+}
+
+install_master() {
+  gem install bundler --no-ri --no-rdoc
+
+  if [ -d $NAME ]
+  then
+    cd $NAME
+    install_rroonga
+    git stash save
+    git pull --rebase
+    git stash pop
+    bundle update
+  else
+    git clone $REPOSITORY_URL
+    cd $NAME
+    install_rroonga
+    bundle install
+  fi
+  bundle exec rake build
+  gem install "pkg/*.gem" --no-ri --no-rdoc
+}
+
 install_service_script() {
   INSTALL_LOCATION=$1
   PLATFORM=$2
@@ -55,7 +109,14 @@ install_in_debian() {
   apt-get update
   apt-get -y upgrade
   apt-get install -y ruby ruby-dev build-essential
-  gem install droonga-engine --no-rdoc --no-ri
+  if [ "$INSTALL_VERSION" = "master" ]; then
+    echo "Installing droonga-engine from the git repository..."
+    apt-get install -y git
+    install_master
+  else
+    echo "Installing droonga-engine from RubyGems..."
+    gem install droonga-engine --no-rdoc --no-ri
+  fi
 
   prepare_user
 
@@ -69,8 +130,8 @@ install_in_debian() {
 install_in_centos() {
   yum update
   yum -y groupinstall development
-  yum -y install ruby-devel
-  gem install droonga-engine --no-rdoc --no-ri
+  yum -y install ruby-devel git
+  install_master
 
   prepare_user
 
