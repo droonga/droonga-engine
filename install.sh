@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 NAME=droonga-engine
-SCRIPT_URL=https://raw.githubusercontent.com/droonga/droonga-engine/master/script
+SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
