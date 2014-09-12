@@ -130,8 +130,15 @@ install_in_debian() {
 install_in_centos() {
   yum update
   yum -y groupinstall development
-  yum -y install ruby-devel git
-  install_master
+  yum -y install ruby-devel
+  if [ "$INSTALL_VERSION" = "master" ]; then
+    echo "Installing droonga-engine from the git repository..."
+    yum -y install git
+    install_master
+  else
+    echo "Installing droonga-engine from RubyGems..."
+    gem install droonga-engine --no-rdoc --no-ri
+  fi
 
   prepare_user
 
