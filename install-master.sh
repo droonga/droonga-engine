@@ -13,11 +13,21 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+# Usage:
+#   Install a release version:
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo bash
+#   Install the latest revision from the repository:
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | INSTALL_VERSION=master sudo bash
+
 NAME=droonga-engine
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
+
+if [ "$INSTALL_VERSION" = "" ]; then
+  export INSTALL_VERSION=release
+fi
 
 exist_command() {
   type "$1" > /dev/null 2>&1
@@ -98,8 +108,13 @@ install_service_script() {
 install_in_debian() {
   apt-get update
   apt-get -y upgrade
-  apt-get install -y ruby ruby-dev build-essential git
-  install_master
+  apt-get install -y ruby ruby-dev build-essential
+  if [ "$INSTALL_VERSION" = "master" ]; then
+    apt-get install -y git
+    install_master
+  else
+    gem install droonga-engine --no-rdoc --no-ri
+  fi
 
   prepare_user
 
