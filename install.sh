@@ -60,7 +60,7 @@ install_rroonga() {
   # doesn't work as we expect for Droonga...
   if exist_command grndump; then
     current_version=$(grndump -v | cut -d " " -f 2)
-    version_matcher=$(cat droonga-engine.gemspec | \
+    version_matcher=$(cat $NAME.gemspec | \
                       grep rroonga | \
                       cut -d "," -f 2 | \
                       cut -d '"' -f 2)
@@ -110,11 +110,11 @@ install_in_debian() {
   apt-get -y upgrade
   apt-get install -y ruby ruby-dev build-essential
   if [ "$INSTALL_VERSION" = "master" ]; then
-    echo "Installing droonga-engine from the git repository..."
+    echo "Installing $NAME from the git repository..."
     apt-get install -y git
     install_master
   else
-    echo "Installing droonga-engine from RubyGems..."
+    echo "Installing $NAME from RubyGems..."
     gem install droonga-engine --no-rdoc --no-ri
   fi
 
@@ -132,11 +132,11 @@ install_in_centos() {
   yum -y groupinstall development
   yum -y install ruby-devel
   if [ "$INSTALL_VERSION" = "master" ]; then
-    echo "Installing droonga-engine from the git repository..."
+    echo "Installing $NAME from the git repository..."
     yum -y install git
     install_master
   else
-    echo "Installing droonga-engine from RubyGems..."
+    echo "Installing $NAME from RubyGems..."
     gem install droonga-engine --no-rdoc --no-ri
   fi
 
