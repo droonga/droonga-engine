@@ -19,6 +19,10 @@ REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
+exist_command() {
+  type "$1" > /dev/null 2>&1
+}
+
 exist_user() {
   id "$1" > /dev/null 2>&1
 }
@@ -41,11 +45,31 @@ setup_configuration_directory() {
   chown -R $USER.$USER $DROONGA_BASE_DIR
 }
 
+install_rroonga() {
+  # Install Rroonga globally from a public gem, because custom build
+  # doesn't work as we expect for Droonga...
+  if exist_command grndump; then
+    current_version=$(grndump -v | cut -d " " -f 2)
+    version_matcher=$(cat droonga-engine.gemspec | \
+                      grep rroonga | \
+                      cut -d "," -f 2 | \
+                      cut -d '"' -f 2)
+    compared_version=$(echo "$version_matcher" | \
+                       cut -d " " -f 2)
+    operator=$(echo "$version_matcher" | cut -d " " -f 1)
+    compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
+    if [ $compare_result = "true" ]; then return 0; fi
+  fi
+  gem install rroonga --no-ri --no-rdoc
+}
+
 install_master() {
-  gem install bundler rroonga --no-ri --no-rdoc
+  gem install bundler --no-ri --no-rdoc
+
   if [ -d $NAME ]
   then
     cd $NAME
+    install_rroonga
     git stash save
     git pull --rebase
     git stash pop
@@ -53,6 +77,7 @@ install_master() {
   else
     git clone $REPOSITORY_URL
     cd $NAME
+    install_rroonga
     bundle install
   fi
   bundle exec rake build
