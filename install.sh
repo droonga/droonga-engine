@@ -25,8 +25,8 @@ REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
-if [ "$INSTALL_VERSION" = "" ]; then
-  export INSTALL_VERSION=release
+if [ "$VERSION" = "" ]; then
+  export VERSION=release
 fi
 
 exist_command() {
@@ -109,7 +109,7 @@ install_in_debian() {
   apt-get update
   apt-get -y upgrade
   apt-get install -y ruby ruby-dev build-essential
-  if [ "$INSTALL_VERSION" = "master" ]; then
+  if [ "$VERSION" = "master" ]; then
     echo "Installing $NAME from the git repository..."
     apt-get install -y git
     install_master
@@ -131,7 +131,7 @@ install_in_centos() {
   yum update
   yum -y groupinstall development
   yum -y install ruby-devel
-  if [ "$INSTALL_VERSION" = "master" ]; then
+  if [ "$VERSION" = "master" ]; then
     echo "Installing $NAME from the git repository..."
     yum -y install git
     install_master
