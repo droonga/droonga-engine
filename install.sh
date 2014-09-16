@@ -205,7 +205,7 @@ install_in_debian() {
   setup_configuration_directory debian
 
   echo ""
-  echo "Registering droogna-engine as a service..."
+  echo "Registering $NAME as a service..."
   install_service_script /etc/init.d/$NAME debian
   update-rc.d $NAME defaults
 }
@@ -231,7 +231,7 @@ install_in_centos() {
   setup_configuration_directory centos
 
   echo ""
-  echo "Registering droogna-engine as a service..."
+  echo "Registering $NAME as a service..."
   install_service_script /etc/rc.d/init.d/$NAME centos
   /sbin/chkconfig --add $NAME
 }
@@ -246,5 +246,5 @@ else
 fi
 
 echo ""
-echo "Successfully installed."
+echo "Successfully installed $NAME."
 exit 0
