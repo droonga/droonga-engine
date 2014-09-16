@@ -127,14 +127,20 @@ determine_hostname() {
   done
 
   if [ "$DETERMINED_HOSTNAME" = "Manual Input" ]; then
-    prompt="$prompt_for_manual_input: "
-    echo -n "$prompt"
-    while read DETERMINED_HOSTNAME; do
-      if [ "$DETERMINED_HOSTNAME" != "" ]; then break; fi
-      echo -n "$prompt"
-    done
+    input_hostname "$prompt_for_manual_input" &&
+      DETERMINED_HOSTNAME="$TYPED_HOSTNAME"
   fi
 
+  return 0
+}
+
+input_hostname() {
+  prompt="$1: "
+  echo -n "$prompt"
+  while read TYPED_HOSTNAME; do
+    if [ "$TYPED_HOSTNAME" != "" ]; then break; fi
+    echo -n "$prompt"
+  done
   return 0
 }
 
