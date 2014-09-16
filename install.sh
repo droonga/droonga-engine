@@ -153,7 +153,7 @@ determine_hostname() {
 
 input_hostname() {
   prompt="$1: "
-  while read -p "$prompt" TYPED_HOSTNAME; do
+  while read -p "$prompt" TYPED_HOSTNAME </dev/tty; do
     if [ "$TYPED_HOSTNAME" != "" ]; then break; fi
   done
   return 0
