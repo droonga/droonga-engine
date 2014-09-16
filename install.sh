@@ -75,9 +75,21 @@ setup_configuration_directory() {
   if [ ! -e $DROONGA_BASE_DIR/catalog.json -o \
        ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
     [ "$HOST" = "Auto Detect" ] &&
-      determine_hostname \
-        "Enter a host name or an IP address which is accessible from other nodes for this node" &&
-      HOST=$DETERMINED_HOSTNAME
+      determine_hostname &&
+        HOST=$DETERMINED_HOSTNAME
+
+    if [ "$HOST" = "" ]; then
+      HOST=$(hostname)
+      echo "********************** CAUTION!! **********************"
+      echo "Installation process coudln't detect the hostname of"
+      echo "this node, which is accessible from other nodes."
+      echo "You may have to configure following files manually"
+      echo "to refer a valid accessible hostname for this node:"
+      echo ""
+      echo "  $DROONGA_BASE_DIR/catalog.json"
+      echo "  $DROONGA_BASE_DIR/$NAME.yaml"
+      echo "*******************************************************"
+    fi
   fi
   echo "This node is configured with a hostname $HOST."
 
@@ -112,8 +124,6 @@ guess_global_hostname() {
 }
 
 determine_hostname() {
-  prompt_for_manual_input="$1"
-
   global_hostname=$(guess_global_hostname)
   if [ "$global_hostname" != "" ]; then
     DETERMINED_HOSTNAME="$global_hostname"
@@ -130,10 +140,8 @@ determine_hostname() {
     return 0
   fi
 
-  input_hostname "$prompt_for_manual_input" &&
-    DETERMINED_HOSTNAME="$TYPED_HOSTNAME"
-
-  return 0
+  DETERMINED_HOSTNAME=""
+  return 1
 }
 
 input_hostname() {
