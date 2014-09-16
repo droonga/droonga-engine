@@ -79,6 +79,7 @@ setup_configuration_directory() {
         "Enter a host name or an IP address which is accessible from other nodes for this node" &&
       HOST=$DETERMINED_HOSTNAME
   fi
+  echo "This node is configured with a hostname $HOST."
 
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
     droonga-engine-catalog-generate --hosts=$HOST \
