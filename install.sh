@@ -70,7 +70,7 @@ setup_configuration_directory() {
     cat $config_file.template | \
       $sed -e "s/\\\$hostname/$HOST/" \
       > $config_file
-    rm $config_file
+    rm $config_file.template
   fi
 
   chown -R $USER.$USER $DROONGA_BASE_DIR
