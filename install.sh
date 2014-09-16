@@ -100,7 +100,7 @@ setup_configuration_directory() {
 guess_global_hostname() {
   if hostname -d > /dev/null 2>&1; then
     domain=$(hostname -d)
-    hostname=$(hostname)
+    hostname=$(hostname -s)
     if [ "$domain" != "" ]; then
       echo "$hostname.$domain"
       return 0
