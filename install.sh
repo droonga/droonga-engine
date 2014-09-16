@@ -45,12 +45,17 @@ exist_user() {
 
 prepare_user() {
   if ! exist_user $USER; then
+    echo ""
+    echo "Preparing the user..."
     useradd -m $USER
   fi
 }
 
 setup_configuration_directory() {
   PLATFORM=$1
+
+  echo ""
+  echo "Setting up the configuration directory..."
 
   [ ! -e $DROONGA_BASE_DIR ] &&
     mkdir $DROONGA_BASE_DIR
@@ -183,6 +188,9 @@ install_in_debian() {
   apt-get update
   apt-get -y upgrade
   apt-get install -y ruby ruby-dev build-essential
+
+  echo ""
+
   if [ "$VERSION" = "master" ]; then
     echo "Installing $NAME from the git repository..."
     apt-get install -y git
@@ -196,7 +204,8 @@ install_in_debian() {
 
   setup_configuration_directory debian
 
-  # register droogna-engine as a service
+  echo ""
+  echo "Registering droogna-engine as a service..."
   install_service_script /etc/init.d/$NAME debian
   update-rc.d $NAME defaults
 }
@@ -205,6 +214,9 @@ install_in_centos() {
   yum update
   yum -y groupinstall development
   yum -y install ruby-devel
+
+  echo ""
+
   if [ "$VERSION" = "master" ]; then
     echo "Installing $NAME from the git repository..."
     yum -y install git
@@ -218,7 +230,8 @@ install_in_centos() {
 
   setup_configuration_directory centos
 
-  # register droogna-engine as a service
+  echo ""
+  echo "Registering droogna-engine as a service..."
   install_service_script /etc/rc.d/init.d/$NAME centos
   /sbin/chkconfig --add $NAME
 }
@@ -231,3 +244,7 @@ else
   echo "Not supported platform. This script works only for Debian or CentOS."
   return 255
 fi
+
+echo ""
+echo "Successfully installed."
+exit 0
