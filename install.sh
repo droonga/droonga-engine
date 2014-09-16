@@ -167,6 +167,7 @@ install_master() {
   gem install bundler --no-ri --no-rdoc
 
   tempdir=/tmp/install-$NAME
+  mkdir $tempdir
   cd $tempdir
 
   if [ -d $NAME ]
