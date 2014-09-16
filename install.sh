@@ -242,7 +242,7 @@ elif [ -e /etc/centos-release ]; then
   install_in_centos
 else
   echo "Not supported platform. This script works only for Debian or CentOS."
-  return 255
+  exit 255
 fi
 
 echo ""
