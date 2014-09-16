@@ -70,7 +70,8 @@ setup_configuration_directory() {
   fi
 
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
-    droonga-engine-catalog-generate --hosts=$HOST --output=$DROONGA_BASE_DIR/catalog.json
+    droonga-engine-catalog-generate --hosts=$HOST \
+                                    --output=$DROONGA_BASE_DIR/catalog.json
 
   config_file="$DROONGA_BASE_DIR/$NAME.yaml"
   if [ ! -e $config_file ]; then
@@ -87,14 +88,16 @@ setup_configuration_directory() {
 
 get_addresses_with_interface() {
   if exist_command ip; then
-    ip addr | grep "inet " | $sed -e "s/^ *inet ([0-9\.]+).+ ([^ ]+)\$/\1 \2/"
+    ip addr | grep "inet " | \
+      $sed -e "s/^ *inet ([0-9\.]+).+ ([^ ]+)\$/\1 \2/"
     return 0
   fi
 
   if exist_command ifconfig; then
     interfaces=$(ifconfig -s | cut -d " " -f 1 | tail -n +2)
     for interface in $interfaces; do
-      address=$(LANG=C ifconfig $interface | grep "inet addr" | $sed -e "s/^ *inet addr:([0-9\.]+).+\$/\1/")
+      address=$(LANG=C ifconfig $interface | grep "inet addr" | \
+                $sed -e "s/^ *inet addr:([0-9\.]+).+\$/\1/")
       if [ "$address" != "" ]; then
         echo $address $interface
       fi
@@ -111,12 +114,14 @@ determine_hostname() {
   prompt_for_manual_input="$2"
 
   if [ $(get_addresses_with_interface | wc -l) -eq 1 ]; then
-    DETERMINED_HOSTNAME=$(get_addresses_with_interface | cut -d " " -f 1)
+    DETERMINED_HOSTNAME=$(get_addresses_with_interface | \
+                          cut -d " " -f 1)
     return 0
   fi
 
   PS3="$prompt_for_suggestions: "
-  select chosen in $(get_addresses_with_interface | $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
+  select chosen in $(get_addresses_with_interface | \
+                     $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
   do
     if [ -z "$chosen" ]; then
       continue
