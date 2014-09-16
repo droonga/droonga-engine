@@ -141,10 +141,8 @@ determine_hostname() {
 
 input_hostname() {
   prompt="$1: "
-  echo -n "$prompt"
-  while read TYPED_HOSTNAME; do
+  while read -p "$prompt" TYPED_HOSTNAME; do
     if [ "$TYPED_HOSTNAME" != "" ]; then break; fi
-    echo -n "$prompt"
   done
   return 0
 }
