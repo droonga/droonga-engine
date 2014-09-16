@@ -76,8 +76,7 @@ setup_configuration_directory() {
        ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
     [ "$HOST" = "Auto Detect" ] &&
       determine_hostname \
-        "If this node has a global host name or a global IP address, then choose \"Manual Input\" and type it. Otherwise, choose a preferred IP address which can be accessed from other nodes." \
-        "Enter a global host name or a global IP address for this node" &&
+        "Enter a host name or an IP address  which is accessible from other nodes for this node" &&
       HOST=$DETERMINED_HOSTNAME
   fi
 
@@ -98,55 +97,40 @@ setup_configuration_directory() {
 }
 
 
-get_addresses_with_interface() {
-  if exist_command ip; then
-    ip addr | grep "inet " | \
-      $sed -e "s/^ *inet ([0-9\.]+).+ ([^ ]+)\$/\1 \2/"
-    return 0
+guess_global_hostname() {
+  if hostname -d > /dev/null 2>&1; then
+    domain=$(hostname -d)
+    hostname=$(hostname)
+    if [ "$domain" != "" ]; then
+      echo "$hostname.$domain"
+      return 0
+    fi
   fi
-
-  if exist_command ifconfig; then
-    interfaces=$(ifconfig -s | cut -d " " -f 1 | tail -n +2)
-    for interface in $interfaces; do
-      address=$(LANG=C ifconfig $interface | grep "inet addr" | \
-                $sed -e "s/^ *inet addr:([0-9\.]+).+\$/\1/")
-      if [ "$address" != "" ]; then
-        echo $address $interface
-      fi
-    done
-    return 0
-  fi
-
-  echo "127.0.0.1 lo"
-  return 0
+  echo ""
+  return 1
 }
 
 determine_hostname() {
-  prompt_for_suggestions="$1"
-  prompt_for_manual_input="$2"
+  prompt_for_manual_input="$1"
 
-  if [ $(get_addresses_with_interface | wc -l) -eq 1 ]; then
-    DETERMINED_HOSTNAME=$(get_addresses_with_interface | \
-                          cut -d " " -f 1)
+  global_hostname=$(guess_global_hostname)
+  if [ "$global_hostname" != "" ]; then
+    DETERMINED_HOSTNAME="$global_hostname"
     return 0
   fi
 
-  PS3="$prompt_for_suggestions: "
-  select chosen in $(get_addresses_with_interface | \
-                     $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
-  do
-    if [ -z "$chosen" ]; then
-      continue
-    else
-      DETERMINED_HOSTNAME=$(echo $chosen | cut -d "(" -f 1)
-      break
-    fi
-  done
-
-  if [ "$DETERMINED_HOSTNAME" = "Manual Input" ]; then
-    input_hostname "$prompt_for_manual_input" &&
-      DETERMINED_HOSTNAME="$TYPED_HOSTNAME"
+  address=$(hostname -i | \
+            $sed -e "s/127\.[0-9]+\.[0-9]+\.[0-9]+//g" \
+                 -e "s/  +/ /g" \
+                 -e "s/^ +| +\$//g" |\
+            cut -d " " -f 1)
+  if [ "$address" != "" ]; then
+    DETERMINED_HOSTNAME="$address"
+    return 0
   fi
+
+  input_hostname "$prompt_for_manual_input" &&
+    DETERMINED_HOSTNAME="$TYPED_HOSTNAME"
 
   return 0
 }
