@@ -27,8 +27,8 @@ REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
-[ "$VERSION" = "" ] && VERSION="release"
-[ "$HOST" = "" ] && HOST="Auto Detect"
+: ${VERSION:=release}
+: ${HOST:=Auto Detect}
 
 case $(uname) in
   Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
