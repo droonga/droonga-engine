@@ -60,8 +60,14 @@ setup_configuration_directory() {
   [ ! -e $DROONGA_BASE_DIR ] &&
     mkdir $DROONGA_BASE_DIR
 
-  [ ! -e $DROONGA_BASE_DIR/catalog.json -o ! -e $DROONGA_BASE_DIR/$NAME.yaml ] &&
-    determine_hostname
+  if [ ! -e $DROONGA_BASE_DIR/catalog.json -o \
+       ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
+    [ "$HOST" != "Auto Detect" ] &&
+      determine_hostname \
+        "Which is the host that the initial replica for this node?" \
+        "Enter the host name or IP address of the inital replica for this node" &&
+      HOST=$DETERMINED_HOSTNAME
+  fi
 
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
     droonga-engine-catalog-generate --hosts=$HOST --output=$DROONGA_BASE_DIR/catalog.json
@@ -101,31 +107,30 @@ get_addresses_with_interface() {
 }
 
 determine_hostname() {
-  if [ "$HOST" != "Auto Detect" ]; then
-    return 0
-  fi
+  prompt_for_suggestions="$1"
+  prompt_for_manual_input="$2"
 
   if [ $(get_addresses_with_interface | wc -l) -eq 1 ]; then
-    HOST=$(get_addresses_with_interface | cut -d " " -f 1)
+    DETERMINED_HOSTNAME=$(get_addresses_with_interface | cut -d " " -f 1)
     return 0
   fi
 
-  PS3="Which is the host that the initial replica for this node? > "
+  PS3="$prompt_for_suggestions > "
   select chosen in $(get_addresses_with_interface | $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
   do
     if [ -z "$chosen" ]; then
       continue
     else
-      HOST=$(echo $chosen | cut -d "(" -f 1)
+      DETERMINED_HOSTNAME=$(echo $chosen | cut -d "(" -f 1)
       break
     fi
   done
 
-  if [ "$HOST" = "Manual Input" ]; then
-    prompt="Enter the host name or IP address of the inital replica for this node: "
+  if [ "$DETERMINED_HOSTNAME" = "Manual Input" ]; then
+    prompt="$prompt_for_manual_input: "
     echo -n "$prompt"
-    while read HOST; do
-      if [ "$HOST" != "" ]; then break; fi
+    while read DETERMINED_HOSTNAME; do
+      if [ "$DETERMINED_HOSTNAME" != "" ]; then break; fi
       echo -n "$prompt"
     done
   fi
