@@ -62,10 +62,10 @@ setup_configuration_directory() {
 
   if [ ! -e $DROONGA_BASE_DIR/catalog.json -o \
        ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
-    [ "$HOST" != "Auto Detect" ] &&
+    [ "$HOST" = "Auto Detect" ] &&
       determine_hostname \
-        "Which is the host that the initial replica for this node?" \
-        "Enter the host name or IP address of the inital replica for this node" &&
+        "If this node has a global host name or a global IP address, then choose \"Manual Input\" and type it. Otherwise, choose a preferred IP address which can be accessed from other nodes." \
+        "Enter a global host name or a global IP address for this node" &&
       HOST=$DETERMINED_HOSTNAME
   fi
 
