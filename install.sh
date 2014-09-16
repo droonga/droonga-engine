@@ -17,7 +17,9 @@
 #   Install a release version:
 #     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo bash
 #   Install the latest revision from the repository:
-#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo INSTALL_VERSION=master bash
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo VERSION=master bash
+#   Install without prompt for the hostname:
+#     curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo HOST=xxx.xxx.xxx.xxx bash
 
 NAME=droonga-engine
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
