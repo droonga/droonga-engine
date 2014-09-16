@@ -171,6 +171,11 @@ install_rroonga() {
 install_master() {
   gem install bundler --no-ri --no-rdoc
 
+  [ ! -e $DROONGA_BASE_DIR ] &&
+    mkdir $DROONGA_BASE_DIR
+
+  cd $DROONGA_BASE_DIR
+
   if [ -d $NAME ]
   then
     cd $NAME
