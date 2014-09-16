@@ -26,11 +26,11 @@ USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
 if [ "$VERSION" = "" ]; then
-  export VERSION=release
+  VERSION=release
 fi
 
 if [ "$HOST" = "" ]; then
-  export HOST="Auto Detect"
+  HOST="Auto Detect"
 fi
 
 case $(uname) in
