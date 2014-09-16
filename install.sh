@@ -115,7 +115,7 @@ determine_hostname() {
     return 0
   fi
 
-  PS3="$prompt_for_suggestions > "
+  PS3="$prompt_for_suggestions: "
   select chosen in $(get_addresses_with_interface | $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
   do
     if [ -z "$chosen" ]; then
