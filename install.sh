@@ -76,7 +76,7 @@ setup_configuration_directory() {
        ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
     [ "$HOST" = "Auto Detect" ] &&
       determine_hostname \
-        "Enter a host name or an IP address  which is accessible from other nodes for this node" &&
+        "Enter a host name or an IP address which is accessible from other nodes for this node" &&
       HOST=$DETERMINED_HOSTNAME
   fi
 
