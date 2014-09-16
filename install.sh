@@ -24,10 +24,13 @@ SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
-HOST=127.0.0.1
 
 if [ "$VERSION" = "" ]; then
   export VERSION=release
+fi
+
+if [ "$HOST" = "" ]; then
+  export HOST="Auto Detect"
 fi
 
 case $(uname) in
@@ -96,6 +99,10 @@ get_addresses_with_interface() {
 }
 
 determine_hostname() {
+  if [ "$HOST" != "Auto Detect" ]; then
+    return 0
+  fi
+
   if [ $(get_addresses_with_interface | wc -l) -eq 1 ]; then
     HOST=$(get_addresses_with_interface | cut -d " " -f 1)
     return 0
