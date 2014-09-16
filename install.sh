@@ -25,13 +25,8 @@ REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
 
-if [ "$VERSION" = "" ]; then
-  VERSION=release
-fi
-
-if [ "$HOST" = "" ]; then
-  HOST="Auto Detect"
-fi
+[ "$VERSION" = "" ] && VERSION="release"
+[ "$HOST" = "" ] && HOST="Auto Detect"
 
 case $(uname) in
   Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
