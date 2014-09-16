@@ -1,4 +1,4 @@
-host: 127.0.0.1
+host: $hostname
 port: 10031
 tag: droonga
 daemon: true

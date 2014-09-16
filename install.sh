@@ -24,10 +24,16 @@ SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 DROONGA_BASE_DIR=/home/$USER/droonga
+HOST=127.0.0.1
 
 if [ "$VERSION" = "" ]; then
   export VERSION=release
 fi
+
+case $(uname) in
+  Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
+  *)                   sed="sed -r" ;;
+esac
 
 exist_command() {
   type "$1" > /dev/null 2>&1
@@ -48,12 +54,76 @@ setup_configuration_directory() {
 
   [ ! -e $DROONGA_BASE_DIR ] &&
     mkdir $DROONGA_BASE_DIR
+
+  [ ! -e $DROONGA_BASE_DIR/catalog.json -o ! -e $DROONGA_BASE_DIR/$NAME.yaml ] &&
+    determine_hostname
+
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
-    droonga-engine-catalog-generate --output=$DROONGA_BASE_DIR/catalog.json
-  [ ! -e $DROONGA_BASE_DIR/$NAME.yaml ] &&
-    curl -o $DROONGA_BASE_DIR/$NAME.yaml $SCRIPT_URL/$PLATFORM/$NAME.yaml
+    droonga-engine-catalog-generate --hosts=$HOST --output=$DROONGA_BASE_DIR/catalog.json
+
+  config_file="$DROONGA_BASE_DIR/$NAME.yaml"
+  if [ ! -e $config_file ]; then
+    curl -o $config_file.template $SCRIPT_URL/$PLATFORM/$NAME.yaml
+    cat $config_file.template | \
+      $sed -e "s/\\\$hostname/$HOST/" \
+      > $config_file
+    rm $config_file
+  fi
+
   chown -R $USER.$USER $DROONGA_BASE_DIR
 }
+
+
+get_addresses_with_interface() {
+  if exist_command ip; then
+    ip addr | grep "inet " | $sed -e "s/^ *inet ([0-9\.]+).+ ([^ ]+)\$/\1 \2/"
+    return 0
+  fi
+
+  if exist_command ifconfig; then
+    interfaces=$(ifconfig -s | cut -d " " -f 1 | tail -n +2)
+    for interface in $interfaces; do
+      address=$(LANG=C ifconfig $interface | grep "inet addr" | $sed -e "s/^ *inet addr:([0-9\.]+).+\$/\1/")
+      if [ "$address" != "" ]; then
+        echo $address $interface
+      fi
+    done
+    return 0
+  fi
+
+  echo "127.0.0.1 lo"
+  return 0
+}
+
+determine_hostname() {
+  if [ $(get_addresses_with_interface | wc -l) -eq 1 ]; then
+    HOST=$(get_addresses_with_interface | cut -d " " -f 1)
+    return 0
+  fi
+
+  PS3="Which is the host that the initial replica for this node? > "
+  select chosen in $(get_addresses_with_interface | $sed -e "s/ (.+)\$/(\1)/") "Manual Input"
+  do
+    if [ -z "$chosen" ]; then
+      continue
+    else
+      HOST=$(echo $chosen | cut -d "(" -f 1)
+      break
+    fi
+  done
+
+  if [ "$HOST" = "Manual Input" ]; then
+    prompt="Enter the host name or IP address of the inital replica for this node: "
+    echo -n "$prompt"
+    while read HOST; do
+      if [ "$HOST" != "" ]; then break; fi
+      echo -n "$prompt"
+    done
+  fi
+
+  return 0
+}
+
 
 install_rroonga() {
   # Install Rroonga globally from a public gem, because custom build
