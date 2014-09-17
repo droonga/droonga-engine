@@ -21,7 +21,7 @@
 #     $ curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo bash
 #   Install the latest revision from the repository:
 #     $ curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo VERSION=master bash
-#   Install without prompt for the hostname:
+#   Install with the specified hostname (disabling auto-detection):
 #     $ curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | sudo HOST=xxx.xxx.xxx.xxx bash
 #
 #  CentOS 7:
@@ -30,7 +30,7 @@
 #     # curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | bash
 #   Install the latest revision from the repository:
 #     # curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | VERSION=master bash
-#   Install without prompt for the hostname:
+#   Install with the specified hostname (disabling auto-detection):
 #     # curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | HOST=xxx.xxx.xxx.xxx bash
 
 NAME=droonga-engine
