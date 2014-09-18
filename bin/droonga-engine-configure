@@ -59,28 +59,38 @@ def running?(configuration)
   else
     system("droonga-engine-status",
            "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path)
+           "--pid-file", configuration.pid_file_path,
+           :out => "/dev/null",
+           :err => "/dev/null")
   end
 end
 
 def unjoin(configuration)
   system("droonga-engine-unjoin",
-         "--host", configuration.host)
+         "--host", configuration.host,
+         :out => "/dev/null",
+         :err => "/dev/null")
 end
 
 def stop_service(configuration)
   if installed_as_service?
-    system("service", "droonga-engine", "stop")
+    system("service", "droonga-engine", "stop",
+           :out => "/dev/null",
+           :err => "/dev/null")
   else
     system("droonga-engine-stop",
            "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path)
+           "--pid-file", configuration.pid_file_path,
+           :out => "/dev/null",
+           :err => "/dev/null")
   end
 end
 
 def start_service
   if installed_as_service?
-    system("service", "droonga-engine", "start")
+    system("service", "droonga-engine", "start",
+           :out => "/dev/null",
+           :err => "/dev/null")
   else
     puts("The droonga-engine service is still stopped.")
     puts("You need to start the service again manually.")
