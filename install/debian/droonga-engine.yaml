@@ -1,5 +1,0 @@
-host: $hostname
-port: 10031
-tag: droonga
-daemon: true
-log_file: droonga-engine.log
