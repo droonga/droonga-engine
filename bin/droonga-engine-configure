@@ -16,7 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "optparse"
+require "fileutils"
 
+require "droonga/path"
 require "droonga/command/droonga_engine"
 
 options = {
@@ -116,7 +118,8 @@ if running
 end
 
 if options[:clear]
-  # clear data directories and "status"...
+  FileUtils.rm_rf(Droonga::Path.databases)
+  FileUtils.rm_rf(Droonga::Path.state)
 end
 
 if options[:reset]
