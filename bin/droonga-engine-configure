@@ -39,31 +39,36 @@ parser.on("--reset", "Regenerate the configuration file \"droonga-engine.yaml\".
   options[:reset] = true
 end
 configuration.add_command_line_options(parser)
-parser.parse!(ARGV.clone)
+parser.parse!(ARGV)
 
 
 def installed_as_service?
   system("service", "droonga-engine", "status")
 end
 
-def running?
+def running?(configuration)
   if installed_as_service?
     result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
     result.include?("running")
   else
-    system("droonga-engine-status", *ARGV)
+    system("droonga-engine-status",
+           "--base-dir", Droonga::Path.base.to_s,
+           "--pid-file", configuration.pid_file_path)
   end
 end
 
-def unjoin
-  system("droonga-engine-stop", *ARGV, "--host", current_host)
+def unjoin(configuration)
+  system("droonga-engine-unjoin",
+         "--host", configuration.host)
 end
 
-def stop_service
+def stop_service(configuration)
   if installed_as_service?
     system("service", "droonga-engine", "stop")
   else
-    system("droonga-engine-stop", *ARGV)
+    system("droonga-engine-stop",
+           "--base-dir", Droonga::Path.base.to_s,
+           "--pid-file", configuration.pid_file_path)
   end
 end
 
@@ -91,7 +96,7 @@ end
 
 
 running = false
-if running?
+if running?(configuration)
   if !options[:quiet]
     puts("The droonga-engine service is now running.")
     puts("Before reconfiguration, the service is going to be stopped " +
@@ -113,8 +118,8 @@ if !options[:quiet] and options[:reset].nil?
 end
 
 if running
-  unjoin
-  stop_service
+  unjoin(configuration)
+  stop_service(configuration)
 end
 
 if options[:clear]
