@@ -144,14 +144,6 @@ determine_hostname() {
   return 1
 }
 
-input_hostname() {
-  prompt="$1: "
-  while read -p "$prompt" TYPED_HOSTNAME </dev/tty; do
-    if [ "$TYPED_HOSTNAME" != "" ]; then break; fi
-  done
-  return 0
-}
-
 
 install_rroonga() {
   # Install Rroonga globally from a public gem, because custom build
