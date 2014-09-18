@@ -43,9 +43,13 @@ parser.parse!(ARGV)
 
 
 def installed_as_service?
-  system("service", "droonga-engine", "status",
-         :out => "/dev/null",
-         :err => "/dev/null")
+  succeeded = system("service", "droonga-engine", "status",
+                     :out => "/dev/null",
+                     :err => "/dev/null")
+  return true if succeeded
+
+  result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+  result.include?("droonga-engine is stopped")
 end
 
 def service_user_name
