@@ -46,13 +46,13 @@ class CatalogVersion1Test < Test::Unit::TestCase
       partitions = @catalog.get_partitions("localhost:23003/test")
       assert_equal({
                      "localhost:23003/test.000" => {
-                       :database  => "#{base_path}/000/db",
+                       :database  => "#{base_path}/database/000/db",
                        :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
                      },
                      "localhost:23003/test.002" => {
-                       :database  => "#{base_path}/002/db",
+                       :database  => "#{base_path}/database/002/db",
                        :dataset   => "Test",
                        :plugins   => ["for_dataset"],
                        :n_workers => 0
