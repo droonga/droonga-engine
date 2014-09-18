@@ -48,6 +48,21 @@ configuration.add_command_line_options(parser)
 parser.parse!(ARGV)
 
 
+def ensure_have_write_permission
+  test_file = Droonga::Path.base + "#{Time.now.to_i}.test"
+  begin
+    FileUtils.touch(test_file.to_s)
+  rescue Errno::EACCES => error
+  end
+  unless test_file.exist?
+    puts("You have no permission to write files under " +
+           "<#{Droonga::Path.base.to_s}>.")
+    puts("Try again with right permission.")
+    exit(false)
+  end
+  FileUtils.rm_f(test_file.to_s)
+end
+
 def installed_as_service?
   succeeded = system("service", "droonga-engine", "status",
                      :out => "/dev/null",
@@ -160,6 +175,8 @@ end
 
 
 Droonga::Path.base = service_base_directory if installed_as_service?
+
+ensure_have_write_permission
 
 
 data_files = [
