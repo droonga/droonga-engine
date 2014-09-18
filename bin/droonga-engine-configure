@@ -63,7 +63,7 @@ def running?(configuration)
   else
     system("droonga-engine-status",
            "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path,
+           "--pid-file", configuration.pid_file_path.to_s,
            :out => "/dev/null",
            :err => "/dev/null")
   end
@@ -84,7 +84,7 @@ def stop_service(configuration)
   else
     system("droonga-engine-stop",
            "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path,
+           "--pid-file", configuration.pid_file_path.to_s,
            :out => "/dev/null",
            :err => "/dev/null")
   end
