@@ -43,7 +43,13 @@ parser.parse!(ARGV)
 
 
 def installed_as_service?
-  system("service", "droonga-engine", "status")
+  system("service", "droonga-engine", "status",
+         :out => "/dev/null",
+         :err => "/dev/null")
+end
+
+def service_user_name
+  "droonga-engine"
 end
 
 def running?(configuration)
