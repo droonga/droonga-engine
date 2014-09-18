@@ -90,8 +90,8 @@ setup_configuration_directory() {
       echo "  $DROONGA_BASE_DIR/$NAME.yaml"
       echo "*******************************************************"
     fi
+    echo "This node is configured with a hostname $HOST."
   fi
-  echo "This node is configured with a hostname $HOST."
 
   [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
     droonga-engine-catalog-generate --hosts=$HOST \
