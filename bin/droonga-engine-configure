@@ -266,14 +266,20 @@ if options[:reset_config]
   end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))
+  if installed_as_service?
+    FileUtils.chown(service_user_name, service_user_name, Droonga::Path.config)
+  end
 end
 
 if options[:reset_catalog]
   system("droonga-engine-catalog-generate",
          "--output", Droonga::Path.catalog.to_s,
          "--hosts",  host,
-         "--port",   port,
+         "--port",   port.to_s,
          "--tag",    tag)
+  if installed_as_service?
+    FileUtils.chown(service_user_name, service_user_name, Droonga::Path.catalog)
+  end
 end
 
 start_service if running
