@@ -164,9 +164,8 @@ install_master() {
   then
     cd $NAME
     install_rroonga
-    git stash save
+    git reset --hard
     git pull --rebase
-    git stash pop
     bundle update
   else
     git clone $REPOSITORY_URL
