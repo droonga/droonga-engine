@@ -86,9 +86,9 @@ def confirmed?(message)
     print "#{message} (y/N): "
     response = gets
     case response
-      when /^[yY]/
+      when /^y/i
         return true
-      when /^[nN]/, /^$/
+      when /^n/i, /^$/
         return false
     end
   end
