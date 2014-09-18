@@ -109,7 +109,7 @@ end
 
 def input(message, default_value=nil)
   print "#{message} [#{default_value}]: "
-  response = gets
+  response = gets.strip
   if response.empty?
     default_value
   else
