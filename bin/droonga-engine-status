@@ -35,6 +35,10 @@ end
 
 begin
   pid_file = configuration.pid_file_path
+  if pid_file.nil?
+    raise Failed.new("Couldn't find the PID file.")
+  end
+
   unless pid_file.exist?
     raise Failed.new("There is no PID file at <#{pid_file.to_s}>.")
   end
