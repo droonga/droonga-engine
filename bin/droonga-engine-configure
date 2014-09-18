@@ -26,7 +26,8 @@ require "droonga/safe_file_writer"
 options = {
   :quiet => nil,
   :clear => nil,
-  :reset => nil,
+  :reset_config  => nil,
+  :reset_catalog => nil,
 }
 
 configuration = Droonga::Command::DroongaEngine::Configuration.new
@@ -37,8 +38,11 @@ end
 parser.on("--clear", "Clear any existing data.") do |host|
   options[:clear] = true
 end
-parser.on("--reset", "Regenerate the configuration file \"droonga-engine.yaml\".") do |host|
-  options[:reset] = true
+parser.on("--reset-config", "Regenerate the configuration file \"droonga-engine.yaml\".") do |host|
+  options[:reset_config] = true
+end
+parser.on("--reset-catalog", "Regenerate the \"catalog.json\".") do |host|
+  options[:reset_catalog] = true
 end
 configuration.add_command_line_options(parser)
 parser.parse!(ARGV)
@@ -170,11 +174,16 @@ if !options[:quiet] and options[:clear].nil?
 end
 
 
-options[:reset] = true unless Droonga::Path.config.exist?
+options[:reset_config] = true unless Droonga::Path.config.exist?
+if !options[:quiet] and options[:reset_config].nil?
+  options[:reset_config] = confirmed?("Do you want the configuration file " +
+                                        "\"droonga-engine.yaml\" to be regenerated?")
+end
 
-if !options[:quiet] and options[:reset].nil?
-  options[:reset] = confirmed?("Do you want the configuration file " +
-                                 "\"droonga-engine.yaml\" to be regenerated?")
+options[:reset_catalog] = true unless Droonga::Path.catalog.exist?
+if !options[:quiet] and options[:reset_catalog].nil?
+  options[:reset_catalog] = confirmed?("Do you want the file \"catalog.json\" " +
+                                         "to be regenerated?")
 end
 
 
@@ -189,7 +198,7 @@ if options[:clear]
   end
 end
 
-if options[:reset]
+if options[:reset_config] or options[:reset_catalog]
   if configuration.have_given_host? or options[:quiet]
     host = configuration.host
   else
@@ -207,7 +216,9 @@ if options[:reset]
   else
     tag = input("tag", configuration.tag)
   end
+end
 
+if options[:reset_config]
   if installed_as_service?
     daemon = true
   elsif configuration.have_given_daemon? or options[:quiet]
@@ -257,11 +268,13 @@ if options[:reset]
                                 YAML.dump(new_configuration))
 end
 
-system("droonga-engine-catalog-generate",
-       "--output", Droonga::Path.catalog.to_s,
-       "--hosts",  configuration.host,
-       "--port",   configuration.port.to_s,
-       "--tag",    configuration.tag)
+if options[:reset_catalog]
+  system("droonga-engine-catalog-generate",
+         "--output", Droonga::Path.catalog.to_s,
+         "--hosts",  host,
+         "--port",   port,
+         "--tag",    tag)
+end
 
 start_service if running
 
