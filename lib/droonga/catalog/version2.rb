@@ -44,7 +44,7 @@ module Droonga
             volume.slices.each do |slice|
               volume_address = slice.volume.address
               if volume_address.node == node
-                path = File.join([device, Path.databases.basename, volume_address.name, "db"])
+                path = File.join([device, Path.databases.basename.to_s, volume_address.name, "db"])
                 path = Pathname(path).expand_path(base_path)
                 migrate_database_location(path, :device => device,
                                                 :name   => volume_address.name)

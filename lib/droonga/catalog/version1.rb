@@ -54,7 +54,7 @@ module Droonga
               partitions.each do |partition|
                 if partition =~ pattern
                   database_name = $POSTMATCH
-                  path = File.join([device, Path.databases.basename, database_name, "db"])
+                  path = File.join([device, Path.databases.basename.to_s, database_name, "db"])
                   path = Pathname(path).expand_path(base_path)
                   migrate_database_location(path, :device => device,
                                                   :name   => database_name)
