@@ -1,0 +1,128 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+require "optparse"
+
+require "droonga/command/droonga_engine"
+
+options = {
+  :quiet => nil,
+  :clear => nil,
+  :reset => nil,
+}
+
+configuration = Droonga::Command::DroongaEngine::Configuration.new
+parser = OptionParser.new
+parser.on("--quiet", "Run with no prompt.") do |host|
+  options[:quiet] = true
+end
+parser.on("--clear", "Clear any existing data.") do |host|
+  options[:clear] = true
+end
+parser.on("--reset", "Regenerate the configuration file \"droonga-engine.yaml\".") do |host|
+  options[:reset] = true
+end
+configuration.add_command_line_options(parser)
+parser.parse!(ARGV.clone)
+
+
+def installed_as_service?
+  system("service", "droonga-engine", "status")
+end
+
+def running?
+  if installed_as_service?
+    result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+    result.include?("running")
+  else
+    system("droonga-engine-status", *ARGV)
+  end
+end
+
+def unjoin
+  system("droonga-engine-stop", *ARGV, "--host", current_host)
+end
+
+def stop_service
+  if installed_as_service?
+    system("service", "droonga-engine", "stop")
+  else
+    system("droonga-engine-stop", *ARGV)
+  end
+end
+
+def start_service
+  if installed_as_service?
+    system("service", "droonga-engine", "start")
+  else
+    puts("The droonga-engine service is still stopped.")
+    puts("You need to start the service again manually.")
+  end
+end
+
+def confirmed?(message)
+  while true
+    print "#{message} (y/N): "
+    response = gets
+    case response
+      when /^[yY]/
+        return true
+      when /^[nN]/, /^$/
+        return false
+    end
+  end
+end
+
+
+running = false
+if running?
+  if !options[:quiet]
+    puts("The droonga-engine service is now running.")
+    puts("Before reconfiguration, the service is going to be stopped " +
+           "and this node will be unjoined from the cluster.")
+    unless confirmed?("Are you sure you want to continue reconfiguration?")
+      exit(false)
+    end
+  end
+  running = true
+end
+
+if !options[:quiet] and options[:clear].nil?
+  options[:clear] = confirmed?("Do you want all data to be cleared?")
+end
+
+if !options[:quiet] and options[:reset].nil?
+  options[:reset] = confirmed?("Do you want the configuration file " +
+                                 "\"droonga-engine.yaml\" to be regenerated?")
+end
+
+if running
+  unjoin
+  stop_service
+end
+
+if options[:clear]
+  # clear data directories and "status"...
+end
+
+if options[:reset]
+  # clear and regenerate "droonga-engine.yaml"...
+end
+
+start_service if running
+
+exit(true)
