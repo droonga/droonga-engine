@@ -49,11 +49,15 @@ def installed_as_service?
   return true if succeeded
 
   result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
-  result.include?("droonga-engine is stopped")
+  result.include?("running") or result.include?("droonga-engine is stopped")
 end
 
 def service_user_name
   "droonga-engine"
+end
+
+def service_base_directory
+  "/home/#{service_user_name}/droonga"
 end
 
 def running?(configuration)
@@ -137,14 +141,17 @@ if !options[:quiet] and options[:reset].nil?
                                  "\"droonga-engine.yaml\" to be regenerated?")
 end
 
+
+Droonga::Path.base = service_base_directory if installed_as_service?
+
 if running
   unjoin(configuration)
   stop_service(configuration)
 end
 
 if options[:clear]
-  FileUtils.rm_rf(Droonga::Path.databases)
-  FileUtils.rm_rf(Droonga::Path.state)
+  FileUtils.rm_rf(Droonga::Path.databases.to_s)
+  FileUtils.rm_rf(Droonga::Path.state.to_s)
 end
 
 if options[:reset]
