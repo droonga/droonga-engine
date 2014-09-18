@@ -17,9 +17,11 @@
 
 require "optparse"
 require "fileutils"
+require "yaml"
 
 require "droonga/path"
 require "droonga/command/droonga_engine"
+require "droonga/safe_file_writer"
 
 options = {
   :quiet => nil,
@@ -118,6 +120,16 @@ def confirmed?(message)
   end
 end
 
+def path_from_base_dir(path)
+  path = path.to_s
+  base = "#{Droonga::Path.base.to_s}/"
+  if path.start_with?(base)
+    path.sub(base, "")
+  else
+    path
+  end
+end
+
 
 running = false
 if running?(configuration)
@@ -132,9 +144,23 @@ if running?(configuration)
   running = true
 end
 
+
+Droonga::Path.base = service_base_directory if installed_as_service?
+
+
+data_files = [
+  Droonga::Path.databases,
+  Droonga::Path.state,
+]
+have_data = data_files.any?(&:exist?)
+options[:clear] = false unless have_data
+
 if !options[:quiet] and options[:clear].nil?
   options[:clear] = confirmed?("Do you want all data to be cleared?")
 end
+
+
+options[:reset] = true unless Droonga::Path.config.exist?
 
 if !options[:quiet] and options[:reset].nil?
   options[:reset] = confirmed?("Do you want the configuration file " +
@@ -142,21 +168,38 @@ if !options[:quiet] and options[:reset].nil?
 end
 
 
-Droonga::Path.base = service_base_directory if installed_as_service?
-
 if running
   unjoin(configuration)
   stop_service(configuration)
 end
 
 if options[:clear]
-  FileUtils.rm_rf(Droonga::Path.databases.to_s)
-  FileUtils.rm_rf(Droonga::Path.state.to_s)
+  data_files.each do |file|
+    FileUtils.rm_rf(file.to_s)
+  end
 end
 
 if options[:reset]
-  # clear and regenerate "droonga-engine.yaml"...
+  new_configuration = {
+    "host"     => configuration.host,
+    "port"     => configuration.port,
+    "tag"      => configuration.tag,
+    "daemon"   => installed_as_service?,
+    "log_file" => path_from_base_dir(Droonga::Path.default_log_file),
+  }
+  unless installed_as_service?
+    pid_file_path = path_from_base_dir(Droonga::Path.default_pid_file)
+    new_configuration["pid_file"] = pid_file_path
+  end
+  Droonga::SafeFileWriter.write(Droonga::Path.config,
+                                YAML.dump(new_configuration))
 end
+
+system("droonga-engine-catalog-generate",
+       "--output", Droonga::Path.catalog.to_s,
+       "--hosts",  configuration.host,
+       "--port",   configuration.port.to_s,
+       "--tag",    configuration.tag)
 
 start_service if running
 
