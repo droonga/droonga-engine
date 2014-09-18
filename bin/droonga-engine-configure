@@ -107,6 +107,16 @@ def start_service
   end
 end
 
+def input(message, default_value=nil)
+  print "#{message} [#{default_value}]: "
+  response = gets
+  if response.empty?
+    default_value
+  else
+    response
+  end
+end
+
 def confirmed?(message)
   while true
     print "#{message} (y/N): "
@@ -180,16 +190,64 @@ if options[:clear]
 end
 
 if options[:reset]
+  if configuration.have_given_host?
+    host = configuration.host
+  else
+    host = input("host", configuration.host)
+  end
+
+  if configuration.have_given_port?
+    port = configuration.port
+  else
+    port = input("port", configuration.port).to_i
+  end
+
+  if configuration.have_given_tag?
+    tag = configuration.tag
+  else
+    tag = input("tag", configuration.tag)
+  end
+
+  if installed_as_service?
+    daemon = true
+  elsif configuration.have_given_daemon?
+    daemon = configuration.daemon?
+  else
+    daemon = confirmed?("run as a daemon?")
+  end
+
+  if installed_as_service?
+    log_file = Droonga::Path.default_log_file
+  elsif configuration.have_given_log_file?
+    log_file = configuration.log_file
+  else
+    log_file = input("path to the log file", Droonga::Path.default_log_file)
+  end
+
+  if configuration.have_given_log_level?
+    log_level = configuration.log_level
+  else
+    log_level = input("log level", configuration.log_level)
+  end
+
+  unless installed_as_service?
+    if  configuration.have_given_pid_file?
+      pid_file_path = configuration.pid_file_path
+    else
+      pid_file_path = input("path to the PID file", Droonga::Path.default_pid_file)
+    end
+  end
+
   new_configuration = {
-    "host"     => configuration.host,
-    "port"     => configuration.port,
-    "tag"      => configuration.tag,
-    "daemon"   => installed_as_service?,
-    "log_file" => path_from_base_dir(Droonga::Path.default_log_file),
+    "host"      => host,
+    "port"      => port,
+    "tag"       => tag,
+    "daemon"    => daemon,
+    "log_file"  => path_from_base_dir(log_file),
+    "log_level" => log_level,
   }
   unless installed_as_service?
-    pid_file_path = path_from_base_dir(Droonga::Path.default_pid_file)
-    new_configuration["pid_file"] = pid_file_path
+    new_configuration["pid_file"] = path_from_base_dir(pid_file_path)
   end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))

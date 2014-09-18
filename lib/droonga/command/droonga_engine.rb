@@ -120,6 +120,8 @@ module Droonga
           @port = config["port"] || Address::DEFAULT_PORT
           @tag  = config["tag"]  || Address::DEFAULT_TAG
 
+          @given_values = {}
+
           @log_file        = nil
           @daemon          = false
           @pid_file_path   = nil
@@ -141,6 +143,34 @@ module Droonga
 
         def have_config_file?
           File.exist?(Path.config)
+        end
+
+        def have_given_host?
+          @given_values.include?(:host)
+        end
+
+        def have_given_port?
+          @given_values.include?(:port)
+        end
+
+        def have_given_tag?
+          @given_values.include?(:tag)
+        end
+
+        def have_given_daemon?
+          @given_values.include?(:daemon)
+        end
+
+        def have_given_log_file?
+          @given_values.include?(:log_file)
+        end
+
+        def have_given_log_level?
+          @given_values.include?(:log_level)
+        end
+
+        def have_given_pid_file?
+          @given_values.include?(:pid_file)
         end
 
         def load_config
@@ -211,16 +241,19 @@ module Droonga
                     "The host name of the Droonga engine",
                     "(#{@host})") do |host|
             @host = host
+            @given_values[:host] = host
           end
           parser.on("--port=PORT", Integer,
                     "The port number of the Droonga engine",
                     "(#{@port})") do |port|
             @port = port
+            @given_values[:port] = port
           end
           parser.on("--tag=TAG",
                     "The tag of the Droonga engine",
                     "(#{@tag})") do |tag|
             @tag = tag
+            @given_values[:tag] = tag
           end
         end
 
@@ -234,10 +267,12 @@ module Droonga
                     "[#{levels_label}]",
                     "(#{log_level})") do |level|
             self.log_level = level
+            @given_values[:log_level] = log_level
           end
           parser.on("--log-file=FILE",
                     "Output logs to FILE") do |file|
             self.log_file = file
+            @given_values[:log_file] = file
           end
         end
 
@@ -247,14 +282,17 @@ module Droonga
           parser.on("--daemon",
                     "Run as a daemon") do
             @daemon = true
+            @given_values[:daemon] = true
           end
           parser.on("--no-daemon",
                     "Run as a regular process") do
             @daemon = false
+            @given_values[:daemon] = false
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
             self.pid_file_path = path
+            @given_values[:pid_file] = path
           end
         end
 
