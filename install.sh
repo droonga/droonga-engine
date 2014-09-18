@@ -93,18 +93,8 @@ setup_configuration_directory() {
     echo "This node is configured with a hostname $HOST."
   fi
 
-  [ ! -e $DROONGA_BASE_DIR/catalog.json ] &&
-    droonga-engine-catalog-generate --hosts=$HOST \
-                                    --output=$DROONGA_BASE_DIR/catalog.json
-
-  config_file="$DROONGA_BASE_DIR/$NAME.yaml"
-  if [ ! -e $config_file ]; then
-    curl -o $config_file.template $SCRIPT_URL/$PLATFORM/$NAME.yaml
-    cat $config_file.template | \
-      $sed -e "s/\\\$hostname/$HOST/" \
-      > $config_file
-    rm $config_file.template
-  fi
+  droonga-engine-configure --quiet \
+    --host=$HOST
 
   chown -R $USER.$USER $DROONGA_BASE_DIR
 }
