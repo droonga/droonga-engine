@@ -14,6 +14,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "English"
+require "pathname"
+require "fileutils"
 
 require "droonga/catalog/base"
 require "droonga/catalog/dataset"
@@ -51,11 +53,14 @@ module Droonga
             part["partitions"].each do |range, partitions|
               partitions.each do |partition|
                 if partition =~ pattern
-                  path = File.join([device, $POSTMATCH, "db"])
-                  path = File.expand_path(path, base_path)
+                  database_name = $POSTMATCH
+                  path = File.join([device, Path.databases.basename, database_name, "db"])
+                  path = Pathname(path).expand_path(base_path)
+                  migrate_database_location(path, :device => device,
+                                                  :name   => database_name)
                   options = {
                     :dataset => dataset_name,
-                    :database => path,
+                    :database => path.to_s,
                     :n_workers => workers,
                     :plugins => plugins
                   }
@@ -381,6 +386,14 @@ module Droonga
               end
             end
           end
+        end
+      end
+
+      def migrate_database_location(path, params)
+        old_path = File.join([params[:device], params[:name], "db"])
+        old_path = Pathname(old_path).expand_path(base_path)
+        if old_path.exist? and not path.exist?
+          FileUtils.move(old_path.to_s, path.to_s)
         end
       end
 

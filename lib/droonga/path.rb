@@ -34,6 +34,10 @@ module Droonga
         ENV[BASE_DIR_ENV_NAME] = new_base
       end
 
+      def databases
+        base + "database"
+      end
+
       def state
         base + "state"
       end

@@ -13,6 +13,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "pathname"
+require "fileutils"
+
 require "droonga/address"
 require "droonga/catalog/base"
 require "droonga/catalog/dataset"
@@ -41,11 +44,13 @@ module Droonga
             volume.slices.each do |slice|
               volume_address = slice.volume.address
               if volume_address.node == node
-                path = File.join([device, volume_address.name, "db"])
-                path = File.expand_path(path, base_path)
+                path = File.join([device, Path.databases.basename, volume_address.name, "db"])
+                path = Pathname(path).expand_path(base_path)
+                migrate_database_location(path, :device => device,
+                                                :name   => volume_address.name)
                 options = {
                   :dataset => dataset_name,
-                  :database => path,
+                  :database => path.to_s,
                   :n_workers => n_workers,
                   :plugins => plugins
                 }
@@ -80,6 +85,14 @@ module Droonga
           nodes += dataset.all_nodes
         end
         nodes.sort.uniq
+      end
+
+      def migrate_database_location(path, params)
+        old_path = File.join([params[:device], params[:name], "db"])
+        old_path = Pathname(old_path).expand_path(base_path)
+        if old_path.exist? and not path.exist?
+          FileUtils.move(old_path.to_s, path.to_s)
+        end
       end
     end
   end
