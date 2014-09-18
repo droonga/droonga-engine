@@ -20,16 +20,44 @@ require "sys/proctable"
 
 require "droonga/command/droonga_engine"
 
-running = system("droonga-engine-status", *ARGV)
-exit(false) unless running
-
 configuration = Droonga::Command::DroongaEngine::Configuration.new
 parser = OptionParser.new
 configuration.add_command_line_options(parser)
 parser.parse!(ARGV)
 
-pid_file = configuration.pid_file_path
-pid = File.read(pid_file).strip
-puts "Sending SIGTERM to the process...";
-Process.kill(:TERM, pid.to_i)
+class Failed < StandardError
+  attr_reader :message
+
+  def initialize(message)
+    @message = message
+  end
+end
+
+begin
+  pid_file = configuration.pid_file_path
+  unless pid_file.exist?
+    raise Failed.new("There is no PID file at <#{pid_file.to_s}>.")
+  end
+
+  pid = File.read(pid_file).strip
+  unless pid =~ /\A[1-9][0-9]*\z/
+    raise Failed.new("Invalid PID <#{pid}>.")
+  end
+
+  pid = pid.to_i
+  process_info = Sys::ProcTable.ps(pid)
+  unless process_info
+    raise Failed.new("No such process with the PID <#{pid}>.")
+  end
+  unless process_info.cmdline.include?("droonga-engine")
+    raise Failed.new("Not a droonga-engine process: PID <#{pid}> (#{process_info.cmdline})")
+  end
+
+  puts "droonga-engine is running.";
+rescue Failed => error
+  puts "Failed to detect running droonga-engine process."
+  puts error.message
+  exit(false)
+end
+
 exit(true)
