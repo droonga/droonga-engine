@@ -190,19 +190,19 @@ if options[:clear]
 end
 
 if options[:reset]
-  if configuration.have_given_host?
+  if configuration.have_given_host? or options[:quiet]
     host = configuration.host
   else
     host = input("host", configuration.host)
   end
 
-  if configuration.have_given_port?
+  if configuration.have_given_port? or options[:quiet]
     port = configuration.port
   else
     port = input("port", configuration.port).to_i
   end
 
-  if configuration.have_given_tag?
+  if configuration.have_given_tag? or options[:quiet]
     tag = configuration.tag
   else
     tag = input("tag", configuration.tag)
@@ -210,7 +210,7 @@ if options[:reset]
 
   if installed_as_service?
     daemon = true
-  elsif configuration.have_given_daemon?
+  elsif configuration.have_given_daemon? or options[:quiet]
     daemon = configuration.daemon?
   else
     daemon = confirmed?("run as a daemon?")
@@ -220,18 +220,22 @@ if options[:reset]
     log_file = Droonga::Path.default_log_file
   elsif configuration.have_given_log_file?
     log_file = configuration.log_file
+  elsif options[:quiet]
+    log_file = Droonga::Path.default_log_file
   else
     log_file = input("path to the log file", Droonga::Path.default_log_file)
   end
 
-  if configuration.have_given_log_level?
+  if configuration.have_given_log_level? or options[:quiet]
     log_level = configuration.log_level
   else
     log_level = input("log level", configuration.log_level)
   end
 
   unless installed_as_service?
-    if  configuration.have_given_pid_file?
+    if options[:quiet]
+      pid_file_path = Droonga::Path.default_pid_file
+    elsif  configuration.have_given_pid_file?
       pid_file_path = configuration.pid_file_path
     else
       pid_file_path = input("path to the PID file", Droonga::Path.default_pid_file)
