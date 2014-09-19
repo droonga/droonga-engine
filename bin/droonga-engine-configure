@@ -63,7 +63,15 @@ def ensure_have_write_permission
   FileUtils.rm_f(test_file.to_s)
 end
 
+def service_user_exist?
+  system("id", service_user_name,
+         :out => "/dev/null",
+         :err => "/dev/null")
+end
+
 def installed_as_service?
+  return false unless service_user_exist?
+
   succeeded = system("service", "droonga-engine", "status",
                      :out => "/dev/null",
                      :err => "/dev/null")
@@ -174,7 +182,7 @@ if running?(configuration)
 end
 
 
-Droonga::Path.base = service_base_directory if installed_as_service?
+Droonga::Path.base = service_base_directory if service_user_exist?
 
 ensure_have_write_permission
 
@@ -236,7 +244,7 @@ if options[:reset_config] or options[:reset_catalog]
 end
 
 if options[:reset_config]
-  if installed_as_service?
+  if service_user_exist?
     daemon = true
   elsif configuration.have_given_daemon? or options[:quiet]
     daemon = configuration.daemon?
@@ -244,7 +252,7 @@ if options[:reset_config]
     daemon = confirmed?("run as a daemon?")
   end
 
-  if installed_as_service?
+  if service_user_exist?
     log_file = Droonga::Path.default_log_file
   elsif configuration.have_given_log_file?
     log_file = configuration.log_file
@@ -260,8 +268,9 @@ if options[:reset_config]
     log_level = input("log level", configuration.log_level)
   end
 
+  pid_file_path = nil
   unless installed_as_service?
-    if options[:quiet]
+    if options[:quiet] or service_user_exist?
       pid_file_path = Droonga::Path.default_pid_file
     elsif  configuration.have_given_pid_file?
       pid_file_path = configuration.pid_file_path
@@ -278,12 +287,12 @@ if options[:reset_config]
     "log_file"  => path_from_base_dir(log_file),
     "log_level" => log_level,
   }
-  unless installed_as_service?
+  unless pid_file_path.nil?
     new_configuration["pid_file"] = path_from_base_dir(pid_file_path)
   end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))
-  if installed_as_service?
+  if service_user_exist?
     FileUtils.chown(service_user_name, service_user_name, Droonga::Path.config)
   end
 end
@@ -294,7 +303,7 @@ if options[:reset_catalog]
          "--hosts",  host,
          "--port",   port.to_s,
          "--tag",    tag)
-  if installed_as_service?
+  if service_user_exist?
     FileUtils.chown(service_user_name, service_user_name, Droonga::Path.catalog)
   end
 end
