@@ -44,7 +44,7 @@ module Droonga
     end
 
     def have_write_permission?
-      test_file = base_directory + "#{Time.now.to_i}.test"
+      test_file = Path.base + "#{Time.now.to_i}.test"
       begin
         FileUtils.touch(test_file.to_s)
       rescue Errno::EACCES => error
