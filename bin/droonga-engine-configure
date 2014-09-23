@@ -22,6 +22,7 @@ require "yaml"
 require "droonga/path"
 require "droonga/command/droonga_engine"
 require "droonga/safe_file_writer"
+require "droonga/service_installation"
 
 options = {
   :quiet => nil,
@@ -48,90 +49,11 @@ configuration.add_command_line_options(parser)
 parser.parse!(ARGV)
 
 
-def ensure_have_write_permission
-  test_file = Droonga::Path.base + "#{Time.now.to_i}.test"
-  begin
-    FileUtils.touch(test_file.to_s)
-  rescue Errno::EACCES => error
-  end
-  unless test_file.exist?
-    puts("You have no permission to write files under " +
-           "<#{Droonga::Path.base.to_s}>.")
-    puts("Try again with right permission.")
-    exit(false)
-  end
-  FileUtils.rm_f(test_file.to_s)
-end
-
-def service_user_exist?
-  system("id", service_user_name,
-         :out => "/dev/null",
-         :err => "/dev/null")
-end
-
-def installed_as_service?
-  return false unless service_user_exist?
-
-  succeeded = system("service", "droonga-engine", "status",
-                     :out => "/dev/null",
-                     :err => "/dev/null")
-  return true if succeeded
-
-  result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
-  result.include?("running") or result.include?("droonga-engine is stopped")
-end
-
-def service_user_name
-  "droonga-engine"
-end
-
-def service_base_directory
-  "/home/#{service_user_name}/droonga"
-end
-
-def running?(configuration)
-  if installed_as_service?
-    result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
-    result.include?("running")
-  else
-    system("droonga-engine-status",
-           "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path.to_s,
-           :out => "/dev/null",
-           :err => "/dev/null")
-  end
-end
-
 def unjoin(configuration)
   system("droonga-engine-unjoin",
          "--host", configuration.host,
          :out => "/dev/null",
          :err => "/dev/null")
-end
-
-def stop_service(configuration)
-  if installed_as_service?
-    system("service", "droonga-engine", "stop",
-           :out => "/dev/null",
-           :err => "/dev/null")
-  else
-    system("droonga-engine-stop",
-           "--base-dir", Droonga::Path.base.to_s,
-           "--pid-file", configuration.pid_file_path.to_s,
-           :out => "/dev/null",
-           :err => "/dev/null")
-  end
-end
-
-def start_service
-  if installed_as_service?
-    system("service", "droonga-engine", "start",
-           :out => "/dev/null",
-           :err => "/dev/null")
-  else
-    puts("The droonga-engine service is still stopped.")
-    puts("You need to start the service again manually.")
-  end
 end
 
 def input(message, default_value=nil)
@@ -168,8 +90,11 @@ def path_from_base_dir(path)
 end
 
 
+service_installation = Droonga::ServiceInstallation.new
+service_installation.ensure_using_service_base_directory
+
 running = false
-if running?(configuration)
+if service_installation.running?(configuration.pid_file_path)
   if !options[:quiet]
     puts("The droonga-engine service is now running.")
     puts("Before reconfiguration, the service is going to be stopped " +
@@ -181,10 +106,12 @@ if running?(configuration)
   running = true
 end
 
-
-Droonga::Path.base = service_base_directory if service_user_exist?
-
-ensure_have_write_permission
+unless service_installation.have_write_permission?
+  puts("You have no permission to write files under " +
+         "<#{Droonga::Path.base.to_s}>.")
+  puts("Try again with right permission.")
+  exit(false)
+end
 
 
 data_files = [
@@ -214,7 +141,7 @@ end
 
 if running
   unjoin(configuration)
-  stop_service(configuration)
+  service_installation.stop_service(configuration.pid_file_path)
 end
 
 if options[:clear]
@@ -244,7 +171,7 @@ if options[:reset_config] or options[:reset_catalog]
 end
 
 if options[:reset_config]
-  if service_user_exist?
+  if service_installation.user_exist?
     daemon = true
   elsif configuration.have_given_daemon? or options[:quiet]
     daemon = configuration.daemon?
@@ -252,7 +179,7 @@ if options[:reset_config]
     daemon = confirmed?("run as a daemon?")
   end
 
-  if service_user_exist?
+  if service_installation.user_exist?
     log_file = Droonga::Path.default_log_file
   elsif configuration.have_given_log_file?
     log_file = configuration.log_file
@@ -269,8 +196,8 @@ if options[:reset_config]
   end
 
   pid_file_path = nil
-  unless installed_as_service?
-    if options[:quiet] or service_user_exist?
+  unless service_installation.installed_as_service?
+    if options[:quiet] or service_installation.user_exist?
       pid_file_path = Droonga::Path.default_pid_file
     elsif  configuration.have_given_pid_file?
       pid_file_path = configuration.pid_file_path
@@ -292,9 +219,7 @@ if options[:reset_config]
   end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))
-  if service_user_exist?
-    FileUtils.chown(service_user_name, service_user_name, Droonga::Path.config)
-  end
+  service_installation.ensure_correct_file_permission(Droonga::Path.config)
 end
 
 if options[:reset_catalog]
@@ -303,11 +228,15 @@ if options[:reset_catalog]
          "--hosts",  host,
          "--port",   port.to_s,
          "--tag",    tag)
-  if service_user_exist?
-    FileUtils.chown(service_user_name, service_user_name, Droonga::Path.catalog)
-  end
+  service_installation.ensure_correct_file_permission(Droonga::Path.catalog)
 end
 
-start_service if running
+if running
+  successfully_started = service_installation.start
+  unless successfully_started
+    puts("The droonga-engine service is still stopped.")
+    puts("You need to start the service again manually.")
+  end
+end
 
 exit(true)
