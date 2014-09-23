@@ -240,7 +240,10 @@ install_in_centos() {
   /sbin/chkconfig --add $NAME
 }
 
-if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+if [ "$EUID" != "0" ]; then
+  echo "You must run this script as the root."
+  exit 1
+elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
   install_in_debian
 elif [ -e /etc/centos-release ]; then
   install_in_centos
