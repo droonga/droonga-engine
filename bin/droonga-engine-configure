@@ -77,7 +77,7 @@ def installed_as_service?
                      :err => "/dev/null")
   return true if succeeded
 
-  result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+  result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
   result.include?("running") or result.include?("droonga-engine is stopped")
 end
 
@@ -91,7 +91,7 @@ end
 
 def running?(configuration)
   if installed_as_service?
-    result = `SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+    result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
     result.include?("running")
   else
     system("droonga-engine-status",
