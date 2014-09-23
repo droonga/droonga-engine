@@ -24,7 +24,11 @@ require "droonga/engine/version"
 require "droonga/path"
 require "droonga/catalog_generator"
 require "droonga/safe_file_writer"
+require "droonga/service_installation"
 require "droonga/serf"
+
+service_installation = Droonga::ServiceInstallation.new
+service_installation.ensure_using_service_base_directory
 
 options = OpenStruct.new
 options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
@@ -48,6 +52,7 @@ parser.parse!(ARGV)
 base_dir = Pathname(options.base_dir).expand_path
 ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
 
+
 catalog_path = Droonga::Path.catalog
 unless catalog_path.exist?
   raise "Cannot load 'catalog.json'. You must specify correct path " +
@@ -57,6 +62,13 @@ end
 unless options.replica_remove_host
   raise "You must specify the host name or the IP address of a node to " +
           "be removed from the cluster via --replica-remove-host option."
+end
+
+unless service_installation.have_read_permission?
+  puts("You have no permission to read files under " +
+         "<#{Droonga::Path.base.to_s}>.")
+  puts("Try again with right permission.")
+  exit(false)
 end
 
 source_catalog = JSON.parse(catalog_path.read)

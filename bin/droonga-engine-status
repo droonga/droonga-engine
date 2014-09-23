@@ -19,6 +19,17 @@ require "optparse"
 require "sys/proctable"
 
 require "droonga/command/droonga_engine"
+require "droonga/service_installation"
+
+service_installation = Droonga::ServiceInstallation.new
+service_installation.ensure_using_service_base_directory
+
+unless service_installation.have_read_permission?
+  puts("You have no permission to read files under " +
+         "<#{Droonga::Path.base.to_s}>.")
+  puts("Try again with right permission.")
+  exit(false)
+end
 
 configuration = Droonga::Command::DroongaEngine::Configuration.new
 parser = OptionParser.new

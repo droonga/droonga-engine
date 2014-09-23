@@ -43,6 +43,16 @@ module Droonga
       end
     end
 
+    def have_read_permission?
+      test_file = Path.config
+      begin
+        test_file.read
+      rescue Errno::EACCES => error
+        return false
+      end
+      true
+    end
+
     def have_write_permission?
       test_file = Path.base + "#{Time.now.to_i}.test"
       begin
