@@ -39,7 +39,7 @@ module Droonga
 
     def ensure_using_service_base_directory
       if user_exist?
-        Path.base = base_directory
+        Path.base = base_directory.to_s
       end
     end
 
