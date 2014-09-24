@@ -19,6 +19,10 @@ require "optparse"
 require "sys/proctable"
 
 require "droonga/command/droonga_engine"
+require "droonga/service_installation"
+
+service_installation = Droonga::ServiceInstallation.new
+service_installation.ensure_using_service_base_directory
 
 running = system("droonga-engine-status", *ARGV)
 exit(false) unless running
