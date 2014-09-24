@@ -1,16 +1,20 @@
 # News
 
-## 1.0.6: 2014-08-29 (planned)
+## 1.0.6: 2014-09-29 (planned)
 
+ * The installation script is now available.
+   It automatically installs required softwares and configure the `droonga-engine` as a system service.
+   Currently it works only for Debian, Ubuntu, and CentOS 7.
  * A static configuration file to define default parameters (`host` and so on) is now available.
    It must be placed into the directory same to `catalog.json`.
-   You don't have to run "droonga-engine" command with many options, anymore.
+   You don't have to run `droonga-engine` command with many options, anymore.
  * `droonga-engine-join` now automatically fetches `catalog.json` from the specified source replica node.
    Now you don't have to copy `catalog.json` from another node before you run `droonga-engine-join` anymore.
  * A new `catalog` plugin is introduced as one of default plugins, to fetch `catalog.json` from existing cluster.
    The list of plugins in your `catalog.json` must include it.
- * `droonga-engine-stop`, a new command line utility to stop the service is available.
-   You don't need to send `SIGTERM` manually anymore.
+ * A new command line utility `droonga-engine-configure` is available.
+   It generates the static configuration file, the `catalog.json` for the service.
+   Moreover, it clears old stored data to make the node empty.
 
 ## 1.0.5: 2014-07-29
 
