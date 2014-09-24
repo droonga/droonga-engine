@@ -185,7 +185,6 @@ if options[:reset_config]
     "host"      => host,
     "port"      => port,
     "tag"       => tag,
-    "daemon"    => true,
     "log_file"  => path_from_base_dir(Droonga::Path.default_log_file),
     "log_level" => log_level,
   }
