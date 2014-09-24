@@ -22,7 +22,7 @@ module Droonga
     class << self
     end
 
-    class MissingPidFilePath < ArgumentError
+    class NotInstalledAsService < StandardError
     end
 
     def user_name
@@ -93,46 +93,23 @@ module Droonga
     end
 
     def running?(pid_file_path=nil)
-      if installed_as_service?
-        result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
-        result.include?("running")
-      else
-        if pid_file_path.nil?
-          raise MissingPidFilePath.new
-        end
-        system("droonga-engine-status",
-               "--base-dir", Path.base.to_s,
-               "--pid-file", pid_file_path.to_s,
-               :out => "/dev/null",
-               :err => "/dev/null")
-      end
+      raise NotInstalledAsService.new unless installed_as_service?
+      result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+      result.include?("running")
     end
 
     def start
-      if installed_as_service?
-        system("service", "droonga-engine", "start",
-               :out => "/dev/null",
-               :err => "/dev/null")
-      else
-        false
-      end
+      raise NotInstalledAsService.new unless installed_as_service?
+      system("service", "droonga-engine", "start",
+             :out => "/dev/null",
+             :err => "/dev/null")
     end
 
-    def stop(pid_file_path=nil)
-      if installed_as_service?
-        system("service", "droonga-engine", "stop",
-               :out => "/dev/null",
-               :err => "/dev/null")
-      else
-        if pid_file_path.nil?
-          raise MissingPidFilePath.new
-        end
-        system("droonga-engine-stop",
-               "--base-dir", Path.base.to_s,
-               "--pid-file", pid_file_path.to_s,
-               :out => "/dev/null",
-               :err => "/dev/null")
-      end
+    def stop
+      raise NotInstalledAsService.new unless installed_as_service?
+      system("service", "droonga-engine", "stop",
+             :out => "/dev/null",
+             :err => "/dev/null")
     end
   end
 end

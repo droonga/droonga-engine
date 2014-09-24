@@ -95,7 +95,7 @@ service_installation.ensure_using_service_base_directory
 
 running = false
 begin
-  if service_installation.running?(configuration.pid_file_path)
+  if service_installation.running?
     if !options[:quiet]
       puts("The droonga-engine service is now running.")
       puts("Before reconfiguration, the service is going to be stopped " +
@@ -106,8 +106,8 @@ begin
     end
     running = true
   end
-rescue Droonga::ServiceInstallation::MissingPidFilePath
-  puts("Couldn't detect running status of the service.")
+rescue Droonga::NotInstalledAsService::MissingPidFilePath
+  puts("Not installed as a service yet.")
 end
 
 unless service_installation.have_write_permission?
@@ -145,7 +145,7 @@ end
 
 if running
   unjoin(configuration)
-  service_installation.stop_service(configuration.pid_file_path)
+  service_installation.stop
 end
 
 if options[:clear]
@@ -175,52 +175,20 @@ if options[:reset_config] or options[:reset_catalog]
 end
 
 if options[:reset_config]
-  if service_installation.user_exist?
-    daemon = true
-  elsif configuration.have_given_daemon? or options[:quiet]
-    daemon = configuration.daemon?
-  else
-    daemon = confirmed?("run as a daemon?")
-  end
-
-  if service_installation.user_exist?
-    log_file = Droonga::Path.default_log_file
-  elsif configuration.have_given_log_file?
-    log_file = configuration.log_file
-  elsif options[:quiet]
-    log_file = Droonga::Path.default_log_file
-  else
-    log_file = input("path to the log file", Droonga::Path.default_log_file)
-  end
-
   if configuration.have_given_log_level? or options[:quiet]
     log_level = configuration.log_level
   else
     log_level = input("log level", configuration.log_level)
   end
 
-  pid_file_path = nil
-  unless service_installation.installed_as_service?
-    if options[:quiet] or service_installation.user_exist?
-      pid_file_path = Droonga::Path.default_pid_file
-    elsif  configuration.have_given_pid_file?
-      pid_file_path = configuration.pid_file_path
-    else
-      pid_file_path = input("path to the PID file", Droonga::Path.default_pid_file)
-    end
-  end
-
   new_configuration = {
     "host"      => host,
     "port"      => port,
     "tag"       => tag,
-    "daemon"    => daemon,
-    "log_file"  => path_from_base_dir(log_file),
+    "daemon"    => true,
+    "log_file"  => path_from_base_dir(Droonga::Path.default_log_file),
     "log_level" => log_level,
   }
-  unless pid_file_path.nil?
-    new_configuration["pid_file"] = path_from_base_dir(pid_file_path)
-  end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))
 end
