@@ -88,7 +88,7 @@ module Droonga
 
     def ensure_correct_file_permission(file)
       if user_exist?
-        FileUtils.chown(user_name, group_name, file)
+        FileUtils.chown_R(user_name, group_name, file)
       end
     end
 

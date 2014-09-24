@@ -223,7 +223,6 @@ if options[:reset_config]
   end
   Droonga::SafeFileWriter.write(Droonga::Path.config,
                                 YAML.dump(new_configuration))
-  service_installation.ensure_correct_file_permission(Droonga::Path.config)
 end
 
 if options[:reset_catalog]
@@ -232,7 +231,10 @@ if options[:reset_catalog]
          "--hosts",  host,
          "--port",   port.to_s,
          "--tag",    tag)
-  service_installation.ensure_correct_file_permission(Droonga::Path.catalog)
+end
+
+if options[:reset_config] or options[:reset_catalog]
+  service_installation.ensure_correct_file_permission(Droonga::Path.base)
 end
 
 if running
