@@ -28,6 +28,7 @@ require "droonga/serf"
 require "droonga/node_status"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
+require "droonga/service_installation"
 
 module Droonga
   module Command
@@ -68,6 +69,10 @@ module Droonga
 
       def setup_path
         Path.setup
+
+        service_installation = ServiceInstallation.new
+        service_installation.ensure_using_service_base_directory
+
         unless $0 == File.basename($0)
           droonga_engine_bin_path = File.expand_path(File.dirname($0))
           new_paths = [
