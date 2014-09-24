@@ -181,11 +181,8 @@ install_service_script() {
   INSTALL_LOCATION=$1
   PLATFORM=$2
   DOWNLOAD_URL=$SCRIPT_URL/$PLATFORM/$NAME
-  if [ ! -e $INSTALL_LOCATION ]
-  then
-    curl -o $INSTALL_LOCATION $DOWNLOAD_URL
-    chmod +x $INSTALL_LOCATION
-  fi
+  curl -o $INSTALL_LOCATION $DOWNLOAD_URL
+  chmod +x $INSTALL_LOCATION
 }
 
 install_in_debian() {
