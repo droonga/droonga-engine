@@ -173,6 +173,7 @@ install_master() {
     install_rroonga
     bundle install
   fi
+  rm -rf pkg
   bundle exec rake build
   gem install "pkg/*.gem" --no-ri --no-rdoc
 }
