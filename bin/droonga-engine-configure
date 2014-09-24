@@ -106,7 +106,7 @@ begin
     end
     running = true
   end
-rescue Droonga::NotInstalledAsService::MissingPidFilePath
+rescue Droonga::ServiceInstallation::NotInstalledAsService
   puts("Not installed as a service yet.")
 end
 
