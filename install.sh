@@ -42,6 +42,10 @@ DROONGA_BASE_DIR=/home/$USER/droonga
 : ${VERSION:=release}
 : ${HOST:=Auto Detect}
 
+REQUIRED_COMMANDS=gem
+[ "$VERSION" = "master" ] &&
+  REQUIRED_COMMANDS="$REQUIRED_COMMANDS git"
+
 case $(uname) in
   Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
   *)                   sed="sed -r" ;;
@@ -49,6 +53,15 @@ esac
 
 exist_command() {
   type "$1" > /dev/null 2>&1
+}
+
+exist_all_commands() {
+  for command in $@; do
+    if ! exist_command $command; then
+      return 1
+    fi
+  done
+  return 0
 }
 
 exist_user() {
@@ -61,6 +74,16 @@ prepare_user() {
     echo "Preparing the user..."
     useradd -m $USER
   fi
+}
+
+prepare_environment() {
+  if exist_all_commands $REQUIRED_COMMANDS; then
+    return 0
+  fi
+
+  echo "Preparing the environment..."
+  prepare_environment_in_$PLATFORM
+  return 0
 }
 
 setup_configuration_directory() {
