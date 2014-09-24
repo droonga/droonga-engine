@@ -82,7 +82,8 @@ module Droonga
     
       result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
       result.include?("running") or \
-        result.include?("droonga-engine is stopped")
+        result.include?("droonga-engine is stopped") or \
+        result.include?("droonga-engine dead")
     end
 
     def ensure_correct_file_permission(file)
