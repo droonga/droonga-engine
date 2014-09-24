@@ -95,17 +95,17 @@ service_installation.ensure_using_service_base_directory
 
 running = false
 begin
-if service_installation.running?(configuration.pid_file_path)
-  if !options[:quiet]
-    puts("The droonga-engine service is now running.")
-    puts("Before reconfiguration, the service is going to be stopped " +
-           "and this node will be unjoined from the cluster.")
-    unless confirmed?("Are you sure you want to continue reconfiguration?")
-      exit(false)
+  if service_installation.running?(configuration.pid_file_path)
+    if !options[:quiet]
+      puts("The droonga-engine service is now running.")
+      puts("Before reconfiguration, the service is going to be stopped " +
+             "and this node will be unjoined from the cluster.")
+      unless confirmed?("Are you sure you want to continue reconfiguration?")
+        exit(false)
+      end
     end
+    running = true
   end
-  running = true
-end
 rescue Droonga::ServiceInstallation::MissingPidFilePath
   puts("Couldn't detect running status of the service.")
 end
