@@ -75,8 +75,7 @@ setup_configuration_directory() {
   if [ ! -e $DROONGA_BASE_DIR/catalog.json -o \
        ! -e $DROONGA_BASE_DIR/$NAME.yaml ]; then
     [ "$HOST" = "Auto Detect" ] &&
-      determine_hostname &&
-        HOST=$DETERMINED_HOSTNAME
+      HOST=$(determine_hostname)
 
     if [ "$HOST" = "" ]; then
       HOST=$(hostname)
@@ -116,7 +115,7 @@ guess_global_hostname() {
 determine_hostname() {
   global_hostname=$(guess_global_hostname)
   if [ "$global_hostname" != "" ]; then
-    DETERMINED_HOSTNAME="$global_hostname"
+    echo "$global_hostname"
     return 0
   fi
 
@@ -126,11 +125,11 @@ determine_hostname() {
                  -e "s/^ +| +\$//g" |\
             cut -d " " -f 1)
   if [ "$address" != "" ]; then
-    DETERMINED_HOSTNAME="$address"
+    echo "$address"
     return 0
   fi
 
-  DETERMINED_HOSTNAME=""
+  echo ""
   return 1
 }
 
