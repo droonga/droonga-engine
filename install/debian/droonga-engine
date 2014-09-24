@@ -17,7 +17,7 @@ NAME=droonga-engine
 DAEMON=/usr/local/bin/$NAME
 export DROONGA_BASE_DIR=/home/$NAME/droonga
 PIDFILE=/var/run/$NAME.pid
-DAEMON_ARGS="--pid-file=$PIDFILE"
+DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Exit if the package is not installed
