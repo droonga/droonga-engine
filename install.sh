@@ -251,6 +251,10 @@ prepare_environment_in_centos() {
 }
 
 register_service_in_centos() {
+  pid_dir=/run/$NAME
+  mkdir -p $pid_dir
+  chown -R $USER:$GROUP $pid_dir
+
   install_service_script /etc/rc.d/init.d/$NAME centos
   /sbin/chkconfig --add $NAME
 }

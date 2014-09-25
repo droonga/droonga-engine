@@ -13,13 +13,14 @@ USER=$NAME
 GROUP=droonga
 DAEMON=/usr/local/bin/$NAME
 export DROONGA_BASE_DIR=/home/$NAME/droonga
-DAEMON_ARGS="--daemon --pid-file=$NAME"
+PIDFILE=/run/$NAME/$NAME.pid
+DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 
 [ -x $DAEMON ] || exit 0
 
 start() {
 	echo -n "Starting $NAME: "
-  daemon --user $USER $DAEMON $DAEMON_ARGS
+  daemon --user $USER --pidfile $PIDFILE $DAEMON $DAEMON_ARGS
   RET_CODE=$?
   touch /var/lock/subsys/$NAME
 	return $RET_CODE
@@ -27,7 +28,7 @@ start() {
 
 stop() {
 	echo -n "Shutting down $NAME: "
-	killproc $DAEMON
+	killproc -p $PIDFILE $DAEMON
   RET_CODE=$?
   rm -f /var/lock/subsys/$NAME
 	return $RET_CODE
