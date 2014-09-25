@@ -85,6 +85,10 @@ parser.parse!(ARGV)
 if options.source_path != "-" and options.update
   options.output_path = options.source_path
 end
+if service_installation.user_exist? and
+     options.output_path == Droonga::Path.catalog
+  options.for_service = true
+end
 
 def load_source(path)
   source = nil
@@ -112,6 +116,9 @@ def open_output(path)
 end
 
 catalog = generator.generate
-open_output(options.output_path) do |output|
+open_output(options.output_path) do |output, file|
   output.puts(JSON.pretty_generate(catalog))
+  if options.for_service
+    service_installation.ensure_correct_file_permission(file)
+  end
 end

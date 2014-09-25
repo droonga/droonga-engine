@@ -26,7 +26,7 @@ module Droonga
         FileUtils.mkdir_p(path.dirname.to_s)
         Tempfile.open(path.basename.to_s, path.dirname.to_s, "w") do |output|
           if block_given?
-            yield(output)
+            yield(output, output.path)
           else
             output.write(contents)
           end
