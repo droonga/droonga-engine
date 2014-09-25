@@ -251,8 +251,8 @@ register_service_in_centos() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  curl -o /rc.d/init.d/$NAME $SCRIPT_URL/centos/$NAME
-  chmod +x /rc.d/init.d/$NAME
+  curl -o /etc/rc.d/init.d/$NAME $SCRIPT_URL/centos/$NAME
+  chmod +x /etc/rc.d/init.d/$NAME
   /sbin/chkconfig --add $NAME
 }
 
