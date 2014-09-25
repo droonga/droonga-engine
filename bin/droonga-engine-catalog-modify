@@ -23,6 +23,10 @@ require "pathname"
 require "droonga/engine/version"
 require "droonga/catalog_generator"
 require "droonga/safe_file_writer"
+require "droonga/service_installation"
+
+service_installation = Droonga::ServiceInstallation.new
+service_installation.ensure_using_service_base_directory
 
 generator = Droonga::CatalogGenerator.new
 current_dataset = {}
@@ -31,9 +35,14 @@ datasets = {
 }
 
 options = OpenStruct.new
-options.source_path = "./catalog.json"
 options.output_path = "-"
-options.update      = false
+if service_installation.user_exist?
+  options.source_path = Droonga::Path.catalog
+  options.update      = true
+else
+  options.source_path = "./catalog.json"
+  options.update      = false
+end
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 parser.on("--source=PATH",
