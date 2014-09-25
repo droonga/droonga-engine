@@ -100,7 +100,7 @@ module Droonga
       raise NotInstalledAsService.new unless installed_as_service?
       #TODO: we should support systemd also...
       result = `service droonga-engine status`
-      result.include?("running")
+      result.include?("is running")
     end
 
     def start
