@@ -92,7 +92,7 @@ module Droonga
     def ensure_correct_file_permission(file)
       if user_exist?
         FileUtils.chown_R(user_name, group_name, file)
-        FileUtils.chmod_R("g+r", file)
+        FileUtils.chmod_R("go+r", file)
       end
     end
 
