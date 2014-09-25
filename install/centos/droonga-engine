@@ -5,6 +5,9 @@
 #	<Droonga engine is a core component in Droonga system>
 # chkconfig: 2345 20 80
 
+# TODO: we have to migrate to systemd based management in near future...
+export SYSTEMCTL_SKIP_REDIRECT=yes
+
 # Source function library.
 . /etc/init.d/functions
 

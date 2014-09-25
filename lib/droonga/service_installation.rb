@@ -75,12 +75,14 @@ module Droonga
     def installed_as_service?
       return false unless user_exist?
     
+      #TODO: we should support systemd also...
       succeeded = system("service", "droonga-engine", "status",
                          :out => "/dev/null",
                          :err => "/dev/null")
       return true if succeeded
     
-      result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+      #TODO: we should support systemd also...
+      result = `service droonga-engine status`
       result.include?("running") or \
         result.include?("droonga-engine is stopped") or \
         result.include?("droonga-engine dead")
@@ -95,12 +97,14 @@ module Droonga
 
     def running?(pid_file_path=nil)
       raise NotInstalledAsService.new unless installed_as_service?
-      result = `env SYSTEMCTL_SKIP_REDIRECT=yes service droonga-engine status`
+      #TODO: we should support systemd also...
+      result = `service droonga-engine status`
       result.include?("running")
     end
 
     def start
       raise NotInstalledAsService.new unless installed_as_service?
+      #TODO: we should support systemd also...
       system("service", "droonga-engine", "start",
              :out => "/dev/null",
              :err => "/dev/null")
@@ -108,6 +112,7 @@ module Droonga
 
     def stop
       raise NotInstalledAsService.new unless installed_as_service?
+      #TODO: we should support systemd also...
       system("service", "droonga-engine", "stop",
              :out => "/dev/null",
              :err => "/dev/null")
