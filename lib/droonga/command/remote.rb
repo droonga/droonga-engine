@@ -23,6 +23,7 @@ require "droonga/catalog_modifier"
 require "droonga/catalog_fetcher"
 require "droonga/data_absorber"
 require "droonga/safe_file_writer"
+require "droonga/service_installation"
 
 module Droonga
   module Command
@@ -37,6 +38,9 @@ module Droonga
             "log" => []
           }
           @serf = Serf.new(nil, @serf_name)
+
+          @service_installation = ServiceInstallation.new
+          @service_installation.ensure_using_service_base_directory
 
           log("params = #{params}")
         end
@@ -166,15 +170,19 @@ module Droonga
           return if other_hosts.empty?
 
           # restart self with the fetched catalog.
-          SafeFileWriter.write(Path.catalog, JSON.pretty_generate(@catalog))
+          SafeFileWriter.write(Path.catalog) do |output, file|
+            output.puts(JSON.pretty_generate(@catalog))
+            @service_installation.ensure_correct_file_permission(file)
+          end
 
           absorb_data if should_absorb_data?
 
           log("joining to the cluster: update myself")
 
-          CatalogModifier.modify do |modifier|
+          CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset_name].replicas.hosts += other_hosts
             modifier.datasets[dataset_name].replicas.hosts.uniq!
+            @service_installation.ensure_correct_file_permission(file)
           end
 
           @serf.join(*other_hosts)
@@ -200,8 +208,9 @@ module Droonga
         def absorb_data
           log("starting to copy data from #{source_host}")
 
-          CatalogModifier.modify do |modifier|
+          CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset_name].replicas.hosts = [host]
+            @service_installation.ensure_correct_file_permission(file)
           end
           sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
 
@@ -295,8 +304,9 @@ module Droonga
 
           log("new replicas: #{hosts.join(",")}")
 
-          CatalogModifier.modify do |modifier|
+          CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts = hosts
+            @service_installation.ensure_correct_file_permission(file)
           end
 
           @serf.join(*hosts)
@@ -312,9 +322,10 @@ module Droonga
           log("adding replicas: #{added_hosts.join(",")}")
           return if added_hosts.empty?
 
-          CatalogModifier.modify do |modifier|
+          CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts += added_hosts
             modifier.datasets[dataset].replicas.hosts.uniq!
+            @service_installation.ensure_correct_file_permission(file)
           end
 
           @serf.join(*added_hosts)
@@ -327,8 +338,9 @@ module Droonga
 
           log("removing replicas: #{hosts.join(",")}")
 
-          CatalogModifier.modify do |modifier|
+          CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts -= hosts
+            @service_installation.ensure_correct_file_permission(file)
           end
 
           #XXX Now we should restart serf agent to remove unjoined nodes from the list of members...
@@ -340,7 +352,10 @@ module Droonga
           path = Path.live_nodes
           nodes = live_nodes
           file_contents = JSON.pretty_generate(nodes)
-          SafeFileWriter.write(path, file_contents)
+          SafeFileWriter.write(path) do |output, file|
+            output.puts(file_contents)
+            @service_installation.ensure_correct_file_permission(file)
+          end
         end
 
         private

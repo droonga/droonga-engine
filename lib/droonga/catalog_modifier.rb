@@ -23,8 +23,8 @@ module Droonga
   class CatalogModifier
     class << self
       def modify
-        new.modify do |generator|
-          yield(generator)
+        new.modify do |generator, file|
+          yield(generator, file)
         end
       end
     end
@@ -36,8 +36,10 @@ module Droonga
     end
 
     def modify
-      yield(@generator)
-      SafeFileWriter.write(Path.catalog, JSON.pretty_generate(@generator.generate))
+      SafeFileWriter.write(Path.catalog) do |output, file|
+        yield(@generator, file)
+        output.puts(JSON.pretty_generate(@generator.generate))
+      end
     end
   end
 end
