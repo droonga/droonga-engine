@@ -15,7 +15,9 @@
  * A new command line utility `droonga-engine-configure` is available.
    It generates the static configuration file, the `catalog.json` for the service.
    Moreover, it clears old stored data to make the node empty.
- * Now, service processes stop and restart gracefully.
+ * Some options for utility commands become optional.
+   Important parameters are automatically detected.
+ * Restarts server processes more gracefully.
 
 ## 1.0.5: 2014-07-29
 
