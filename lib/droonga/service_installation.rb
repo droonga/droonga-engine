@@ -30,7 +30,7 @@ module Droonga
     end
 
     def group_name
-      user_name
+      "droonga"
     end
 
     def base_directory
