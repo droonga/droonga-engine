@@ -204,13 +204,6 @@ install_master() {
   gem install "pkg/*.gem" --no-ri --no-rdoc
 }
 
-install_service_script() {
-  INSTALL_LOCATION=$1
-  DOWNLOAD_URL=$SCRIPT_URL/$PLATFORM/$NAME
-  curl -o $INSTALL_LOCATION $DOWNLOAD_URL
-  chmod +x $INSTALL_LOCATION
-}
-
 
 
 # ====================== for Debian/Ubuntu ==========================
@@ -230,7 +223,8 @@ register_service_in_debian() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  install_service_script /etc/init.d/$NAME debian
+  curl -o /etc/init.d/$NAME $SCRIPT_URL/debian/$NAME
+  chmod +x /etc/init.d/$NAME
   update-rc.d $NAME defaults
 }
 
@@ -255,7 +249,9 @@ register_service_in_centos() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  install_service_script /etc/rc.d/init.d/$NAME centos
+  #TODO: we should migrate to systemd in near future...
+  curl -o /rc.d/init.d/$NAME $SCRIPT_URL/centos/$NAME
+  chmod +x /rc.d/init.d/$NAME
   /sbin/chkconfig --add $NAME
 }
 
