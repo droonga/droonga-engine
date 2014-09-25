@@ -107,10 +107,10 @@ generator.modify(datasets)
 
 def open_output(path)
   if path == "-"
-    yield($stdout)
+    yield($stdout, nil)
   else
-    Droonga::SafeFileWriter.write(path) do |output|
-      yield(output)
+    Droonga::SafeFileWriter.write(path) do |output, file|
+      yield(output, file)
     end
   end
 end
@@ -118,7 +118,7 @@ end
 catalog = generator.generate
 open_output(options.output_path) do |output, file|
   output.puts(JSON.pretty_generate(catalog))
-  if options.for_service
+  if file and options.for_service
     service_installation.ensure_correct_file_permission(file)
   end
 end
