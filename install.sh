@@ -37,7 +37,7 @@ NAME=droonga-engine
 SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
-GROUP=$USER
+GROUP=droonga
 DROONGA_BASE_DIR=/home/$USER/droonga
 
 : ${VERSION:=release}
@@ -69,14 +69,6 @@ exist_user() {
   id "$1" > /dev/null 2>&1
 }
 
-prepare_user() {
-  if ! exist_user $USER; then
-    echo ""
-    echo "Preparing the user..."
-    useradd -m $USER
-  fi
-}
-
 prepare_environment() {
   if exist_all_commands $REQUIRED_COMMANDS; then
     return 0
@@ -85,6 +77,19 @@ prepare_environment() {
   echo "Preparing the environment..."
   prepare_environment_in_$PLATFORM
   return 0
+}
+
+prepare_user() {
+  echo ""
+  echo "Preparing the user..."
+
+  groupadd $GROUP
+
+  if ! exist_user $USER; then
+    useradd -m $USER
+  fi
+
+  usermod -G $GROUP $USER
 }
 
 setup_configuration_directory() {
