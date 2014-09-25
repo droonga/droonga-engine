@@ -89,6 +89,7 @@ prepare_user() {
   fi
 
   usermod -G $GROUP $USER
+  return 0
 }
 
 setup_configuration_directory() {
