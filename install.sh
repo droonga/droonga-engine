@@ -245,11 +245,12 @@ prepare_environment_in_centos() {
 }
 
 register_service_in_centos() {
+  #TODO: we should migrate to systemd in near future...
+
   pid_dir=/run/$NAME
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  #TODO: we should migrate to systemd in near future...
   curl -o /rc.d/init.d/$NAME $SCRIPT_URL/centos/$NAME
   chmod +x /rc.d/init.d/$NAME
   /sbin/chkconfig --add $NAME
