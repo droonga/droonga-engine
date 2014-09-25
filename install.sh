@@ -76,7 +76,6 @@ prepare_environment() {
 
   echo "Preparing the environment..."
   prepare_environment_in_$PLATFORM
-  return 0
 }
 
 prepare_user() {
