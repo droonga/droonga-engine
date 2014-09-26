@@ -5,6 +5,8 @@
  * The installation script is now available.
    It automatically installs required softwares and configure the `droonga-engine` as a system service.
    Currently it works only for Debian, Ubuntu, and CentOS 7.
+ * The service works as a process belonging to a user `droonga-engine` who is specific for the service.
+   The configuration directory for the service is placed under the home directory of the user.
  * A static configuration file to define default parameters (`host` and so on) is now available.
    It must be placed into the directory same to `catalog.json`.
    You don't have to run `droonga-engine` command with many options, anymore.
