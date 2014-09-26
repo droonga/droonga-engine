@@ -99,8 +99,9 @@ module Droonga
     def running?(pid_file_path=nil)
       raise NotInstalledAsService.new unless installed_as_service?
       #TODO: we should support systemd also...
-      result = `service droonga-engine status`
-      result.include?("is running")
+      system("service", "droonga-engine", "status",
+             :out => "/dev/null",
+             :err => "/dev/null")
     end
 
     def start
