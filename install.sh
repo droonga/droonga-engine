@@ -164,8 +164,12 @@ script_url() {
   if [ "$VERSION" = "master" ]; then
     echo "$SCRIPT_URL_BASE/master/$1"
   else
-    echo "$SCRIPT_URL_BASE/v$($NAME --version)/$1"
+    echo "$SCRIPT_URL_BASE/v$(installed_version)/$1"
   fi
+}
+
+installed_version() {
+  $NAME --version | cut -d " " -f 2
 }
 
 
