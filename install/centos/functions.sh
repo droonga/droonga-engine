@@ -24,7 +24,7 @@ register_service() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  curl -o /etc/rc.d/init.d/$NAME $(script_url "install/centos/$NAME")
+  curl -o /etc/rc.d/init.d/$NAME $(download_url "install/centos/$NAME")
   chmod +x /etc/rc.d/init.d/$NAME
   /sbin/chkconfig --add $NAME
 }
