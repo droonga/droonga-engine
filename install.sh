@@ -221,7 +221,7 @@ install_master() {
 prepare_environment_in_debian() {
   apt-get update
   apt-get -y upgrade
-  apt-get install -y ruby ruby-dev build-essential
+  apt-get install -y curl ruby ruby-dev build-essential
 
   if [ "$VERSION" = "master" ]; then
     apt-get install -y git
@@ -235,7 +235,7 @@ prepare_environment_in_debian() {
 prepare_environment_in_centos() {
   yum update
   yum -y groupinstall development
-  yum -y install ruby-devel
+  yum -y install curl ruby-devel
 
   if [ "$VERSION" = "master" ]; then
     yum -y install git
