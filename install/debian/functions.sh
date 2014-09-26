@@ -14,11 +14,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 register_service() {
-  NAME=$1
-  USER=$2
-  GROUP=$3
+  local NAME=$1
+  local USER=$2
+  local GROUP=$3
 
-  pid_dir=/var/run/$NAME
+  local pid_dir=/var/run/$NAME
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 

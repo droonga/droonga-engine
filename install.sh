@@ -129,8 +129,8 @@ setup_configuration_directory() {
 
 guess_global_hostname() {
   if hostname -d > /dev/null 2>&1; then
-    domain=$(hostname -d)
-    hostname=$(hostname -s)
+    local domain=$(hostname -d)
+    local hostname=$(hostname -s)
     if [ "$domain" != "" ]; then
       echo "$hostname.$domain"
       return 0
@@ -141,17 +141,17 @@ guess_global_hostname() {
 }
 
 determine_hostname() {
-  global_hostname=$(guess_global_hostname)
+  local global_hostname=$(guess_global_hostname)
   if [ "$global_hostname" != "" ]; then
     echo "$global_hostname"
     return 0
   fi
 
-  address=$(hostname -i | \
-            $sed -e "s/127\.[0-9]+\.[0-9]+\.[0-9]+//g" \
-                 -e "s/  +/ /g" \
-                 -e "s/^ +| +\$//g" |\
-            cut -d " " -f 1)
+  local address=$(hostname -i | \
+                  $sed -e "s/127\.[0-9]+\.[0-9]+\.[0-9]+//g" \
+                       -e "s/  +/ /g" \
+                       -e "s/^ +| +\$//g" |\
+                  cut -d " " -f 1)
   if [ "$address" != "" ]; then
     echo "$address"
     return 0
@@ -178,15 +178,15 @@ install_rroonga() {
   # Install Rroonga globally from a public gem, because custom build
   # doesn't work as we expect for Droonga...
   if exist_command grndump; then
-    current_version=$(grndump -v | cut -d " " -f 2)
-    version_matcher=$(cat $NAME.gemspec | \
-                      grep rroonga | \
-                      cut -d "," -f 2 | \
-                      cut -d '"' -f 2)
-    compared_version=$(echo "$version_matcher" | \
-                       cut -d " " -f 2)
-    operator=$(echo "$version_matcher" | cut -d " " -f 1)
-    compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
+    local current_version=$(grndump -v | cut -d " " -f 2)
+    local version_matcher=$(cat $NAME.gemspec | \
+                            grep rroonga | \
+                            cut -d "," -f 2 | \
+                            cut -d '"' -f 2)
+    local compared_version=$(echo "$version_matcher" | \
+                             cut -d " " -f 2)
+    local operator=$(echo "$version_matcher" | cut -d " " -f 1)
+    local compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
     if [ $compare_result = "true" ]; then return 0; fi
   fi
   gem install rroonga --no-ri --no-rdoc
