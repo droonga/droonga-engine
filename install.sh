@@ -34,7 +34,7 @@
 #     # curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | HOST=xxx.xxx.xxx.xxx bash
 
 NAME=droonga-engine
-SCRIPT_URL=https://raw.githubusercontent.com/droonga/$NAME/master/install
+SCRIPT_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 GROUP=droonga
@@ -160,6 +160,14 @@ determine_hostname() {
   return 1
 }
 
+script_url() {
+  if [ "$VERSION" = "master" ]; then
+    echo "$SCRIPT_URL_BASE/master/$1"
+  else
+    echo "$SCRIPT_URL_BASE/v$($NAME --version)/$1"
+  fi
+}
+
 
 install_rroonga() {
   # Install Rroonga globally from a public gem, because custom build
@@ -223,7 +231,7 @@ register_service_in_debian() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  curl -o /etc/init.d/$NAME $SCRIPT_URL/debian/$NAME
+  curl -o /etc/init.d/$NAME $(script_url "install/debian/$NAME")
   chmod +x /etc/init.d/$NAME
   update-rc.d $NAME defaults
 }
@@ -251,7 +259,7 @@ register_service_in_centos() {
   mkdir -p $pid_dir
   chown -R $USER:$GROUP $pid_dir
 
-  curl -o /etc/rc.d/init.d/$NAME $SCRIPT_URL/centos/$NAME
+  curl -o /etc/rc.d/init.d/$NAME $(script_url "install/centos/$NAME")
   chmod +x /etc/rc.d/init.d/$NAME
   /sbin/chkconfig --add $NAME
 }
