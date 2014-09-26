@@ -22,6 +22,7 @@ require "yaml"
 require "coolio"
 require "sigdump"
 
+require "droonga/engine/version"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
@@ -62,6 +63,7 @@ module Droonga
       private
       def parse_command_line_arguments!(command_line_arguments)
         parser = OptionParser.new
+        parser.version = Engine::VERSION
         @configuration.add_command_line_options(parser)
         parser.parse!(command_line_arguments)
       end
