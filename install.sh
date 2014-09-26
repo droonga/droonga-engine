@@ -34,16 +34,17 @@
 #     # curl https://raw.githubusercontent.com/droonga/droonga-engine/master/install.sh | HOST=xxx.xxx.xxx.xxx bash
 
 NAME=droonga-engine
-SCRIPT_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
+DOWNLOAD_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 USER=$NAME
 GROUP=droonga
 DROONGA_BASE_DIR=/home/$USER/droonga
+TEMPDIR=/tmp/install-$NAME
 
 : ${VERSION:=release}
 : ${HOST:=Auto Detect}
 
-REQUIRED_COMMANDS=gem
+REQUIRED_COMMANDS=curl gem
 [ "$VERSION" = "master" ] &&
   REQUIRED_COMMANDS="$REQUIRED_COMMANDS git"
 
@@ -160,11 +161,11 @@ determine_hostname() {
   return 1
 }
 
-script_url() {
+download_url() {
   if [ "$VERSION" = "master" ]; then
-    echo "$SCRIPT_URL_BASE/master/$1"
+    echo "$DOWNLOAD_URL_BASE/master/$1"
   else
-    echo "$SCRIPT_URL_BASE/v$(installed_version)/$1"
+    echo "$DOWNLOAD_URL_BASE/v$(installed_version)/$1"
   fi
 }
 
@@ -194,9 +195,7 @@ install_rroonga() {
 install_master() {
   gem install bundler --no-ri --no-rdoc
 
-  tempdir=/tmp/install-$NAME
-  mkdir $tempdir
-  cd $tempdir
+  cd $TEMPDIR
 
   if [ -d $NAME ]
   then
@@ -219,7 +218,6 @@ install_master() {
 
 
 # ====================== for Debian/Ubuntu ==========================
-
 prepare_environment_in_debian() {
   apt-get update
   apt-get -y upgrade
@@ -229,23 +227,11 @@ prepare_environment_in_debian() {
     apt-get install -y git
   fi
 }
-
-register_service_in_debian() {
-  pid_dir=/var/run/$NAME
-  mkdir -p $pid_dir
-  chown -R $USER:$GROUP $pid_dir
-
-  curl -o /etc/init.d/$NAME $(script_url "install/debian/$NAME")
-  chmod +x /etc/init.d/$NAME
-  update-rc.d $NAME defaults
-}
-
 # ====================== /for Debian/Ubuntu =========================
 
 
 
 # ========================= for CentOS 7 ============================
-
 prepare_environment_in_centos() {
   yum update
   yum -y groupinstall development
@@ -255,26 +241,14 @@ prepare_environment_in_centos() {
     yum -y install git
   fi
 }
-
-register_service_in_centos() {
-  #TODO: we should migrate to systemd in near future...
-
-  pid_dir=/run/$NAME
-  mkdir -p $pid_dir
-  chown -R $USER:$GROUP $pid_dir
-
-  curl -o /etc/rc.d/init.d/$NAME $(script_url "install/centos/$NAME")
-  chmod +x /etc/rc.d/init.d/$NAME
-  /sbin/chkconfig --add $NAME
-}
-
 # ========================= /for CentOS 7 ===========================
 
 
 
 install() {
-  echo "Preparing the environment..."
-  prepare_environment_in_$PLATFORM
+  mkdir -p $TEMPDIR
+
+  prepare_environment
 
   echo ""
   if [ "$VERSION" = "master" ]; then
@@ -285,13 +259,17 @@ install() {
     gem install droonga-engine --no-rdoc --no-ri
   fi
 
+  curl -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
+  source $TEMPDIR/functions.sh
+
   prepare_user
 
   setup_configuration_directory
 
   echo ""
   echo "Registering $NAME as a service..."
-  register_service_in_$PLATFORM
+  # this function is defined by the downloaded "functions.sh"!
+  register_service
 
   echo ""
   echo "Successfully installed $NAME."
