@@ -44,7 +44,7 @@ TEMPDIR=/tmp/install-$NAME
 : ${VERSION:=release}
 : ${HOST:=Auto Detect}
 
-REQUIRED_COMMANDS=curl gem
+REQUIRED_COMMANDS="curl gem"
 [ "$VERSION" = "master" ] &&
   REQUIRED_COMMANDS="$REQUIRED_COMMANDS git"
 
