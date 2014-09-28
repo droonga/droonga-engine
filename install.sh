@@ -246,6 +246,12 @@ prepare_environment_in_debian() {
   apt-get -y upgrade
   apt-get install -y curl ruby ruby-dev build-essential
 
+#  if lsb_release -i | grep --quiet Ubuntu; then
+#    add-apt-repository -y ppa:groonga/ppa
+#    apt-get update
+#    apt-get install -y libgroonga-dev
+#  fi
+
   if [ "$VERSION" = "master" ]; then
     apt-get install -y git
   fi
