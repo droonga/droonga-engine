@@ -53,6 +53,29 @@ case $(uname) in
   *)                   sed="sed -r" ;;
 esac
 
+ensure_root() {
+  if [ "$EUID" != "0" ]; then
+    echo "You must run this script as the root."
+    exit 1
+  fi
+}
+
+guess_platform() {
+  if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+#    if lsb_release -i | grep --quiet Ubuntu; then
+#      echo "ubuntu"
+#      return 0
+#    elif lsb_release -i | grep --quiet Debian; then
+      echo "debian"
+      return 0
+#    fi
+  elif [ -e /etc/centos-release ]; then
+    echo "centos"
+    return 0
+  fi
+  return 1
+}
+
 exist_command() {
   type "$1" > /dev/null 2>&1
 }
@@ -275,15 +298,12 @@ install() {
   echo "Successfully installed $NAME."
 }
 
-if [ "$EUID" != "0" ]; then
-  echo "You must run this script as the root."
-  exit 1
-elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-  PLATFORM=debian
-elif [ -e /etc/centos-release ]; then
-  PLATFORM=centos
-else
-  echo "Not supported platform. This script works only for Debian or CentOS."
+
+ensure_root
+
+PLATFORM=$(guess_platform)
+if [ "$PLATFORM" = "" ]; then
+  echo "Not supported platform."
   exit 255
 fi
 
