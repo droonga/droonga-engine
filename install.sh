@@ -165,6 +165,7 @@ determine_hostname() {
 
   local address=$(hostname -i | \
                   $sed -e "s/127\.[0-9]+\.[0-9]+\.[0-9]+//g" \
+                       -e "s/[0-9a-f:]+%[^ ]+//g" \
                        -e "s/  +/ /g" \
                        -e "s/^ +| +\$//g" |\
                   cut -d " " -f 1)
