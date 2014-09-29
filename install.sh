@@ -229,7 +229,7 @@ install_master() {
 # ====================== for Debian/Ubuntu ==========================
 prepare_environment_in_debian() {
   local use_groonga_package=no
-  if apt-cache show libgroonga-dev; then
+  if apt-cache policy | grep --quiet groonga; then
     use_groonga_package=yes
   else
     if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
