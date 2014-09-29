@@ -260,9 +260,18 @@ prepare_environment_in_debian() {
 
 # ========================= for CentOS 7 ============================
 prepare_environment_in_centos() {
+  local use_libgroonga_dev=no
+  rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
+  yum makecache
+  use_libgroonga_dev=yes
+
   yum update
   yum -y groupinstall development
   yum -y install curl ruby-devel
+
+  if [ "$use_libgroonga_dev" = "yes" ]; then
+    yum -y install libgroonga-dev
+  fi
 
   if [ "$VERSION" = "master" ]; then
     yum -y install git
