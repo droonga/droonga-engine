@@ -232,17 +232,17 @@ prepare_environment_in_debian() {
   if apt-cache show libgroonga-dev; then
     use_groonga_package=yes
   else
-  if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
-    add-apt-repository -y ppa:groonga/ppa
-    use_groonga_package=yes
-  else
-    local groonga_list=/etc/apt/sources.list.d/groonga.list
-    echo "deb http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
-    echo "deb-src http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
-    apt-get update
-    apt-get install -y --allow-unauthenticated groonga-keyring
-    use_groonga_package=yes
-  fi
+    if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
+      add-apt-repository -y ppa:groonga/ppa
+      use_groonga_package=yes
+    else
+      local groonga_list=/etc/apt/sources.list.d/groonga.list
+      echo "deb http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
+      echo "deb-src http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
+      apt-get update
+      apt-get install -y --allow-unauthenticated groonga-keyring
+      use_groonga_package=yes
+    fi
   fi
 
   apt-get update
