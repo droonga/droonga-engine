@@ -23,6 +23,11 @@ register_service() {
   chown -R $USER:$GROUP $pid_dir
 
   curl -o /etc/init.d/$NAME $(download_url "install/debian/$NAME")
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to download service script!"
+    exit 1
+  fi
+
   chmod +x /etc/init.d/$NAME
   update-rc.d $NAME defaults
 }
