@@ -66,7 +66,7 @@ module Droonga
         raise DownloadFailed.new("Couldn't download serf executable. Try it later.")
       end
     rescue Faraday::ConnectionFailed => network_error
-      logger.warn("Cinnection failed.")
+      logger.warn("Connection failed.")
       if @retry_count < MAX_RETRY_COUNT
         @retry_count += 1
         sleep(RETRY_INTERVAL * @retry_count)
