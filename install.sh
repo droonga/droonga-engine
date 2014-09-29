@@ -85,6 +85,10 @@ exist_all_commands() {
   return 0
 }
 
+exist_yum_repository() {
+  yum repolist | grep --quiet "$1"
+}
+
 exist_user() {
   id "$1" > /dev/null 2>&1
 }
@@ -261,16 +265,29 @@ prepare_environment_in_debian() {
 # ========================= for CentOS 7 ============================
 prepare_environment_in_centos() {
   local use_libgroonga_dev=no
-  rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
-  yum makecache
-  use_libgroonga_dev=yes
+  if ! exist_yum_repository groonga; then
+    rpm -ivh http://packages.groonga.org/centos/groonga-release-1.1.0-1.noarch.rpm
 
-  yum update
+    # disable it by default!
+    groonga_repo=/etc/yum.repos.d/groonga.repo
+    backup=/tmp/$(basename $groonga_repo).bak
+    mv $groonga_repo $backup
+    cat $backup | $sed -e "s/enabled=1/enabled=0/" \
+      > $groonga_repo
+
+    use_libgroonga_dev=yes
+  fi
+
+  if [ "$use_libgroonga_dev" = "yes" ]; then
+    yum --enablerepo=groonga update
+  else
+    yum update
+  fi
   yum -y groupinstall development
   yum -y install curl ruby-devel
 
   if [ "$use_libgroonga_dev" = "yes" ]; then
-    yum -y install libgroonga-dev
+    yum -y --enablerepo=groonga install libgroonga-dev
   fi
 
   if [ "$VERSION" = "master" ]; then
