@@ -197,7 +197,7 @@ install_rroonga() {
                              cut -d " " -f 2)
     local operator=$(echo "$version_matcher" | cut -d " " -f 1)
     local compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
-    if [ $compare_result = "true" ]; then return 0; fi
+    if [ "$compare_result" = "true" ]; then return 0; fi
   fi
   gem install rroonga --no-ri --no-rdoc
 }
