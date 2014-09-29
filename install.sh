@@ -253,7 +253,6 @@ prepare_environment_in_debian() {
   fi
 
   apt-get update
-  apt-get -y upgrade
   apt-get install -y curl ruby ruby-dev build-essential
 
   if [ "$use_groonga_package" = "yes" ]; then
@@ -280,15 +279,13 @@ prepare_environment_in_centos() {
     mv $groonga_repo $backup
     cat $backup | $sed -e "s/enabled=1/enabled=0/" \
       > $groonga_repo
-
-    yum -y --enablerepo=groonga makecache
   fi
 
   if exist_yum_repository groonga; then
     use_groonga_package=yes
-    yum --enablerepo=groonga update
+    yum -y --enablerepo=groonga makecache
   else
-    yum update
+    yum -y makecache
   fi
   yum -y groupinstall development
   yum -y install curl ruby-devel
