@@ -60,7 +60,7 @@ module Droonga
       logger.warn("Downloaded zip file is broken.")
       if @retry_count < MAX_RETRY_COUNT
         @retry_count += 1
-        sleep(RETRY_INTERVAL)
+        sleep(RETRY_INTERVAL * @retry_count)
         download
       else
         raise DownloadFailed.new("Couldn't download serf executable. Try it later.")
@@ -69,7 +69,7 @@ module Droonga
       logger.warn("Cinnection failed.")
       if @retry_count < MAX_RETRY_COUNT
         @retry_count += 1
-        sleep(RETRY_INTERVAL)
+        sleep(RETRY_INTERVAL * @retry_count)
         download
       else
         raise DownloadFailed.new("Couldn't download serf executable. Try it later.")
