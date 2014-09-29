@@ -15,6 +15,6 @@
 
 module Droonga
   class Engine
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
   end
 end
