@@ -316,6 +316,11 @@ install() {
     gem install droonga-engine --no-rdoc --no-ri
   fi
 
+  if ! exist_command droonga-engine; then
+    echo "ERROR: Failed to install $NAME!"
+    exit 1
+  fi
+
   curl -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
   source $TEMPDIR/functions.sh
 
