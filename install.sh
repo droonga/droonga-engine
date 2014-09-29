@@ -134,6 +134,10 @@ setup_configuration_directory() {
 
   droonga-engine-configure --quiet \
     --host=$HOST
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to configure $NAME!"
+    exit 1
+  fi
 
   chown -R $USER:$GROUP $DROONGA_BASE_DIR
 }
@@ -322,7 +326,14 @@ install() {
   fi
 
   curl -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
-  source $TEMPDIR/functions.sh
+  if ! source $TEMPDIR/functions.sh; then
+    echo "ERROR: Failed to download post-installation script!"
+    exit 1
+  fi
+  if ! exist_command register_service; then
+    echo "ERROR: Downloaded post-installation script is broken!"
+    exit 1
+  fi
 
   prepare_user
 
