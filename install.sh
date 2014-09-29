@@ -229,15 +229,26 @@ install_master() {
 
 # ====================== for Debian/Ubuntu ==========================
 prepare_environment_in_debian() {
+  local use_libgroonga_dev=no
+  if lsb_release -i | grep --quiet Ubuntu; then
+    add-apt-repository -y ppa:groonga/ppa
+    use_libgroonga_dev=yes
+  elif lsb_release -i | grep --quiet Debian; then
+    local groonga_list=/etc/apt/sources.list.d/groonga.list
+    echo "deb http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
+    echo "deb-src http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
+    sudo apt-get update
+    sudo apt-get install -y --allow-unauthenticated groonga-keyring
+    use_libgroonga_dev=yes
+  fi
+
   apt-get update
   apt-get -y upgrade
   apt-get install -y curl ruby ruby-dev build-essential
 
-#  if lsb_release -i | grep --quiet Ubuntu; then
-#    add-apt-repository -y ppa:groonga/ppa
-#    apt-get update
-#    apt-get install -y libgroonga-dev
-#  fi
+  if [ "$use_libgroonga_dev" = "yes" ]; then
+    apt-get install -y libgroonga-dev
+  fi
 
   if [ "$VERSION" = "master" ]; then
     apt-get install -y git
