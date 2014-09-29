@@ -58,13 +58,8 @@ ensure_root() {
 
 guess_platform() {
   if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
-#    if lsb_release -i | grep --quiet Ubuntu; then
-#      echo "ubuntu"
-#      return 0
-#    elif lsb_release -i | grep --quiet Debian; then
-      echo "debian"
-      return 0
-#    fi
+    echo "debian"
+    return 0
   elif [ -e /etc/centos-release ]; then
     echo "centos"
     return 0
@@ -234,10 +229,10 @@ install_master() {
 # ====================== for Debian/Ubuntu ==========================
 prepare_environment_in_debian() {
   local use_libgroonga_dev=no
-  if lsb_release -i | grep --quiet Ubuntu; then
+  if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
     add-apt-repository -y ppa:groonga/ppa
     use_libgroonga_dev=yes
-  elif lsb_release -i | grep --quiet Debian; then
+  else
     local groonga_list=/etc/apt/sources.list.d/groonga.list
     echo "deb http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
     echo "deb-src http://packages.groonga.org/debian/ wheezy main" >> $groonga_list
