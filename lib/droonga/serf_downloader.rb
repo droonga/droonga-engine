@@ -27,8 +27,15 @@ module Droonga
   class SerfDownloader
     include Loggable
 
+    class DownloadFailed < StandardError
+    end
+
+    MAX_RETRY_COUNT = 5
+    RETRY_INTERVAL  = 10
+
     def initialize(output_path)
       @output_path = output_path
+      @retry_count = 0
     end
 
     def download
@@ -48,6 +55,15 @@ module Droonga
                              :directories => false)
         FileUtils.mv("#{dir}/serf", absolete_output_path.to_s)
         FileUtils.chmod(0755, absolete_output_path.to_s)
+      end
+    rescue Archive::Zip::UnzipError => archive_error
+      logger.warn("Downloaded zip file is broken.")
+      if @retry_count < MAX_RETRY_COUNT
+        @retry_count += 1
+        sleep(RETRY_INTERVAL)
+        download
+      else
+        raise DownloadFailed.new("Couldn't download serf executable. Try it later.")
       end
     end
 
