@@ -81,7 +81,10 @@ exist_all_commands() {
 }
 
 exist_yum_repository() {
-  yum repolist | grep --quiet "$1"
+  if ! yum --enablerepo=$1 repolist; then
+    return 1
+  fi
+  yum --enablerepo=$1 repolist | grep --quiet "$1"
 }
 
 exist_user() {
@@ -273,6 +276,8 @@ prepare_environment_in_centos() {
     mv $groonga_repo $backup
     cat $backup | $sed -e "s/enabled=1/enabled=0/" \
       > $groonga_repo
+
+    yum -y --enablerepo=groonga makecache
   fi
 
   if exist_yum_repository groonga; then
