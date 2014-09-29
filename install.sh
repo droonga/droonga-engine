@@ -269,11 +269,10 @@ prepare_environment_in_centos() {
     mv $groonga_repo $backup
     cat $backup | $sed -e "s/enabled=1/enabled=0/" \
       > $groonga_repo
-
-    use_groonga_package=yes
   fi
 
-  if [ "$use_groonga_package" = "yes" ]; then
+  if exist_yum_repository groonga; then
+    use_groonga_package=yes
     yum --enablerepo=groonga update
   else
     yum update
