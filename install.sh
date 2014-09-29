@@ -229,6 +229,7 @@ install_master() {
 # ====================== for Debian/Ubuntu ==========================
 prepare_environment_in_debian() {
   local use_groonga_package=no
+  if ! apt-cache show libgroonga-dev; then
   if [ "$(lsb_release -i -s)" = "Ubuntu" ]; then
     add-apt-repository -y ppa:groonga/ppa
     use_groonga_package=yes
@@ -239,6 +240,7 @@ prepare_environment_in_debian() {
     apt-get update
     apt-get install -y --allow-unauthenticated groonga-keyring
     use_groonga_package=yes
+  fi
   fi
 
   apt-get update
