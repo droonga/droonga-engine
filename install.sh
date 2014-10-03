@@ -43,6 +43,7 @@ TEMPDIR=/tmp/install-$NAME
 
 : ${VERSION:=release}
 : ${HOST:=Auto Detect}
+: ${PORT:=10031}
 
 case $(uname) in
   Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
@@ -133,7 +134,7 @@ setup_configuration_directory() {
   fi
 
   droonga-engine-configure --quiet \
-    --host=$HOST
+    --host=$HOST --port=$PORT
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to configure $NAME!"
     exit 1
