@@ -36,6 +36,7 @@ module Droonga
     end
 
     DEFAULT_HOST = Socket.gethostname
+    DEFAULT_HOST.force_encoding("US-ASCII") if DEFAULT_HOST.ascii_only?
     DEFAULT_PORT = 10031
     DEFAULT_TAG  = "droonga"
 
