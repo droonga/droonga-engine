@@ -83,7 +83,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
               "query"  => "QueryTest",
               "matchTo"=> expected_matchTo,
               "defaultOperator"=> "&&",
-              "allowPragma"=> false,
+              "allowPragma"=> true,
               "allowColumn"=> true,
             },
             "output"   => {
@@ -165,7 +165,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
                 "query"  => "QueryTest",
                 "matchTo"=> ["_key"],
                 "defaultOperator"=> "&&",
-                "allowPragma"=> false,
+                "allowPragma"=> true,
                 "allowColumn"=> true,
               },
               "title@'FilterTest'",
