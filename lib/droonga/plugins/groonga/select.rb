@@ -19,6 +19,7 @@ module Droonga
   module Plugins
     module Groonga
       module Select
+        DEFAULT_QUERY_FLAGS = "ALLOW_PRAGMA|ALLOW_COLUMN"
         DRILLDOWN_RESULT_PREFIX = "drilldown_result_"
 
         class RequestConverter
@@ -89,13 +90,13 @@ module Droonga
 
             conditions = []
             if query
-              conditions << {
+              condition = {
                 "query"  => query,
                 "matchTo"=> match_to,
                 "defaultOperator"=> "&&",
-                "allowPragma"=> false,
-                "allowColumn"=> true,
               }
+              apply_query_flags(condition, select_request["query_flags"])
+              conditions << condition
             end
 
             if filter
@@ -112,6 +113,16 @@ module Droonga
             end
 
             condition
+          end
+
+          def apply_query_flags(condition, flags)
+            flags ||= DEFAULT_QUERY_FLAGS
+            flags = flags.split("|")
+            condition["allowPragma"] = flags.include?("ALLOW_PRAGMA")
+            condition["allowColumn"] = flags.include?("ALLOW_COLUMN")
+            #XXX not supported yet by the "search" command
+            # condition["allowUpdate"] = flags.include?("ALLOW_UPDATE")
+            # condition["allowLeadingNot"] = flags.include?("ALLOW_LEADING_NOT")
           end
 
           def convert_drilldown(select_request)

@@ -189,6 +189,62 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
     end
   end
 
+  class QueryFlagsTest < self
+    def test_none
+      select_request = {
+        "table"          => "EmptyTable",
+        "match_columns"  => "_key",
+        "query"          => "QueryTest",
+        "query_flags"    => "NONE",
+      }
+      expected_search_condition = {
+        "query"  => "QueryTest",
+        "matchTo"=> ["_key"],
+        "defaultOperator"=> "&&",
+        "allowPragma" => false,
+        "allowColumn" => false,
+      }
+      assert_equal(expected_search_condition,
+                   convert(select_request)["queries"]["EmptyTable_result"]["condition"])
+    end
+
+    def test_allow_pragma_only
+      select_request = {
+        "table"          => "EmptyTable",
+        "match_columns"  => "_key",
+        "query"          => "QueryTest",
+        "query_flags"    => "ALLOW_PRAGMA",
+      }
+      expected_search_condition = {
+        "query"  => "QueryTest",
+        "matchTo"=> ["_key"],
+        "defaultOperator"=> "&&",
+        "allowPragma" => true,
+        "allowColumn" => false,
+      }
+      assert_equal(expected_search_condition,
+                   convert(select_request)["queries"]["EmptyTable_result"]["condition"])
+    end
+
+    def test_allow_column_only
+      select_request = {
+        "table"          => "EmptyTable",
+        "match_columns"  => "_key",
+        "query"          => "QueryTest",
+        "query_flags"    => "ALLOW_COLUMN",
+      }
+      expected_search_condition = {
+        "query"  => "QueryTest",
+        "matchTo"=> ["_key"],
+        "defaultOperator"=> "&&",
+        "allowPragma" => false,
+        "allowColumn" => true,
+      }
+      assert_equal(expected_search_condition,
+                   convert(select_request)["queries"]["EmptyTable_result"]["condition"])
+    end
+  end
+
   class OffsetTest < self
     def assert_offset(expected_offset, offset)
       select_request = {
