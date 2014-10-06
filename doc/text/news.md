@@ -1,5 +1,11 @@
 # News
 
+## 1.0.7: 2014-10-29 (planned)
+
+ * Supports `query_flags` option for Groonga's `select` command.
+   Currently available flags are: `ALLOW_PRAGMA`, `ALLOW_COLUMN`, and `NONE`.
+   Others are simply ignored.
+
 ## 1.0.6: 2014-09-29
 
  * The installation script is now available.
