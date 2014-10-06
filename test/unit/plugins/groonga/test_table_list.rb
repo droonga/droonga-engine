@@ -32,6 +32,10 @@ class TableListTest < GroongaHandlerTest
                                                       @loop)
   end
 
+  def database_path
+    @database_path.to_s + ".0000100",
+  end
+
   def test_success
     Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
@@ -53,7 +57,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -72,7 +76,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "HistoryEntries",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_NO_KEY|PERSISTENT",
          nil,
          nil,
@@ -91,7 +95,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_PAT_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -110,7 +114,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_DAT_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -131,7 +135,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "BookIds",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "UInt32",
          "UInt32",
@@ -151,7 +155,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -171,7 +175,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         @database_path.to_s + ".0000100",
+         database_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
