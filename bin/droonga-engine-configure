@@ -23,6 +23,7 @@ require "droonga/path"
 require "droonga/command/droonga_engine"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
+require "droonga/logger"
 
 options = {
   :quiet => nil,
@@ -178,7 +179,9 @@ if options[:reset_config]
   if configuration.have_given_log_level? or options[:quiet]
     log_level = configuration.log_level
   else
-    log_level = input("log level", configuration.log_level)
+    levels = Droonga::Logger::Level::LABELS
+    levels_label = levels.join(",")
+    log_level = input("log level (#{levels_label})", configuration.log_level)
   end
 
   new_configuration = {
