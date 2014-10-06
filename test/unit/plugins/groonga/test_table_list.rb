@@ -33,7 +33,7 @@ class TableListTest < GroongaHandlerTest
   end
 
   def database_path
-    @database_path.to_s + ".0000100",
+    @database_path.to_s + ".0000100"
   end
 
   def test_success
