@@ -18,10 +18,6 @@ register_service() {
   local USER=$2
   local GROUP=$3
 
-  local pid_dir=/var/run/$NAME
-  mkdir -p $pid_dir
-  chown -R $USER:$GROUP $pid_dir
-
   curl -o /etc/init.d/$NAME $(download_url "install/debian/$NAME")
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to download service script!"
