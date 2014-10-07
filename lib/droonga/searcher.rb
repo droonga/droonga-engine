@@ -267,6 +267,7 @@ module Droonga
           options[:syntax] = :query
           options[:allow_pragma] = true
           options[:allow_column] = true
+          options[:allow_leading_not] = false
           if condition["defaultOperator"]
             default_operator_string = condition["defaultOperator"]
             default_operator = OPERATOR_CONVERSION_TABLE[default_operator_string]
@@ -280,6 +281,9 @@ module Droonga
           end
           unless condition["allowColumn"].nil?
             options[:allow_column] = condition["allowColumn"] ? true : false
+          end
+          unless condition["allowLeadingNot"].nil?
+            options[:allow_leading_not] = condition["allowLeadingNot"] ? true : false
           end
           syntax_errors = [
             Groonga::SyntaxError,
