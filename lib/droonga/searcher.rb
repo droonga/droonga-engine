@@ -275,11 +275,11 @@ module Droonga
             end
             options[:default_operator] = default_operator
           end
-          unless condition["allowPragma"]
-            options[:allow_pragma] = false
+          unless condition["allowPragma"].nil?
+            options[:allow_pragma] = condition["allowPragma"] ? true : false
           end
-          unless condition["allowColumn"]
-            options[:allow_column] = false
+          unless condition["allowColumn"].nil?
+            options[:allow_column] = condition["allowColumn"] ? true : false
           end
           syntax_errors = [
             Groonga::SyntaxError,
