@@ -85,6 +85,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
               "defaultOperator"=> "&&",
               "allowPragma"=> true,
               "allowColumn"=> true,
+              "allowLeadingNot" => false,
             },
             "output"   => {
               "elements"   => [
@@ -167,6 +168,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
                 "defaultOperator"=> "&&",
                 "allowPragma"=> true,
                 "allowColumn"=> true,
+                "allowLeadingNot" => false,
               },
               "title@'FilterTest'",
             ],
@@ -203,6 +205,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => false,
         "allowColumn" => false,
+        "allowLeadingNot" => false,
       }
       assert_equal(expected_search_condition,
                    convert(select_request)["queries"]["EmptyTable_result"]["condition"])
@@ -221,6 +224,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => true,
         "allowColumn" => false,
+        "allowLeadingNot" => false,
       }
       assert_equal(expected_search_condition,
                    convert(select_request)["queries"]["EmptyTable_result"]["condition"])
@@ -239,6 +243,26 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => false,
         "allowColumn" => true,
+        "allowLeadingNot" => false,
+      }
+      assert_equal(expected_search_condition,
+                   convert(select_request)["queries"]["EmptyTable_result"]["condition"])
+    end
+
+    def test_allow_leading_not_only
+      select_request = {
+        "table"          => "EmptyTable",
+        "match_columns"  => "_key",
+        "query"          => "QueryTest",
+        "query_flags"    => "ALLOW_LEADING_NOT",
+      }
+      expected_search_condition = {
+        "query"  => "QueryTest",
+        "matchTo"=> ["_key"],
+        "defaultOperator"=> "&&",
+        "allowPragma" => false,
+        "allowColumn" => false,
+        "allowLeadingNot" => true,
       }
       assert_equal(expected_search_condition,
                    convert(select_request)["queries"]["EmptyTable_result"]["condition"])
