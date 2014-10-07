@@ -20,6 +20,11 @@ cd $DROONGA_BASE_DIR
 PIDFILE=/run/$NAME/$NAME.pid
 DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 
+# This directory is required to write PID file by non-root user.
+pid_dir=/run/$NAME
+mkdir -p $pid_dir
+chown -R $USER:$GROUP $pid_dir
+
 [ -x $DAEMON ] || exit 0
 
 start() {

@@ -22,6 +22,11 @@ PIDFILE=/var/run/$NAME/$NAME.pid
 DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
+# This directory is required to write PID file by non-root user.
+pid_dir=/var/run/$NAME
+mkdir -p $pid_dir
+chown -R $USER:$GROUP $pid_dir
+
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
