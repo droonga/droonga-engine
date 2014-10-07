@@ -85,6 +85,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
               "defaultOperator"=> "&&",
               "allowPragma"=> true,
               "allowColumn"=> true,
+              "allowUpdate"=> false,
               "allowLeadingNot" => false,
             },
             "output"   => {
@@ -168,6 +169,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
                 "defaultOperator"=> "&&",
                 "allowPragma"=> true,
                 "allowColumn"=> true,
+                "allowUpdate"=> false,
                 "allowLeadingNot" => false,
               },
               "title@'FilterTest'",
@@ -205,6 +207,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => false,
         "allowColumn" => false,
+        "allowUpdate"=> false,
         "allowLeadingNot" => false,
       }
       assert_equal(expected_search_condition,
@@ -224,6 +227,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => true,
         "allowColumn" => false,
+        "allowUpdate"=> false,
         "allowLeadingNot" => false,
       }
       assert_equal(expected_search_condition,
@@ -243,6 +247,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => false,
         "allowColumn" => true,
+        "allowUpdate"=> false,
         "allowLeadingNot" => false,
       }
       assert_equal(expected_search_condition,
@@ -262,6 +267,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         "defaultOperator"=> "&&",
         "allowPragma" => false,
         "allowColumn" => false,
+        "allowUpdate"=> false,
         "allowLeadingNot" => true,
       }
       assert_equal(expected_search_condition,

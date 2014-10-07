@@ -120,9 +120,8 @@ module Droonga
             flags = flags.split("|")
             condition["allowPragma"] = flags.include?("ALLOW_PRAGMA")
             condition["allowColumn"] = flags.include?("ALLOW_COLUMN")
+            condition["allowUpdate"] = flags.include?("ALLOW_UPDATE")
             condition["allowLeadingNot"] = flags.include?("ALLOW_LEADING_NOT")
-            #XXX not supported yet by the "search" command
-            # condition["allowUpdate"] = flags.include?("ALLOW_UPDATE")
           end
 
           def convert_drilldown(select_request)
