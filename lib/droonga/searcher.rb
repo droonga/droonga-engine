@@ -267,6 +267,7 @@ module Droonga
           options[:syntax] = :query
           options[:allow_pragma] = true
           options[:allow_column] = true
+          options[:allow_update] = false
           options[:allow_leading_not] = false
           if condition["defaultOperator"]
             default_operator_string = condition["defaultOperator"]
@@ -282,6 +283,13 @@ module Droonga
           unless condition["allowColumn"].nil?
             options[:allow_column] = condition["allowColumn"] ? true : false
           end
+          #XXX Currently we disallow to set this option to true, because
+          #    a `search` command is handled only on one replica and ignored by other replicas.
+          #    If we simply allow allowUpdate=true, replicas can be un-synchronized.
+          #    We have to do something about this problem.
+          # unless condition["allowUpdate"].nil?
+          #   options[:allow_update] = condition["allowUpdate"] ? true : false
+          # end
           unless condition["allowLeadingNot"].nil?
             options[:allow_leading_not] = condition["allowLeadingNot"] ? true : false
           end
