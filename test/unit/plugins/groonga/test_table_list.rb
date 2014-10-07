@@ -32,7 +32,7 @@ class TableListTest < GroongaHandlerTest
                                                       @loop)
   end
 
-  def database_path
+  def table_path
     @database_path.to_s + ".0000100"
   end
 
@@ -57,7 +57,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         database_path,
+         table_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -76,7 +76,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "HistoryEntries",
-         database_path,
+         table_path,
          "TABLE_NO_KEY|PERSISTENT",
          nil,
          nil,
@@ -95,7 +95,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         database_path,
+         table_path,
          "TABLE_PAT_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -114,7 +114,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         database_path,
+         table_path,
          "TABLE_DAT_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -135,7 +135,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "BookIds",
-         database_path,
+         table_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "UInt32",
          "UInt32",
@@ -155,7 +155,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         database_path,
+         table_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
@@ -175,7 +175,7 @@ class TableListTest < GroongaHandlerTest
         TABLES_HEADER,
         [256,
          "Books",
-         database_path,
+         table_path,
          "TABLE_HASH_KEY|PERSISTENT",
          "ShortText",
          nil,
