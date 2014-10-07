@@ -3,8 +3,7 @@
 ## 1.0.7: 2014-10-29 (planned)
 
  * Better compatibility to Groonga: `select` command now supports `query_flags` option.
-   Currently available flags are: `ALLOW_PRAGMA`, `ALLOW_COLUMN`, `ALLOW_LEADING_NOT`, and `NONE`.
-   Others are simply ignored.
+   Note: `ALLOW_UPDATE` is ignored even if you specify, because it is not implemented in Droonga yet.
  * `saerch` command has some improvements.
    * The value `false` for `allowPragma` and `allowColumn` options in query syntax search conditions is correctly applied.
      In old versions, they options are always `true` even if you intentionally specified `false` for them.
