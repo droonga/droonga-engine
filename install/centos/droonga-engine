@@ -17,7 +17,7 @@ GROUP=droonga
 DAEMON=/usr/local/bin/$NAME
 export DROONGA_BASE_DIR=/home/$NAME/droonga
 cd $DROONGA_BASE_DIR
-PIDFILE=$DROONGA_BASE_DIR/$NAME.pid
+PIDFILE=/run/$NAME/$NAME.pid
 DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 
 [ -x $DAEMON ] || exit 0

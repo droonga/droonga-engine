@@ -18,7 +18,7 @@ USER=$NAME
 GROUP=droonga
 DAEMON=/usr/local/bin/$NAME
 export DROONGA_BASE_DIR=/home/$NAME/droonga
-PIDFILE=$DROONGA_BASE_DIR/$NAME.pid
+PIDFILE=/var/run/$NAME/$NAME.pid
 DAEMON_ARGS="--daemon --pid-file=$PIDFILE"
 SCRIPTNAME=/etc/init.d/$NAME
 
