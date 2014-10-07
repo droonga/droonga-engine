@@ -1,6 +1,6 @@
 # News
 
-## 1.0.7: 2014-10-29 (planned)
+## 1.0.7: 2014-10-07
 
  * Better compatibility to Groonga: `select` command now supports `query_flags` option.
    Note: `ALLOW_UPDATE` is ignored even if you specify, because it is not implemented in Droonga yet.
