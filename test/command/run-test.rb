@@ -18,6 +18,17 @@
 require "rbconfig"
 require "fileutils"
 
+def system_serf_exist?
+  system("serf", "--help")
+end
+
+unless system_serf_exist?
+  puts("Serf is not installed to your system.")
+  puts("Install Serf before running this test.")
+  puts("See: http://www.serfdom.io/")
+  exit(false)
+end
+
 def run(*command_line)
   return if system(*command_line)
   puts("failed to run: #{command_line.join(' ')}")
