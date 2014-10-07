@@ -32,10 +32,6 @@ class TableListTest < GroongaHandlerTest
                                                       @loop)
   end
 
-  def table_path
-    @database_path.to_s + ".0000100"
-  end
-
   def test_success
     Groonga::Schema.define do |schema|
       schema.create_table("Books", :type => :hash)
@@ -48,6 +44,10 @@ class TableListTest < GroongaHandlerTest
   end
 
   class ListTest < self
+    def table_path
+      @database_path.to_s + ".0000100"
+    end
+
     def test_hash_table
       Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
