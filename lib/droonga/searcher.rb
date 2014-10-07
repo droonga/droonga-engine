@@ -265,6 +265,8 @@ module Droonga
         query = condition["query"]
         if query
           options[:syntax] = :query
+          options[:allow_pragma] = true
+          options[:allow_column] = true
           if condition["defaultOperator"]
             default_operator_string = condition["defaultOperator"]
             default_operator = OPERATOR_CONVERSION_TABLE[default_operator_string]
@@ -273,11 +275,11 @@ module Droonga
             end
             options[:default_operator] = default_operator
           end
-          if condition["allowPragma"]
-            options[:allow_pragma] = true
+          unless condition["allowPragma"]
+            options[:allow_pragma] = false
           end
-          if condition["allowColumn"]
-            options[:allow_column] = true
+          unless condition["allowColumn"]
+            options[:allow_column] = false
           end
           syntax_errors = [
             Groonga::SyntaxError,
