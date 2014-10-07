@@ -114,7 +114,7 @@ module Droonga
 
       class Configuration
         attr_reader :host, :port, :tag, :log_file, :pid_file_path
-        attr_reader :ready_notify_fd, :orchestrated
+        attr_reader :ready_notify_fd
         def initialize
           config = load_config
 
@@ -128,7 +128,6 @@ module Droonga
           @daemon          = false
           @pid_file_path   = nil
           @ready_notify_fd = nil
-          @orchestrated = true
 
           if have_config_file?
             if config.include?("daemon")
@@ -225,7 +224,6 @@ module Droonga
           add_log_options(parser)
           add_process_options(parser)
           add_path_options(parser)
-          add_orchestration_options(parser)
           add_notification_options(parser)
         end
 
@@ -310,13 +308,6 @@ module Droonga
           end
         end
 
-        def add_orchestration_options(parser)
-          parser.on("--no-orchestration",
-                    "Disable orchestration with other nodes") do
-            @orchestrated = false
-          end
-        end
-
         def add_notification_options(parser)
           parser.separator("")
           parser.separator("Notification:")
@@ -348,7 +339,7 @@ module Droonga
 
           trap_signals
           @loop.run
-          @serf.stop if @serf and @serf.running?
+          @serf.stop if @serf.running?
 
           @service_runner.success?
         end
@@ -389,14 +380,14 @@ module Droonga
 
         def stop_gracefully
           @command_runner.stop
-          @serf.stop if @serf
+          @serf.stop
           @catalog_observer.stop
           @service_runner.stop_gracefully
         end
 
         def stop_immediately
           @command_runner.stop
-          @serf.stop if @serf
+          @serf.stop
           @catalog_observer.stop
           @service_runner.stop_immediately
         end
@@ -427,7 +418,6 @@ module Droonga
         end
 
         def run_serf
-          return nil unless @configuration.orchestrated
           serf = Serf.new(@loop, @configuration.engine_name)
           serf.start
           serf
