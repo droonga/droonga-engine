@@ -6,6 +6,7 @@
    Currently available flags are: `ALLOW_PRAGMA`, `ALLOW_COLUMN`, and `NONE`.
    Others are simply ignored.
  * Works correctly even if you restarted the computer itself.
+ * `droonga-engine-configure` now asks the log level.
 
 ## 1.0.6: 2014-09-29
 
