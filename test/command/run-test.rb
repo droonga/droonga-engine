@@ -19,7 +19,9 @@ require "rbconfig"
 require "fileutils"
 
 def system_serf_exist?
-  system("serf", "--help")
+  system("serf", "--help",
+         :out => "/dev/null",
+         :err => "/dev/null")
 end
 
 unless system_serf_exist?
