@@ -103,9 +103,6 @@ module Droonga
           column_name
         end
 
-        # After schema changes, we must restart workers, because
-        # old schema information chached by workers can break
-        # indexes for newly added records.
         def restart_workers
           #XXX IMPLEMENT ME!!
         end
