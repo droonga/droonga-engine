@@ -29,11 +29,14 @@ module Droonga
 
             table_name = valid_table_name("table", :error_result => false)
 
+            result = false
             if @command.column_index?
-              define_index(table_name)
+              result = define_index(table_name)
             else
-              define_column(table_name)
+              result = define_column(table_name)
             end
+            restart_workers
+            result
           end
 
           private

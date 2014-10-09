@@ -31,7 +31,9 @@ module Droonga
             column_name = valid_column_name("name", :table_name => table_name,
                                                     :error_result => false)
 
-            remove_column(table_name, column_name)
+            result = remove_column(table_name, column_name)
+            restart_workers
+            result
           end
 
           private

@@ -102,6 +102,10 @@ module Droonga
 
           column_name
         end
+
+        def restart_workers
+          #XXX IMPLEMENT ME!!
+        end
       end
     end
   end

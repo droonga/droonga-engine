@@ -33,7 +33,9 @@ module Droonga
 
             new_name = @command["new_name"]
 
-            rename_column(table_name, column_name, new_name)
+            result = rename_column(table_name, column_name, new_name)
+            restart_workers
+            result
           end
 
           private
