@@ -32,7 +32,6 @@ module Droonga
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.remove_table(name)
             end
-            restart_workers
             true
           end
         end

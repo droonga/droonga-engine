@@ -39,7 +39,6 @@ module Droonga
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.create_table(name, options)
             end
-            restart_workers
             true
           end
 
