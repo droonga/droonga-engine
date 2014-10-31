@@ -66,7 +66,7 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
     end
 
     class CommandVersion1Test < self
-      def test_command_version_1
+      def test_whiet_space_separated
         assert_attributes(["_id","_key"], "_id _key")
       end
     end
