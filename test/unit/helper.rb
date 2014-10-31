@@ -23,6 +23,6 @@ require_relative "helper/watch_helper"
 require_relative "helper/distributed_search_planner_helper"
 
 class Test::Unit::TestCase
-  include Sandbox
-  include Fixture
+  include ::Sandbox
+  include ::Fixture
 end
