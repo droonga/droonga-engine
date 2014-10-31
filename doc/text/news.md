@@ -1,5 +1,10 @@
 # News
 
+## 1.0.8: 2014-11-29 (planned)
+
+ * Better compatibility to Groonga's `command_version=1`.
+   Whitespace-separeted `outout_columns` is now available.
+
 ## 1.0.7: 2014-10-07
 
  * Better compatibility to Groonga: `select` command now supports `query_flags` option.
