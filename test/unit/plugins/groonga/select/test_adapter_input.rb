@@ -67,12 +67,12 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       end
     end
 
-    class CommandVersion1Test < self
-      def test_whitespace_separated
+    class WhiteSpaceSeparatedTest < self
+      def test_command_version_1
         assert_attributes(["_id","_key"], "_id _key")
       end
 
-      def test_whitespace_separated_arguments
+      def test_whitespace_in_function_args
         assert_attributes(["_id","_key","snippet_html( content )"],
                            "_id,_key,snippet_html( content )")
       end
