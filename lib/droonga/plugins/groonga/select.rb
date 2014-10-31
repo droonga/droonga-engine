@@ -166,8 +166,16 @@ module Droonga
             queries
           end
 
+          COMMAND_VERSION_1_OUTPUT_COLUMNS_PATTERN = /\A[^\s,]+(\s+[^\s,]+)+\z/
+
           def convert_output_columns(output_columns)
-            output_columns.split(/\s*,\s*/)
+            output_columns = output_columns.strip
+            command_version_is_1 = output_columns =~ COMMAND_VERSION_1_OUTPUT_COLUMNS_PATTERN
+            if command_version_is_1
+              output_columns.split(/\s+/)
+            else
+              output_columns.split(/\s*,\s*/)
+            end
           end
         end
 
