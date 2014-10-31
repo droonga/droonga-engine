@@ -28,7 +28,7 @@ module Droonga
             @result_name = @table + "_result"
 
             output_columns = select_request["output_columns"] || "_id, _key, *"
-            attributes = output_columns.split(/\s*,\s*/)
+            attributes = convert_output_columns(output_columns)
             offset = (select_request["offset"] || "0").to_i
             limit = (select_request["limit"] || "10").to_i
 
@@ -131,7 +131,7 @@ module Droonga
             drilldown_keys = drilldown_keys.split(",")
 
             sort_keys = (select_request["drilldown_sortby"] || "").split(",")
-            columns   = (select_request["drilldown_output_columns"] || "_key,_nsubrecs").split(",")
+            columns   = convert_output_columns(select_request["drilldown_output_columns"] || "_key,_nsubrecs")
             offset    = (select_request["drilldown_offset"] || "0").to_i
             limit     = (select_request["drilldown_limit"] || "10").to_i
 
@@ -164,6 +164,10 @@ module Droonga
               queries["#{DRILLDOWN_RESULT_PREFIX}#{key}"] = query
             end
             queries
+          end
+
+          def convert_output_columns(output_columns)
+            output_columns.split(/\s*,\s*/)
           end
         end
 
