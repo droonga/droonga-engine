@@ -57,11 +57,13 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
 
     class FunctionTest < self
       def test_single_argument
-        assert_attributes(["snippet_html(content)"], "snippet_html(content)")
+        assert_attributes(["snippet_html(content)"],
+                           "snippet_html(content)")
       end
 
       def test_with_columns
-        assert_attributes(["_id","_key","snippet_html(content)"], "_id,_key,snippet_html(content)")
+        assert_attributes(["_id","_key","snippet_html(content)"],
+                           "_id,_key,snippet_html(content)")
       end
     end
 
@@ -71,7 +73,8 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       end
 
       def test_whiet_space_separated_arguments
-        assert_attributes(["_id","_key","snippet_html( content )"], "_id,_key,snippet_html( content )")
+        assert_attributes(["_id","_key","snippet_html( content )"],
+                           "_id,_key,snippet_html( content )")
       end
     end
   end
