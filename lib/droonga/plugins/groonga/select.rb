@@ -166,11 +166,13 @@ module Droonga
             queries
           end
 
-          COMMAND_VERSION_1_OUTPUT_COLUMNS_PATTERN = /\A[^\s,]+(\s+[^\s,]+)+\z/
+          # for a backward compatibility for command_version=1,
+          # whitespace-separeted case (without functions) should be accepted.
+          COMMAND_VERSION_1_ONLY_PATTERN = /\A[^\s,()]+(\s+[^\s,()]+)+\z/
 
           def convert_output_columns(output_columns)
             output_columns = output_columns.strip
-            command_version_is_1 = output_columns =~ COMMAND_VERSION_1_OUTPUT_COLUMNS_PATTERN
+            command_version_is_1 = output_columns =~ COMMAND_VERSION_1_ONLY_PATTERN
             if command_version_is_1
               output_columns.split(/\s+/)
             else

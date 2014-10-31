@@ -69,6 +69,10 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
       def test_whiet_space_separated
         assert_attributes(["_id","_key"], "_id _key")
       end
+
+      def test_whiet_space_separated_arguments
+        assert_attributes(["_id","_key","snippet_html( content )"], "_id,_key,snippet_html( content )")
+      end
     end
   end
 
