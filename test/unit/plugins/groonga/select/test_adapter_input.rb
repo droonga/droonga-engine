@@ -64,6 +64,12 @@ class GroongaSelectAdapterInputTest < Test::Unit::TestCase
         assert_attributes(["_id","_key","snippet_html(content)"], "_id,_key,snippet_html(content)")
       end
     end
+
+    class CommandVersion1Test < self
+      def test_command_version_1
+        assert_attributes(["_id","_key"], "_id _key")
+      end
+    end
   end
 
   class MatchColumnsTest < self
