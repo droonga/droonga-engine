@@ -70,6 +70,7 @@ module Droonga
                    "-bind", "#{extract_host(@name)}:#{port}",
                    "-event-handler", "droonga-engine-serf-event-handler",
                    "-log-level", log_level,
+                   "-tag", "role=engine",
                    *retry_joins)
       logger.trace("start: done")
     end
