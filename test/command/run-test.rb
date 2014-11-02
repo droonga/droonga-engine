@@ -19,7 +19,7 @@ require "rbconfig"
 require "fileutils"
 
 def system_serf_exist?
-  system("serf", "--version",
+  system("serf", "version",
          :out => "/dev/null",
          :err => "/dev/null")
 end
