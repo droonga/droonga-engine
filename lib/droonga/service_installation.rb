@@ -75,13 +75,13 @@ module Droonga
 
     def installed_as_service?
       return false unless user_exist?
-    
+
       #TODO: we should support systemd also...
       succeeded = system("service", "droonga-engine", "status",
                          :out => "/dev/null",
                          :err => "/dev/null")
       return true if succeeded
-    
+
       #TODO: we should support systemd also...
       result = `service droonga-engine status`
       result.include?("running") or \
