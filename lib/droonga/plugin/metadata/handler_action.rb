@@ -21,6 +21,14 @@ module Droonga
           @handler_class = handler_class
         end
 
+        def change_schema?
+          configuration[:change_schema]
+        end
+
+        def change_schema=(boolean)
+          configuration[:change_schema] = boolean
+        end
+
         def synchronous?
           configuration[:synchronous]
         end

@@ -44,9 +44,10 @@ module Droonga
       if @handler_runner.processable?(type)
         logger.trace("process: handlable: #{type}")
         synchronous = @handler_runner.prefer_synchronous?(type)
-        if @n_workers.zero? or synchronous
+        change_schema = @handler_runner.change_schema?(type)
+        if @n_workers.zero? or synchronous or change_schema
           @handler_runner.process(message)
-          if synchronous
+          if change_schema
             @job_pusher.broadcast(database_reopen_message)
           end
         else

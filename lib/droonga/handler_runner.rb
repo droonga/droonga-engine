@@ -44,6 +44,10 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
+    def change_schema?(type)
+      find_handler_class(type).action.change_schema?
+    end
+
     def prefer_synchronous?(type)
       find_handler_class(type).action.synchronous?
     end

@@ -103,7 +103,7 @@ module Droonga
         end
 
         class Handler < Droonga::Handler
-          action.synchronous = true
+          action.change_schema = true
 
           def handle(message)
             command = Command.new(@context)
