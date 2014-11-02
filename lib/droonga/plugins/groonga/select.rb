@@ -237,6 +237,7 @@ module Droonga
             records.collect do |record|
               record.collect.each_with_index do |value, i|
                 name, type = attributes[i]
+                _ = name # suppress a warning
                 case type
                 when "Time"
                   normalize_time(value).to_f
