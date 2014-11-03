@@ -462,14 +462,16 @@ module Droonga
           sub_record_table = table.range
           sub_attributes = format(attribute[:attributes], sub_record_table)
 
-          format_attribute_subrecs(label, sub_attributes)
+          yield(format_attribute_subrecs(label, sub_attributes))
         else
           expression = attribute[:expression]
           if expression
-            format_attribute_expression(label, expression)
+            yield(format_attribute_expression(label, expression))
           else
             column = table.column(source)
-            format_attribute_column(label, column)
+            if column
+              yield(format_attribute_column(label, column))
+            end
           end
         end
       end
@@ -495,9 +497,13 @@ module Droonga
       end
 
       def format(attributes, table)
-        attributes.collect do |attribute|
-          format_attribute(attribute, table)
+        formatted_attributes = []
+        attributes.each do |attribute|
+          format_attribute(attribute, table) do |formatted_attribute|
+            formatted_attributes << formatted_attribute
+          end
         end
+        formatted_attributes
       end
     end
 
@@ -522,9 +528,10 @@ module Droonga
       def format(attributes, table)
         formatted_attributes = {}
         attributes.each do |attribute|
-          formatted_attribute = format_attribute(attribute, table)
-          attribute_name = attribute[:label]
-          formatted_attributes[attribute_name] = formatted_attribute
+          format_attribute(attribute, table) do |formatted_attribute|
+            attribute_name = attribute[:label]
+            formatted_attributes[attribute_name] = formatted_attribute
+          end
         end
         formatted_attributes
       end
@@ -547,25 +554,28 @@ module Droonga
 
       private
       def record_value(record, attribute)
-        if attribute[:source] == "_subrecs"
+        source = attribute[:source]
+        if source == "_subrecs"
           if record.table.is_a?(Groonga::Array)
             target_record = record.value
           else
             target_record = record
           end
-          target_record.sub_records.collect do |sub_record|
+          values = target_record.sub_records.collect do |sub_record|
             sub_attributes = attribute[:attributes]
             format_record(sub_attributes, sub_record)
           end
+          yield(values)
         else
           expression = attribute[:expression]
           if expression
             variable = attribute[:variable]
             variable.value = record
-            expression.execute
+            yield(expression.execute)
           else
-            column_value = record[attribute[:source]]
-            format_column_value(column_value)
+            return unless record.have_column?(source)
+            column_value = record[source]
+            yield(format_column_value(column_value))
           end
         end
       end
@@ -589,9 +599,13 @@ module Droonga
 
       private
       def format_record(attributes, record)
+        formatted_record = []
         attributes.collect do |attribute|
-          record_value(record, attribute)
+          record_value(record, attribute) do |formatted_value|
+            formatted_record << formatted_value
+          end
         end
+        formatted_record
       end
     end
 
@@ -602,7 +616,9 @@ module Droonga
       def format_record(attributes, record)
         values = {}
         attributes.each do |attribute|
-          values[attribute[:label]] = record_value(record, attribute)
+          record_value(record, attribute) do |formatted_value|
+            values[attribute[:label]] = formatted_value
+          end
         end
         values
       end

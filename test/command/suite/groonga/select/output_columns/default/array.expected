@@ -1,0 +1,33 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "select.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    [
+      [
+        [
+          1
+        ],
+        [
+          [
+            "_id",
+            "UInt32"
+          ],
+          [
+            "message",
+            "Text"
+          ]
+        ],
+        [
+          1,
+          "Droonga is started."
+        ]
+      ]
+    ]
+  ]
+}

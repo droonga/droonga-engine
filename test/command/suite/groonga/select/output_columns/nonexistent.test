@@ -1,0 +1,26 @@
+#@disable-logging
+{
+  "dataset": "Default",
+  "type": "table_create",
+  "body": {
+    "name"  : "IDs",
+    "flags" : "TABLE_NO_KEY"
+  }
+}
+{
+  "dataset": "Default",
+  "type": "add",
+  "body": {
+    "table": "IDs"
+  }
+}
+#@enable-logging
+
+{
+  "dataset": "Default",
+  "type": "select",
+  "body": {
+    "table": "IDs",
+    "output_columns": "_id, _key"
+  }
+}

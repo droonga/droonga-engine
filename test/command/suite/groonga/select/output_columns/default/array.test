@@ -1,0 +1,38 @@
+#@disable-logging
+{
+  "dataset": "Default",
+  "type": "table_create",
+  "body": {
+    "name"  : "Logs",
+    "flags" : "TABLE_NO_KEY"
+  }
+}
+{
+  "dataset": "Default",
+  "type": "column_create",
+  "body": {
+    "table" : "Logs",
+    "name"  : "message",
+    "flags" : "COLUMN_SCALAR",
+    "type"  : "Text"
+  }
+}
+{
+  "dataset": "Default",
+  "type": "add",
+  "body": {
+    "table": "Logs",
+    "values": {
+      "message": "Droonga is started."
+    }
+  }
+}
+#@enable-logging
+
+{
+  "dataset": "Default",
+  "type": "select",
+  "body": {
+    "table": "Logs"
+  }
+}
