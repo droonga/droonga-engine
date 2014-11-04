@@ -133,6 +133,7 @@ setup_configuration_directory() {
     echo "This node is configured with a hostname $HOST."
   fi
 
+  # we should use --no-prompt instead of --quiet, for droonga-engine 1.0.8 and later.
   droonga-engine-configure --quiet \
     --host=$HOST --port=$PORT
   if [ $? -ne 0 ]; then

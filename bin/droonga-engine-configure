@@ -26,7 +26,7 @@ require "droonga/service_installation"
 require "droonga/logger"
 
 options = {
-  :quiet => nil,
+  :no_prompt => nil,
   :clear => nil,
   :reset_config  => nil,
   :reset_catalog => nil,
@@ -34,8 +34,11 @@ options = {
 
 configuration = Droonga::Command::DroongaEngine::Configuration.new
 parser = OptionParser.new
-parser.on("--quiet", "Run with no prompt.") do |host|
-  options[:quiet] = true
+parser.on("--no-prompt", "Run with no prompt.") do |host|
+  options[:no_prompt] = true
+end
+parser.on("--quiet", "Same to --no-prompt. For backward compatibility.") do |host|
+  options[:no_prompt] = true
 end
 parser.on("--clear", "Clear any existing data.") do |host|
   options[:clear] = true
@@ -97,7 +100,7 @@ service_installation.ensure_using_service_base_directory
 running = false
 begin
   if service_installation.running?
-    if !options[:quiet]
+    if !options[:no_prompt]
       puts("The droonga-engine service is now running.")
       puts("Before reconfiguration, the service is going to be stopped " +
              "and this node will be unjoined from the cluster.")
@@ -126,19 +129,19 @@ data_files = [
 have_data = data_files.any?(&:exist?)
 options[:clear] = false unless have_data
 
-if !options[:quiet] and options[:clear].nil?
+if !options[:no_prompt] and options[:clear].nil?
   options[:clear] = confirmed?("Do you want all data to be cleared?")
 end
 
 
 options[:reset_config] = true unless Droonga::Path.config.exist?
-if !options[:quiet] and options[:reset_config].nil?
+if !options[:no_prompt] and options[:reset_config].nil?
   options[:reset_config] = confirmed?("Do you want the configuration file " +
                                         "\"droonga-engine.yaml\" to be regenerated?")
 end
 
 options[:reset_catalog] = true unless Droonga::Path.catalog.exist?
-if !options[:quiet] and options[:reset_catalog].nil?
+if !options[:no_prompt] and options[:reset_catalog].nil?
   options[:reset_catalog] = confirmed?("Do you want the file \"catalog.json\" " +
                                          "to be regenerated?")
 end
@@ -156,19 +159,19 @@ if options[:clear]
 end
 
 if options[:reset_config] or options[:reset_catalog]
-  if configuration.have_given_host? or options[:quiet]
+  if configuration.have_given_host? or options[:no_prompt]
     host = configuration.host
   else
     host = input("host", configuration.host)
   end
 
-  if configuration.have_given_port? or options[:quiet]
+  if configuration.have_given_port? or options[:no_prompt]
     port = configuration.port
   else
     port = input("port", configuration.port).to_i
   end
 
-  if configuration.have_given_tag? or options[:quiet]
+  if configuration.have_given_tag? or options[:no_prompt]
     tag = configuration.tag
   else
     tag = input("tag", configuration.tag)
@@ -176,7 +179,7 @@ if options[:reset_config] or options[:reset_catalog]
 end
 
 if options[:reset_config]
-  if configuration.have_given_log_level? or options[:quiet]
+  if configuration.have_given_log_level? or options[:no_prompt]
     log_level = configuration.log_level
   else
     levels = Droonga::Logger::Level::LABELS
