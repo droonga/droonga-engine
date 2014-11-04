@@ -130,8 +130,6 @@ module Droonga
           if have_config_file?
             if config.include?("daemon")
               @daemon = config["daemon"]
-            else
-              @daemon = true
             end
             if @daemon
               self.pid_file_path = config["pid_file"] || Path.default_pid_file
