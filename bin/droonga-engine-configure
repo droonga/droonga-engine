@@ -159,19 +159,19 @@ if options[:clear]
 end
 
 if options[:reset_config] or options[:reset_catalog]
-  if configuration.have_given_host? or options[:no_prompt]
+  if options[:no_prompt]
     host = configuration.host
   else
     host = input("host", configuration.host)
   end
 
-  if configuration.have_given_port? or options[:no_prompt]
+  if options[:no_prompt]
     port = configuration.port
   else
     port = input("port", configuration.port).to_i
   end
 
-  if configuration.have_given_tag? or options[:no_prompt]
+  if options[:no_prompt]
     tag = configuration.tag
   else
     tag = input("tag", configuration.tag)
@@ -179,7 +179,7 @@ if options[:reset_config] or options[:reset_catalog]
 end
 
 if options[:reset_config]
-  if configuration.have_given_log_level? or options[:no_prompt]
+  if options[:no_prompt]
     log_level = configuration.log_level
   else
     levels = Droonga::Logger::Level::LABELS
