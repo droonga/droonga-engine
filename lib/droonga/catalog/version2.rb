@@ -47,7 +47,7 @@ module Droonga
                 name = volume_address.name
                 migrate_database_location(device, name)
 
-                path = File.join([device, Path.databases.basename.to_s, name, "db"])
+                path = File.join(device, Path.databases.basename.to_s, name, "db")
                 path = Pathname(path).expand_path(base_path)
                 options = {
                   :dataset => dataset_name,
