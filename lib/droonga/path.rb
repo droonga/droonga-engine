@@ -58,10 +58,6 @@ module Droonga
         base + "droonga-engine.yaml"
       end
 
-      def default_pid_file
-        base + "droonga-engine.pid"
-      end
-
       def default_log_file
         base + "droonga-engine.log"
       end
