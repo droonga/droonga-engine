@@ -2,8 +2,9 @@
 
 ## 1.0.8: 2014-11-29 (planned)
 
- * Better compatibility to Groonga's `command_version=1`.
-   Whitespace-separeted `outout_columns` is now available.
+ * Better compatibility to Groonga's `select` command:
+   * Whitespace-separeted `outout_columns` (it is valid on `command_version=1` environments) is now available.
+   * `output_columns=*` works correctly even if it is a `TABLE_NO_KEY` table.
  * The `daemon` option is now ignored in the static configuration file.
    Now, you always have to specify `--daemon` option for the `droonga-engine` command
    to start it as a daemon.
