@@ -4,6 +4,10 @@
 
  * Better compatibility to Groonga's `command_version=1`.
    Whitespace-separeted `outout_columns` is now available.
+ * The `daemon` option is now ignored in the static configuration file.
+   Now, you always have to specify `--daemon` option for the `droonga-engine` command
+   to start it as a daemon.
+ * The `droonga-engine-configure` command now shows prompts for all options always.
 
 ## 1.0.7: 2014-10-07
 
