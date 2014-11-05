@@ -251,7 +251,9 @@ module Droonga
               "type" => "sum",
             }
             if unifiable?
-              @query["sortBy"]["limit"] = UNLIMITED if @query["sortBy"].is_a?(Hash)
+              if @query["sortBy"].is_a?(Hash)
+                @query["sortBy"]["limit"] = UNLIMITED
+              end
               @output["limit"] = UNLIMITED unless @dataset.single_slice?
               mapper = {
                 "target" => "records",
