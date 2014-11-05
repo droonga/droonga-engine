@@ -46,8 +46,7 @@ module Droonga
               if volume_address.node == node
                 path = File.join([device, Path.databases.basename.to_s, volume_address.name, "db"])
                 path = Pathname(path).expand_path(base_path)
-                migrate_database_location(path, :device => device,
-                                                :name   => volume_address.name)
+                migrate_database_location(device, volume_address.name)
                 options = {
                   :dataset => dataset_name,
                   :database => path.to_s,
@@ -87,11 +86,15 @@ module Droonga
         nodes.sort.uniq
       end
 
-      def migrate_database_location(path, params)
-        old_path = File.join([params[:device], params[:name], "db"])
-        old_path = Pathname(old_path).expand_path(base_path)
-        if old_path.exist? and not path.exist?
-          FileUtils.move(old_path.to_s, path.to_s)
+      def migrate_database_location(device, name)
+        common_base_path = Pathname(base_path) + device
+        old_db_dir_path = common_base_path + name
+        old_db_path = old_db_dir_path + "db"
+        current_db_dir_path = common_base_path + Path.databases.basename + name
+        current_db_path = current_db_dir_path + "db"
+        if old_db_path.exist? and not current_db_path.exist?
+          FileUtils.mkdir_p(current_db_dir_path.parent)
+          FileUtils.move(old_db_dir_path, current_db_dir_path)
         end
       end
     end
