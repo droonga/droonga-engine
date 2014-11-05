@@ -21,7 +21,7 @@ class DistributedSearchPlannerBasicTest < Test::Unit::TestCase
       def setup
         @request = {
           "type"    => "search",
-          "dataset" => "Droonga",
+          "dataset" => "Default",
           "body"    => {
             "queries" => {
               "query1" => {
@@ -63,7 +63,7 @@ class DistributedSearchPlannerBasicTest < Test::Unit::TestCase
     def setup
       @request = {
         "type"    => "search",
-        "dataset" => "Droonga",
+        "dataset" => "Default",
         "body"    => {
           "queries" => {
             "no_output" => {

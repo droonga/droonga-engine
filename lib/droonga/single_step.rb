@@ -26,12 +26,12 @@ module Droonga
     def plan(message)
       if message["type"] == "search"
         # XXX: workaround
-        planner = Plugins::Search::Planner.new
+        planner = Plugins::Search::Planner.new(@dataset)
         return planner.plan(message)
       end
 
       # XXX: Re-implement me.
-      planner = Planner.new
+      planner = Planner.new(@dataset)
       options = {}
       options[:write] = @definition.write?
       collector_class = @definition.collector_class

@@ -22,7 +22,7 @@ module Droonga
   module Plugins
     module Search
       class DistributedSearchPlanner < DistributedCommandPlanner
-        def initialize(search_request_message)
+        def initialize(dataset, search_request_message)
           super
 
           @request = @source_message["body"]
@@ -43,7 +43,6 @@ module Droonga
             transform_query(input_name, query)
           end
 
-          @dataset = @source_message["dataset"] || @request["dataset"]
           broadcast(:body => @request)
 
           super
@@ -79,7 +78,7 @@ module Droonga
         def transform_query(input_name, query)
           return unless need_reduce?(query)
 
-          transformer = QueryTransformer.new(query)
+          transformer = QueryTransformer.new(@dataset, query)
           elements = transformer.mappers
           mapper = {}
           mapper["elements"] = elements unless elements.empty?
@@ -103,7 +102,8 @@ module Droonga
         class QueryTransformer
           attr_reader :reducers, :mappers
 
-          def initialize(query)
+          def initialize(dataset, query)
+            @dataset = dataset
             @query = query
             @output = @query["output"]
             @reducers = {}
@@ -210,10 +210,14 @@ module Droonga
           end
 
           def final_offset
+            return @original_output_offset if @dataset.single_slice?
+
             @original_sort_offset + @original_output_offset
           end
 
           def final_limit
+            return @original_output_limit if @dataset.single_slice?
+
             if @original_sort_limit == UNLIMITED and
                 @original_output_limit == UNLIMITED
               UNLIMITED
@@ -248,12 +252,12 @@ module Droonga
             }
             if unifiable?
               @query["sortBy"]["limit"] = -1 if @query["sortBy"].is_a?(Hash)
-              @output["limit"] = -1
+              @output["limit"] = -1 unless @dataset.single_slice?
               mapper = {
                 "target" => "records",
               }
               unless @output["elements"].include?("records")
-                @records_limit = -1
+                @records_limit = -1 unless @dataset.single_slice?
                 @output["elements"] << "records"
                 @output["attributes"] ||= ["_key"]
                 @output_records = false

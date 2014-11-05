@@ -85,6 +85,14 @@ module Droonga
         routes
       end
 
+      def single_slice?
+        # TODO: Support slice key
+        replicas.all? do |volume|
+          volume.is_a?(SingleVolume) or
+            volume.slices.size == 1
+        end
+      end
+
       private
       def create_volumes(raw_volumes)
         raw_volumes.collect do |raw_volume|

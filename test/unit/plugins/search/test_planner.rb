@@ -19,7 +19,15 @@ class SearchPlannerTest < Test::Unit::TestCase
   def setup
     setup_database
     @planner = Droonga::Test::StubPlanner.new
-    @plugin = Droonga::Plugins::Search::Planner.new
+    # TODO: Use real dataset
+    stub_dataset = Object.new
+    stub(stub_dataset).name do
+      Droonga::Catalog::Dataset::DEFAULT_NAME
+    end
+    stub(stub_dataset).single_slice? do
+      false
+    end
+    @plugin = Droonga::Plugins::Search::Planner.new(stub_dataset)
   end
 
   def teardown
@@ -135,7 +143,7 @@ class SearchPlannerTest < Test::Unit::TestCase
     searcher = {
       "type" => "broadcast",
       "command" => "search",
-      "dataset" => "Droonga",
+      "dataset" => "Default",
       "body" => {
         "queries" => {
           "query1" => {

@@ -17,7 +17,15 @@ require "droonga/plugins/search/distributed_search_planner"
 
 module DistributedSearchPlannerHelper
   def plan(search_request)
-    planner = Droonga::Plugins::Search::DistributedSearchPlanner.new(search_request)
+    # TODO: Use real dataset
+    stub_dataset = Object.new
+    stub(stub_dataset).name do
+      Droonga::Catalog::Dataset::DEFAULT_NAME
+    end
+    stub(stub_dataset).single_slice? do
+      false
+    end
+    planner = Droonga::Plugins::Search::DistributedSearchPlanner.new(stub_dataset, search_request)
     planner.plan
   end
 

@@ -17,17 +17,17 @@
 
 module Droonga
   class DistributedCommandPlanner
-    attr_accessor :key, :dataset
+    attr_accessor :key
 
     REDUCE_SUM = "sum"
 
     DEFAULT_LIMIT = -1
 
-    def initialize(source_message)
+    def initialize(dataset, source_message)
+      @dataset = dataset
       @source_message = source_message
 
       @key = nil
-      @dataset = nil
       @outputs = []
 
       @reducers = []
@@ -58,7 +58,7 @@ module Droonga
     def scatter(record, options={})
       @processor = {
         "command" => @source_message["type"],
-        "dataset" => @dataset || @source_message["dataset"],
+        "dataset" => @dataset.name,
         "body"    => options[:body] || @source_message["body"],
         "record"  => record,
         "type"    => "scatter",
@@ -71,7 +71,7 @@ module Droonga
     def broadcast(options={})
       processor = {
         "command" => @source_message["type"],
-        "dataset" => @dataset || @source_message["dataset"],
+        "dataset" => @dataset.name,
         "body"    => options[:body] || @source_message["body"],
         "type"    => "broadcast",
         "outputs" => [],

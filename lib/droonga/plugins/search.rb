@@ -25,7 +25,7 @@ module Droonga
 
       class Planner < Droonga::Planner
         def plan(message)
-          planner = DistributedSearchPlanner.new(message)
+          planner = DistributedSearchPlanner.new(@dataset, message)
           planner.plan
         end
       end

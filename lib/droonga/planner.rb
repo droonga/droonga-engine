@@ -22,7 +22,8 @@ module Droonga
     include Loggable
     include ErrorMessages
 
-    def initialize
+    def initialize(dataset)
+      @dataset = dataset
     end
 
     def plan(message)
@@ -31,14 +32,14 @@ module Droonga
 
     private
     def scatter(message, record, options={})
-      planner = DistributedCommandPlanner.new(message)
+      planner = DistributedCommandPlanner.new(@dataset, message)
       planner.scatter(record)
       planner.reduce(options[:reduce])
       planner.plan
     end
 
     def broadcast(message, options={})
-      planner = DistributedCommandPlanner.new(message)
+      planner = DistributedCommandPlanner.new(@dataset, message)
       planner.broadcast(:write => options[:write])
       planner.reduce(options[:reduce])
       planner.plan
