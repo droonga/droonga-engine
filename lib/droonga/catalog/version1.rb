@@ -54,10 +54,9 @@ module Droonga
               partitions.each do |partition|
                 if partition =~ pattern
                   database_name = $POSTMATCH
-                  path = File.join([device, Path.databases.basename.to_s, database_name, "db"])
-                  path = Pathname(path).expand_path(base_path)
-                  migrate_database_location(path, :device => device,
-                                                  :name   => database_name)
+                  path = Pathname(Path.databases).expand_path(base_path)
+                           + device + database_name + "db"
+                  migrate_database_location(path, device, database_name)
                   options = {
                     :dataset => dataset_name,
                     :database => path.to_s,
@@ -386,14 +385,6 @@ module Droonga
               end
             end
           end
-        end
-      end
-
-      def migrate_database_location(path, params)
-        old_path = File.join([params[:device], params[:name], "db"])
-        old_path = Pathname(old_path).expand_path(base_path)
-        if old_path.exist? and not path.exist?
-          FileUtils.move(old_path.to_s, path.to_s)
         end
       end
 
