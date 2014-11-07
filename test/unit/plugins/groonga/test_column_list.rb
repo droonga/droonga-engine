@@ -68,7 +68,7 @@ class ColumnListTest < GroongaHandlerTest
   class BodyTest < self
     def test_fix
       Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash)
+        schema.create_table("Books", :type => :array)
         schema.change_table("Books") do |table|
           table.column("age", "UInt32", :type => :scalar)
         end
@@ -91,7 +91,7 @@ class ColumnListTest < GroongaHandlerTest
 
     def test_var
       Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash)
+        schema.create_table("Books", :type => :array)
         schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
         end
@@ -114,7 +114,7 @@ class ColumnListTest < GroongaHandlerTest
 
     def test_vector
       Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash)
+        schema.create_table("Books", :type => :array)
         schema.change_table("Books") do |table|
           table.column("authors", "ShortText", :type => :vector)
         end
@@ -135,41 +135,9 @@ class ColumnListTest < GroongaHandlerTest
       assert_equal(expected, response.last)
     end
 
-    def test_with_key
-      Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash,
-                                     :key_type => "ShortText")
-        schema.change_table("Books") do |table|
-          table.column("age", "UInt32", :type => :scalar)
-        end
-      end
-      response = process(:column_list,
-                         {"table" => "Books"})
-      expected = [
-        COLUMNS_HEADER,
-        [256,
-         "_key",
-         "",
-         "",
-         "COLUMN_SCALAR",
-         "Books",
-         "ShortText",
-         []],
-        [257,
-         "age",
-         @database_path.to_s + ".0000101",
-         "fix",
-         "COLUMN_SCALAR",
-         "Books",
-         "UInt32",
-         []],
-      ]
-      assert_equal(expected, response.last)
-    end
-
     def test_index
       Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash)
+        schema.create_table("Books", :type => :array)
         schema.change_table("Books") do |table|
           table.column("title", "ShortText", :type => :scalar)
           table.index("Books", "title", :name => "entry_title")
@@ -197,6 +165,96 @@ class ColumnListTest < GroongaHandlerTest
          []],
       ]
       assert_equal(expected, response.last)
+    end
+  end
+
+  class VirtualColumnsTest < self
+    def test_array
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :array)
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_hash
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :hash)
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        virtual_key_column(256, "Books"),
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_patricia_trie
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :patricia_trie)
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        virtual_key_column(256, "Books"),
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_double_array_trie
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :double_array_trie)
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        virtual_key_column(256, "Books"),
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def test_both_virtual_and_real
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :hash)
+        schema.change_table("Books") do |table|
+          table.column("age", "UInt32", :type => :scalar)
+        end
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        virtual_key_column(256, "Books"),
+        [257,
+         "age",
+         @database_path.to_s + ".0000101",
+         "fix",
+         "COLUMN_SCALAR",
+         "Books",
+         "UInt32",
+         []],
+      ]
+      assert_equal(expected, response.last)
+    end
+
+    def virtual_key_column(id, table_name)
+      [
+        256,
+        "_key",
+        "",
+        "",
+        "COLUMN_SCALAR",
+        "Books",
+        "ShortText",
+        [],
+      ]
     end
   end
 end
