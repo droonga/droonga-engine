@@ -35,7 +35,7 @@ module Droonga
       end
 
       def databases
-        base + "database"
+        base + "databases"
       end
 
       def state
