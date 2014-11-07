@@ -35,6 +35,8 @@ module Droonga
                                      :result => false)
             end
 
+            validate_key_type
+
             options = parse_command
             ::Groonga::Schema.define(:context => @context) do |schema|
               schema.create_table(name, options)
@@ -87,6 +89,29 @@ module Droonga
           def parse_normalizer(options)
             return unless @command["normalizer"]
             options[:normalizer] = @command["normalizer"]
+          end
+
+          def validate_key_type
+            if @command.table_hash_key? and @command["key_type"].nil?
+              message = "key_type is required for TABLE_HASH_KEY table"
+              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                     :message => message,
+                                     :result => false)
+            end
+
+            if @command.table_pat_key? and @command["key_type"].nil?
+              message = "key_type is required for TABLE_PAT_KEY table"
+              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                     :message => message,
+                                     :result => false)
+            end
+
+            if @command.table_dat_key? and @command["key_type"].nil?
+              message = "key_type is required for TABLE_DAT_KEY table"
+              raise CommandError.new(:status => Status::INVALID_ARGUMENT,
+                                     :message => message,
+                                     :result => false)
+            end
           end
         end
 
