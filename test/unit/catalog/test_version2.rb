@@ -45,19 +45,19 @@ class CatalogVersion2Test < Test::Unit::TestCase
       slices = @catalog.slices("localhost:23003/test")
       assert_equal({
                      "localhost:23003/test.000" => {
-                       :database  => "#{base_path}/database/000/db",
+                       :database  => "#{base_path}/databases/000/db",
                        :dataset   => "Test",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,
                      },
                      "localhost:23003/test.001" => {
-                       :database  => "#{base_path}/database/001/db",
+                       :database  => "#{base_path}/databases/001/db",
                        :dataset   => "Test",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,
                      },
                      "localhost:23003/test.002" => {
-                       :database  => "#{base_path}/database/002/db",
+                       :database  => "#{base_path}/databases/002/db",
                        :dataset   => "Test",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,

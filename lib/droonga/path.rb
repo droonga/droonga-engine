@@ -34,8 +34,10 @@ module Droonga
         ENV[BASE_DIR_ENV_NAME] = new_base
       end
 
-      def databases
-        base + "databases"
+      def databases(base_path=nil)
+        base_path ||= base
+        path = Pathname(base_path) + "databases"
+        path.expand_path(base_path)
       end
 
       def state
