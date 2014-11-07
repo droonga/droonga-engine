@@ -45,8 +45,8 @@ module Droonga
               volume_address = slice.volume.address
               if volume_address.node == node
                 name = volume_address.name
-                path = Pathname(Path.databases) + device + name + "db"
-                path = path.expand_path(base_path)
+                path = Path.databases.expand_path(base_path) +
+                         device + name + "db"
                 migrate_database_location(path, device, name)
 
                 options = {
