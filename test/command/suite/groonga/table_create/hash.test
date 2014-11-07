@@ -2,7 +2,8 @@
   "type": "table_create",
   "dataset": "Default",
   "body": {
-    "name"  : "User",
-    "flags" : "TABLE_HASH_KEY"
+    "name"     : "User",
+    "flags"    : "TABLE_HASH_KEY",
+    "key_type" : "ShortText"
   }
 }
