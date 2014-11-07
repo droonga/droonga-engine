@@ -47,6 +47,28 @@ module Droonga
           private
           def list_columns(table_name)
             table = @context[table_name]
+            virtual_columns(table) + real_columns(table)
+          end
+
+          def virtual_columns(table)
+            if not table.support_key? or table.domain.nil?
+              return []
+            end
+            [
+              [
+                table.id,          # id
+                "_key",            # name
+                "",                # path
+                "",                # type
+                "COLUMN_SCALAR",   # flags
+                table.name,        # domain
+                table.domain.name, # range
+                [],                # source
+              ]
+            ]
+          end
+
+          def real_columns(table)
             table.columns.collect do |column|
               format_column(column)
             end
