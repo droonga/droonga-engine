@@ -5,6 +5,11 @@
  * Better compatibility to Groonga's `select` command:
    * Whitespace-separeted `outout_columns` (it is valid on `command_version=1` environments) is now available.
    * `output_columns=*` works correctly even if it is a `TABLE_NO_KEY` table.
+ * Better compatibility to Groonga's `column_list` command:
+   * A `_key` virtual column is correctly appear in the result, for tables with one of flags: `TABLE_HASH_KEY`, `TABLE_PAT_KEY`, and `TABLE_DAT_KEY`.
+ * Groonga's `table_create` command now requires `key_type` parameter for tables with one of flags: `TABLE_HASH_KEY`, `TABLE_PAT_KEY`, or `TABLE_DAT_KEY`.
+   You'll get an error response, if the parameter is not given.
+   (Groonga unexpectedly accepts `table_create` requests without `key_type`, but it is a bad behavior (too lazy) and it should not be covered as a compatibility.)
  * The `daemon` option is now ignored in the static configuration file.
    Now, you always have to specify `--daemon` option for the `droonga-engine` command
    to start it as a daemon.
