@@ -120,7 +120,7 @@ module Droonga
             return [] unless column.is_a?(::Groonga::IndexColumn)
             column.sources.collect do |source|
               if source.is_a?(::Groonga::Table)
-                "_key"
+                source.name
               else
                 source.local_name
               end
