@@ -1,0 +1,14 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "table_create.result",
+  "body": [
+    [
+      -22,
+      0.0,
+      0.0,
+      "key_type is required for TABLE_DAT_KEY table"
+    ],
+    false
+  ]
+}
