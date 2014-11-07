@@ -147,7 +147,7 @@ class ColumnListTest < GroongaHandlerTest
                          {"table" => "Books"})
       expected = [
         COLUMNS_HEADER,
-        [257,
+        [256,
          "_key",
          "",
          "",
@@ -155,7 +155,7 @@ class ColumnListTest < GroongaHandlerTest
          "Books",
          "ShortText",
          []],
-        [258,
+        [257,
          "age",
          @database_path.to_s + ".0000101",
          "fix",
