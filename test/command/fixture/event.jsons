@@ -3,8 +3,9 @@
   "type": "table_create",
   "dataset": "Default",
   "body": {
-    "name"  : "Event",
-    "flags" : "TABLE_HASH_KEY"
+    "name"     : "Event",
+    "flags"    : "TABLE_HASH_KEY",
+    "key_type" : "ShortText"
   }
 }
 {
