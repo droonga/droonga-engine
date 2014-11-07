@@ -89,14 +89,21 @@ module Droonga
       end
 
       def migrate_database_location(device, name)
-        common_base_path = Pathname(base_path) + device
-        old_db_dir_path = common_base_path + name
-        old_db_path = old_db_dir_path + "db"
-        current_db_dir_path = common_base_path + Path.databases.basename + name
+        current_db_dir_path = Path.databases + device + name
         current_db_path = current_db_dir_path + "db"
-        if old_db_path.exist? and not current_db_path.exist?
-          FileUtils.mkdir_p(current_db_dir_path.parent)
-          FileUtils.move(old_db_dir_path, current_db_dir_path)
+        return if current_db_path.exist?
+
+        common_base_path = Pathname(base_path)
+        old_db_path = {
+          :top_level     => common_base_path + device + name + "db",
+          :singular_form => common_base_path + device + "database" + name + "db",
+        }
+        old_db_path.each do |type, old_db_path|
+          if old_db_path.exist?
+            FileUtils.mkdir_p(current_db_dir_path.parent)
+            FileUtils.move(old_db_path.parent, current_db_dir_path)
+            return
+          end
         end
       end
     end
