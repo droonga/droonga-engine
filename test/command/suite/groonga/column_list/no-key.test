@@ -3,7 +3,7 @@
   "dataset": "Default",
   "body": {
     "name"  : "User",
-    "flags" : "TABLE_PAT_KEY"
+    "flags" : "TABLE_NO_KEY"
   }
 }
 {
