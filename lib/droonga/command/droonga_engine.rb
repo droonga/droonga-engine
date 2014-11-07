@@ -128,7 +128,7 @@ module Droonga
           @ready_notify_fd = nil
 
           if have_config_file?
-            self.pid_file_path = config["pid_file"]
+            self.pid_file_path = config["pid_file"] if config["pid_file"]
             self.log_file  = config["log_file"] || Path.default_log_file
             self.log_level = config["log_level"] if config.include?("log_level")
           end
