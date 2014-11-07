@@ -2,8 +2,9 @@
   "type": "table_create",
   "dataset": "Default",
   "body": {
-    "name"  : "User",
-    "flags" : "TABLE_PAT_KEY"
+    "name"     : "User",
+    "flags"    : "TABLE_PAT_KEY",
+    "key_type" : "ShortText"
   }
 }
 {
