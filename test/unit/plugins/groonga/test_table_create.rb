@@ -54,30 +54,35 @@ table_create Books TABLE_NO_KEY
            },
            "TABLE_HASH_KEY" => {
              :flags => "TABLE_HASH_KEY",
+             :key_type => "ShortText",
              :schema => <<-SCHEMA,
 table_create Books TABLE_HASH_KEY ShortText
              SCHEMA
            },
            "TABLE_PAT_KEY" => {
              :flags => "TABLE_PAT_KEY",
+             :key_type => "ShortText",
              :schema => <<-SCHEMA,
 table_create Books TABLE_PAT_KEY ShortText
              SCHEMA
            },
            "TABLE_DAT_KEY" => {
              :flags => "TABLE_DAT_KEY",
+             :key_type => "ShortText",
              :schema => <<-SCHEMA,
 table_create Books TABLE_DAT_KEY ShortText
              SCHEMA
            },
            "KEY_WITH_SIS with TABLE_PAT_KEY" => {
              :flags => "KEY_WITH_SIS|TABLE_PAT_KEY",
+             :key_type => "ShortText",
              :schema => <<-SCHEMA,
 table_create Books TABLE_PAT_KEY|KEY_WITH_SIS ShortText
              SCHEMA
            },
            "KEY_WITH_SIS without TABLE_PAT_KEY" => {
              :flags => "TABLE_NO_KEY|KEY_WITH_SIS",
+             :key_type => "ShortText",
              :schema => <<-SCHEMA,
 table_create Books TABLE_NO_KEY
              SCHEMA
@@ -88,8 +93,32 @@ table_create Books TABLE_NO_KEY
         "name" => "Books",
         "flags" => data[:flags],
       }
+      request["key_type"] = data[:key_type] if data[:key_type]
       process(:table_create, request)
       assert_equal(data[:schema], dump)
+    end
+
+    data({
+           "TABLE_HASH_KEY missing key_type" => {
+             :flags => "TABLE_HASH_KEY",
+           },
+           "TABLE_PAT_KEY missing key_type" => {
+             :flags => "TABLE_PAT_KEY",
+           },
+           "TABLE_DAT_KEY missing key_type" => {
+             :flags => "TABLE_DAT_KEY",
+           },
+         })
+    def test_missing_required_parameter(data)
+      request = {
+        "name" => "Books",
+        "flags" => data[:flags],
+      }
+      response = process(:table_create, request)
+      assert_equal(
+        [NORMALIZED_HEADER_INVALID_ARGUMENT, false],
+        [normalize_header(response.first), response.last]
+      )
     end
   end
 
