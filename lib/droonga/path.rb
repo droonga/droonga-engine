@@ -37,7 +37,7 @@ module Droonga
       def databases(base_path=nil)
         base_path ||= base
         path = Pathname(base_path) + "databases"
-        path.expand_path(base_path)
+        path.expand_path
       end
 
       def state
