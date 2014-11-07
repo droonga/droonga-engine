@@ -42,11 +42,11 @@ module Droonga
         return if current_db_path.exist?
 
         common_base_path = Pathname(@base_path)
-        old_db_path = {
+        old_db_paths = {
           :top_level     => common_base_path + device + name + "db",
           :singular_form => common_base_path + device + "database" + name + "db",
         }
-        old_db_path.each do |type, old_db_path|
+        old_db_paths.each do |type, old_db_path|
           if old_db_path.exist?
             FileUtils.mkdir_p(current_db_path.parent.parent)
             FileUtils.move(old_db_path.parent, current_db_path.parent)
