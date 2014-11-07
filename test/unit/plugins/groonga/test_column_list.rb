@@ -32,6 +32,19 @@ class ColumnListTest < GroongaHandlerTest
                                                        @loop)
   end
 
+  def virtual_key_column(id, table_name)
+    [
+      id,
+      "_key",
+      "",
+      "",
+      "COLUMN_SCALAR",
+      table_name,
+      "ShortText",
+      [],
+    ]
+  end
+
   class HeaderTest < self
     def test_success
       Groonga::Schema.define do |schema|
@@ -166,6 +179,31 @@ class ColumnListTest < GroongaHandlerTest
       ]
       assert_equal(expected, response.last)
     end
+
+    def test_index_source_key
+      Groonga::Schema.define do |schema|
+        schema.create_table("Memos", :type => :patricia_trie)
+        schema.create_table("Terms", :type => :patricia_trie)
+        schema.change_table("Terms") do |table|
+          table.index("Memos", "_key", :name => "index")
+        end
+      end
+      response = process(:column_list,
+                         {"table" => "Terms"})
+      expected = [
+        COLUMNS_HEADER,
+        virtual_key_column(257, "Terms"),
+        [258,
+         "index",
+         @database_path.to_s + ".0000102",
+         "index",
+         "COLUMN_INDEX",
+         "Terms",
+         "Memos",
+         ["Memos"]],
+      ]
+      assert_equal(expected, response.last)
+    end
   end
 
   class VirtualColumnsTest < self
@@ -242,19 +280,6 @@ class ColumnListTest < GroongaHandlerTest
          []],
       ]
       assert_equal(expected, response.last)
-    end
-
-    def virtual_key_column(id, table_name)
-      [
-        256,
-        "_key",
-        "",
-        "",
-        "COLUMN_SCALAR",
-        "Books",
-        "ShortText",
-        [],
-      ]
     end
   end
 end
