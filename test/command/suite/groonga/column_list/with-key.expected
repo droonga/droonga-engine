@@ -1,0 +1,96 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "table_create.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    true
+  ]
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "column_create.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    true
+  ]
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "column_list.result",
+  "body": [
+    [
+      0,
+      0.0,
+      0.0
+    ],
+    [
+      [
+        [
+          "id",
+          "UInt32"
+        ],
+        [
+          "name",
+          "ShortText"
+        ],
+        [
+          "path",
+          "ShortText"
+        ],
+        [
+          "type",
+          "ShortText"
+        ],
+        [
+          "flags",
+          "ShortText"
+        ],
+        [
+          "domain",
+          "ShortText"
+        ],
+        [
+          "range",
+          "ShortText"
+        ],
+        [
+          "source",
+          "ShortText"
+        ]
+      ],
+      [
+        257,
+        "_key",
+        "",
+        "",
+        "COLUMN_SCALAR",
+        "User",
+        "ShortText",
+        []
+      ],
+      [
+        258,
+        "age",
+        "/path/to/column",
+        "fix",
+        "COLUMN_SCALAR",
+        "User",
+        "Int32",
+        [
+
+        ]
+      ]
+    ]
+  ]
+}
