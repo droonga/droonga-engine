@@ -3,7 +3,7 @@
 ## 1.0.8: 2014-11-29 (planned)
 
  * Better compatibility to Groonga's `select` command:
-   * Whitespace-separeted `outout_columns` (it is valid on `command_version=1` environments) is now available.
+   * Whitespace-separeted `output_columns` (it is valid on `command_version=1` environments) is now available.
    * `output_columns=*` works correctly even if it is a `TABLE_NO_KEY` table.
  * Better compatibility to Groonga's `column_list` command:
    * A `_key` virtual column is correctly appear in the result, for tables with one of flags: `TABLE_HASH_KEY`, `TABLE_PAT_KEY`, and `TABLE_DAT_KEY`.
