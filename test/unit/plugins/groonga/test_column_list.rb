@@ -135,6 +135,38 @@ class ColumnListTest < GroongaHandlerTest
       assert_equal(expected, response.last)
     end
 
+    def test_with_key
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books", :type => :hash,
+                                     :key_type => "ShortText")
+        schema.change_table("Books") do |table|
+          table.column("age", "UInt32", :type => :scalar)
+        end
+      end
+      response = process(:column_list,
+                         {"table" => "Books"})
+      expected = [
+        COLUMNS_HEADER,
+        [257,
+         "_key",
+         "",
+         "",
+         "COLUMN_SCALAR",
+         "Books",
+         "ShortText",
+         []],
+        [258,
+         "age",
+         @database_path.to_s + ".0000101",
+         "fix",
+         "COLUMN_SCALAR",
+         "Books",
+         "UInt32",
+         []],
+      ]
+      assert_equal(expected, response.last)
+    end
+
     def test_index
       Groonga::Schema.define do |schema|
         schema.create_table("Books", :type => :hash)
