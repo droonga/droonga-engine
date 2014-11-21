@@ -89,6 +89,13 @@ module Droonga
         end
       end
 
+      class SetEffectiveMessageTimestamp < Base
+        def process
+          status = NodeStatus.new
+          status.set(:effective_message_timestamp, @params["timestamp"])
+        end
+      end
+
       class Join < Base
         def process
           log("type = #{type}")

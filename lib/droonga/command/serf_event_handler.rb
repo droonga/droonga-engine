@@ -72,6 +72,8 @@ module Droonga
           Remote::ChangeRole
         when "report_status"
           Remote::ReportStatus
+        when "set_effective_message_timestamp"
+          Remote::SetEffectiveMessageTimestamp
         when "join"
           Remote::Join
         when "set_replicas"
