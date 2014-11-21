@@ -134,6 +134,7 @@ module Droonga
 
           def []=(key, value)
             @ids[key.object_id] = value.object_id
+            value
           end
         end
 
