@@ -32,7 +32,7 @@ module Droonga
 
         #TODO: We should use droonga-send instead of droonga-request,
         #      because droonga-request is too slow.
-        client = params[:client] || "droonga-request"
+        client = params[:client] || "droonga-send"
         client_options = []
         if client.include?("droonga-request")
           client_options += ["--host", params[:destination_host]]
