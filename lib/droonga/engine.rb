@@ -42,7 +42,9 @@ module Droonga
       end
       @node_status_observer = FileObserver.new(loop, Path.node_status)
       @node_status_observer.on_change = lambda do
+        logger.trace("reloading node_status: start")
         node_status.reload
+        logger.trace("reloading node_status: done")
       end
       @on_ready = nil
     end
@@ -139,9 +141,12 @@ module Droonga
       return true if effective_timestamp.nil?
 
       message_timestamp = Time.parse(message["date"])
+      logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(message_timestamp)")
       return false if effective_timestamp >= message_timestamp
 
+      logger.trace("deleting obsolete effective_message_timestamp: start")
       node_status.delete(:effective_message_timestamp)
+      logger.trace("deleting obsolete effective_message_timestamp: done")
       true
     end
 
