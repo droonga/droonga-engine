@@ -85,16 +85,18 @@ run_remote_command(joining_node, "join",
                    "copy"    => !options["no-copy"])
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 
-while true
-  sleep(3)
-  response = run_remote_command(joining_node, "report_status",
-                                "node" => joining_node,
-                                "key"  => "absorbing")
-  absorbing = response["value"]
-  break unless absorbing
+unless options["no-copy"]
+  while true
+    sleep(3)
+    response = run_remote_command(joining_node, "report_status",
+                                  "node" => joining_node,
+                                  "key"  => "absorbing")
+    absorbing = response["value"]
+    break unless absorbing
 
-  progress = absorber.report_progress(start_time_in_seconds)
-  puts(progress) if progress
+    progress = absorber.report_progress(start_time_in_seconds)
+    puts(progress) if progress
+  end
 end
 
 response = run_remote_command(source_node, "report_status",
