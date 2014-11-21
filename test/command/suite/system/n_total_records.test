@@ -1,7 +1,0 @@
-#@include fixture/users.jsons
-#@include fixture/documents.jsons
-{
-  "type": "system.n_total_records",
-  "dataset": "Default",
-  "body": {}
-}
