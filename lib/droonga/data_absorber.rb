@@ -75,7 +75,7 @@ module Droonga
     def report_progress(start_time_in_seconds)
       return nil unless can_report_remaining_time?
 
-      elapsed_time = Time.new.to_i - start
+      elapsed_time = Time.new.to_i - start_time_in_seconds
       progress = elapsed_time / required_time_in_seconds
       progress = [(progress * 100).to_i, 100].min
       remaining_time_in_seconds = [required_time_in_seconds - elapsed_time, 0].max
