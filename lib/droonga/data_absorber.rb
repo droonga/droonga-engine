@@ -32,9 +32,6 @@ module Droonga
 
         #TODO: We should use droonga-send instead of droonga-request,
         #      because droonga-request is too slow.
-        #      However, to do it, we have to implement an API to know
-        #      that all messages sent by droonga-send are completely
-        #      processed.
         client = params[:client] || "droonga-request"
         client_options = []
         if client.include?("droonga-request")
