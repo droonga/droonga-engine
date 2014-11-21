@@ -109,41 +109,6 @@ module Droonga
     class Chunk
       SUFFIX = ".chunk"
 
-      if ObjectSpace.const_defined?(:WeakMap)
-        @@data_map = ObjectSpace::WeakMap.new
-      else
-        # XXX Ruby 1.9.x (installed by default on Ubuntu 14.0.4LTS etc.)
-        #     doesn't have WeakMap...
-        require "weakref"
-
-        class WeakMap
-          def initialize
-            @ids = {}
-          end
-
-          def [](key)
-            value_ref = @ids[key.object_id]
-            if value_ref and value_ref.weakref_alive?
-              begin
-                value_ref.__getobj__
-              rescue RangeError
-                nil
-              end
-            else
-              nil
-            end
-          end
-
-          def []=(key, value)
-            ref = WeakRef.new(value)
-            @ids[key.object_id] = ref
-            value
-          end
-        end
-
-        @@data_map = WeakMap.new
-      end
-
       class << self
         def load(path)
           data_directory = path.dirname
@@ -155,7 +120,7 @@ module Droonga
         end
       end
 
-      attr_reader :time_stamp
+      attr_reader :data, :time_stamp
       def initialize(data_directory, data, time_stamp, revision)
         @data_directory = data_directory
         @data = data
@@ -167,12 +132,6 @@ module Droonga
         path.open("wb") do |file|
           file.write(@data)
         end
-        @@data_map[self] = @data
-        @data = nil
-      end
-
-      def data
-        @data ||= @@data_map[self] ||= read_data
       end
 
       def written
@@ -189,12 +148,6 @@ module Droonga
       private
       def path
         @data_directory + "#{@time_stamp.iso8601(6)}.#{@revision}.#{SUFFIX}"
-      end
-
-      def read_data
-        path.open("rb") do |file|
-          file.read
-        end
       end
     end
   end
