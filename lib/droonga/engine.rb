@@ -65,7 +65,7 @@ module Droonga
       @node_status_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
-        save_last_processed_timestamp
+        save_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
@@ -85,7 +85,7 @@ module Droonga
     # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
-      save_last_processed_timestamp
+      save_last_processed_message_timestamp
       @live_nodes_list_observer.stop
       @node_status_observer.stop
       @dispatcher.stop_immediately
@@ -95,7 +95,7 @@ module Droonga
 
     def process(message)
       return unless effective_message?(message)
-      @last_processed_timestamp = message["date"]
+      @last_processed_message_timestamp = message["date"]
       @dispatcher.process_message(message)
     end
 
@@ -128,10 +128,10 @@ module Droonga
       Dispatcher.new(@state, @catalog)
     end
 
-    def save_last_processed_timestamp
-      logger.trace("output_last_processed_timestamp: start")
-      node_status.set(:last_processed_timestamp, @last_processed_timestamp.to_s)
-      logger.trace("output_last_processed_timestamp: done")
+    def save_last_processed_message_timestamp
+      logger.trace("output_last_processed_message_timestamp: start")
+      node_status.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+      logger.trace("output_last_processed_message_timestamp: done")
     end
 
     def effective_message?(message)
