@@ -75,6 +75,15 @@ absorber_options = {
 }
 absorber = Droonga::DataAbsorber.new(absorber_options)
 
+if absorber.source_node_suspendable?
+  run_remote_command(source_node, "change_role",
+                     "node" => source_node,
+                     "role" => "source")
+end
+run_remote_command(joining_node, "change_role",
+                   "node" => joining_node,
+                   "role" => "destination")
+
 start_time_in_seconds = Time.new.to_i
 puts("Joining new replica to the cluster...")
 run_remote_command(joining_node, "join",
@@ -125,6 +134,15 @@ puts("Update existing hosts in the cluster...")
 run_remote_command(source_node, "add_replicas",
                    "dataset" => options[:dataset],
                    "hosts"   => [options[:host]])
+
+if absorber.source_node_suspendable?
+  run_remote_command(source_node, "change_role",
+                     "node" => source_node,
+                     "role" => "")
+end
+run_remote_command(joining_node, "change_role",
+                   "node" => joining_node,
+                   "role" => "")
 
 
 puts("Done.")
