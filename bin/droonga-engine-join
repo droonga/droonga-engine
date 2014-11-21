@@ -66,6 +66,17 @@ def run_remote_command(target, command, options)
   result[:response]
 end
 
+absorber_options = {
+  :dataset          => options[:dataset],
+  :source_host      => options["replica-source-host"],
+  :destination_host => options[:host],
+  :port             => options[:port],
+  :tag              => options[:tag],
+}
+absorber = Droonga::DataAbsorber.new(absorber_options)
+calculated_required_time = absorber.required_time_in_seconds
+
+start = Time.new.to_i
 puts("Joining new replica to the cluster...")
 run_remote_command(joining_node, "join",
                    "node"    => joining_node,
@@ -82,6 +93,16 @@ while true
                                 "key"  => "absorbing")
   absorbing = response["value"]
   break unless absorbing
+
+  if calculated_required_time != Droonga::DataAbsorber::TIME_UNKNOWN and
+     calculated_required_time > 0
+    elapsed_time = Time.new.to_i - start
+    progress = elapsed_time / calculated_required_time
+    progress = [(progress * 100).to_i, 100].min
+    remaining_time_in_seconds = [calculated_required_time - elapsed_time, 0].max
+    remaining_time_in_minutes = remaining_time_in_seconds / 60
+    puts "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
+  end
 end
 
 response = run_remote_command(source_node, "report_status",

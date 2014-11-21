@@ -104,6 +104,7 @@ absorber_options = {
   :tag              => options.tag,
 }
 absorber = Droonga::DataAbsorber.new(absorber_options)
+calculated_required_time = absorber.required_time_in_seconds
 
 if options.remote
   start = Time.new.to_i
@@ -125,8 +126,8 @@ if options.remote
        calculated_required_time > 0
       elapsed_time = Time.new.to_i - start
       progress = elapsed_time / calculated_required_time
-      progress = (progress * 100).to_i
-      remaining_time_in_seconds = calculated_required_time - elapsed_time
+      progress = [(progress * 100).to_i, 100].min
+      remaining_time_in_seconds = [calculated_required_time - elapsed_time, 0].max
       remaining_time_in_minutes = remaining_time_in_seconds / 60
       puts "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
     end
@@ -146,8 +147,8 @@ if options.remote
 else
   absorber.absorb do |live_status|
     if live_status[:progress] != Droonga::DataAbsorber::PROGRESS_UNKNOWN
-      progress = (live_status[:progress] * 100).to_i
-      remaining_time_in_seconds = calculated_required_time * (1 - live_status[:progress])
+      progress = [(live_status[:progress] * 100).to_i, 100].min
+      remaining_time_in_seconds = ]calculated_required_time * (1 - live_status[:progress])].max
       remaining_time_in_minutes = remaining_time_in_seconds / 60
       puts "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
     else
