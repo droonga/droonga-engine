@@ -184,7 +184,7 @@ module Droonga
 
       private
       def path
-        @data_directory + "#{@time_stamp.iso8601(6)}.#{@revision}.chunk"
+        @data_directory + "#{@time_stamp.iso8601(6)}.#{@revision}.#{SUFFIX}"
       end
 
       def read_data
