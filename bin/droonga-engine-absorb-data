@@ -24,6 +24,7 @@ require "droonga/catalog_generator"
 require "droonga/path"
 require "droonga/data_absorber"
 require "droonga/serf"
+require "droonga/client"
 
 options = OpenStruct.new
 options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
