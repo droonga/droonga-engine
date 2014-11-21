@@ -89,10 +89,10 @@ module Droonga
         end
       end
 
-      class SetEffectiveMessageTimestamp < Base
+      class SetStatus < Base
         def process
           status = NodeStatus.new
-          status.set(:effective_message_timestamp, @params["timestamp"])
+          status.set(@params["key"], @params["value"])
         end
       end
 
