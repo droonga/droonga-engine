@@ -113,6 +113,7 @@ if options.remote
                      "port"    => options.port,
                      "tag"     => options.tag,
                      "dataset" => options.dataset)
+  last_progress = ""
   while true
     sleep(3)
     response = run_remote_command(destination_node, "report_status",
@@ -124,8 +125,14 @@ if options.remote
     end
 
     progress = absorber.report_progress(start_time_in_seconds)
-    puts(progress) if progress
+    if progress
+      printf("%s", "#{" " * last_progress.size}\r")
+      printf("%s", "#{progress}\r")
+      last_progress = progress
+    end
   end
+  puts ""
+
   response = run_remote_command(source_node, "report_status",
                                 "node" => source_node,
                                 "key" => "last_processed_message_timestamp")
