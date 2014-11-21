@@ -76,10 +76,10 @@ module Droonga
       return nil unless can_report_remaining_time?
 
       elapsed_time = Time.new.to_i - start_time_in_seconds
-      progress = elapsed_time / required_time_in_seconds
+      progress = elapsed_time.to_f / required_time_in_seconds
       progress = [(progress * 100).to_i, 100].min
       remaining_time_in_seconds = [required_time_in_seconds - elapsed_time, 0].max
-      remaining_time_in_minutes = remaining_time_in_seconds / 60
+      remaining_time_in_minutes = remaining_time_in_seconds.to_f / 60
       "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
     end
 
