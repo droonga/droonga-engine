@@ -84,7 +84,7 @@ module Droonga
 
     private
     def calculate_required_time_in_seconds
-      @params[:client].include?("droonga-send")
+      if @params[:client].include?("droonga-send")
         total_n_source_records / @params[:messages_per_second]
       else
         TIME_UNKNOWN
