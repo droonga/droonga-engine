@@ -44,69 +44,69 @@ module Droonga
       @params[:client] ||= "droonga-send"
     end
 
-      def absorb
-        drndump = @params[:drndump]
-        drndump_options = []
-        drndump_options += ["--host", @params[:source_host]] if @params[:source_host]
-        drndump_options += ["--port", @params[:port].to_s] if @params[:port]
-        drndump_options += ["--tag", @params[:tag]] if @params[:tag]
-        drndump_options += ["--dataset", @params[:dataset]] if @params[:dataset]
-        drndump_options += ["--receiver-host", @params[:destination_host]]
-        drndump_options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
+    def absorb
+      drndump = @params[:drndump]
+      drndump_options = []
+      drndump_options += ["--host", @params[:source_host]] if @params[:source_host]
+      drndump_options += ["--port", @params[:port].to_s] if @params[:port]
+      drndump_options += ["--tag", @params[:tag]] if @params[:tag]
+      drndump_options += ["--dataset", @params[:dataset]] if @params[:dataset]
+      drndump_options += ["--receiver-host", @params[:destination_host]]
+      drndump_options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
 
-        client = @params[:client]
-        client_options = []
-        if client.include?("droonga-request")
-          client_options += ["--host", @params[:destination_host]]
-          client_options += ["--port", @params[:port].to_s] if @params[:port]
-          client_options += ["--tag", @params[:tag]] if @params[:tag]
-          client_options += ["--receiver-host", @params[:destination_host]]
-          client_options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
-        elsif client.include?("droonga-send")
-          #XXX Don't use round-robin with multiple endpoints
-          #    even if there are too much data.
-          #    Schema and indexes must be sent to just one endpoint
-          #    to keep their order, but currently there is no way to
-          #    extract only schema and indexes via drndump.
-          #    So, we always use just one endpoint for now,
-          #    even if there are too much data.
-          server = "droonga:#{params[:destination_host]}"
-          server = "#{server}:#{params[:port].to_s}" if @params[:port]
-          server = "#{server}/#{params[:tag].to_s}" if @params[:tag]
-          client_options += ["--server", server]
-          #XXX We should restrict the traffic to avoid overflowing!
-          client_options += ["--messages-per-second", @params[:messages_per_second]]
-        else
-          raise ArgumentError.new("Unknwon type client: #{client}")
+      client = @params[:client]
+      client_options = []
+      if client.include?("droonga-request")
+        client_options += ["--host", @params[:destination_host]]
+        client_options += ["--port", @params[:port].to_s] if @params[:port]
+        client_options += ["--tag", @params[:tag]] if @params[:tag]
+        client_options += ["--receiver-host", @params[:destination_host]]
+        client_options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
+      elsif client.include?("droonga-send")
+        #XXX Don't use round-robin with multiple endpoints
+        #    even if there are too much data.
+        #    Schema and indexes must be sent to just one endpoint
+        #    to keep their order, but currently there is no way to
+        #    extract only schema and indexes via drndump.
+        #    So, we always use just one endpoint for now,
+        #    even if there are too much data.
+        server = "droonga:#{params[:destination_host]}"
+        server = "#{server}:#{params[:port].to_s}" if @params[:port]
+        server = "#{server}/#{params[:tag].to_s}" if @params[:tag]
+        client_options += ["--server", server]
+        #XXX We should restrict the traffic to avoid overflowing!
+        client_options += ["--messages-per-second", @params[:messages_per_second]]
+      else
+        raise ArgumentError.new("Unknwon type client: #{client}")
+      end
+
+      drndump_command_line = [drndump] + drndump_options
+      client_command_line = [client] + client_options
+
+      calculated_required_time = required_time_in_seconds
+      unless calculated_required_time == TIME_UNKNOWN
+        logger.info("calculated required time: #{calculated_required_time}sec")
+        if block_given?
+          yield(:required_time_in_seconds => calculated_required_time)
         end
 
-        drndump_command_line = [drndump] + drndump_options
-        client_command_line = [client] + client_options
-
-        calculated_required_time = required_time_in_seconds
-        unless calculated_required_time == TIME_UNKNOWN
-          logger.info("calculated required time: #{calculated_required_time}sec")
-          if block_given?
-            yield(:required_time_in_seconds => calculated_required_time)
+      start = Time.new.to_i
+      env = {}
+      Open3.pipeline_r([env, *drndump_command_line],
+                       [env, *client_command_line]) do |last_stdout, thread|
+        last_stdout.each do |output|
+          progress = nil
+          if calculated_required_time == TIME_UNKNOWN or
+             calculated_required_time <= 0
+            progress = PROGRESS_UNKNOWN
+          else
+            progress = (Time.new.to_i - start) / calculated_required_time
           end
-
-        start = Time.new.to_i
-        env = {}
-        Open3.pipeline_r([env, *drndump_command_line],
-                         [env, *client_command_line]) do |last_stdout, thread|
-          last_stdout.each do |output|
-            progress = nil
-            if calculated_required_time == TIME_UNKNOWN or
-               calculated_required_time <= 0
-              progress = PROGRESS_UNKNOWN
-            else
-              progress = (Time.new.to_i - start) / calculated_required_time
-            end
-            yield(:progress => progress,
-                  :output   => output) 
-          end
+          yield(:progress => progress,
+                :output   => output) 
         end
       end
+    end
 
     def required_time_in_seconds
       @params[:client].include?("droonga-send")
