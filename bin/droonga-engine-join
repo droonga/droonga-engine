@@ -34,13 +34,13 @@ begin
 
     option.separator("Connections:")
     option.on(:host=,
-              "Host name of the node to be joined.",
+              "Host name of the new node to be joined.",
               :required => true)
     option.on("replica-source-host=",
-              "Host name of the soruce cluster to be connected.",
+              "Host name of the soruce node in the cluster to be connected.",
               :required => true)
     option.on(:dataset=,
-              "Tag dataset name of the cluster to be joined as a node.",
+              "Dataset name of for the node to be joined.",
               :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
     option.on(:port=,
               "Port number of the source cluster to be connected.",
@@ -86,6 +86,7 @@ run_remote_command(joining_node, "join",
 sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
 
 unless options["no-copy"]
+  puts("Copying data from the source node...")
   last_progress = ""
   while true
     sleep(3)
