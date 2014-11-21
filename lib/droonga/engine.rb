@@ -40,6 +40,10 @@ module Droonga
       @live_nodes_list_observer.on_change = lambda do
         @state.live_nodes = load_live_nodes
       end
+      @node_status_observer = FileObserver.new(loop, Path.node_status)
+      @node_status_observer.on_change = lambda do
+        node_status.reload
+      end
       @on_ready = nil
     end
 
@@ -50,6 +54,7 @@ module Droonga
       end
       @state.start
       @live_nodes_list_observer.start
+      @node_status_observer.start
       @dispatcher.start
       logger.trace("start: done")
     end
@@ -57,6 +62,7 @@ module Droonga
     def stop_gracefully
       logger.trace("stop_gracefully: start")
       @live_nodes_list_observer.stop
+      @node_status_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         save_last_processed_timestamp
@@ -81,6 +87,7 @@ module Droonga
       logger.trace("stop_immediately: start")
       save_last_processed_timestamp
       @live_nodes_list_observer.stop
+      @node_status_observer.stop
       @dispatcher.stop_immediately
       @state.shutdown
       logger.trace("stop_immediately: done")
@@ -134,7 +141,7 @@ module Droonga
       message_timestamp = Time.parse(message["date"])
       return false if effective_timestamp >= message_timestamp
 
-      FileUtils.rm(Path.effective_timestamp.to_s)
+      node_status.delete(:effective_message_timestamp)
       true
     end
 

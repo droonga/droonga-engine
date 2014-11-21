@@ -20,7 +20,7 @@ require "droonga/safe_file_writer"
 module Droonga
   class NodeStatus
     def initialize
-      @status = load
+      reload
     end
 
     def have?(key)
@@ -45,13 +45,17 @@ module Droonga
       SafeFileWriter.write(status_file, JSON.pretty_generate(@status))
     end
 
+    def reload
+      @status = load
+    end
+
     private
     def normalize_key(key)
       key.to_sym
     end
 
     def status_file
-      @status_file ||= Path.state + "status_file"
+      @status_file ||= Path.node_status
     end
 
     def load
