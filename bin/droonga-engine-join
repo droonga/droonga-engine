@@ -61,7 +61,7 @@ source_node  = "#{options["replica-source-host"]}:#{options[:port]}/#{options[:t
 def run_remote_command(target, command, options)
   serf = Droonga::Serf.new(nil, target)
   result = serf.send_query(command, options)
-  puts(result[:result])
+  #puts(result[:result])
   puts(result[:error]) unless result[:error].empty?
   result[:response]
 end
@@ -91,8 +91,10 @@ unless options["no-copy"]
     response = run_remote_command(joining_node, "report_status",
                                   "node" => joining_node,
                                   "key"  => "absorbing")
-    absorbing = response["value"]
-    break unless absorbing
+    if response
+      absorbing = response["value"]
+      break unless absorbing
+    end
 
     progress = absorber.report_progress(start_time_in_seconds)
     puts(progress) if progress
@@ -103,8 +105,8 @@ response = run_remote_command(source_node, "report_status",
                               "node" => source_node,
                               "key" => "last_processed_message_timestamp")
 timestamp = response["value"]
-puts "The timestamp of the last processed message in the source node: #{timestamp}"
 if timestamp and not timestamp.empty?
+  puts "The timestamp of the last processed message in the source node: #{timestamp}"
   puts "Setting effective message timestamp for the destination node..."
   response = run_remote_command(destination_node, "set_status",
                                 "node" => destination_node,
