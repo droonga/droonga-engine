@@ -24,6 +24,7 @@ require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
 require "droonga/live_nodes_list_loader"
+require "droonga/node_status"
 
 module Droonga
   class Engine
@@ -58,7 +59,7 @@ module Droonga
       @live_nodes_list_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
-        output_last_processed_timestamp
+        save_last_processed_timestamp
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
@@ -78,7 +79,7 @@ module Droonga
     # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
-      output_last_processed_timestamp
+      save_last_processed_timestamp
       @live_nodes_list_observer.stop
       @dispatcher.stop_immediately
       @state.shutdown
@@ -89,6 +90,10 @@ module Droonga
       return unless effective_message?(message)
       @last_processed_timestamp = message["date"]
       @dispatcher.process_message(message)
+    end
+
+    def node_status
+      @node_status ||= NodeStatus.new
     end
 
     private
@@ -116,13 +121,9 @@ module Droonga
       Dispatcher.new(@state, @catalog)
     end
 
-    def output_last_processed_timestamp
+    def save_last_processed_timestamp
       logger.trace("output_last_processed_timestamp: start")
-      path = Path.last_processed_timestamp
-      FileUtils.mkdir_p(path.dirname.to_s)
-      path.open("w") do |file|
-        file.write(@last_processed_timestamp)
-      end
+      node_status.set(:last_processed_timestamp, @last_processed_timestamp.to_s)
       logger.trace("output_last_processed_timestamp: done")
     end
 
@@ -138,10 +139,9 @@ module Droonga
     end
 
     def effective_message_timestamp
-      path = Path.effective_message_timestamp
-      return nil unless path.exist?
+      timestamp = node_status.get(:effective_message_timestamp)
+      return nil unless timestamp
 
-      timestamp = path.read
       begin
         Time.parse(timestamp)
       rescue ArgumentError

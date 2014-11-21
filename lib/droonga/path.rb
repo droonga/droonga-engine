@@ -48,14 +48,6 @@ module Droonga
         state + "live-nodes.json"
       end
 
-      def last_processed_timestamp
-        state + "last-processed.timestamp"
-      end
-
-      def effective_message_timestamp
-        state + "effective-message.timestamp"
-      end
-
       def config
         base + "droonga-engine.yaml"
       end
