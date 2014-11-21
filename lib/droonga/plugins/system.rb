@@ -45,6 +45,24 @@ module Droonga
         step.handler = StatusHandler
         step.collector = Collectors::Or
       end
+
+      class NTotalRecordsHandler < Droonga::Handler
+        def handle(message)
+          n_records = 0
+          @context.database.tables.collect do |table|
+            n_records += table.size
+          end
+          {
+            "n_total_records" => n_records,
+          }
+        end
+      end
+
+      define_single_step do |step|
+        step.name = "system.n_total_records"
+        step.handler = NTotalRecordsHandler
+        step.collector = Collectors::Sum
+      end
     end
   end
 end
