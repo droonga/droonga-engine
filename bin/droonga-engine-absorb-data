@@ -146,12 +146,16 @@ if options.remote
                                   "value" => timestamp)
   end
 else
+  last_progress = ""
   absorber.absorb do |live_status|
     if live_status[:progress]
-      puts live_status[:progress]
+      progress = live_status[:progress]
     else
-      puts live_status[:output]
+      progress = live_status[:output]
     end
+    printf("%s", "#{" " * last_progress.size}\r")
+    printf("%s", "#{progress}\r")
+    last_progress = progress
   end
   response = run_remote_command(source_node, "report_status",
                                 "node" => source_node,
