@@ -112,6 +112,8 @@ module Droonga
       if ObjectSpace.const_defined?(:WeakMap)
         @@data_map = ObjectSpace::WeakMap.new
       else
+        # XXX Ruby 1.9.x (installed by default on Ubuntu 14.0.4LTS etc.)
+        #     doesn't have WeakMap...
         class WeakMap
           def initialize
             @ids = {}
