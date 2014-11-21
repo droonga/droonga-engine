@@ -51,13 +51,6 @@ module Droonga
       client_command_line = [client] + client_options(client)
 
       calculated_required_time = required_time_in_seconds
-      unless calculated_required_time == TIME_UNKNOWN
-        logger.info("calculated required time: #{calculated_required_time}sec")
-        if block_given?
-          yield(:required_time_in_seconds => calculated_required_time)
-        end
-      end
-
       start = Time.new.to_i
       env = {}
       Open3.pipeline_r([env, *drndump_command_line],
@@ -76,6 +69,15 @@ module Droonga
       end
     end
 
+    def required_time_in_seconds
+      @params[:client].include?("droonga-send")
+        total_n_source_records / @params[:messages_per_second]
+      else
+        TIME_UNKNOWN
+      end
+    end
+
+    private
     def drndump_options
       options = []
       options += ["--host", @params[:source_host]] if @params[:source_host]
@@ -125,14 +127,6 @@ module Droonga
         droonga_send_options
       else
         raise ArgumentError.new("Unknwon type client: #{client}")
-      end
-    end
-
-    def required_time_in_seconds
-      @params[:client].include?("droonga-send")
-        total_n_source_records / @params[:messages_per_second]
-      else
-        TIME_UNKNOWN
       end
     end
 

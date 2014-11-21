@@ -83,7 +83,7 @@ destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 def run_remote_command(target, command, options)
   serf = Droonga::Serf.new(nil, target)
   result = serf.send_query(command, options)
-  puts result[:result]
+  # puts result[:result]
   puts result[:error] unless result[:error].empty?
   result[:response]
 end
@@ -96,7 +96,17 @@ puts "  tag     = #{options.tag}"
 puts ""
 puts "Absorbing..."
 
+absorber_options = {
+  :dataset          => options.dataset,
+  :source_host      => options.source_host,
+  :destination_host => options.destination_host,
+  :port             => options.port,
+  :tag              => options.tag,
+}
+absorber = Droonga::DataAbsorber.new(absorber_options)
+
 if options.remote
+  start = Time.new.to_i
   run_remote_command(destination_node, "absorb_data",
                      "node"    => destination_node,
                      "source"  => options.source_host,
@@ -110,6 +120,16 @@ if options.remote
                                   "key" => "absorbing")
     absorbing = response["value"]
     break unless absorbing
+
+    if calculated_required_time != Droonga::DataAbsorber::TIME_UNKNOWN and
+       calculated_required_time > 0
+      elapsed_time = Time.new.to_i - start
+      progress = elapsed_time / calculated_required_time
+      progress = (progress * 100).to_i
+      remaining_time_in_seconds = calculated_required_time - elapsed_time
+      remaining_time_in_minutes = remaining_time_in_seconds / 60
+      puts "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
+    end
   end
   response = run_remote_command(source_node, "report_status",
                                 "node" => source_node,
@@ -124,12 +144,15 @@ if options.remote
                                   "value" => timestamp)
   end
 else
-  Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
-                               :source_host      => options.source_host,
-                               :destination_host => options.destination_host,
-                               :port             => options.port,
-                               :tag              => options.tag) do |output|
-    puts output
+  absorber.absorb do |live_status|
+    if live_status[:progress] != Droonga::DataAbsorber::PROGRESS_UNKNOWN
+      progress = (live_status[:progress] * 100).to_i
+      remaining_time_in_seconds = calculated_required_time * (1 - live_status[:progress])
+      remaining_time_in_minutes = remaining_time_in_seconds / 60
+      puts "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
+    else
+      puts live_status[:output]
+    end
   end
   response = run_remote_command(source_node, "report_status",
                                 "node" => source_node,
