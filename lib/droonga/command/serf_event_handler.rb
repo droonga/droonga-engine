@@ -46,6 +46,7 @@ module Droonga
         FileUtils.mkdir_p(Path.serf_event_handler_errors)
         File.open(Path.serf_event_handler_error_file, "w") do |file|
           file.write(exception.inspect)
+          file.write(exception.backtrace)
         end
         true
       end
