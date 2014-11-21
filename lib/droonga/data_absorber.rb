@@ -17,7 +17,7 @@ require "open3"
 
 module Droonga
   class DataAbsorber
-    DEFAULT_MAXIMUM_MESSAGES_PER_SECOND = 100
+    DEFAULT_MESSAGES_PER_SECOND = 100
 
     class << self
       def absorb(params)
@@ -56,7 +56,7 @@ module Droonga
           server = "#{server}/#{params[:tag].to_s}" if params[:tag]
           client_options += ["--server", server]
           #XXX We should restrict the traffic to avoid overflowing!
-          params[:messages_per_second] ||= DEFAULT_MAXIMUM_MESSAGES_PER_SECOND
+          params[:messages_per_second] ||= DEFAULT_MESSAGES_PER_SECOND
           client_options += ["--messages-per-second", params[:messages_per_second]]
         else
           raise ArgumentError.new("Unknwon type client: #{client}")
