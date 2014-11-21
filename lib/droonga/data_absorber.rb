@@ -83,7 +83,7 @@ module Droonga
         "#{progress}% done (maybe #{remaining_time_in_seconds} seconds remaining)"
       else
         remaining_time_in_minutes = remaining_time_in_seconds.to_f / 60
-        "#{progress}% done (maybe #{remaining_time_in_minutes} minutes remaining)"
+        "#{progress}% done (maybe #{sprintf("%.1f", remaining_time_in_minutes)} minutes remaining)"
       end
     end
 
