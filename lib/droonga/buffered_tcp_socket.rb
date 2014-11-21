@@ -124,7 +124,7 @@ module Droonga
             if value_object_id
               begin
                 ObjectSpace._id2ref(value_object_id)
-              rescue RangeObject
+              rescue RangeError
                 nil
               end
             else
