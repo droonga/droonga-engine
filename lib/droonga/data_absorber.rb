@@ -50,14 +50,15 @@ module Droonga
       client = @params[:client]
       client_command_line = [client] + client_options(client)
 
-      calculated_required_time = required_time_in_seconds
       start_time_in_seconds = Time.new.to_i
       env = {}
       Open3.pipeline_r([env, *drndump_command_line],
                        [env, *client_command_line]) do |last_stdout, thread|
         last_stdout.each do |output|
-          yield(:progress => report_progress(start_time_in_seconds),
-                :output   => output) 
+          if block_given?
+            yield(:progress => report_progress(start_time_in_seconds),
+                  :output   => output)
+          end
         end
       end
     end
