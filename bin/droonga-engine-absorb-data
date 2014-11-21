@@ -76,6 +76,7 @@ unless options.destination_host
   raise "You must specify the destination host via --destination-host option."
 end
 
+source_node      = "#{options.source_host}:#{options.port}/#{options.tag}"
 destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 
 def run_remote_command(target, command, options)
@@ -109,6 +110,18 @@ if options.remote
     absorbing = response["value"]
     break unless absorbing
   end
+  response = run_remote_command(source_node, "report_status",
+                                "node" => source_node,
+                                "key" => "last_processed_message_timestamp")
+  timestamp = response["value"]
+  puts "The timestamp of the last processed message in the source node: #{timestamp}"
+  if timestamp and not timestamp.empty?
+    puts "Setting effective message timestamp for the destination node..."
+    response = run_remote_command(destination_node, "set_status",
+                                  "node" => destination_node,
+                                  "key" => "effective_message_timestamp",
+                                  "value" => timestamp)
+  end
 else
   Droonga::DataAbsorber.absorb(:dataset          => options.dataset,
                                :source_host      => options.source_host,
@@ -116,6 +129,15 @@ else
                                :port             => options.port,
                                :tag              => options.tag) do |output|
     puts output
+  end
+  response = run_remote_command(source_node, "report_status",
+                                "node" => source_node,
+                                "key" => "last_processed_message_timestamp")
+  timestamp = response["value"]
+  puts "The timestamp of the last processed message in the source node: #{timestamp}"
+  if timestamp and not timestamp.empty?
+    status = NodeStatus.new
+    status.set(:effective_message_timestamp, timestamp)
   end
 end
 puts "Done."

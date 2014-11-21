@@ -84,6 +84,19 @@ while true
   break unless absorbing
 end
 
+response = run_remote_command(source_node, "report_status",
+                              "node" => source_node,
+                              "key" => "last_processed_message_timestamp")
+timestamp = response["value"]
+puts "The timestamp of the last processed message in the source node: #{timestamp}"
+if timestamp and not timestamp.empty?
+  puts "Setting effective message timestamp for the destination node..."
+  response = run_remote_command(destination_node, "set_status",
+                                "node" => destination_node,
+                                "key" => "effective_message_timestamp",
+                                "value" => timestamp)
+end
+
 puts("Update existing hosts in the cluster...")
 run_remote_command(source_node, "add_replicas",
                    "dataset" => options[:dataset],
