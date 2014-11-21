@@ -100,7 +100,7 @@ module Droonga
       options += ["--dataset", @params[:dataset]] if @params[:dataset]
       options += ["--receiver-host", @params[:destination_host]]
       options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
-      options
+      options.collect(&:to_s)
     end
 
     def droonga_request_options
@@ -110,7 +110,7 @@ module Droonga
       options += ["--tag", @params[:tag]] if @params[:tag]
       options += ["--receiver-host", @params[:destination_host]]
       options += ["--receiver-port", @params[:receiver_port].to_s] if @params[:receiver_port]
-      options
+      options.collect(&:to_s)
     end
 
     def droonga_send_options
@@ -131,7 +131,7 @@ module Droonga
       #XXX We should restrict the traffic to avoid overflowing!
       options += ["--messages-per-second", @params[:messages_per_second]]
   
-      options
+      options.collect(&:to_s)
     end
 
     def client_options(client)
