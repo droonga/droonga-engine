@@ -89,6 +89,7 @@ module Droonga
         if block_given?
           yield(:required_time_in_seconds => calculated_required_time)
         end
+      end
 
       start = Time.new.to_i
       env = {}
