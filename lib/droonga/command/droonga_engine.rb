@@ -20,7 +20,7 @@ require "fileutils"
 require "yaml"
 
 require "coolio"
-require "sigdump"
+require "sigdump/setup"
 
 require "droonga/engine/version"
 require "droonga/path"

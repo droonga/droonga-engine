@@ -16,6 +16,7 @@
 require "optparse"
 
 require "coolio"
+require "sigdump/setup"
 
 require "droonga/worker_process_agent"
 require "droonga/engine"

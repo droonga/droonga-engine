@@ -17,6 +17,7 @@ require "optparse"
 require "fileutils"
 
 require "coolio"
+require "sigdump/setup"
 
 require "droonga/job_receiver"
 require "droonga/plugin_loader"
