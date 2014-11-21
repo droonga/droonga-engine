@@ -51,25 +51,39 @@ module Droonga
       client_command_line = [client] + client_options(client)
 
       calculated_required_time = required_time_in_seconds
-      start = Time.new.to_i
+      start_time_in_seconds = Time.new.to_i
       env = {}
       Open3.pipeline_r([env, *drndump_command_line],
                        [env, *client_command_line]) do |last_stdout, thread|
         last_stdout.each do |output|
-          progress = nil
-          if calculated_required_time == TIME_UNKNOWN or
-             calculated_required_time <= 0
-            progress = PROGRESS_UNKNOWN
-          else
-            progress = (Time.new.to_i - start) / calculated_required_time
-          end
-          yield(:progress => progress,
+          yield(:progress => report_progress(start_time_in_seconds),
                 :output   => output) 
         end
       end
     end
 
+    def can_report_remaining_time?
+      required_time_in_seconds != Droonga::DataAbsorber::TIME_UNKNOWN and
+        required_time_in_seconds > 0
+    end
+
     def required_time_in_seconds
+      @required_time_in_seconds ||= calculate_required_time_in_seconds
+    end
+
+    def report_progress(start_time_in_seconds)
+      return nil unless can_report_remaining_time?
+
+      elapsed_time = Time.new.to_i - start
+      progress = elapsed_time / required_time_in_seconds
+      progress = [(progress * 100).to_i, 100].min
+      remaining_time_in_seconds = [required_time_in_seconds - elapsed_time, 0].max
+      remaining_time_in_minutes = remaining_time_in_seconds / 60
+      "#{progress}% done (maybe #{remaining_time_in_minutes}minutes remaining)"
+    end
+
+    private
+    def calculate_required_time_in_seconds
       @params[:client].include?("droonga-send")
         total_n_source_records / @params[:messages_per_second]
       else
@@ -77,7 +91,6 @@ module Droonga
       end
     end
 
-    private
     def drndump_options
       options = []
       options += ["--host", @params[:source_host]] if @params[:source_host]
