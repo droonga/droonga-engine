@@ -52,9 +52,7 @@ module Droonga
           @context.database.tables.collect do |table|
             n_records += table.size
           end
-          {
-            "n_total_records" => n_records,
-          }
+          n_records
         end
       end
 
