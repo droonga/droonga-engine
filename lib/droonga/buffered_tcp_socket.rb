@@ -109,6 +109,35 @@ module Droonga
     class Chunk
       SUFFIX = ".chunk"
 
+      if ObjectSpace.const_defined?(:WeakMap)
+        @@data_map = ObjectSpace::WeakMap.new
+      else
+        class WeakMap
+          def initialize
+            @ids = {}
+          end
+
+          def [](key)
+            value_object_id = @ids[key.object_id]
+            if value_object_id
+              begin
+                ObjectSpace._id2ref(value_object_id)
+              rescue RangeObject
+                nil
+              end
+            else
+              nil
+            end
+          end
+
+          def []=(key, value)
+            @ids[key.object_id] = value.object_id
+          end
+        end
+
+        @@data_map = WeakMap.new
+      end
+
       class << self
         def load(path)
           data_directory = path.dirname
@@ -120,7 +149,7 @@ module Droonga
         end
       end
 
-      attr_reader :data, :time_stamp
+      attr_reader :time_stamp
       def initialize(data_directory, data, time_stamp, revision)
         @data_directory = data_directory
         @data = data
@@ -132,6 +161,12 @@ module Droonga
         path.open("wb") do |file|
           file.write(@data)
         end
+        @@data_map[self] = @data
+        @data = nil
+      end
+
+      def data
+        @data ||= @@data_map[self] ||= read_data
       end
 
       def written
@@ -140,7 +175,7 @@ module Droonga
 
       def written_partial(size)
         written
-        @data = @data[size..-1]
+        @data = data[size..-1]
         @revision += 1
         buffering
       end
@@ -148,6 +183,12 @@ module Droonga
       private
       def path
         @data_directory + "#{@time_stamp.iso8601(6)}.#{@revision}.chunk"
+      end
+
+      def read_data
+        path.open("rb") do |file|
+          file.read
+        end
       end
     end
   end
