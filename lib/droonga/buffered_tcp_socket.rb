@@ -114,16 +114,18 @@ module Droonga
       else
         # XXX Ruby 1.9.x (installed by default on Ubuntu 14.0.4LTS etc.)
         #     doesn't have WeakMap...
+        require "weakref"
+
         class WeakMap
           def initialize
             @ids = {}
           end
 
           def [](key)
-            value_object_id = @ids[key.object_id]
-            if value_object_id
+            value_ref = @ids[key.object_id]
+            if value_ref and value_ref.weakref_alive?
               begin
-                ObjectSpace._id2ref(value_object_id)
+                value_ref.__getobj__
               rescue RangeError
                 nil
               end
@@ -133,7 +135,8 @@ module Droonga
           end
 
           def []=(key, value)
-            @ids[key.object_id] = value.object_id
+            ref = WeakRef.new(value)
+            @ids[key.object_id] = ref
             value
           end
         end
