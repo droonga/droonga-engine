@@ -1,0 +1,6 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "system.n_total_records.result",
+  "body": 12
+}

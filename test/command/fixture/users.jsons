@@ -1,0 +1,25 @@
+#@include fixture/user-table.jsons
+#@disable-logging
+{
+  "dataset": "Default",
+  "type": "add",
+  "body": {
+    "table": "User",
+    "key": "Alice",
+    "values": {
+      "name": "Alice"
+    }
+  }
+}
+{
+  "dataset": "Default",
+  "type": "add",
+  "body": {
+    "table": "User",
+    "key": "Bob",
+    "values": {
+      "name": "Bob"
+    }
+  }
+}
+#@enable-logging
