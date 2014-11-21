@@ -39,22 +39,26 @@ module Droonga
     def initialize(params)
       @params = params
 
-      @params[:messages_per_second] ||= DEFAULT_MESSAGES_PER_SECOND
-      @params[:drndump] ||= "drndump"
+      @messages_per_second = @params[:messages_per_second] || DEFAULT_MESSAGES_PER_SECOND
+
+      @drndump = @params[:drndump] || "drndump"
       # We should use droonga-send instead of droonga-request,
       # because droonga-request is too slow.
-      @params[:client] ||= "droonga-send"
+      @client = @params[:client] || "droonga-send"
 
-      @params[:dataset] ||= CatalogGenerator::DEFAULT_DATASET
-      @params[:port]    ||= CatalogGenerator::DEFAULT_PORT
-      @params[:tag]     ||= CatalogGenerator::DEFAULT_TAG
+      @dataset = @params[:dataset] || CatalogGenerator::DEFAULT_DATASET
+      @port    = @params[:port]    || CatalogGenerator::DEFAULT_PORT
+      @tag     = @params[:tag]     || CatalogGenerator::DEFAULT_TAG
+
+      @source_host      = @params[:source_host]
+      @destination_host = @params[:destination_host]
+
+      @receiver_port = @params[:receiver_port]
     end
 
     def absorb
-      drndump_command_line = [@params[:drndump]] + drndump_options
-
-      client = @params[:client]
-      client_command_line = [client] + client_options(client)
+      drndump_command_line = [@drndump] + drndump_options
+      client_command_line  = [@client] + client_options(@client)
 
       start_time_in_seconds = Time.new.to_i
       env = {}
@@ -95,11 +99,11 @@ module Droonga
 
     def source_client
       options = {
-        :host          => @params[:source_host],
-        :port          => @params[:port],
-        :tag           => @params[:tag],
+        :host          => @source_host,
+        :port          => @port,
+        :tag           => @tag,
         :progocol      => :droonga,
-        :receiver_host => @params[:destination_host],
+        :receiver_host => @destination_host,
         :receiver_port => 0,
       }
       @source_client ||= Droonga::Client.new(options)
@@ -107,24 +111,24 @@ module Droonga
 
     def destination_client
       options = {
-        :host          => @params[:destination_host],
-        :port          => @params[:port],
-        :tag           => @params[:tag],
+        :host          => @destination_host,
+        :port          => @port,
+        :tag           => @tag,
         :progocol      => :droonga,
-        :receiver_host => @params[:destination_host],
+        :receiver_host => @destination_host,
         :receiver_port => 0,
       }
       @destination_client ||= Droonga::Client.new(options)
     end
 
     def source_node_suspendable?
-      (source_replica_hosts - [@params[:source_host]]).size > 1
+      (source_replica_hosts - [@source_host]).size > 1
     end
 
     private
     def calculate_required_time_in_seconds
-      if @params[:client].include?("droonga-send")
-        total_n_source_records / @params[:messages_per_second]
+      if @client.include?("droonga-send")
+        total_n_source_records / @messages_per_second
       else
         TIME_UNKNOWN
       end
@@ -132,22 +136,22 @@ module Droonga
 
     def drndump_options
       options = []
-      options += ["--host", @params[:source_host]] if @params[:source_host]
-      options += ["--port", @params[:port]]
-      options += ["--tag", @params[:tag]]
-      options += ["--dataset", @params[:dataset]]
-      options += ["--receiver-host", @params[:destination_host]]
-      options += ["--receiver-port", @params[:receiver_port]] if @params[:receiver_port]
+      options += ["--host", @source_host] if @source_host
+      options += ["--port", @port]
+      options += ["--tag", @tag]
+      options += ["--dataset", @dataset]
+      options += ["--receiver-host", @destination_host]
+      options += ["--receiver-port", @receiver_port] if @receiver_port
       options.collect(&:to_s)
     end
 
     def droonga_request_options
       options = []
-      options += ["--host", @params[:destination_host]]
-      options += ["--port", @params[:port]]
-      options += ["--tag", @params[:tag]]
-      options += ["--receiver-host", @params[:destination_host]]
-      options += ["--receiver-port", @params[:receiver_port]] if @params[:receiver_port]
+      options += ["--host", @destination_host]
+      options += ["--port", @port]
+      options += ["--tag", @tag]
+      options += ["--receiver-host", @destination_host]
+      options += ["--receiver-port", @receiver_port] if @receiver_port
       options.collect(&:to_s)
     end
 
@@ -167,7 +171,7 @@ module Droonga
       options += ["--server", server]
   
       #XXX We should restrict the traffic to avoid overflowing!
-      options += ["--messages-per-second", @params[:messages_per_second]]
+      options += ["--messages-per-second", @messages_per_second]
   
       options.collect(&:to_s)
     end
@@ -183,7 +187,7 @@ module Droonga
     end
 
     def source_tables
-      response = source_client.request("dataset" => @params[:dataset],
+      response = source_client.request("dataset" => @dataset,
                                        "type"    => "table_list")
       body = response["body"][1]
       tables = body[1..-1]
@@ -202,7 +206,7 @@ module Droonga
           },
         }
       end
-      response = source_client.request("dataset" => @params[:dataset],
+      response = source_client.request("dataset" => @dataset,
                                        "type"    => "search",
                                        "body"    => {
                                          "queries" => queries,
@@ -221,7 +225,7 @@ module Droonga
     def get_source_replica_hosts
       generator = CatalogGenerator.new
       generator.load(source_catalog)
-      dataset = generator.dataset_for_host(@params[:source_host])
+      dataset = generator.dataset_for_host(@source_host)
       return [] unless dataset
       dataset.replicas.hosts
     end
@@ -231,11 +235,11 @@ module Droonga
     end
 
     def fetch_source_catalog
-      fetcher = CatalogFetcher.new(:host          => @params[:source_host],
-                                   :port          => @params[:port],
-                                   :tag           => @params[:tag],
-                                   :receiver_host => @params[:destination_host])
-      fetcher.fetch(:dataset => @params[:dataset])
+      fetcher = CatalogFetcher.new(:host          => @source_host,
+                                   :port          => @port,
+                                   :tag           => @tag,
+                                   :receiver_host => @destination_host)
+      fetcher.fetch(:dataset => @dataset)
     end
 
     def log_tag
