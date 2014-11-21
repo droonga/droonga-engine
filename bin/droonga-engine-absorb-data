@@ -83,7 +83,7 @@ destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
 def run_remote_command(target, command, options)
   serf = Droonga::Serf.new(nil, target)
   result = serf.send_query(command, options)
-  puts result[:result]
+  #puts result[:result]
   puts result[:error] unless result[:error].empty?
   result[:response]
 end
@@ -118,8 +118,10 @@ if options.remote
     response = run_remote_command(destination_node, "report_status",
                                   "node" => destination_node,
                                   "key" => "absorbing")
-    absorbing = response["value"]
-    break unless absorbing
+    if response
+      absorbing = response["value"]
+      break unless absorbing
+    end
 
     progress = absorber.report_progress(start_time_in_seconds)
     puts(progress) if progress
