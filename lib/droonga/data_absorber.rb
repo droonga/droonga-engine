@@ -82,19 +82,24 @@ module Droonga
       @required_time_in_seconds ||= calculate_required_time_in_seconds
     end
 
+    ONE_MINUTE_IN_SECONDS = 60
+    ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60
+
     def report_progress(start_time_in_seconds)
       return nil unless can_report_remaining_time?
 
       elapsed_time = Time.new.to_i - start_time_in_seconds
       progress = elapsed_time.to_f / required_time_in_seconds
       progress = [(progress * 100).to_i, 100].min
-      remaining_time_in_seconds = [required_time_in_seconds - elapsed_time, 0].max
-      if remaining_time_in_seconds < 60
-        "#{progress}% done (maybe #{remaining_time_in_seconds} seconds remaining)"
-      else
-        remaining_time_in_minutes = remaining_time_in_seconds.to_f / 60
-        "#{progress}% done (maybe #{sprintf("%.1f", remaining_time_in_minutes)} minutes remaining)"
-      end
+
+      remaining_seconds  = [required_time_in_seconds - elapsed_time, 0].max
+      remaining_hours    = remaining_seconds / ONE_HOUR_IN_SECONDS
+      remaining_seconds -= remaining_hours * ONE_HOUR_IN_SECONDS
+      remaining_minutes  = remaining_seconds / ONE_MINUTE_IN_SECONDS
+      remaining_seconds -= remaining_minutes * ONE_MINUTE_IN_SECONDS
+      remaining_time     = sprintf("%02i:%02i:%02i", remaining_hours, remaining_minutes, remaining_seconds)
+
+      "#{progress}% done (maybe #{remaining_time} remaining)"
     end
 
     def source_client
