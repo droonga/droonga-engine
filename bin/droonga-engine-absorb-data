@@ -26,6 +26,31 @@ require "droonga/data_absorber"
 require "droonga/serf"
 require "droonga/client"
 
+class AbsorbDataCommand
+  def run
+    parse_options
+    assert_valid_options
+
+    puts "Start to absorb data from #{@options.source_host}"
+    puts "                       to #{@options.destination_host}"
+    puts "  dataset = #{@options.dataset}"
+    puts "  port    = #{@options.port}"
+    puts "  tag     = #{@options.tag}"
+    puts ""
+    puts "Absorbing..."
+
+    if @options.remote
+      absorb_on_remote
+    else
+      absorb_on_local
+    end
+
+    puts "Done."
+    exit(true)
+  end
+
+  private
+  def parse_options
 options = OpenStruct.new
 options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
 options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
@@ -69,16 +94,25 @@ parser.on("--dataset=DATASET",
 end
 
 parser.parse!(ARGV)
+    @options = options
+  end
 
-unless options.source_host
+  def assert_valid_options
+unless @options.source_host
   raise "You must specify the source host via --source-host option."
 end
-unless options.destination_host
+unless @options.destination_host
   raise "You must specify the destination host via --destination-host option."
 end
+  end
 
-source_node      = "#{options.source_host}:#{options.port}/#{options.tag}"
-destination_node = "#{options.destination_host}:#{options.port}/#{options.tag}"
+  def source_node
+    "#{@options.source_host}:#{@options.port}/#{@options.tag}"
+  end
+
+  def destination_node
+    "#{@options.destination_host}:#{@options.port}/#{@options.tag}"
+  end
 
 def run_remote_command(target, command, options)
   serf = Droonga::Serf.new(nil, target)
@@ -88,31 +122,29 @@ def run_remote_command(target, command, options)
   result[:response]
 end
 
-puts "Start to absorb data from #{options.source_host}"
-puts "                       to #{options.destination_host}"
-puts "  dataset = #{options.dataset}"
-puts "  port    = #{options.port}"
-puts "  tag     = #{options.tag}"
-puts ""
-puts "Absorbing..."
+  def absorber
+    @absorber ||= prepare_absorber
+  end
 
+  def prepare_absorber
 absorber_options = {
-  :dataset          => options.dataset,
-  :source_host      => options.source_host,
-  :destination_host => options.destination_host,
-  :port             => options.port,
-  :tag              => options.tag,
+  :dataset          => @options.dataset,
+  :source_host      => @options.source_host,
+  :destination_host => @options.destination_host,
+  :port             => @options.port,
+  :tag              => @options.tag,
 }
-absorber = Droonga::DataAbsorber.new(absorber_options)
+Droonga::DataAbsorber.new(absorber_options)
+  end
 
-if options.remote
+  def absorb_on_remote
   start_time_in_seconds = Time.new.to_i
   run_remote_command(destination_node, "absorb_data",
                      "node"    => destination_node,
-                     "source"  => options.source_host,
-                     "port"    => options.port,
-                     "tag"     => options.tag,
-                     "dataset" => options.dataset)
+                     "source"  => @options.source_host,
+                     "port"    => @options.port,
+                     "tag"     => @options.tag,
+                     "dataset" => @options.dataset)
   last_progress = ""
   while true
     sleep(3)
@@ -145,7 +177,9 @@ if options.remote
                                   "key" => "effective_message_timestamp",
                                   "value" => timestamp)
   end
-else
+  end
+
+  def absorb_on_local
   last_progress = ""
   absorber.absorb do |live_status|
     if live_status[:progress]
@@ -166,7 +200,7 @@ else
     status = NodeStatus.new
     status.set(:effective_message_timestamp, timestamp)
   end
+  end
 end
-puts "Done."
 
-exit(true)
+AbsorbDataCommand.new.run
