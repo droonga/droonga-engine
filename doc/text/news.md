@@ -15,6 +15,8 @@
    Now, you always have to specify `--daemon` option for the `droonga-engine` command
    to start it as a daemon.
  * The `droonga-engine-configure` command now shows prompts for all options always.
+ * The rate of absorbed records are limited to 100 records per second by default, for `droonga-engine-absorb-data` and `droonga-join` commands.
+ * `droonga-engine-absorb-data` and `droonga-join` commands now report their progress, if possible.
 
 ## 1.0.7: 2014-10-07
 
