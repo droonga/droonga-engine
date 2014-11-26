@@ -51,59 +51,59 @@ class AbsorbDataCommand
 
   private
   def parse_options
-options = OpenStruct.new
-options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
-options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
-options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
-options.remote  = true
-parser = OptionParser.new
-parser.version = Droonga::Engine::VERSION
+    options = OpenStruct.new
+    options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
+    options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
+    options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
+    options.remote  = true
+    parser = OptionParser.new
+    parser.version = Droonga::Engine::VERSION
 
-parser.separator("")
-parser.separator("Connection:")
-parser.on("--source-host=HOST",
-          "Host name of the source cluster to be connected.") do |host|
-  options.source_host = host
-end
-parser.on("--destination-host=HOST",
-          "Host name of this cluster to be connected.") do |host|
-  options.destination_host = host
-end
-parser.on("--port=PORT", Integer,
-          "Port number of the source cluster to be connected.",
-          "(#{options.port})") do |port|
-  options.port = port
-end
-parser.on("--[no-]remote",
-          "Run command in remote node or not.",
-          "(#{options.remote})") do |remote|
-  options.remote = remote
-end
+    parser.separator("")
+    parser.separator("Connection:")
+    parser.on("--source-host=HOST",
+              "Host name of the source cluster to be connected.") do |host|
+      options.source_host = host
+    end
+    parser.on("--destination-host=HOST",
+              "Host name of this cluster to be connected.") do |host|
+      options.destination_host = host
+    end
+    parser.on("--port=PORT", Integer,
+              "Port number of the source cluster to be connected.",
+              "(#{options.port})") do |port|
+      options.port = port
+    end
+    parser.on("--[no-]remote",
+              "Run command in remote node or not.",
+              "(#{options.remote})") do |remote|
+      options.remote = remote
+    end
 
-parser.separator("")
-parser.separator("Data:")
-parser.on("--tag=TAG",
-          "Tag name to be used to communicate with Droonga system.",
-          "(#{options.tag})") do |tag|
-  options.tag = tag
-end
-parser.on("--dataset=DATASET",
-          "Dataset to be absorbed.",
-          "(#{options.dataset})") do |dataset|
-  options.dataset = dataset
-end
+    parser.separator("")
+    parser.separator("Data:")
+    parser.on("--tag=TAG",
+              "Tag name to be used to communicate with Droonga system.",
+              "(#{options.tag})") do |tag|
+      options.tag = tag
+    end
+    parser.on("--dataset=DATASET",
+              "Dataset to be absorbed.",
+              "(#{options.dataset})") do |dataset|
+      options.dataset = dataset
+    end
 
-parser.parse!(ARGV)
+    parser.parse!(ARGV)
     @options = options
   end
 
   def assert_valid_options
-unless @options.source_host
-  raise "You must specify the source host via --source-host option."
-end
-unless @options.destination_host
-  raise "You must specify the destination host via --destination-host option."
-end
+    unless @options.source_host
+      raise "You must specify the source host via --source-host option."
+    end
+    unless @options.destination_host
+      raise "You must specify the destination host via --destination-host option."
+    end
   end
 
   def source_node
@@ -114,92 +114,92 @@ end
     "#{@options.destination_host}:#{@options.port}/#{@options.tag}"
   end
 
-def run_remote_command(target, command, options)
-  serf = Droonga::Serf.new(nil, target)
-  result = serf.send_query(command, options)
-  #puts result[:result]
-  puts result[:error] unless result[:error].empty?
-  result[:response]
-end
+  def run_remote_command(target, command, options)
+    serf = Droonga::Serf.new(nil, target)
+    result = serf.send_query(command, options)
+    #puts result[:result]
+    puts result[:error] unless result[:error].empty?
+    result[:response]
+  end
 
   def absorber
     @absorber ||= prepare_absorber
   end
 
   def prepare_absorber
-absorber_options = {
-  :dataset          => @options.dataset,
-  :source_host      => @options.source_host,
-  :destination_host => @options.destination_host,
-  :port             => @options.port,
-  :tag              => @options.tag,
-}
-Droonga::DataAbsorber.new(absorber_options)
+    absorber_options = {
+      :dataset          => @options.dataset,
+      :source_host      => @options.source_host,
+      :destination_host => @options.destination_host,
+      :port             => @options.port,
+      :tag              => @options.tag,
+    }
+    Droonga::DataAbsorber.new(absorber_options)
   end
 
   def absorb_on_remote
-  start_time_in_seconds = Time.new.to_i
-  run_remote_command(destination_node, "absorb_data",
-                     "node"    => destination_node,
-                     "source"  => @options.source_host,
-                     "port"    => @options.port,
-                     "tag"     => @options.tag,
-                     "dataset" => @options.dataset)
-  last_progress = ""
-  while true
-    sleep(3)
-    response = run_remote_command(destination_node, "report_status",
-                                  "node" => destination_node,
-                                  "key" => "absorbing")
-    if response
-      absorbing = response["value"]
-      break unless absorbing
-    end
+    start_time_in_seconds = Time.new.to_i
+    run_remote_command(destination_node, "absorb_data",
+                       "node"    => destination_node,
+                       "source"  => @options.source_host,
+                       "port"    => @options.port,
+                       "tag"     => @options.tag,
+                       "dataset" => @options.dataset)
+    last_progress = ""
+    while true
+      sleep(3)
+      response = run_remote_command(destination_node, "report_status",
+                                    "node" => destination_node,
+                                    "key" => "absorbing")
+      if response
+        absorbing = response["value"]
+        break unless absorbing
+      end
 
-    progress = absorber.report_progress(start_time_in_seconds)
-    if progress
+      progress = absorber.report_progress(start_time_in_seconds)
+      if progress
+        printf("%s", "#{" " * last_progress.size}\r")
+        printf("%s", "#{progress}\r")
+        last_progress = progress
+      end
+    end
+    puts ""
+
+    response = run_remote_command(source_node, "report_status",
+                                  "node" => source_node,
+                                  "key" => "last_processed_message_timestamp")
+    timestamp = response["value"]
+    if timestamp and not timestamp.empty?
+      puts "The timestamp of the last processed message in the source node: #{timestamp}"
+      puts "Setting effective message timestamp for the destination node..."
+      response = run_remote_command(destination_node, "set_status",
+                                    "node" => destination_node,
+                                    "key" => "effective_message_timestamp",
+                                    "value" => timestamp)
+    end
+  end
+
+  def absorb_on_local
+    last_progress = ""
+    absorber.absorb do |live_status|
+      if live_status[:progress]
+        progress = live_status[:progress]
+      else
+        progress = live_status[:output]
+      end
       printf("%s", "#{" " * last_progress.size}\r")
       printf("%s", "#{progress}\r")
       last_progress = progress
     end
-  end
-  puts ""
-
-  response = run_remote_command(source_node, "report_status",
-                                "node" => source_node,
-                                "key" => "last_processed_message_timestamp")
-  timestamp = response["value"]
-  if timestamp and not timestamp.empty?
+    response = run_remote_command(source_node, "report_status",
+                                  "node" => source_node,
+                                  "key" => "last_processed_message_timestamp")
+    timestamp = response["value"]
     puts "The timestamp of the last processed message in the source node: #{timestamp}"
-    puts "Setting effective message timestamp for the destination node..."
-    response = run_remote_command(destination_node, "set_status",
-                                  "node" => destination_node,
-                                  "key" => "effective_message_timestamp",
-                                  "value" => timestamp)
-  end
-  end
-
-  def absorb_on_local
-  last_progress = ""
-  absorber.absorb do |live_status|
-    if live_status[:progress]
-      progress = live_status[:progress]
-    else
-      progress = live_status[:output]
+    if timestamp and not timestamp.empty?
+      status = NodeStatus.new
+      status.set(:effective_message_timestamp, timestamp)
     end
-    printf("%s", "#{" " * last_progress.size}\r")
-    printf("%s", "#{progress}\r")
-    last_progress = progress
-  end
-  response = run_remote_command(source_node, "report_status",
-                                "node" => source_node,
-                                "key" => "last_processed_message_timestamp")
-  timestamp = response["value"]
-  puts "The timestamp of the last processed message in the source node: #{timestamp}"
-  if timestamp and not timestamp.empty?
-    status = NodeStatus.new
-    status.set(:effective_message_timestamp, timestamp)
-  end
   end
 end
 
