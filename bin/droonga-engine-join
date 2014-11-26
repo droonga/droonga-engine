@@ -32,7 +32,7 @@ class JoinCommand
     set_node_role
     do_join
     sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
-    do_copy unless options["no-copy"]
+    do_copy unless @options["no-copy"]
     set_effective_message_timestamp
     update_other_nodes
     reset_node_role
@@ -92,11 +92,11 @@ class JoinCommand
 
   def prepare_absorber
     absorber_options = {
-      :dataset          => options[:dataset],
-      :source_host      => options["replica-source-host"],
-      :destination_host => options[:host],
-      :port             => options[:port],
-      :tag              => options[:tag],
+      :dataset          => @options[:dataset],
+      :source_host      => @options["replica-source-host"],
+      :destination_host => @options[:host],
+      :port             => @options[:port],
+      :tag              => @options[:tag],
     }
     Droonga::DataAbsorber.new(absorber_options)
   end
@@ -129,8 +129,8 @@ class JoinCommand
                        "node"    => joining_node,
                        "type"    => "replica",
                        "source"  => source_node,
-                       "dataset" => options[:dataset],
-                       "copy"    => !options["no-copy"])
+                       "dataset" => @options[:dataset],
+                       "copy"    => !@options["no-copy"])
   end
 
   def do_copy
@@ -175,8 +175,8 @@ class JoinCommand
   def update_other_nodes
     puts("Update existing hosts in the cluster...")
     run_remote_command(source_node, "add_replicas",
-                       "dataset" => options[:dataset],
-                       "hosts"   => [options[:host]])
+                       "dataset" => @options[:dataset],
+                       "hosts"   => [@options[:host]])
   end
 end
 
