@@ -29,6 +29,7 @@ require "droonga/serf"
 class JoinCommand
   def run
     parse_options
+    trap_signals
     set_node_role
     do_join
     sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
@@ -110,6 +111,7 @@ class JoinCommand
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => "destination")
+    @node_role_changed = true
   end
 
   def reset_node_role
@@ -121,6 +123,7 @@ class JoinCommand
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => "")
+    @node_role_changed = false
   end
 
   def do_join
@@ -177,6 +180,28 @@ class JoinCommand
     run_remote_command(source_node, "add_replicas",
                        "dataset" => @options[:dataset],
                        "hosts"   => [@options[:host]])
+  end
+
+  def trap_signals
+    trap(:TERM) do
+      do_cancel
+      trap(:TERM, "DEFAULT")
+    end
+
+    trap(:INT) do
+      do_cancel
+      trap(:INT, "DEFAULT")
+    end
+
+    trap(:QUIT) do
+      do_cancel
+      trap(:QUIT, "DEFAULT")
+    end
+  end
+
+  def do_cancel
+    #XXX we have to write more codes to cancel remote processes!
+    reset_node_role if @node_role_changed
   end
 end
 
