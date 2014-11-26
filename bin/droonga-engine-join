@@ -78,38 +78,38 @@ class JoinCommand
     "#{@options["replica-source-host"]}:#{@options[:port]}/#{@options[:tag]}"
   end
 
-def run_remote_command(target, command, options)
-  serf = Droonga::Serf.new(nil, target)
-  result = serf.send_query(command, options)
-  #puts(result[:result])
-  puts(result[:error]) unless result[:error].empty?
-  result[:response]
-end
+  def run_remote_command(target, command, options)
+    serf = Droonga::Serf.new(nil, target)
+    result = serf.send_query(command, options)
+    #puts(result[:result])
+    puts(result[:error]) unless result[:error].empty?
+    result[:response]
+  end
 
   def absorber
     @absorber ||= prepare_absorber
   end
 
   def prepare_absorber
-absorber_options = {
-  :dataset          => options[:dataset],
-  :source_host      => options["replica-source-host"],
-  :destination_host => options[:host],
-  :port             => options[:port],
-  :tag              => options[:tag],
-}
-absorber = Droonga::DataAbsorber.new(absorber_options)
+    absorber_options = {
+      :dataset          => options[:dataset],
+      :source_host      => options["replica-source-host"],
+      :destination_host => options[:host],
+      :port             => options[:port],
+      :tag              => options[:tag],
+    }
+    Droonga::DataAbsorber.new(absorber_options)
   end
 
   def set_node_role
-if absorber.source_node_suspendable?
-  run_remote_command(source_node, "change_role",
-                     "node" => source_node,
-                     "role" => "source")
-end
-run_remote_command(joining_node, "change_role",
-                   "node" => joining_node,
-                   "role" => "destination")
+    if absorber.source_node_suspendable?
+      run_remote_command(source_node, "change_role",
+                         "node" => source_node,
+                         "role" => "source")
+    end
+    run_remote_command(joining_node, "change_role",
+                       "node" => joining_node,
+                       "role" => "destination")
   end
 
   def reset_node_role
@@ -124,59 +124,59 @@ run_remote_command(joining_node, "change_role",
   end
 
   def do_join
-puts("Joining new replica to the cluster...")
-run_remote_command(joining_node, "join",
-                   "node"    => joining_node,
-                   "type"    => "replica",
-                   "source"  => source_node,
-                   "dataset" => options[:dataset],
-                   "copy"    => !options["no-copy"])
+    puts("Joining new replica to the cluster...")
+    run_remote_command(joining_node, "join",
+                       "node"    => joining_node,
+                       "type"    => "replica",
+                       "source"  => source_node,
+                       "dataset" => options[:dataset],
+                       "copy"    => !options["no-copy"])
   end
 
   def do_copy
-  @start_time_in_seconds = Time.new.to_i
-  puts("Copying data from the source node...")
-  last_progress = ""
-  while true
-    sleep(3)
-    response = run_remote_command(joining_node, "report_status",
-                                  "node" => joining_node,
-                                  "key"  => "absorbing")
-    if response
-      absorbing = response["value"]
-      break unless absorbing
-    end
+    @start_time_in_seconds = Time.new.to_i
+    puts("Copying data from the source node...")
+    last_progress = ""
+    while true
+      sleep(3)
+      response = run_remote_command(joining_node, "report_status",
+                                    "node" => joining_node,
+                                    "key"  => "absorbing")
+      if response
+        absorbing = response["value"]
+        break unless absorbing
+      end
 
-    progress = absorber.report_progress(@start_time_in_seconds)
-    if progress
-      printf("%s", "#{" " * last_progress.size}\r")
-      printf("%s", "#{progress}\r")
-      last_progress = progress
+      progress = absorber.report_progress(@start_time_in_seconds)
+      if progress
+        printf("%s", "#{" " * last_progress.size}\r")
+        printf("%s", "#{progress}\r")
+        last_progress = progress
+      end
     end
-  end
-  puts ""
+    puts ""
   end
 
   def set_effective_message_timestamp
-response = run_remote_command(source_node, "report_status",
-                              "node" => source_node,
-                              "key" => "last_processed_message_timestamp")
-timestamp = response["value"]
-if timestamp and not timestamp.empty?
-  puts "The timestamp of the last processed message in the source node: #{timestamp}"
-  puts "Setting effective message timestamp for the destination node..."
-  response = run_remote_command(destination_node, "set_status",
-                                "node" => destination_node,
-                                "key" => "effective_message_timestamp",
-                                "value" => timestamp)
-end
+    response = run_remote_command(source_node, "report_status",
+                                  "node" => source_node,
+                                  "key" => "last_processed_message_timestamp")
+    timestamp = response["value"]
+    if timestamp and not timestamp.empty?
+      puts "The timestamp of the last processed message in the source node: #{timestamp}"
+      puts "Setting effective message timestamp for the destination node..."
+      response = run_remote_command(destination_node, "set_status",
+                                    "node" => destination_node,
+                                    "key" => "effective_message_timestamp",
+                                    "value" => timestamp)
+    end
   end
 
   def update_other_nodes
-puts("Update existing hosts in the cluster...")
-run_remote_command(source_node, "add_replicas",
-                   "dataset" => options[:dataset],
-                   "hosts"   => [options[:host]])
+    puts("Update existing hosts in the cluster...")
+    run_remote_command(source_node, "add_replicas",
+                       "dataset" => options[:dataset],
+                       "hosts"   => [options[:host]])
   end
 end
 
