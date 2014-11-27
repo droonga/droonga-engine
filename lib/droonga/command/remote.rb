@@ -122,6 +122,10 @@ module Droonga
           @params["dataset"]
         end
 
+        def messages_per_second
+          @params["messages_per_second"]
+        end
+
         def valid_params?
           have_required_params? and
             valid_node?(source_node) and
@@ -227,7 +231,8 @@ module Droonga
                               :source_host      => source_host,
                               :destination_host => joining_host,
                               :port             => port,
-                              :tag              => tag)
+                              :tag              => tag,
+                              :messages_per_second => messages_per_second)
           status.delete(:absorbing)
           sleep(1)
         end
@@ -265,6 +270,7 @@ module Droonga
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag,
+                              :messages_per_second => messages_per_second,
                               :client           => "droonga-send")
           status.delete(:absorbing)
         end
@@ -284,6 +290,10 @@ module Droonga
 
         def tag
           @tag ||= @params["tag"]
+        end
+
+        def messages_per_second
+          @messages_per_second ||= @params["messages_per_second"]
         end
       end
 

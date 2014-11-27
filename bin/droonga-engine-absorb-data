@@ -57,6 +57,7 @@ class AbsorbDataCommand
     options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
     options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
     options.remote  = true
+    options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
     parser = OptionParser.new
     parser.version = Droonga::Engine::VERSION
 
@@ -92,6 +93,12 @@ class AbsorbDataCommand
               "Dataset to be absorbed.",
               "(#{options.dataset})") do |dataset|
       options.dataset = dataset
+    end
+    parser.on("--records-per-second=N", Integer,
+              "Maximum number of records per second to be absorbed.",
+              "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
+              "(#{options.messages_per_second})") do |n|
+      options.messages_per_second = n
     end
 
     parser.parse!(ARGV)
@@ -134,6 +141,7 @@ class AbsorbDataCommand
       :destination_host => @options.destination_host,
       :port             => @options.port,
       :tag              => @options.tag,
+      :messages_per_second => @options.messages_per_second,
     }
     Droonga::DataAbsorber.new(absorber_options)
   end
@@ -145,7 +153,8 @@ class AbsorbDataCommand
                        "source"  => @options.source_host,
                        "port"    => @options.port,
                        "tag"     => @options.tag,
-                       "dataset" => @options.dataset)
+                       "dataset" => @options.dataset,
+                       "messages_per_second" => @options.messages_per_second)
     last_progress = ""
     while true
       sleep(3)
