@@ -100,9 +100,9 @@ module Droonga
       progress = [(progress * 100).to_i, 100].min
 
       remaining_seconds  = [required_time_in_seconds - elapsed_time, 0].max
-      remaining_hours    = remaining_seconds / ONE_HOUR_IN_SECONDS
+      remaining_hours    = (remaining_seconds / ONE_HOUR_IN_SECONDS).floor
       remaining_seconds -= remaining_hours * ONE_HOUR_IN_SECONDS
-      remaining_minutes  = remaining_seconds / ONE_MINUTE_IN_SECONDS
+      remaining_minutes  = (remaining_seconds / ONE_MINUTE_IN_SECONDS).floor
       remaining_seconds -= remaining_minutes * ONE_MINUTE_IN_SECONDS
       remaining_time     = sprintf("%02i:%02i:%02i", remaining_hours, remaining_minutes, remaining_seconds)
 
