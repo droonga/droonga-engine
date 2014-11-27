@@ -56,6 +56,8 @@ module Droonga
       @receiver_port = @params[:receiver_port]
     end
 
+    MESSAGES_PER_SECOND_MATCHER = /(\d+(\.\d+)?) messages\/second/
+
     def absorb
       drndump_command_line = [@drndump] + drndump_options
       client_command_line  = [@client] + client_options(@client)
@@ -66,8 +68,13 @@ module Droonga
                        [env, *client_command_line]) do |last_stdout, thread|
         last_stdout.each do |output|
           if block_given?
+            messages_per_second = nil
+            if output =~ MESSAGES_PER_SECOND_MATCHER
+              messages_per_second = $1.to_f
+            end
             yield(:progress => report_progress(start_time_in_seconds),
-                  :output   => output)
+                  :output   => output,
+                  :messages_per_second => messages_per_second)
           end
         end
       end
@@ -177,6 +184,8 @@ module Droonga
   
       #XXX We should restrict the traffic to avoid overflowing!
       options += ["--messages-per-second", @messages_per_second]
+
+      options += ["--report-throughput"]
   
       options.collect(&:to_s)
     end
