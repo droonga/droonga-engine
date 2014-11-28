@@ -66,9 +66,9 @@ class JoinCommand
                 :default => Droonga::CatalogGenerator::DEFAULT_TAG)
       option.on("records-per-second=",
                 :as => Integer,
+                :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND,
                 "Maximum number of records per second to be copied. " +
-                  "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
-                :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND)
+                  "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.")
     end
     @options = options
   rescue Slop::MissingOptionError => error
