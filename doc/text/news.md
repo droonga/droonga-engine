@@ -1,6 +1,6 @@
 # News
 
-## 1.0.8: 2014-11-29 (planned)
+## 1.0.8: 2014-11-29
 
  * Better compatibility to Groonga's `select` command:
    * Whitespace-separeted `output_columns` (it is valid on `command_version=1` environments) is now available.
