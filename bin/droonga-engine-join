@@ -65,10 +65,10 @@ class JoinCommand
                 "Tag name of the soruce cluster to be connected.",
                 :default => Droonga::CatalogGenerator::DEFAULT_TAG)
       option.on("records-per-second=",
-                :as => Integer,
-                :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND,
                 "Maximum number of records per second to be copied. " +
-                  "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.")
+                  "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
+                :as => Integer,
+                :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND)
     end
     @options = options
   rescue Slop::MissingOptionError => error
