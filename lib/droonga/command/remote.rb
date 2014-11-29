@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "json"
+require "fileutils"
 
 require "droonga/path"
 require "droonga/serf"
@@ -378,6 +379,13 @@ module Droonga
         private
         def live_nodes
           @serf.live_nodes
+        end
+      end
+
+      class RestartSerfAgent < Base
+        def process
+          FileUtils.mkdir_p(Serf.restart_file.parent)
+          FileUtils.touch(Serf.restart_file)
         end
       end
     end

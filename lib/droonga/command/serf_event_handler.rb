@@ -85,6 +85,8 @@ module Droonga
           Remote::RemoveReplicas
         when "absorb_data"
           Remote::AbsorbData
+        when "restart_serf_agent"
+          Remote::RestartSerfAgent
         else
           nil
         end
