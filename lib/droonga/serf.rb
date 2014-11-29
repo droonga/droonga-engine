@@ -144,7 +144,7 @@ module Droonga
       nodes
     end
 
-    def set_tag(tag_name, value)
+    def set_tag(name, value)
       ensure_serf
       run_once("tags", "-set", "#{name}=#{value}")
     end
