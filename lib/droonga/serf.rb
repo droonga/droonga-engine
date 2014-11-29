@@ -131,8 +131,10 @@ module Droonga
       result = run_once("members", "-format", "json")
       result[:result] = JSON.parse(result[:result])
       members = result[:result]
+      current_cluster_id = cluster_id
       members["members"].each do |member|
-        if member["status"] == "alive"
+        if member["status"] == "alive" and
+           member["tags"]["cluster_id"] == current_cluster_id
           nodes[member["name"]] = {
             "serfAddress" => member["addr"],
             "tags"        => member["tags"],
