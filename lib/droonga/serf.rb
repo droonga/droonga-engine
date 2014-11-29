@@ -71,6 +71,7 @@ module Droonga
                    "-event-handler", "droonga-engine-serf-event-handler",
                    "-log-level", log_level,
                    "-tag", "role=engine",
+                   "-tag", "cluster_id=#{cluster_id}",
                    *retry_joins)
       logger.trace("start: done")
     end
@@ -139,6 +140,22 @@ module Droonga
         end
       end
       nodes
+    end
+
+    def set_tag(tag_name, value)
+      ensure_serf
+      run_once("tags", "-set", "#{name}=#{value}")
+    end
+
+    def update_cluster_id
+      set_tag("cluster_id", cluster_id)
+    end
+
+    def cluster_id
+      loader = CatalogLoader.new(Path.catalog.to_s)
+      catalog = loader.load
+      raw_id = catalog.all_nodes.sort.join(",")
+      Digest::SHA1.hexdigest(raw_id)
     end
 
     private
