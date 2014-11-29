@@ -16,6 +16,7 @@
 require "digest/sha1"
 require "zlib"
 require "time"
+require "digest"
 require "droonga/error_messages"
 require "droonga/catalog/errors"
 
@@ -35,6 +36,11 @@ module Droonga
 
       def dataset(name)
         datasets[name]
+      end
+
+      def cluster_id
+        raw_id = all_nodes.sort.join(",")
+        Digest::SHA1.hexdigest(raw_id)
       end
 
       private

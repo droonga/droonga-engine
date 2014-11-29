@@ -154,8 +154,7 @@ module Droonga
     def cluster_id
       loader = CatalogLoader.new(Path.catalog.to_s)
       catalog = loader.load
-      raw_id = catalog.all_nodes.sort.join(",")
-      Digest::SHA1.hexdigest(raw_id)
+      catalog.cluster_id
     end
 
     private
