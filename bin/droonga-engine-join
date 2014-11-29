@@ -18,6 +18,7 @@
 require "slop"
 require "json"
 require "pathname"
+require "socket"
 
 require "droonga/engine/version"
 require "droonga/path"
@@ -54,6 +55,9 @@ class JoinCommand
       option.on("replica-source-host=",
                 "Host name of the soruce node in the cluster to be connected.",
                 :required => true)
+      option.on("receiver-host=",
+                "Host name of this host.",
+                :default => Socket.gethostname)
       option.on(:dataset=,
                 "Dataset name of for the node to be joined.",
                 :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
@@ -101,6 +105,7 @@ class JoinCommand
       :dataset          => @options[:dataset],
       :source_host      => @options["replica-source-host"],
       :destination_host => @options[:host],
+      :receiver_host    => @options["receiver-host"],
       :port             => @options[:port],
       :tag              => @options[:tag],
       :messages_per_second => @options["records-per-second"],

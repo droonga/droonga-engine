@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "socket"
+
 require "droonga/client"
 
 require "droonga/address"
@@ -43,7 +45,7 @@ module Droonga
         :tag           => Address::DEFAULT_TAG,
         :protocol      => :droonga,
         :timeout       => 1,
-        :receiver_host => "127.0.0.1",
+        :receiver_host => Socket.gethostname,
         :receiver_port => 0,
       }
     end

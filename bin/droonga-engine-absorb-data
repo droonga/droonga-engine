@@ -18,6 +18,7 @@
 require "ostruct"
 require "optparse"
 require "open3"
+require "socket"
 
 require "droonga/engine/version"
 require "droonga/catalog_generator"
@@ -57,6 +58,7 @@ class AbsorbDataCommand
     options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
     options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
     options.remote  = true
+    options.receiver_host = Socket.gethostname
     options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
     parser = OptionParser.new
     parser.version = Droonga::Engine::VERSION
@@ -70,6 +72,11 @@ class AbsorbDataCommand
     parser.on("--destination-host=HOST",
               "Host name of this cluster to be connected.") do |host|
       options.destination_host = host
+    end
+    parser.on("--receiver-host=HOST",
+              "Host name of this computer.",
+              "(#{options.receiver_host})") do |host|
+      options.receiver_host = host
     end
     parser.on("--port=PORT", Integer,
               "Port number of the source cluster to be connected.",
@@ -139,6 +146,7 @@ class AbsorbDataCommand
       :dataset          => @options.dataset,
       :source_host      => @options.source_host,
       :destination_host => @options.destination_host,
+      :receiver_host    => @options.receiver_host,
       :port             => @options.port,
       :tag              => @options.tag,
       :messages_per_second => @options.messages_per_second,

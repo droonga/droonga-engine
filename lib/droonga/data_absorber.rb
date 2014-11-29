@@ -52,6 +52,7 @@ module Droonga
 
       @source_host      = @params[:source_host]
       @destination_host = @params[:destination_host]
+      @receiver_host    = @params[:receiver_host] || @destination_host
 
       @receiver_port = @params[:receiver_port]
     end
@@ -115,7 +116,7 @@ module Droonga
         :port          => @port,
         :tag           => @tag,
         :progocol      => :droonga,
-        :receiver_host => @destination_host,
+        :receiver_host => @receiver_host,
         :receiver_port => 0,
       }
       @source_client ||= Droonga::Client.new(options)
@@ -127,7 +128,7 @@ module Droonga
         :port          => @port,
         :tag           => @tag,
         :progocol      => :droonga,
-        :receiver_host => @destination_host,
+        :receiver_host => @receiver_host,
         :receiver_port => 0,
       }
       @destination_client ||= Droonga::Client.new(options)
@@ -152,7 +153,7 @@ module Droonga
       options += ["--port", @port]
       options += ["--tag", @tag]
       options += ["--dataset", @dataset]
-      options += ["--receiver-host", @destination_host]
+      options += ["--receiver-host", @receiver_host]
       options += ["--receiver-port", @receiver_port] if @receiver_port
       options.collect(&:to_s)
     end
@@ -162,7 +163,7 @@ module Droonga
       options += ["--host", @destination_host]
       options += ["--port", @port]
       options += ["--tag", @tag]
-      options += ["--receiver-host", @destination_host]
+      options += ["--receiver-host", @receiver_host]
       options += ["--receiver-port", @receiver_port] if @receiver_port
       options.collect(&:to_s)
     end
@@ -252,7 +253,7 @@ module Droonga
       fetcher = CatalogFetcher.new(:host          => @source_host,
                                    :port          => @port,
                                    :tag           => @tag,
-                                   :receiver_host => @destination_host)
+                                   :receiver_host => @receiver_host)
       fetcher.fetch(:dataset => @dataset)
     end
 
