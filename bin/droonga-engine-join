@@ -31,6 +31,11 @@ class JoinCommand
   def run
     parse_options
     trap_signals
+
+    puts "Start to join a new node #{@options[:host]}"
+    puts "       to the cluster of #{@options["replica-source-host"]}"
+    puts "                     via #{@options["receiver-host"]} (this host)"
+
     set_node_role
     do_join
     sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.

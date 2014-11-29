@@ -35,6 +35,7 @@ class AbsorbDataCommand
 
     puts "Start to absorb data from #{@options.source_host}"
     puts "                       to #{@options.destination_host}"
+    puts "                      via #{@options.receiver_host} (this host)"
     puts "  dataset = #{@options.dataset}"
     puts "  port    = #{@options.port}"
     puts "  tag     = #{@options.tag}"
