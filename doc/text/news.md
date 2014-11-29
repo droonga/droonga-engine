@@ -1,5 +1,10 @@
 # News
 
+## 1.0.9: 2014-XX-XX
+
+ * `droonga-engine-join` and `droonga-engine-absorb-data` work on any host.
+   Instead, you have to specify the host name or the IP address of the working host via the `--receiver-host` option.
+
 ## 1.0.8: 2014-11-29
 
  * Better compatibility to Groonga's `select` command:
