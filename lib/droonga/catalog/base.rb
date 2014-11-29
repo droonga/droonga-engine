@@ -39,11 +39,15 @@ module Droonga
       end
 
       def cluster_id
+        @cluster_id ||= calculate_cluster_id
+      end
+
+      private
+      def calculate_cluster_id
         raw_id = all_nodes.sort.join(",")
         Digest::SHA1.hexdigest(raw_id)
       end
 
-      private
       def migrate_database_location(current_db_path, device, name)
         return if current_db_path.exist?
 
