@@ -109,6 +109,11 @@ run_remote_command(options.replica_remove_node, "set_replicas",
                    "node"    => options.replica_remove_node,
                    "dataset" => options.dataset,
                    "hosts"   => [options.replica_remove_host])
+# It must be restarted to be removed from the Serf cluster.
+# Otherwise protocol adapters unexpectedly tries to connect
+# to the unjoined node.
+run_remote_command(options.replica_remove_node, "restart_serf_agent",
+                   "node"    => options.replica_remove_node)
 
 puts "Done."
 
