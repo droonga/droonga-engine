@@ -18,7 +18,6 @@ require "English"
 require "json"
 require "coolio"
 require "open3"
-require "fileutils"
 
 require "droonga/path"
 require "droonga/loggable"
@@ -26,7 +25,6 @@ require "droonga/catalog_loader"
 require "droonga/node_status"
 require "droonga/serf_downloader"
 require "droonga/line_buffer"
-require "droonga/file_observer"
 
 module Droonga
   class Serf
@@ -45,10 +43,6 @@ module Droonga
     class << self
       def path
         Droonga::Path.base + "serf"
-      end
-
-      def restart_file
-        Droonga::Path.state + "restart_serf"
       end
     end
 
@@ -78,16 +72,6 @@ module Droonga
                    "-log-level", log_level,
                    "-tag", "role=engine",
                    *retry_joins)
-
-      FileUtils.mkdir_p(self.class.restart_file.parent)
-      FileUtils.touch(self.class.restart_file)
-
-      @restart_file_observer = FileObserver.new(@loop, self.class.restart_file)
-      @restart_file_observer.on_change = lambda do
-        restart
-      end
-      @restart_file_observer.start
-
       logger.trace("start: done")
     end
 
@@ -98,8 +82,6 @@ module Droonga
     def stop
       logger.trace("stop: start")
       run("leave").stop
-      @restart_file_observer.stop
-      @restart_file_observer = nil
       @agent.stop
       @agent = nil
       logger.trace("stop: done")

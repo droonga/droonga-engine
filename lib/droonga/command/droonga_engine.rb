@@ -382,6 +382,7 @@ module Droonga
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
             restart_graceful
+            @serf.restart if @serf and @serf.running?
           end
           catalog_observer.start
           catalog_observer

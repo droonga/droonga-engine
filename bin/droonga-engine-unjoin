@@ -134,11 +134,6 @@ class UnjoinCommand
                        "node"    => replica_remove_node,
                        "dataset" => dataset_name,
                        "hosts"   => [replica_remove_host])
-    # It must be restarted to be removed from the Serf cluster.
-    # Otherwise protocol adapters unexpectedly tries to connect
-    # to the unjoined node.
-    run_remote_command(replica_remove_node, "restart_serf_agent",
-                       "node"    => replica_remove_node)
   end
 end
 
