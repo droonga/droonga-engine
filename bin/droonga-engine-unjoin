@@ -106,6 +106,7 @@ run_remote_command(options.remaining_node, "remove_replicas",
                    "hosts"   => [options.replica_remove_host])
 
 run_remote_command(options.replica_remove_node, "set_replicas",
+                   "node"    => options.replica_remove_node,
                    "dataset" => options.dataset,
                    "hosts"   => [options.replica_remove_host])
 
