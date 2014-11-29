@@ -15,106 +15,131 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "ostruct"
-require "optparse"
+require "slop"
 require "json"
 require "pathname"
 
 require "droonga/engine/version"
 require "droonga/path"
+require "droonga/catalog_fetcher"
 require "droonga/catalog_generator"
-require "droonga/safe_file_writer"
-require "droonga/service_installation"
 require "droonga/serf"
 
-service_installation = Droonga::ServiceInstallation.new
-service_installation.ensure_using_service_base_directory
+class UnjoinCommand
+  def run
+    parse_options
 
-options = OpenStruct.new
-options.base_dir = ENV[Droonga::Path::BASE_DIR_ENV_NAME] || Dir.pwd
+    puts "Start to unjoin a node #{@options[:host]}"
+    puts "                    by #{@options["receiver-host"]} (this host)"
+    puts ""
 
-parser = OptionParser.new
-parser.version = Droonga::Engine::VERSION
+    do_unjoin
 
-parser.on("--base-dir=PATH",
-          "Path to the base directory the catalog.json is located in.",
-          "(#{options.base_dir})") do |path|
-  options.base_dir = path
+    puts("Done.")
+    exit(true)
+  end
+
+  private
+  def parse_options
+    options = Slop.parse(:help => true) do |option|
+      option.on(:host=,
+                "Host name of the replica removed from cluster.",
+                :required => true)
+      option.on("receiver-host=",
+                "Host name of this host.",
+                :default => Socket.gethostname)
+      option.on(:dataset=,
+                "Dataset name of for the node to be unjoined.",
+                :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
+      option.on(:port=,
+                "Port number of the source cluster to be connected.",
+                :as => Integer,
+                :default => Droonga::CatalogGenerator::DEFAULT_PORT)
+      option.on(:tag=,
+                "Tag name of the soruce cluster to be connected.",
+                :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+    end
+    @options = options
+  rescue Slop::MissingOptionError => error
+    $stderr.puts(error)
+    exit(false)
+  end
+
+  def replica_remove_host
+    @options[:host]
+  end
+
+  def tag
+    @options[:tag]
+  end
+
+  def port
+    @options[:port]
+  end
+
+  def dataset_name
+    @options[:dataset]
+  end
+
+  def replica_remove_node
+    "#{replica_remove_host}:#{port}/#{tag}"
+  end
+
+  def fetch_catalog
+    fetcher = Droonga::CatalogFetcher.new(:host          => replica_remove_host,
+                                          :port          => port,
+                                          :tag           => tag,
+                                          :receiver_host => @options["receiver-host"])
+    fetcher.fetch(:dataset => dataset_name)
+  end
+
+  def remaining_node
+    @remaining_node ||= detect_remaining_node
+  end
+
+  def detect_remaining_node
+    catalog = fetch_catalog
+    generator = Droonga::CatalogGenerator.new
+    generator.load(catalog)
+
+    dataset = generator.dataset_for_host(replica_remove_host)
+    unless dataset
+      raise "Specified host #{replica_remove_host} is not a member of "+
+              "the cluster. You must specify correct host via --replica-remove-host " +
+              "option."
+    end
+
+    other_hosts = dataset.replicas.hosts
+
+    remaining_host = other_hosts.first || replica_remove_host
+    "#{remaining_host}:#{port}/#{tag}"
+  end
+
+  def run_remote_command(target, command, options)
+    serf = Droonga::Serf.new(nil, target)
+    result = serf.send_query(command, options)
+    puts(result[:result])
+    puts(result[:error]) unless result[:error].empty?
+    result[:response]
+  end
+
+  def do_unjoin
+    puts "Unjoining replica from the cluster..."
+
+    run_remote_command(remaining_node, "remove_replicas",
+                       "dataset" => dataset_name,
+                       "hosts"   => [replica_remove_host])
+
+    run_remote_command(replica_remove_node, "set_replicas",
+                       "node"    => replica_remove_node,
+                       "dataset" => dataset_name,
+                       "hosts"   => [replica_remove_host])
+    # It must be restarted to be removed from the Serf cluster.
+    # Otherwise protocol adapters unexpectedly tries to connect
+    # to the unjoined node.
+    run_remote_command(replica_remove_node, "restart_serf_agent",
+                       "node"    => replica_remove_node)
+  end
 end
-parser.on("--host=HOST",
-          "Host name of the replica removed from cluster.") do |host|
-  options.replica_remove_host = host
-end
 
-parser.parse!(ARGV)
-
-
-base_dir = Pathname(options.base_dir).expand_path
-ENV[Droonga::Path::BASE_DIR_ENV_NAME] = base_dir.to_s
-
-
-catalog_path = Droonga::Path.catalog
-unless catalog_path.exist?
-  raise "Cannot load 'catalog.json'. You must specify correct path " +
-          "to the base directory via --base-dir option."
-end
-
-unless options.replica_remove_host
-  raise "You must specify the host name or the IP address of a node to " +
-          "be removed from the cluster via --replica-remove-host option."
-end
-
-unless service_installation.have_read_permission?
-  puts("You have no permission to read files under " +
-         "<#{Droonga::Path.base.to_s}>.")
-  puts("Try again with right permission.")
-  exit(false)
-end
-
-source_catalog = JSON.parse(catalog_path.read)
-generator = Droonga::CatalogGenerator.new
-generator.load(source_catalog)
-
-dataset = generator.dataset_for_host(options.replica_remove_host)
-unless dataset
-  raise "Specified host #{options.replica_remove_host} is not a member of "+
-          "the cluster. You must specify correct host via --replica-remove-host " +
-          "option."
-end
-
-options.dataset     = dataset.name
-options.tag         = dataset.replicas.tag
-options.port        = dataset.replicas.port
-options.other_hosts = dataset.replicas.hosts
-
-remaining_host = options.other_hosts.first || options.replica_remove_host
-options.remaining_node = "#{remaining_host}:#{options.port}/#{options.tag}"
-options.replica_remove_node = "#{options.replica_remove_host}:#{options.port}/#{options.tag}"
-
-def run_remote_command(target, command, options)
-  serf = Droonga::Serf.new(nil, target)
-  result = serf.send_query(command, options)
-  puts result[:result]
-  puts result[:error] unless result[:error].empty?
-end
-
-
-puts "Unjoining replica from the cluster..."
-
-run_remote_command(options.remaining_node, "remove_replicas",
-                   "dataset" => options.dataset,
-                   "hosts"   => [options.replica_remove_host])
-
-run_remote_command(options.replica_remove_node, "set_replicas",
-                   "node"    => options.replica_remove_node,
-                   "dataset" => options.dataset,
-                   "hosts"   => [options.replica_remove_host])
-# It must be restarted to be removed from the Serf cluster.
-# Otherwise protocol adapters unexpectedly tries to connect
-# to the unjoined node.
-run_remote_command(options.replica_remove_node, "restart_serf_agent",
-                   "node"    => options.replica_remove_node)
-
-puts "Done."
-
-exit(true)
+UnjoinCommand.new.run
