@@ -89,7 +89,7 @@ options.other_hosts = dataset.replicas.hosts
 
 remaining_host = options.other_hosts.first || options.replica_remove_host
 options.remaining_node = "#{remaining_host}:#{options.port}/#{options.tag}"
-
+options.replica_remove_node = "#{options.replica_remove_host}:#{options.port}/#{options.tag}"
 
 def run_remote_command(target, command, options)
   serf = Droonga::Serf.new(nil, target)
@@ -102,6 +102,10 @@ end
 puts "Unjoining replica from the cluster..."
 
 run_remote_command(options.remaining_node, "remove_replicas",
+                   "dataset" => options.dataset,
+                   "hosts"   => [options.replica_remove_host])
+
+run_remote_command(options.replica_remove_node, "set_replicas",
                    "dataset" => options.dataset,
                    "hosts"   => [options.replica_remove_host])
 
