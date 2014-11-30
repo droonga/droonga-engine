@@ -1,11 +1,11 @@
 # News
 
-## 1.0.9: 2014-XX-XX
+## 1.0.9: 2014-12-01
 
  * `droonga-engine-join`, `droonga-engine-unjoin`, and `droonga-engine-absorb-data` work on any host.
    Instead, you have to specify the host name or the IP address of the working host via the `--receiver-host` option.
- * Unjoined nodes are removed from the Serf cluster completely.
-   In previous version, a node unjoined from the Droonga cluster was unexpectedly still detected as a member of the Serf cluster, and protocol adapter nodes wrongly sent requests to them.
+ * Clusters are managed with their own unique id.
+   In previous version, a node unjoined from the Droonga cluster is still a member of the Serf cluster, and there is no information that protocol adapter nodes detect which is actual member or not.
 
 ## 1.0.8: 2014-11-29
 
