@@ -77,6 +77,8 @@ module Droonga
           Remote::SetStatus
         when "join"
           Remote::Join
+        when "unjoin"
+          Remote::Unjoin
         when "set_replicas"
           Remote::SetReplicas
         when "add_replicas"

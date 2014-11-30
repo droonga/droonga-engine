@@ -126,12 +126,7 @@ class UnjoinCommand
   def do_unjoin
     puts "Unjoining replica from the cluster..."
 
-    run_remote_command(remaining_node, "remove_replicas",
-                       "dataset" => dataset_name,
-                       "hosts"   => [replica_remove_host])
-
-    run_remote_command(replica_remove_node, "set_replicas",
-                       "node"    => replica_remove_node,
+    run_remote_command(remaining_node, "unjoin",
                        "dataset" => dataset_name,
                        "hosts"   => [replica_remove_host])
   end
