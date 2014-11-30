@@ -238,28 +238,6 @@ module Droonga
         end
       end
 
-      class Unjoin < Base
-        def process
-          return if dataset.nil? or hosts.nil?
-
-          log("unjoining replicas: #{hosts.join(",")}")
-
-          CatalogModifier.modify do |modifier, file|
-            if unjoining_node?
-              modifier.datasets[dataset].replicas.hosts = hosts
-            else
-              modifier.datasets[dataset].replicas.hosts -= hosts
-            end
-            @service_installation.ensure_correct_file_permission(file)
-          end
-        end
-
-        private
-        def unjoining_node?
-          hosts.include?(host)
-        end
-      end
-
       class AbsorbData < Base
         attr_writer :dataset_name, :port, :tag
 
@@ -380,6 +358,28 @@ module Droonga
             modifier.datasets[dataset].replicas.hosts -= hosts
             @service_installation.ensure_correct_file_permission(file)
           end
+        end
+      end
+
+      class Unjoin < ModifyReplicasBase
+        def process
+          return if dataset.nil? or hosts.nil?
+
+          log("unjoining replicas: #{hosts.join(",")}")
+
+          CatalogModifier.modify do |modifier, file|
+            if unjoining_node?
+              modifier.datasets[dataset].replicas.hosts = hosts
+            else
+              modifier.datasets[dataset].replicas.hosts -= hosts
+            end
+            @service_installation.ensure_correct_file_permission(file)
+          end
+        end
+
+        private
+        def unjoining_node?
+          hosts.include?(host)
         end
       end
 
