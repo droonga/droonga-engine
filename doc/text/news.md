@@ -1,5 +1,10 @@
 # News
 
+## 1.1.0: 2014-12-29 (planned)
+
+ * Better compatibility to Groonga's `delete` command:
+   It works correctly for tables with integer key types.
+
 ## 1.0.9: 2014-12-01
 
  * `droonga-engine-join`, `droonga-engine-unjoin`, and `droonga-engine-absorb-data` work on any host.
