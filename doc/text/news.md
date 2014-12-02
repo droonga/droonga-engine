@@ -4,6 +4,7 @@
 
  * Better compatibility to Groonga's `delete` command:
    * Works correctly for tables with integer key types.
+     [The report by funa1g](http://sourceforge.jp/projects/groonga/lists/archive/dev/2014-December/002995.html) inspired this improvement. Thanks!
    * Accepts requests with automatically-convertible mismatched type keys.
      For example, a numeric key `1` is available for a table with the key type `ShortText`.
  * `add` command now accepts requests with automatically-convertible mismatched type keys.
