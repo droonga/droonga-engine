@@ -1,4 +1,4 @@
-#@include fixture/integer-key-table.jsons
+#@include fixture/integer-key-user-table.jsons
 {
   "type": "add",
   "dataset": "Default",

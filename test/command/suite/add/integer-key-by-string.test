@@ -1,0 +1,11 @@
+#@include fixture/integer-key-user-table.jsons
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "User",
+    "key": "1",
+    "values": {
+    }
+  }
+}
