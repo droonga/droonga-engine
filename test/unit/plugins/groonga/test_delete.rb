@@ -80,22 +80,11 @@ class DeleteTest < GroongaHandlerTest
   end
 
   class DeleteKeyTest < self
-    data do
-      data_set = {}
-      [
-        1,
-        "1",
-        "sample",
-      ].each do |key|
-        data_set[key] = key
-      end
-      data_set
-    end
-    def test_string(key)
+    def test_string
       setup_table_with_key_type("ShortText")
-      table.add(key.to_s)
+      table.add("sample")
       process(:delete,
-              {"table" => "Books", "key" => key})
+              {"table" => "Books", "key" => "sample"})
       assert_equal(<<-DUMP, dump)
 table_create Books TABLE_HASH_KEY ShortText
       DUMP
@@ -103,10 +92,6 @@ table_create Books TABLE_HASH_KEY ShortText
 
     data do
       data_set = {}
-      keys = [
-        1,
-        "1",
-      ]
       [
         "Int8",
         "UInt8",
@@ -117,22 +102,17 @@ table_create Books TABLE_HASH_KEY ShortText
         "Int64",
         "UInt64",
       ].each do |key_type|
-        keys.each do |key|
-          data_set["#{key_type}, #{key.class.name}"] = {
-            :key_type => key_type,
-            :key      => key,
-          }
-        end
+        data_set[key_type] = key_type
       end
       data_set
     end
-    def test_integer(data)
-      setup_table_with_key_type(data[:key_type])
-      table.add(data[:key].to_i)
+    def test_integer(key_type)
+      setup_table_with_key_type(key_type)
+      table.add(1)
       process(:delete,
-              {"table" => "Books", "key" => data[:key]})
+              {"table" => "Books", "key" => 1})
       assert_equal(<<-DUMP, dump)
-table_create Books TABLE_HASH_KEY #{data[:key_type]}
+table_create Books TABLE_HASH_KEY #{key_type}
       DUMP
     end
 
@@ -147,6 +127,30 @@ table_create Books TABLE_HASH_KEY #{data[:key_type]}
 
     def table
       Groonga::Context.default["Books"]
+    end
+
+    class MismatchedTypeKey < self
+      class Acceptable < self
+        def test_integer_for_string
+          setup_table_with_key_type("ShortText")
+          table.add("1")
+          process(:delete,
+                  {"table" => "Books", "key" => 1})
+          assert_equal(<<-DUMP, dump)
+table_create Books TABLE_HASH_KEY ShortText
+          DUMP
+        end
+
+        def test_string_for_integer
+          setup_table_with_key_type("UInt32")
+          table.add(1)
+          process(:delete,
+                  {"table" => "Books", "key" => "1"})
+          assert_equal(<<-DUMP, dump)
+table_create Books TABLE_HASH_KEY UInt32
+          DUMP
+        end
+      end
     end
   end
 
