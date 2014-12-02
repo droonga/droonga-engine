@@ -1,0 +1,20 @@
+#@include fixture/user-table.jsons
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table"  : "User",
+    "key"    : "1",
+    "values" : {
+      "name": "1"
+    }
+  }
+}
+{
+  "type": "delete",
+  "dataset": "Default",
+  "body": {
+    "table" : "User",
+    "key"   : "1"
+  }
+}

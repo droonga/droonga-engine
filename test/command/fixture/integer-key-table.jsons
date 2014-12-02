@@ -1,0 +1,48 @@
+#@disable-logging
+{
+  "type": "table_create",
+  "dataset": "Default",
+  "body": {
+    "name"     : "User",
+    "flags"    : "TABLE_PAT_KEY",
+    "key_type" : "UInt32"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Default",
+  "body": {
+    "table" : "User",
+    "name"  : "name",
+    "type"  : "ShortText"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Default",
+  "body": {
+    "table" : "User",
+    "name"  : "age",
+    "type"  : "Int32"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Default",
+  "body": {
+    "table" : "User",
+    "name"  : "email",
+    "type"  : "ShortText",
+    "flags" : "COLUMN_VECTOR"
+  }
+}
+{
+  "type": "column_create",
+  "dataset": "Default",
+  "body": {
+    "table" : "User",
+    "name"  : "birthday",
+    "type"  : "Time"
+  }
+}
+#@enable-logging
