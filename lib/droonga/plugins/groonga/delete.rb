@@ -82,7 +82,7 @@ module Droonga
                  "Int64", "UInt64"
               key.to_i
             else
-              key
+              key.to_s
             end
           end
 
