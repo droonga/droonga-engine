@@ -69,8 +69,21 @@ module Droonga
           end
 
           def delete_record_by_key(table, key)
+            key = normalize_record_key(key, table)
             record = table[key]
             record.delete unless record.nil?
+          end
+
+          def normalize_record_key(key, table)
+            case table.domain.name
+            when "Int8",  "UInt8",
+                 "Int16", "UInt16",
+                 "Int32", "UInt32",
+                 "Int64", "UInt64"
+              key.to_i
+            else
+              key
+            end
           end
 
           def delete_record_by_id(table, id)

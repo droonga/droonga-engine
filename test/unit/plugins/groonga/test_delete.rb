@@ -79,12 +79,10 @@ class DeleteTest < GroongaHandlerTest
     )
   end
 
-  class DeleteTest < self
-    def test_key
-      Groonga::Schema.define do |schema|
-        schema.create_table("Books", :type => :hash)
-      end
-      Groonga::Context.default["Books"].add("sample")
+  class DeleteKeyTest < self
+    def test_string
+      setup_table_with_key_type("ShortText")
+      table.add("sample")
       process(:delete,
               {"table" => "Books", "key" => "sample"})
       assert_equal(<<-DUMP, dump)
@@ -92,6 +90,47 @@ table_create Books TABLE_HASH_KEY ShortText
       DUMP
     end
 
+    data do
+      data_set = {}
+      [
+        "Int8",
+        "UInt8",
+        "Int16",
+        "UInt16",
+        "Int32",
+        "UInt32",
+        "Int64",
+        "UInt64",
+      ].each do |key_type|
+        data_set[key_type] = key_type
+      end
+      data_set
+    end
+    def test_integer(key_type)
+      setup_table_with_key_type(key_type)
+      table.add(1)
+      process(:delete,
+              {"table" => "Books", "key" => "1"})
+      assert_equal(<<-DUMP, dump)
+table_create Books TABLE_HASH_KEY #{key_type}
+      DUMP
+    end
+
+    private
+    def setup_table_with_key_type(key_type)
+      Groonga::Schema.define do |schema|
+        schema.create_table("Books",
+                            :type     => :hash,
+                            :key_type => key_type)
+      end
+    end
+
+    def table
+      Groonga::Context.default["Books"]
+    end
+  end
+
+  class DeleteTest < self
     def test_id
       Groonga::Schema.define do |schema|
         schema.create_table("Ages", :type => :array)
