@@ -134,6 +134,46 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
     end
   end
 
+  class MismatchedTypeKeyTest < self
+    class Acceptable < self
+      def test_integer_for_string
+        setup_table_with_key_type("ShortText")
+        request = {
+          "table"  => "Users",
+          "key"    => 1,
+          "values" => {},
+        }
+        response = process(request)
+        assert_equal(SUCCESS_RESPONSE_BODY, response)
+        table = @worker.context["Users"]
+        assert_equal(["1"], table.collect(&:key))
+      end
+
+      def test_string_for_integer
+        setup_table_with_key_type("UInt32")
+        request = {
+          "table"  => "Users",
+          "key"    => "1",
+          "values" => {},
+        }
+        response = process(request)
+        assert_equal(SUCCESS_RESPONSE_BODY, response)
+        table = @worker.context["Users"]
+        assert_equal([1], table.collect(&:key))
+      end
+    end
+
+    private
+    def setup_table_with_key_type(key_type)
+      Groonga::Schema.define do |schema|
+        schema.create_table("Users",
+                            :type => :hash,
+                            :key_type => key_type) do |table|
+        end
+      end
+    end
+  end
+
   class NoKeyTest < self
     def setup_schema
       Groonga::Schema.define do |schema|
