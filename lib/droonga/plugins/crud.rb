@@ -107,7 +107,8 @@ module Droonga
         def add_record(table, request)
           record = nil
           if table.support_key?
-            record = table.add(request["key"])
+            key = normalize_record_key(request["key"], table)
+            record = table.add(key)
           else
             record = table.add
           end
@@ -124,6 +125,18 @@ module Droonga
               record.delete if record.added?
               raise UnknownColumn.new(column, request["table"], request)
             end
+          end
+        end
+
+        def normalize_record_key(key, table)
+          case table.domain.name
+          when "Int8",  "UInt8",
+               "Int16", "UInt16",
+               "Int32", "UInt32",
+               "Int64", "UInt64"
+            key.to_i
+          else
+            key.to_s
           end
         end
       end
