@@ -1,0 +1,11 @@
+#@disable-logging
+{
+  "type": "table_create",
+  "dataset": "Default",
+  "body": {
+    "name"     : "Integer",
+    "flags"    : "TABLE_PAT_KEY",
+    "key_type" : "UInt32"
+  }
+}
+#@enable-logging

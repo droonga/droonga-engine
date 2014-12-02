@@ -1,0 +1,9 @@
+#@include fixture/integer-key-table.jsons
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "Integer",
+    "key": "1"
+  }
+}

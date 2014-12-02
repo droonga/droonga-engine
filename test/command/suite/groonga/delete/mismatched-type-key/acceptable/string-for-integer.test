@@ -12,6 +12,6 @@
   "dataset": "Default",
   "body": {
     "table" : "Integer",
-    "key"   : 1
+    "key"   : "1"
   }
 }

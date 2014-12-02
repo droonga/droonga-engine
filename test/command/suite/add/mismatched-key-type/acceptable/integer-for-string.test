@@ -1,0 +1,9 @@
+#@include fixture/string-key-table.jsons
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "String",
+    "key": 1
+  }
+}

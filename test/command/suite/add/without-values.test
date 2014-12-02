@@ -4,7 +4,7 @@
   "dataset": "Default",
   "body": {
     "table": "User",
-    "key": 1,
+    "key": "key",
     "values": {
     }
   }

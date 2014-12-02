@@ -1,19 +1,17 @@
-#@include fixture/user-table.jsons
+#@include fixture/string-key-table.jsons
 {
   "type": "add",
   "dataset": "Default",
   "body": {
-    "table"  : "User",
-    "key"    : "key",
-    "values" : {
-    }
+    "table"  : "String",
+    "key"    : "key"
   }
 }
 {
   "type": "delete",
   "dataset": "Default",
   "body": {
-    "table" : "User",
+    "table" : "String",
     "key"   : "key"
   }
 }

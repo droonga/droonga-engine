@@ -1,0 +1,11 @@
+#@disable-logging
+{
+  "type": "table_create",
+  "dataset": "Default",
+  "body": {
+    "name"     : "String",
+    "flags"    : "TABLE_PAT_KEY",
+    "key_type" : "ShortText"
+  }
+}
+#@enable-logging
