@@ -13,12 +13,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/catalog/volume_collection"
+require "droonga/catalog/replicas"
 
-class CatalogVolumeCollectionTest < Test::Unit::TestCase
+class CatalogReplicasTest < Test::Unit::TestCase
   private
-  def create_volume_collection(volumes)
-    Droonga::Catalog::VolumeCollection.new(volumes)
+  def create_replicas(replicas)
+    Droonga::Catalog::Replicas.new(replicas)
   end
 
   class SelectTest < self
@@ -28,7 +28,7 @@ class CatalogVolumeCollectionTest < Test::Unit::TestCase
         "volume2",
         "volume3",
       ]
-      @collection = create_volume_collection(volumes)
+      @collection = create_replicas(volumes)
     end
 
     def test_top
@@ -49,11 +49,11 @@ class CatalogVolumeCollectionTest < Test::Unit::TestCase
   end
 
   class NodesTest < self
-    def create_volume_collection(volumes)
-      volumes = volumes.collect do |volume|
-        create_single_volume(volume)
+    def create_replicas(raw_replicas)
+      replicas = raw_replicas.collect do |replica|
+        create_single_volume(replica)
       end
-      super(volumes)
+      super(replicas)
     end
 
     def create_single_volume(data)
@@ -67,7 +67,7 @@ class CatalogVolumeCollectionTest < Test::Unit::TestCase
         { "address" => "volume2:10047/droonga.002" },
         { "address" => "volume2:10047/droonga.003" },
       ]
-      @collection = create_volume_collection(volumes)
+      @collection = create_replicas(volumes)
     end
 
     def test_all_nodes

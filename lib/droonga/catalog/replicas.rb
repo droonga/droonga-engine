@@ -13,17 +13,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/catalog/volume"
+
 module Droonga
   module Catalog
-    class VolumeCollection
+    class Replicas
+      class << self
+        def create(dataset, raw_replicas)
+          replicas = raw_replicas.collect do |raw_replica|
+            Replica.new(dataset, raw_replica)
+          end
+          new(replicas)
+        end
+      end
+
       include Enumerable
 
-      def initialize(volumes)
-        @volumes = volumes
+      def initialize(replicas)
+        @replicas = replicas
       end
 
       def each(&block)
-        @volumes.each(&block)
+        @replicas.each(&block)
       end
 
       def ==(other)
@@ -40,14 +51,14 @@ module Droonga
       end
 
       def select(how=nil, live_nodes=nil)
-        volumes = live_volumes(live_nodes)
+        replicas = live_replicas(live_nodes)
         case how
         when :top
-          [volumes.first]
+          [replicas.first]
         when :random
-          [volumes.sample]
+          [replicas.sample]
         when :all
-          @volumes
+          @replicas
         else
           super
         end
@@ -57,11 +68,11 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
-      def live_volumes(live_nodes=nil)
-        return @volumes unless live_nodes
+      def live_replicas(live_nodes=nil)
+        return @replicas unless live_nodes
 
-        @volumes.select do |volume|
-          dead_nodes = volume.all_nodes - live_nodes
+        @replicas.select do |replica|
+          dead_nodes = replica.all_nodes - live_nodes
           dead_nodes.empty?
         end
       end
@@ -69,8 +80,8 @@ module Droonga
       private
       def collect_all_nodes
         nodes = []
-        @volumes.each do |volume|
-          nodes += volume.all_nodes
+        @replicas.each do |replica|
+          nodes += replica.all_nodes
         end
         nodes.sort.uniq
       end

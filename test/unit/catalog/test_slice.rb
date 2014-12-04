@@ -99,5 +99,20 @@ class CatalogSliceTest < Test::Unit::TestCase
       assert_equal(["127.0.0.1:10047/volume"],
                    slice.all_nodes)
     end
+
+    def test_deeply_nested
+      data = {
+        "replicas" => [
+          {
+            "volume" => {
+              "address" => "127.0.0.1:10047/volume.000",
+            },
+          },
+        ],
+      }
+      slice = create_slice(data)
+      assert_equal(["127.0.0.1:10047/volume"],
+                   slice.all_nodes)
+    end
   end
 end

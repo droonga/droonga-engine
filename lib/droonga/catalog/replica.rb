@@ -13,47 +13,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/catalog/slices"
+
 module Droonga
   module Catalog
-    class Slice
-      def initialize(dataset, data)
-        @dataset = dataset
-        @data = data
-      end
-
-      def weight
-        @data["weight"] || 1
-      end
-
-      def label
-        @data["label"]
-      end
-
-      def boundary
-        @data["boundary"]
-      end
-
+    class Replica < Slices
       def volume
         return nil unless @data.key?("volume")
         @volume ||= Volume.create(@dataset, @data["volume"])
       end
 
-      def replicas
-        return nil unless @data.key?("replicas")
-        @replicas ||= Replicas.create(@dataset, @data["replicas"])
-      end
-
-      def all_nodes
-        @all_nodes ||= collect_all_nodes
-      end
-
       private
       def collect_all_nodes
-        if volume
-          volume.all_nodes
-        else
-          replicas.all_nodes
-        end
+        return volume.all_nodes if volume
+        super
       end
     end
   end

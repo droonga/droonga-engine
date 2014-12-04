@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/single_volume"
-require "droonga/catalog/collection_volume"
+require "droonga/catalog/replica"
 
 module Droonga
   module Catalog
@@ -24,7 +24,7 @@ module Droonga
           if raw_volume.key?("address")
             SingleVolume.new(raw_volume)
           else
-            CollectionVolume.new(dataset, raw_volume)
+            Replica.new(dataset, raw_volume)
           end
         end
       end

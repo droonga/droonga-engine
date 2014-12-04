@@ -14,8 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/schema"
-require "droonga/catalog/volume"
-require "droonga/catalog/volume_collection"
+require "droonga/catalog/replicas"
 
 module Droonga
   module Catalog
@@ -57,7 +56,7 @@ module Droonga
       end
 
       def replicas
-        @replicas ||= VolumeCollection.new(create_volumes(@data["replicas"]))
+        @replicas ||= Replicas.create(self, @data["replicas"])
       end
 
       def all_nodes
@@ -65,39 +64,45 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        routes = []
-        case message["type"]
-        when "broadcast"
-          volumes = replicas.select(message["replica"].to_sym, live_nodes)
-          volumes.each do |volume|
-            slices = volume.select_slices
-            slices.each do |slice|
-              routes << slice.volume.address.to_s
-            end
-          end
-        when "scatter"
-          volumes = replicas.select(message["replica"].to_sym, live_nodes)
-          volumes.each do |volume|
-            slice = volume.choose_slice(message["record"])
-            routes << slice.volume.address.to_s
-          end
-        end
-        routes
+        compute_routes_from_replicas(replicas, message, live_nodes)
       end
 
       def single_slice?
         # TODO: Support slice key
-        replicas.all? do |volume|
-          volume.is_a?(SingleVolume) or
-            volume.slices.size == 1
+        replicas.all? do |replica|
+          replica.is_a?(SingleVolume) or
+            replica.slices.size == 1
         end
       end
 
       private
-      def create_volumes(raw_volumes)
-        raw_volumes.collect do |raw_volume|
-          Volume.create(self, raw_volume)
+      def compute_routes_from_replicas(replicas, message, live_nodes)
+        routes = []
+        case message["type"]
+        when "broadcast"
+          replicas = replicas.select(message["replica"].to_sym, live_nodes)
+          replicas.each do |replica|
+            slices = replica.select_slices
+            slices.each do |slice|
+              if slice.replicas
+                routes += compute_routes_from_replicas(slice.replicas, message, live_nodes)
+              else
+                routes << slice.volume.address.to_s
+              end
+            end
+          end
+        when "scatter"
+          replicas = replicas.select(message["replica"].to_sym, live_nodes)
+          replicas.each do |replica|
+            slice = replica.choose_slice(message["record"])
+            if slice.replicas
+              routes += compute_routes_from_replicas(slice.replicas, message, live_nodes)
+            else
+              routes << slice.volume.address.to_s
+            end
+          end
         end
+        routes
       end
     end
   end

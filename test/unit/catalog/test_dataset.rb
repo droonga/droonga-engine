@@ -97,7 +97,7 @@ class CatalogDatasetTest < Test::Unit::TestCase
         "replicas" => [],
       }
       dataset = create_dataset(data)
-      assert_equal(Droonga::Catalog::VolumeCollection.new([]),
+      assert_equal(Droonga::Catalog::Replicas.new([]),
                    dataset.replicas)
     end
   end
