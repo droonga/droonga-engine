@@ -64,7 +64,7 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        compute_routes_from_replicas(replicas, message, live_nodes)
+        routes_from_replicas(replicas, message, live_nodes)
       end
 
       def single_slice?
@@ -77,33 +77,39 @@ module Droonga
       end
 
       private
-      def compute_routes_from_replicas(replicas, message, live_nodes)
+      def routes_from_replicas(replicas, message, live_nodes)
         routes = []
         case message["type"]
         when "broadcast"
           replicas = replicas.select(message["replica"].to_sym, live_nodes)
           replicas.each do |replica|
             slices = replica.select_slices
-            slices.each do |slice|
-              if slice.replicas
-                routes += compute_routes_from_replicas(slice.replicas, message, live_nodes)
-              else
-                routes << slice.volume.address.to_s
-              end
-            end
+            routes += routes_from_slices(slices, message, live_nodes)
           end
         when "scatter"
           replicas = replicas.select(message["replica"].to_sym, live_nodes)
           replicas.each do |replica|
             slice = replica.choose_slice(message["record"])
-            if slice.replicas
-              routes += compute_routes_from_replicas(slice.replicas, message, live_nodes)
-            else
-              routes << slice.volume.address.to_s
-            end
+            routes += routes_from_slice(slice, message, live_nodes)
           end
         end
         routes
+      end
+
+      def routes_from_slices(slices, message, live_nodes)
+        routes = []
+        slices.each do |slice|
+          routes += routes_from_slice(slice, message, live_nodes)
+        end
+        routes
+      end
+
+      def routes_from_slice(slice, message, live_nodes)
+        if slice.replicas
+          routes_from_replicas(slice.replicas, message, live_nodes)
+        else
+          [slice.volume.address.to_s]
+        end
       end
     end
   end
