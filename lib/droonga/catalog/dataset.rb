@@ -64,7 +64,10 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        routes_from_replicas(replicas, message, live_nodes)
+        collect_routes_from_replicas(replicas,
+                                     :message    => message,
+                                     :live_nodes => live_nodes,
+                                     :routes     => [])
       end
 
       def single_slice?
@@ -77,38 +80,39 @@ module Droonga
       end
 
       private
-      def routes_from_replicas(replicas, message, live_nodes)
-        routes = []
+      def collect_routes_from_replicas(replicas, params)
+        message = params[:message]
+        routes = params[:routes] ||= []
         case message["type"]
         when "broadcast"
-          replicas = replicas.select(message["replica"].to_sym, live_nodes)
+          replicas = replicas.select(message["replica"].to_sym, params[:live_nodes])
           replicas.each do |replica|
             slices = replica.select_slices
-            routes += routes_from_slices(slices, message, live_nodes)
+            collect_routes_from_slices(slices, params)
           end
         when "scatter"
-          replicas = replicas.select(message["replica"].to_sym, live_nodes)
+          replicas = replicas.select(message["replica"].to_sym, params[:live_nodes])
           replicas.each do |replica|
             slice = replica.choose_slice(message["record"])
-            routes += routes_from_slice(slice, message, live_nodes)
+            collect_routes_from_slice(slice, params)
           end
         end
         routes
       end
 
-      def routes_from_slices(slices, message, live_nodes)
-        routes = []
+      def collect_routes_from_slices(slices, params)
         slices.each do |slice|
-          routes += routes_from_slice(slice, message, live_nodes)
+          collect_routes_from_slice(slice, params)
         end
-        routes
       end
 
-      def routes_from_slice(slice, message, live_nodes)
+      def collect_routes_from_slice(slice, message, live_nodes)
         if slice.replicas
-          routes_from_replicas(slice.replicas, message, live_nodes)
+          collect_routes_from_replicas(slice.replicas, params)
         else
-          [slice.volume.address.to_s]
+          routes = params[:routes] ||= []
+          rouets << slice.volume.address.to_s
+          rouets
         end
       end
     end
