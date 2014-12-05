@@ -50,6 +50,7 @@ module Droonga
         end
 
         def should_process?
+          return false unless for_this_cluster?
           for_me? or @params.nil? or not @params.include?("node")
         end
 
@@ -62,8 +63,20 @@ module Droonga
           node.split(":").first
         end
 
+        def cluster_id
+          @serf.cluster_id
+        end
+
+        def target_cluster
+          @params && @params["cluster_id"]
+        end
+
         def target_node
           @params && @params["node"]
+        end
+
+        def for_this_cluster?
+          target_cluster.nil? or target_cluster == cluster_id
         end
 
         def for_me?
