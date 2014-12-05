@@ -71,6 +71,7 @@ module Droonga
         # TODO: Support slice key
         replicas.all? do |replica|
           replica.is_a?(SingleVolume) or
+            replica.slices.nil? or
             replica.slices.size == 1
         end
       end
