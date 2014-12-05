@@ -210,13 +210,13 @@ module Droonga
           end
 
           def final_offset
-            return @original_output_offset if @dataset.single_slice?
+            return @original_output_offset unless @dataset.sliced?
 
             @original_sort_offset + @original_output_offset
           end
 
           def final_limit
-            return @original_output_limit if @dataset.single_slice?
+            return @original_output_limit unless @dataset.sliced?
 
             if @original_sort_limit == UNLIMITED and
                 @original_output_limit == UNLIMITED
@@ -251,7 +251,7 @@ module Droonga
               "type" => "sum",
             }
             if unifiable?
-              unless @dataset.single_slice?
+              if @dataset.sliced?
                 if @query["sortBy"].is_a?(Hash)
                   @query["sortBy"]["limit"] = UNLIMITED
                 end
@@ -261,7 +261,7 @@ module Droonga
                 "target" => "records",
               }
               unless @output["elements"].include?("records")
-                @records_limit = UNLIMITED unless @dataset.single_slice?
+                @records_limit = UNLIMITED if @dataset.sliced?
                 @output["elements"] << "records"
                 @output["attributes"] ||= ["_key"]
                 @output_records = false

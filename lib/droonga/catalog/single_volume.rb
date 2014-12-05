@@ -31,6 +31,10 @@ module Droonga
       def all_nodes
         @all_nodes ||= [node]
       end
+
+      def sliced?
+        false
+      end
     end
   end
 end

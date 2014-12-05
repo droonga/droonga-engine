@@ -86,6 +86,10 @@ module Droonga
         routes
       end
 
+      def sliced?
+        slices.size > 1
+      end
+
       private
       def compute_continuum
         total_weight = compute_total_weight

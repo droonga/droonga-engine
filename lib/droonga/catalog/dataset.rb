@@ -72,12 +72,10 @@ module Droonga
                                      :live_nodes => live_nodes)
       end
 
-      def single_slice?
+      def sliced?
         # TODO: Support slice key
-        replicas.all? do |volume|
-          volume.is_a?(SingleVolume) or
-            volume.is_a?(ReplicasVolume) or
-            volume.slices.size == 1
+        replicas.any? do |volume|
+          volume.sliced?
         end
       end
     end

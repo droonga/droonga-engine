@@ -94,6 +94,10 @@ module Droonga
         routes
       end
 
+      def sliced?
+        false
+      end
+
       private
       def collect_all_nodes
         nodes = []
