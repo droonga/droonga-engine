@@ -66,8 +66,7 @@ module Droonga
       def compute_routes(message, live_nodes)
         collect_routes_from_replicas(replicas,
                                      :message    => message,
-                                     :live_nodes => live_nodes,
-                                     :routes     => [])
+                                     :live_nodes => live_nodes)
       end
 
       def single_slice?
