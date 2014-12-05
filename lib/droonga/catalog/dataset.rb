@@ -110,8 +110,8 @@ module Droonga
           collect_routes_from_replicas(slice.replicas, params)
         else
           routes = params[:routes] ||= []
-          rouets << slice.volume.address.to_s
-          rouets
+          routes << slice.volume.address.to_s
+          routes
         end
       end
     end
