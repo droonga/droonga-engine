@@ -95,7 +95,7 @@ module Droonga
       end
 
       def sliced?
-        @volumes.any? dp |volume|
+        @volumes.any? do |volume|
           volume.sliced?
         end
       end
