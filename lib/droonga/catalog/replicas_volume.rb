@@ -95,7 +95,9 @@ module Droonga
       end
 
       def sliced?
-        false
+        @volumes.any? dp |volume|
+          volume.sliced?
+        end
       end
 
       private
