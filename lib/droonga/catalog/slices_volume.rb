@@ -20,13 +20,11 @@ require "droonga/catalog/slice"
 
 module Droonga
   module Catalog
-    class Slices
+    class SlicesVolume
       def initialize(dataset, data)
         @dataset = dataset
         @data = data
-        if slices and ratio_scaled_slicer?
-          compute_continuum
-        end
+        compute_continuum if ratio_scaled_slicer?
       end
 
       def dimension
@@ -38,7 +36,6 @@ module Droonga
       end
 
       def slices
-        return nil unless @data.key?("slices")
         @slices ||= create_slices
       end
 

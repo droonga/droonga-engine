@@ -106,11 +106,7 @@ class CatalogSliceTest < Test::Unit::TestCase
       data = {
         "volume" => {
           "replicas" => [
-            {
-              "volume" => {
-                "address" => "127.0.0.1:10047/volume.000",
-              },
-            },
+            { "address" => "127.0.0.1:10047/volume.000" },
           ],
         },
       }

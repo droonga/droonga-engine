@@ -13,12 +13,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/catalog/replicas"
+require "droonga/catalog/volume"
+require "droonga/catalog/replicas_volume"
 
 class CatalogReplicasTest < Test::Unit::TestCase
   private
-  def create_replicas(replicas)
-    Droonga::Catalog::Replicas.new(nil, replicas)
+  def create_replicas(data_or_replicas)
+    Droonga::Catalog::ReplicasVolume.new(nil, data_or_replicas)
   end
 
   class SelectTest < self

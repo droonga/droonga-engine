@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/dataset"
+require "droonga/catalog/slices_volume"
 
 class CatalogSingleVolumeTest < Test::Unit::TestCase
   def create_slices(data)
@@ -22,7 +23,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       },
     }
     dataset = Droonga::Catalog::Dataset.new("DatasetName", minimum_dataset_data)
-    Droonga::Catalog::Slices.new(dataset, data)
+    Droonga::Catalog::SlicesVolume.new(dataset, data)
   end
 
   class DimensionTest < self
@@ -122,16 +123,16 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
           {
             "volume" => {
               "replicas" => [
-                { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
-                { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+                { "address" => "127.0.0.1:23003/droonga.000" },
+                { "address" => "127.0.0.1:23003/droonga.001" },
               ],
             },
           },
           {
             "volume" => {
               "replicas" => [
-                { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
-                { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+                { "address" => "127.0.0.1:23004/droonga.100" },
+                { "address" => "127.0.0.1:23004/droonga.101" },
               ],
             },
           },

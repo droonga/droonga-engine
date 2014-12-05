@@ -13,25 +13,24 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/catalog/volume"
-
 module Droonga
   module Catalog
-    class Replicas
-      class << self
-        def create(dataset, raw_replicas)
-          replicas = raw_replicas.collect do |raw_replica|
-            Replica.new(dataset, raw_replica)
-          end
-          new(dataset, replicas)
-        end
-      end
-
+    class ReplicasVolume
       include Enumerable
 
-      def initialize(dataset, replicas)
+      def initialize(dataset, data)
         @dataset = dataset
-        @replicas = replicas
+
+        if data.is_a?(Hash) and data.key?("replicas")
+          @data     = data
+          @replicas = @data["replicas"].collect do |raw_volume|
+            Catalog::Volume.create(dataset, raw_volume)
+          end
+        elsif data.is_a?(Array)
+          @replicas = data
+        else
+          raise ArgumentError.new(data)
+        end
       end
 
       def each(&block)

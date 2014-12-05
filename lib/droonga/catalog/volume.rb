@@ -14,17 +14,34 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/single_volume"
-require "droonga/catalog/replica"
+require "droonga/catalog/slices_volume"
+require "droonga/catalog/replicas_volume"
 
 module Droonga
   module Catalog
     module Volume
+      class UnknownTypeVolume < ArgumentError
+        attr_reader :raw_volume
+
+        def initialize(raw_volume)
+          @raw_volume = raw_volume
+        end
+
+        def message
+          @raw_volume.inspect
+        end
+      end
+
       class << self
         def create(dataset, raw_volume)
           if raw_volume.key?("address")
             SingleVolume.new(raw_volume)
+          elsif raw_volume.key?("slices")
+            SlicesVolume.new(dataset, raw_volume)
+          elsif raw_volume.key?("replicas")
+            ReplicasVolume.new(dataset, raw_volume)
           else
-            Replica.new(dataset, raw_volume)
+            raise UnknownTypeVolume.new(raw_volume)
           end
         end
       end

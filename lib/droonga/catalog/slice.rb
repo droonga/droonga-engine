@@ -34,26 +34,27 @@ module Droonga
       end
 
       def volume
-        return nil unless @data.key?("volume")
-        @volume ||= Volume.create(@dataset, @data["volume"])
+        @volume ||= Catalog::Volume.create(@dataset, @data["volume"])
       end
 
       def replicas
-        return nil unless @data.key?("replicas")
-        @replicas ||= Replicas.create(@dataset, @data["replicas"])
+        if volume.is_a?(ReplicasVolume)
+          volume.replicas
+        else
+          nil
+        end
+      end
+
+      def slices
+        if volume.is_a?(SlicesVolume)
+          volume.slices
+        else
+          nil
+        end
       end
 
       def all_nodes
-        @all_nodes ||= collect_all_nodes
-      end
-
-      private
-      def collect_all_nodes
-        if volume
-          volume.all_nodes
-        else
-          replicas.all_nodes
-        end
+        @all_nodes ||= volume.all_nodes
       end
     end
   end

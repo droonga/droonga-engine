@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/schema"
-require "droonga/catalog/replicas"
+require "droonga/catalog/volume"
 
 module Droonga
   module Catalog
@@ -55,8 +55,12 @@ module Droonga
         @data["nWorkers"] || 0
       end
 
+      #XXX Currently, dataset has a property named "replicas" so
+      #    can be parsed as a ReplicasVolume.
+      #    We must introduce a new property "volume" to provide
+      #    ReplicasVolume safely.
       def replicas
-        @replicas ||= Replicas.create(self, @data["replicas"])
+        @replicas ||= ReplicasVolume.new(self, @data)
       end
 
       def all_nodes
