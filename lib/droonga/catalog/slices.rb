@@ -24,7 +24,9 @@ module Droonga
       def initialize(dataset, data)
         @dataset = dataset
         @data = data
-        compute_continuum if slices and ratio_scaled_slicer?
+        if slices and ratio_scaled_slicer?
+          compute_continuum
+        end
       end
 
       def dimension
