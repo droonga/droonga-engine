@@ -68,54 +68,16 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        collect_routes_from_replicas(replicas,
-                                     :message    => message,
+        @replicas.collect_routes_for(message,
                                      :live_nodes => live_nodes)
       end
 
       def single_slice?
         # TODO: Support slice key
-        replicas.all? do |replica|
-          replica.is_a?(SingleVolume) or
-            replica.slices.nil? or
-            replica.slices.size == 1
-        end
-      end
-
-      private
-      def collect_routes_from_replicas(replicas, params)
-        message = params[:message]
-        routes = params[:routes] ||= []
-        case message["type"]
-        when "broadcast"
-          replicas = replicas.select(message["replica"].to_sym, params[:live_nodes])
-          replicas.each do |replica|
-            slices = replica.select_slices
-            collect_routes_from_slices(slices, params)
-          end
-        when "scatter"
-          replicas = replicas.select(message["replica"].to_sym, params[:live_nodes])
-          replicas.each do |replica|
-            slice = replica.choose_slice(message["record"])
-            collect_routes_from_slice(slice, params)
-          end
-        end
-        routes
-      end
-
-      def collect_routes_from_slices(slices, params)
-        slices.each do |slice|
-          collect_routes_from_slice(slice, params)
-        end
-      end
-
-      def collect_routes_from_slice(slice, params)
-        if slice.replicas
-          collect_routes_from_replicas(slice.replicas, params)
-        else
-          routes = params[:routes] ||= []
-          routes << slice.volume.address.to_s
-          routes
+        replicas.all? do |volume|
+          volume.is_a?(SingleVolume) or
+            volume.is_a?(ReplicasVolume) or
+            volume.slices.size == 1
         end
       end
     end

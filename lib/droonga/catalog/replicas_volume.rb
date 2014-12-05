@@ -77,6 +77,23 @@ module Droonga
         end
       end
 
+      def collect_routes_for(message, params)
+        routes = params[:routes] ||= []
+        case message["type"]
+        when "broadcast"
+          volumes = select(message["replica"].to_sym, params[:live_nodes])
+          volumes.each do |volume|
+            volume.collect_routes_for(message, params)
+          end
+        when "scatter"
+          volumes = select(message["replica"].to_sym, params[:live_nodes])
+          volumes.each do |volume|
+            volume.collect_routes_for(message, params)
+          end
+        end
+        routes
+      end
+
       private
       def collect_all_nodes
         nodes = []

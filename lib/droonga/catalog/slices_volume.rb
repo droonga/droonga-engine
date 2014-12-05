@@ -71,6 +71,21 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
+      def collect_routes_for(message, params)
+        routes = params[:routes] ||= []
+        case message["type"]
+        when "broadcast"
+          slices = select_slices
+          slices.each do |slice|
+            slice.collect_routes_for(message, params)
+          end
+        when "scatter"
+          slice = choose_slice(message["record"])
+          slice.collect_routes_for(message, params)
+        end
+        routes
+      end
+
       private
       def compute_continuum
         total_weight = compute_total_weight
