@@ -105,7 +105,7 @@ module Droonga
         end
       end
 
-      def collect_routes_from_slice(slice, message, live_nodes)
+      def collect_routes_from_slice(slice, params)
         if slice.replicas
           collect_routes_from_replicas(slice.replicas, params)
         else
