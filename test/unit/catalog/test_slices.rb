@@ -101,8 +101,8 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
     end
   end
 
-  class NodesTest < self
-    def test_all_nodes
+  class AllNodesTest < self
+    def test_slices
       data = {
         "slices" => [
           { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
@@ -116,20 +116,24 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
                    volume.all_nodes)
     end
 
-    def test_nested
+    def test_replicas_in_slice
       data = {
         "slices" => [
           {
-            "replicas" => [
-              { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
-              { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
-            ],
+            "volume" => {
+              "replicas" => [
+                { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
+                { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+              ],
+            },
           },
           {
-            "replicas" => [
-              { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
-              { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
-            ],
+            "volume" => {
+              "replicas" => [
+                { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
+                { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+              ],
+            },
           },
         ],
       }
@@ -138,28 +142,32 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
                    volume.all_nodes)
     end
 
-    def test_deeply_nested
+    def test_slices_in_replicas_in_slice
       data = {
         "slices" => [
           {
-            "replicas" => [
-              {
-                "slices" => [
-                  { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
-                  { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
-                ],
-              },
-            ],
+            "volume" => {
+              "replicas" => [
+                {
+                  "slices" => [
+                    { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
+                    { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+                  ],
+                },
+              ],
+            },
           },
           {
-            "replicas" => [
-              {
-                "slices" => [
-                  { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
-                  { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
-                ],
-              },
-            ],
+            "volume" => {
+              "replicas" => [
+                {
+                  "slices" => [
+                    { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
+                    { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+                  ],
+                },
+              ],
+            },
           },
         ],
       }
