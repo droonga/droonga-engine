@@ -116,7 +116,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
                    volume.all_nodes)
     end
 
-    def test_deeply_nested
+    def test_nested
       data = {
         "slices" => [
           {
@@ -129,6 +129,36 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
             "replicas" => [
               { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
               { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+            ],
+          },
+        ],
+      }
+      volume = create_slices(data)
+      assert_equal(["127.0.0.1:23003/droonga", "127.0.0.1:23004/droonga"],
+                   volume.all_nodes)
+    end
+
+    def test_deeply_nested
+      data = {
+        "slices" => [
+          {
+            "replicas" => [
+              {
+                "slices" => [
+                  { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
+                  { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+                ],
+              },
+            ],
+          },
+          {
+            "replicas" => [
+              {
+                "slices" => [
+                  { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
+                  { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+                ],
+              },
             ],
           },
         ],
