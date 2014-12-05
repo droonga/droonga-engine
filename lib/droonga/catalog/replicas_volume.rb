@@ -23,18 +23,18 @@ module Droonga
 
         if data.is_a?(Hash) and data.key?("replicas")
           @data     = data
-          @replicas = @data["replicas"].collect do |raw_volume|
+          @volumes = @data["replicas"].collect do |raw_volume|
             Catalog::Volume.create(dataset, raw_volume)
           end
         elsif data.is_a?(Array)
-          @replicas = data
+          @volumes = data
         else
           raise ArgumentError.new(data)
         end
       end
 
       def each(&block)
-        @replicas.each(&block)
+        @volumes.each(&block)
       end
 
       def ==(other)
@@ -51,14 +51,14 @@ module Droonga
       end
 
       def select(how=nil, live_nodes=nil)
-        replicas = live_replicas(live_nodes)
+        volumes = live_volumes(live_nodes)
         case how
         when :top
-          [replicas.first]
+          [volumes.first]
         when :random
-          [replicas.sample]
+          [volumes.sample]
         when :all
-          @replicas
+          @volumes
         else
           super
         end
@@ -68,11 +68,11 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
-      def live_replicas(live_nodes=nil)
-        return @replicas unless live_nodes
+      def live_volumes(live_nodes=nil)
+        return @volumes unless live_nodes
 
-        @replicas.select do |replica|
-          dead_nodes = replica.all_nodes - live_nodes
+        @volumes.select do |volume|
+          dead_nodes = volume.all_nodes - live_nodes
           dead_nodes.empty?
         end
       end
@@ -101,8 +101,8 @@ module Droonga
       private
       def collect_all_nodes
         nodes = []
-        @replicas.each do |replica|
-          nodes += replica.all_nodes
+        @volumes.each do |volume|
+          nodes += volume.all_nodes
         end
         nodes.sort.uniq
       end
