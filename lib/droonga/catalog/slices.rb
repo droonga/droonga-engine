@@ -39,9 +39,7 @@ module Droonga
 
       def slices
         return nil unless @data.key?("slices")
-        @slices ||= @data["slices"].collect do |raw_slice|
-          Slice.new(@dataset, raw_slice)
-        end
+        @slices ||= create_slices
       end
 
       def select_slices(range=0..-1)
@@ -106,6 +104,12 @@ module Droonga
           key.to_s
         else
           key
+        end
+      end
+
+      def create_slices
+        @data["slices"].collect do |raw_slice|
+          Slice.new(@dataset, raw_slice)
         end
       end
 
