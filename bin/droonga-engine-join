@@ -22,7 +22,9 @@ require "socket"
 
 require "droonga/engine/version"
 require "droonga/path"
+require "droonga/catalog_fetcher"
 require "droonga/catalog_generator"
+require "droonga/catalog_loader"
 require "droonga/safe_file_writer"
 require "droonga/data_absorber"
 require "droonga/serf"
@@ -92,6 +94,31 @@ class JoinCommand
 
   def source_node
     "#{@options["replica-source-host"]}:#{@options[:port]}/#{@options[:tag]}"
+  end
+
+  def source_cluster_id
+    source_catalog.cluster_id
+  end
+
+  def source_catalog
+    @source_catalog ||= parse_source_catalog
+  end
+
+  def parse_source_catalog
+    loader = Droonga::CatalogLoader.new
+    loader.parse(raw_source_catalog)
+  end
+
+  def raw_source_catalog
+    @raw_source_catalog ||= fetch_source_catalog
+  end
+
+  def fetch_source_catalog
+    fetcher = Droonga::CatalogFetcher.new(:host          => @options["replica-source-host"],
+                                          :port          => @options[:port],
+                                          :tag           => @options[:tag],
+                                          :receiver_host => @options["receiver-host"])
+    fetcher.fetch(:dataset => @options[:dataset])
   end
 
   def run_remote_command(target, command, options)
@@ -195,6 +222,7 @@ class JoinCommand
   def update_other_nodes
     puts("Update existing hosts in the cluster...")
     run_remote_command(source_node, "add_replicas",
+                       "cluster_id" => source_cluster_id,
                        "dataset" => @options[:dataset],
                        "hosts"   => [@options[:host]])
   end
