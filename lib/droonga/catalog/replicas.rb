@@ -23,13 +23,14 @@ module Droonga
           replicas = raw_replicas.collect do |raw_replica|
             Replica.new(dataset, raw_replica)
           end
-          new(replicas)
+          new(dataset, replicas)
         end
       end
 
       include Enumerable
 
-      def initialize(replicas)
+      def initialize(dataset, replicas)
+        @dataset = dataset
         @replicas = replicas
       end
 

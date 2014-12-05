@@ -18,7 +18,7 @@ require "droonga/catalog/replicas"
 class CatalogReplicasTest < Test::Unit::TestCase
   private
   def create_replicas(replicas)
-    Droonga::Catalog::Replicas.new(replicas)
+    Droonga::Catalog::Replicas.new(nil, replicas)
   end
 
   class SelectTest < self
