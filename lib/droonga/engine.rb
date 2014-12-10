@@ -132,7 +132,9 @@ module Droonga
 
     def save_last_processed_message_timestamp
       logger.trace("output_last_processed_message_timestamp: start")
-      node_status.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+      if @last_processed_message_timestamp
+        node_status.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+      end
       logger.trace("output_last_processed_message_timestamp: done")
     end
 
