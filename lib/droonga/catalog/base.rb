@@ -27,7 +27,7 @@ module Droonga
       def initialize(data, path=nil)
         @data = data
         @path = path || "/tmp/temporary-catalog.json"
-        @base_path = File.dirname(path)
+        @base_path = File.dirname(@path)
       end
 
       def have_dataset?(name)
