@@ -38,6 +38,8 @@ class JoinCommand
     puts "       to the cluster of #{@options["replica-source-host"]}"
     puts "                     via #{@options["receiver-host"]} (this host)"
     puts ""
+    puts "Source Cluster ID: #{source_cluster_id}"
+    puts ""
 
     set_node_role
     do_join
