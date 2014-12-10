@@ -24,9 +24,9 @@ module Droonga
   module Catalog
     class Base
       attr_reader :path, :base_path
-      def initialize(data, path)
+      def initialize(data, path=nil)
         @data = data
-        @path = path
+        @path = path || "/tmp/temporary-catalog.json"
         @base_path = File.dirname(path)
       end
 
