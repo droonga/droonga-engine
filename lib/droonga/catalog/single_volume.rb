@@ -32,6 +32,10 @@ module Droonga
         @all_nodes ||= [node]
       end
 
+      def compute_routes(message, live_nodes)
+        [address.to_s]
+      end
+
       def sliced?
         false
       end
