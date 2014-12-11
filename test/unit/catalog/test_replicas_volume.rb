@@ -18,62 +18,62 @@ require "droonga/catalog/replicas_volume"
 
 class CatalogReplicasTest < Test::Unit::TestCase
   private
-  def create_replicas(data_or_replicas)
-    Droonga::Catalog::ReplicasVolume.new(nil, data_or_replicas)
+  def create_replicas(raw_volume)
+    Droonga::Catalog::ReplicasVolume.new(nil, raw_volume)
   end
 
   class SelectTest < self
     def setup
-      volumes = [
-        "volume1",
-        "volume2",
-        "volume3",
-      ]
-      @collection = create_replicas(volumes)
+      volume = {
+        "replicas" => [
+          { "address" => "volume1:10047/droonga.000" },
+          { "address" => "volume2:10047/droonga.000" },
+          { "address" => "volume3:10047/droonga.000" },
+        ],
+      }
+      @collection = create_replicas(volume)
     end
 
     def test_top
-      assert_equal(["volume1"], @collection.select(:top))
+      hosts = @collection.select(:top).collect do |volume|
+        volume.address.host
+      end
+      assert_equal(["volume1"],
+                   hosts)
     end
 
     def test_random
       random_volumes = @collection.select(:random).collect do |volume|
-        volume.gsub(/\Avolume[123]\z/, "any volume")
+        volume.address.host.gsub(/\Avolume[123]\z/, "any volume")
       end
       assert_equal(["any volume"], random_volumes)
     end
 
     def test_all
+      hosts = @collection.select(:all).collect do |volume|
+        volume.address.host
+      end
       assert_equal(["volume1", "volume2", "volume3"],
-                   @collection.select(:all))
+                   hosts)
     end
   end
 
   class NodesTest < self
-    def create_replicas(raw_replicas)
-      replicas = raw_replicas.collect do |replica|
-        create_single_volume(replica)
-      end
-      super(replicas)
-    end
-
-    def create_single_volume(data)
-      Droonga::Catalog::SingleVolume.new(data)
-    end
-
     def setup
-      volumes = [
-        { "address" => "volume1:10047/droonga.000" },
-        { "address" => "volume1:10047/droonga.001" },
-        { "address" => "volume2:10047/droonga.002" },
-        { "address" => "volume2:10047/droonga.003" },
-      ]
-      @collection = create_replicas(volumes)
+      volume = {
+        "replicas" => [
+          { "address" => "volume1:10047/droonga.000" },
+          { "address" => "volume1:10047/droonga.001" },
+          { "address" => "volume2:10047/droonga.002" },
+          { "address" => "volume2:10047/droonga.003" },
+        ],
+      }
+      @replicas = create_replicas(volume)
     end
 
     def test_all_nodes
       assert_equal(["volume1:10047/droonga", "volume2:10047/droonga"],
-                   @collection.all_nodes)
+                   @replicas.all_nodes)
     end
   end
 end

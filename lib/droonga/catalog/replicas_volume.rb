@@ -49,7 +49,7 @@ module Droonga
           replicas = live_replicas(live_nodes)
           [replicas.sample]
         when :all
-          replicas
+          self.replicas
         else
           super
         end
