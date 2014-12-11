@@ -396,11 +396,11 @@ module Droonga
         end
       end
 
-      class UpdateLiveNodes < Base
+      class UpdateLiveNodesList < Base
         def process
-          path = Path.live_nodes
-          nodes = live_nodes
-          file_contents = JSON.pretty_generate(nodes)
+          path = Path.live_nodes_list
+          new_list = live_nodes_list
+          file_contents = JSON.pretty_generate(new_list)
           SafeFileWriter.write(path) do |output, file|
             output.puts(file_contents)
             @service_installation.ensure_correct_file_permission(file)
@@ -408,8 +408,8 @@ module Droonga
         end
 
         private
-        def live_nodes
-          @serf.live_nodes
+        def live_nodes_list
+          @serf.live_nodes_list
         end
       end
     end

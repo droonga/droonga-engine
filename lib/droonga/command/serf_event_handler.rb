@@ -61,7 +61,7 @@ module Droonga
           @payload = JSON.parse($stdin.gets)
           detect_command_class_from_custom_event(ENV["SERF_QUERY_NAME"])
         when "member-join", "member-leave", "member-update", "member-reap"
-          Remote::UpdateLiveNodes
+          Remote::UpdateLiveNodesList
         else
           nil
         end

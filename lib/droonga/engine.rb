@@ -36,9 +36,9 @@ module Droonga
       @catalog = load_catalog
       @state.catalog = @catalog
       @dispatcher = create_dispatcher
-      @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes)
+      @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes_list)
       @live_nodes_list_observer.on_change = lambda do
-        @state.live_nodes = load_live_nodes
+        @state.live_nodes_list = load_live_nodes_list
       end
       @node_status_observer = FileObserver.new(loop, Path.node_status)
       @node_status_observer.on_change = lambda do
@@ -116,14 +116,14 @@ module Droonga
       catalog
     end
 
-    def load_live_nodes
-      path = Path.live_nodes
+    def load_live_nodes_list
+      path = Path.live_nodes_list
       loader = LiveNodesListLoader.new(path)
-      live_nodes = loader.load
-      logger.info("live-nodes loaded",
+      live_nodes_list = loader.load
+      logger.info("live-nodes-list loaded",
                   :path  => path.to_s,
                   :mtime => path.mtime)
-      live_nodes
+      live_nodes_list
     end
 
     def create_dispatcher

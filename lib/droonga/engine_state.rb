@@ -45,7 +45,7 @@ module Droonga
       @on_ready = nil
       @on_finish = nil
       @catalog = nil
-      @live_nodes = nil
+      @live_nodes_list = nil
       @dead_nodes = []
     end
 
@@ -110,15 +110,21 @@ module Droonga
     end
 
     def live_nodes
-      @live_nodes || @catalog.all_nodes
+      if @live_nodes_list
+        @live_nodes_list.all_nodes
+      else
+        all_nodes
+      end
     end
 
-    def live_nodes=(nodes)
-      old_live_nodes = @live_nodes
-      @live_nodes = nodes
-      @dead_nodes = all_nodes - @live_nodes
-      @forwarder.resume if old_live_nodes != @live_nodes
-      @live_nodes
+    def live_nodes_list=(nodes_list)
+      old_live_nodes_list = @live_nodes_list
+      @live_nodes_list = nodes_list
+      @dead_nodes = all_nodes - @live_nodes_list.all
+      if old_live_nodes_list != @live_nodes_list.all
+        @forwarder.resume
+      end
+      @live_nodes_list
     end
 
     def remove_dead_routes(routes)

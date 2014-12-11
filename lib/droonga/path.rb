@@ -48,7 +48,7 @@ module Droonga
         state + "status_file"
       end
 
-      def live_nodes
+      def live_nodes_list
         state + "live-nodes.json"
       end
 

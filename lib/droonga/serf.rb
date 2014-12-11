@@ -125,9 +125,9 @@ module Droonga
       result
     end
 
-    def live_nodes
+    def live_nodes_list
       ensure_serf
-      nodes = {}
+      nodes_list = {}
       result = run_once("members", "-format", "json")
       result[:result] = JSON.parse(result[:result])
       members = result[:result]
@@ -135,13 +135,13 @@ module Droonga
       members["members"].each do |member|
         if member["status"] == "alive" and
            member["tags"]["cluster_id"] == current_cluster_id
-          nodes[member["name"]] = {
+          nodes_list[member["name"]] = {
             "serfAddress" => member["addr"],
             "tags"        => member["tags"],
           }
         end
       end
-      nodes
+      nodes_list
     end
 
     def set_tag(name, value)

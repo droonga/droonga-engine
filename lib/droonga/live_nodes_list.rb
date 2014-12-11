@@ -13,38 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "pathname"
-require "json"
-
-require "droonga/live_nodes_list"
-
 module Droonga
-  class LiveNodesListLoader
-    def initialize(path)
-      @path = path
+  class LiveNodesList
+    def initialize(nodes)
+      @nodes = nodes
     end
 
-    def load
-      list = parse
-      LiveNodesList.new(list)
-    end
-
-    private
-    def parse
-      return default_list unless @path.exist?
-
-      contents = @path.read
-      return default_list if contents.empty?
-
-      begin
-        JSON.parse(contents)
-      rescue JSON::ParserError
-        default_list
-      end
-    end
-
-    def default_list
-      {}
+    def all_nodes
+      @nodes.keys
     end
   end
 end
