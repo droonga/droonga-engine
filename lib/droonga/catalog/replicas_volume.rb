@@ -18,9 +18,9 @@ module Droonga
     class ReplicasVolume
       include Enumerable
 
-      def initialize(dataset, raw_volume)
+      def initialize(dataset, raw)
         @dataset = dataset
-        @raw_volume = raw_volume
+        @raw = raw
       end
 
       def each(&block)
@@ -97,7 +97,7 @@ module Droonga
 
       private
       def create_replicas
-        @raw_volume["replicas"].collect do |raw_replica|
+        @raw["replicas"].collect do |raw_replica|
           Catalog::Volume.create(@dataset, raw_replica)
         end
       end
