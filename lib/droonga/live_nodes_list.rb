@@ -20,7 +20,7 @@ module Droonga
     end
 
     def all_nodes
-      @nodes.keys
+      @all_nodes ||= @nodes.keys.sort
     end
 
     def dead_nodes
@@ -31,6 +31,12 @@ module Droonga
       @suspended_nodes ||= collect_suspended_nodes
     end
 
+    def ==(nodes_list)
+      nodes_list.all_nodes == all_nodes and
+        nodes_list.dead_nodes == dead_nodes and
+        nodes_list.suspended_nodes == suspended_nodes
+    end
+
     private
     def collect_dead_nodes
       nodes = []
@@ -39,7 +45,7 @@ module Droonga
           nodes << name
         end
       end
-      nodes
+      nodes.sort
     end
 
     def collect_suspended_nodes
@@ -50,7 +56,7 @@ module Droonga
           nodes << name
         end
       end
-      nodes
+      nodes.sort
     end
   end
 end
