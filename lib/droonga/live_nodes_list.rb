@@ -22,5 +22,20 @@ module Droonga
     def all_nodes
       @nodes.keys
     end
+
+    def suspended_nodes
+      @suspended_nodes ||= collect_suspended_nodes
+    end
+
+    private
+    def collect_suspended_nodes
+      nodes = []
+      @nodes.each do |name, state|
+        if state["tags"]["suspended"] == "true"
+          nodes << name
+        end
+      end
+      nodes
+    end
   end
 end

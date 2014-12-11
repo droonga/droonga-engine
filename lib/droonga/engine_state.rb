@@ -117,6 +117,14 @@ module Droonga
       end
     end
 
+    def suspended_nodes
+      if @live_nodes_list
+        @live_nodes_list.suspended_nodes
+      else
+        []
+      end
+    end
+
     def live_nodes_list=(nodes_list)
       old_live_nodes_list = @live_nodes_list
       @live_nodes_list = nodes_list
