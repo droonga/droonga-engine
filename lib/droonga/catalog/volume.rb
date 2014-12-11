@@ -21,14 +21,9 @@ module Droonga
   module Catalog
     module Volume
       class UnknownTypeVolume < ArgumentError
-        attr_reader :raw_volume
-
         def initialize(raw_volume)
-          @raw_volume = raw_volume
-        end
-
-        def message
-          @raw_volume.inspect
+          super("volume must have one of 'address', 'slices' or 'replicas': " +
+                  "#{raw_volume.inspect}")
         end
       end
 
