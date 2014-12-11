@@ -77,11 +77,11 @@ module Droonga
         when "broadcast"
           slices = select_slices
           slices.each do |slice|
-            routes += slice.compute_routes(message, live_nodes)
+            routes.concat(slice.compute_routes(message, live_nodes))
           end
         when "scatter"
           slice = choose_slice(message["record"])
-          routes += slice.compute_routes(message, live_nodes)
+          routes.concat(slice.compute_routes(message, live_nodes))
         end
         routes.sort.uniq
       end

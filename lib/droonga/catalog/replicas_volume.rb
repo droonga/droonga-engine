@@ -83,12 +83,12 @@ module Droonga
         when "broadcast"
           volumes = select(message["replica"].to_sym, live_nodes)
           volumes.each do |volume|
-            routes += volume.compute_routes(message, live_nodes)
+            routes.concat(volume.compute_routes(message, live_nodes))
           end
         when "scatter"
           volumes = select(message["replica"].to_sym, live_nodes)
           volumes.each do |volume|
-            routes += volume.compute_routes(message, live_nodes)
+            routes.concat(volume.compute_routes(message, live_nodes))
           end
         end
         routes.sort.uniq
