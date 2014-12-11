@@ -18,18 +18,18 @@ module Droonga
     class ReplicasVolume
       include Enumerable
 
-      def initialize(dataset, data)
+      def initialize(dataset, raw_volume)
         @dataset = dataset
 
-        if data.is_a?(Hash) and data.key?("replicas")
-          @data     = data
-          @volumes = @data["replicas"].collect do |raw_volume|
+        if raw_volume.is_a?(Hash) and raw_volume.key?("replicas")
+          @raw_volume = raw_volume
+          @volumes = @raw_volume["replicas"].collect do |raw_volume|
             Catalog::Volume.create(dataset, raw_volume)
           end
-        elsif data.is_a?(Array)
-          @volumes = data
+        elsif raw_volume.is_a?(Array)
+          @volumes = raw_volume
         else
-          raise ArgumentError.new(data)
+          raise ArgumentError.new(raw_volume)
         end
       end
 

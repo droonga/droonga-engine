@@ -21,18 +21,18 @@ require "droonga/catalog/slice"
 module Droonga
   module Catalog
     class SlicesVolume
-      def initialize(dataset, data)
+      def initialize(dataset, raw_volume)
         @dataset = dataset
-        @data = data
+        @raw_volume = raw_volume
         compute_continuum if ratio_scaled_slicer?
       end
 
       def dimension
-        @data["dimension"] || "_key"
+        @raw_volume["dimension"] || "_key"
       end
 
       def slicer
-        @data["slicer"] || "hash"
+        @raw_volume["slicer"] || "hash"
       end
 
       def slices
@@ -124,7 +124,7 @@ module Droonga
       end
 
       def create_slices
-        @data["slices"].collect do |raw_slice|
+        @raw_volume["slices"].collect do |raw_slice|
           Slice.new(@dataset, raw_slice)
         end
       end
