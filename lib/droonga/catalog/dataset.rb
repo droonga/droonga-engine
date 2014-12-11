@@ -23,36 +23,36 @@ module Droonga
 
       attr_reader :name
 
-      def initialize(name, raw_dataset)
+      def initialize(name, raw)
         @name = name
-        @raw_dataset = raw_dataset
+        @raw = raw
         @schema = nil
       end
 
       # provided for compatibility
       def [](key)
-        @raw_dataset[key]
+        @raw[key]
       end
 
       # provided for compatibility
       def []=(key, value)
-        @raw_dataset[key] = value
+        @raw[key] = value
       end
 
       def schema
-        @schema ||= Schema.new(@name, @raw_dataset["schema"])
+        @schema ||= Schema.new(@name, @raw["schema"])
       end
 
       def plugins
-        @raw_dataset["plugins"] || []
+        @raw["plugins"] || []
       end
 
       def fact
-        @raw_dataset["fact"]
+        @raw["fact"]
       end
 
       def n_workers
-        @raw_dataset["nWorkers"] || 0
+        @raw["nWorkers"] || 0
       end
 
       #XXX Currently, dataset has a property named "replicas" so
@@ -60,7 +60,7 @@ module Droonga
       #    We must introduce a new property "volume" to provide
       #    ReplicasVolume safely.
       def replicas
-        @replicas ||= ReplicasVolume.new(self, @raw_dataset)
+        @replicas ||= ReplicasVolume.new(self, @raw)
       end
 
       def all_nodes
