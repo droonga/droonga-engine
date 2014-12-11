@@ -114,18 +114,22 @@ module Droonga
     #  * read-write messages : deliver
     #  * responses           : returned
     def active_nodes
-      live_nodes - suspended_nodes
+      all_nodes - dead_nodes - suspended_nodes
     end
 
-    # nodes in the serf cluster
+    # nodes in the cluster
     #  * read-only messages  : deliver
     #  * read-write messages : deliver
     #  * responses           : undetermined
     def live_nodes
+      all_nodes - dead_nodes
+    end
+
+    def dead_nodes
       if @live_nodes_list
-        @live_nodes_list.live_nodes
+        @live_nodes_list.dead_nodes
       else
-        all_nodes
+        []
       end
     end
 

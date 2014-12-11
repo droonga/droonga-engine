@@ -23,8 +23,8 @@ module Droonga
       @nodes.keys
     end
 
-    def live_nodes
-      @live_nodes ||= collect_live_nodes
+    def dead_nodes
+      @dead_nodes ||= collect_dead_nodes
     end
 
     def suspended_nodes
@@ -32,10 +32,10 @@ module Droonga
     end
 
     private
-    def collect_live_nodes
+    def collect_dead_nodes
       nodes = []
       @nodes.each do |name, state|
-        if not state["foreign"] and state["live"]
+        unless state["live"]
           nodes << name
         end
       end

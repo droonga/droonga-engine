@@ -54,7 +54,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
       ]
     end
 
-    def live_nodes
+    def active_nodes
       [
         "127.0.0.1:10031/droonga",
       ]
@@ -63,6 +63,12 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     def suspended_nodes
       [
         "127.0.0.1:10032/droonga",
+      ]
+    end
+
+    def dead_nodes
+      [
+        "127.0.0.1:10033/droonga",
       ]
     end
   end
