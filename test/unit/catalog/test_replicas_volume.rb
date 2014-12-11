@@ -31,11 +31,11 @@ class CatalogReplicasTest < Test::Unit::TestCase
           { "address" => "volume3:10047/droonga.000" },
         ],
       }
-      @collection = create_replicas(volume)
+      @replicas = create_replicas(volume)
     end
 
     def test_top
-      hosts = @collection.select(:top).collect do |volume|
+      hosts = @replicas.select(:top).collect do |volume|
         volume.address.host
       end
       assert_equal(["volume1"],
@@ -43,14 +43,14 @@ class CatalogReplicasTest < Test::Unit::TestCase
     end
 
     def test_random
-      random_volumes = @collection.select(:random).collect do |volume|
+      random_volumes = @replicas.select(:random).collect do |volume|
         volume.address.host.gsub(/\Avolume[123]\z/, "any volume")
       end
       assert_equal(["any volume"], random_volumes)
     end
 
     def test_all
-      hosts = @collection.select(:all).collect do |volume|
+      hosts = @replicas.select(:all).collect do |volume|
         volume.address.host
       end
       assert_equal(["volume1", "volume2", "volume3"],
