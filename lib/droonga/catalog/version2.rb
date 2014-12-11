@@ -83,7 +83,7 @@ module Droonga
       def collect_all_nodes
         nodes = []
         @datasets.each do |name, dataset|
-          nodes += dataset.all_nodes
+          nodes.concat(dataset.all_nodes)
         end
         nodes.sort.uniq
       end
