@@ -145,8 +145,8 @@ module Droonga
     def live_nodes_list=(nodes_list)
       old_live_nodes_list = @live_nodes_list
       @live_nodes_list = nodes_list
-      @dead_nodes = all_nodes - @live_nodes_list.all
-      if old_live_nodes_list != @live_nodes_list.all
+      @dead_nodes = all_nodes - @live_nodes_list.live_nodes
+      if old_live_nodes_list != @live_nodes_list.live_nodes
         @forwarder.resume
       end
       @live_nodes_list
