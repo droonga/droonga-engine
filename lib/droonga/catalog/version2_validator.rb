@@ -18,8 +18,8 @@ require "droonga/catalog/errors"
 module Droonga
   module Catalog
     class Version2Validator
-      def initialize(raw_catalog, path)
-        @raw_catalog = raw_catalog
+      def initialize(raw, path)
+        @raw = raw
         @path = path
       end
 
@@ -35,11 +35,11 @@ module Droonga
 
       private
       def validate_datasets
-        unless @raw_catalog.key?("datasets")
+        unless @raw.key?("datasets")
           required_parameter_is_missing("datasets")
           return
         end
-        @raw_catalog["datasets"].each do |name, dataset|
+        @raw["datasets"].each do |name, dataset|
           validate_dataset(name, dataset)
         end
       end
