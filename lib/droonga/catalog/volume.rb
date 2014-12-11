@@ -21,22 +21,22 @@ module Droonga
   module Catalog
     module Volume
       class UnknownTypeVolume < ArgumentError
-        def initialize(raw_volume)
+        def initialize(raw)
           super("volume must have one of 'address', 'slices' or 'replicas': " +
-                  "#{raw_volume.inspect}")
+                  "#{raw.inspect}")
         end
       end
 
       class << self
-        def create(dataset, raw_volume)
-          if raw_volume.key?("address")
-            SingleVolume.new(raw_volume)
-          elsif raw_volume.key?("slices")
-            SlicesVolume.new(dataset, raw_volume)
-          elsif raw_volume.key?("replicas")
-            ReplicasVolume.new(dataset, raw_volume)
+        def create(dataset, raw)
+          if raw.key?("address")
+            SingleVolume.new(raw)
+          elsif raw.key?("slices")
+            SlicesVolume.new(dataset, raw)
+          elsif raw.key?("replicas")
+            ReplicasVolume.new(dataset, raw)
           else
-            raise UnknownTypeVolume.new(raw_volume)
+            raise UnknownTypeVolume.new(raw)
           end
         end
       end
