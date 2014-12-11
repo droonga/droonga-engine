@@ -19,55 +19,55 @@ module Droonga
   module Catalog
     class Schema
       class ColumnVectorOptions
-        def initialize(data)
-          @data = data
+        def initialize(raw)
+          @raw = raw
         end
 
         def weight
-          @data["weight"]
+          @raw["weight"]
         end
       end
 
       class ColumnIndexOptions
-        def initialize(data)
-          @data = data
+        def initialize(raw)
+          @raw = raw
         end
 
         def section
-          @data["section"]
+          @raw["section"]
         end
 
         def weight
-          @data["weight"]
+          @raw["weight"]
         end
 
         def position
-          @data["position"]
+          @raw["position"]
         end
 
         def sources
-          @data["sources"]
+          @raw["sources"]
         end
       end
 
       class Column
-        attr_reader :table, :name, :data, :vector_options, :index_options
-        def initialize(table, name, data)
+        attr_reader :table, :name, :raw, :vector_options, :index_options
+        def initialize(table, name, raw)
           @table = table
           @name = name
-          @data = data
-          @vector_options = ColumnVectorOptions.new(vector_options_data)
-          @index_options = ColumnIndexOptions.new(index_options_data)
+          @raw = raw
+          @vector_options = ColumnVectorOptions.new(raw_vector_options)
+          @index_options = ColumnIndexOptions.new(raw_index_options)
         end
 
         def ==(other)
           self.class == other.class and
             name == other.name and
-            data == other.data
+            raw == other.raw
         end
 
         def type
-          @data["type"] || "Scalar"
+          @raw["type"] || "Scalar"
         end
 
         def type_symbol
@@ -82,7 +82,7 @@ module Droonga
         end
 
         def value_type
-          @data["valueType"]
+          @raw["valueType"]
         end
 
         def value_type_groonga
@@ -94,35 +94,35 @@ module Droonga
         end
 
         private
-        def vector_options_data
-          @data["vectorOptions"] || {}
+        def raw_vector_options
+          @raw["vectorOptions"] || {}
         end
 
-        def index_options_data
-          @data["indexOptions"] || {}
+        def raw_index_options
+          @raw["indexOptions"] || {}
         end
       end
 
       class Table
-        attr_reader :name, :columns, :data
-        def initialize(name, data)
+        attr_reader :name, :columns, :raw
+        def initialize(name, raw)
           @name = name
-          @data = data
+          @raw = raw
           @columns = {}
 
-          columns_data.each do |column_name, column_data|
-            @columns[column_name] = Column.new(name, column_name, column_data)
+          raw_columns.each do |column_name, raw_column|
+            @columns[column_name] = Column.new(name, column_name, raw_column)
           end
         end
 
         def ==(other)
           self.class == other.class and
             name == other.name and
-            data == other.data
+            raw == other.raw
         end
 
         def type
-          @data["type"] || "Hash"
+          @raw["type"] || "Hash"
         end
 
         def type_symbol
@@ -154,26 +154,26 @@ module Droonga
         end
 
         def tokenizer
-          @data["tokenizer"]
+          @raw["tokenizer"]
         end
 
         def normalizer
-          @data["normalizer"]
+          @raw["normalizer"]
         end
 
         private
-        def columns_data
-          @data["columns"] || []
+        def raw_columns
+          @raw["columns"] || []
         end
       end
 
       attr_reader :tables
-      def initialize(dataset_name, data)
+      def initialize(dataset_name, raw)
         @dataset_name = dataset_name
-        @data = data || []
+        @raw = raw || []
         @tables = {}
-        @data.each do |table_name, table_data|
-          @tables[table_name] = Table.new(table_name, table_data)
+        @raw.each do |table_name, raw_table|
+          @tables[table_name] = Table.new(table_name, raw_table)
         end
       end
 
