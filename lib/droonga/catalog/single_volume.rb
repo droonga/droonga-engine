@@ -19,9 +19,9 @@ module Droonga
   module Catalog
     class SingleVolume
       attr_reader :address
-      def initialize(raw_volume)
-        @raw_volume = raw_volume
-        @address = Address.parse(@raw_volume["address"])
+      def initialize(raw)
+        @raw = raw
+        @address = Address.parse(@raw["address"])
       end
 
       def node
