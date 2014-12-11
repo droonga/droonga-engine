@@ -50,12 +50,19 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
       [
         "127.0.0.1:10031/droonga",
         "127.0.0.1:10032/droonga",
+        "127.0.0.1:10033/droonga",
       ]
     end
 
     def live_nodes
       [
         "127.0.0.1:10031/droonga",
+      ]
+    end
+
+    def suspended_nodes
+      [
+        "127.0.0.1:10032/droonga",
       ]
     end
   end
@@ -67,10 +74,13 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     status = {
       "nodes" => {
         "127.0.0.1:10031/droonga" => {
-          "live" => true,
+          "status" => "active",
         },
         "127.0.0.1:10032/droonga" => {
-          "live" => false,
+          "status" => "suspended",
+        },
+        "127.0.0.1:10033/droonga" => {
+          "status" => "inactive",
         },
       },
     }
