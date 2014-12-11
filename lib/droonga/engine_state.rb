@@ -154,9 +154,10 @@ module Droonga
       @live_nodes_list
     end
 
-    def remove_dead_routes(routes)
+    def remove_inactive_routes(routes)
       routes.reject do |route|
-        dead_nodes.include?(farm_path(route))
+        node = farm_path(route)
+        dead_nodes.include?(node) or suspended_nodes.include?(node)
       end
     end
 
