@@ -26,14 +26,14 @@ module Droonga
 
         def handle(message)
           engine_state = @messenger.engine_state
-          live_nodes = engine_state.live_nodes
+          active_nodes = engine_state.active_nodes
           suspended_nodes = engine_state.suspended_nodes
           nodes = {}
           engine_state.all_nodes.collect do |identifier|
-            if suspended_nodes.include?(identifier)
-              status = "suspended"
-            elsif live_nodes.include?(identifier)
+            if active_nodes.include?(identifier)
               status = "active"
+            elsif suspended_nodes.include?(identifier)
+              status = "suspended"
             else
               status = "inactive"
             end

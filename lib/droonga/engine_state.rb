@@ -109,6 +109,18 @@ module Droonga
       @catalog.all_nodes
     end
 
+    # nodes who provide the service actually
+    #  * read-only messages  : deliver
+    #  * read-write messages : deliver
+    #  * responses           : returned
+    def active_nodes
+      live_nodes - suspended_nodes
+    end
+
+    # nodes in the serf cluster
+    #  * read-only messages  : deliver
+    #  * read-write messages : deliver
+    #  * responses           : undetermined
     def live_nodes
       if @live_nodes_list
         @live_nodes_list.all_nodes
@@ -117,6 +129,11 @@ module Droonga
       end
     end
 
+    # nodes who temporary suspended
+    # (going to join to the cluster, etc,)
+    #  * read-only messages  : don't deliver
+    #  * read-write messages : deliver
+    #  * responses           : not returned
     def suspended_nodes
       if @live_nodes_list
         @live_nodes_list.suspended_nodes
