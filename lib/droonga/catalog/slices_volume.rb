@@ -83,7 +83,7 @@ module Droonga
           slice = choose_slice(message["record"])
           routes.concat(slice.compute_routes(message, live_nodes))
         end
-        routes.sort.uniq
+        routes
       end
 
       def sliced?
