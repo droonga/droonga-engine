@@ -133,13 +133,13 @@ module Droonga
       members = result[:result]
       current_cluster_id = cluster_id
       members["members"].each do |member|
-        if member["status"] == "alive" and
-           member["tags"]["cluster_id"] == current_cluster_id
-          nodes_list[member["name"]] = {
-            "serfAddress" => member["addr"],
-            "tags"        => member["tags"],
-          }
-        end
+        foreign = member["tags"]["cluster_id"] != current_cluster_id
+        nodes_list[member["name"]] = {
+          "live"        => member["status"] == "alive",
+          "foreign"     => foreign,
+          "serfAddress" => member["addr"],
+          "tags"        => member["tags"],
+        }
       end
       nodes_list
     end

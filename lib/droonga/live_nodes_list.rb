@@ -23,15 +23,30 @@ module Droonga
       @nodes.keys
     end
 
+    def live_nodes
+      @live_nodes ||= collect_live_nodes
+    end
+
     def suspended_nodes
       @suspended_nodes ||= collect_suspended_nodes
     end
 
     private
+    def collect_live_nodes
+      nodes = []
+      @nodes.each do |name, state|
+        if not state["foreign"] and state["live"]
+          nodes << name
+        end
+      end
+      nodes
+    end
+
     def collect_suspended_nodes
       nodes = []
       @nodes.each do |name, state|
-        if state["tags"]["suspended"] == "true"
+        if not state["foreign"] and
+             state["tags"]["suspended"] == "true"
           nodes << name
         end
       end

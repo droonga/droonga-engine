@@ -123,7 +123,7 @@ module Droonga
     #  * responses           : undetermined
     def live_nodes
       if @live_nodes_list
-        @live_nodes_list.all_nodes
+        @live_nodes_list.live_nodes
       else
         all_nodes
       end
