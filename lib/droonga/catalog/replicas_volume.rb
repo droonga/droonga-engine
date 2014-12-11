@@ -105,7 +105,7 @@ module Droonga
       def collect_all_nodes
         nodes = []
         replicas.each do |volume|
-          nodes += volume.all_nodes
+          nodes.concat(volume.all_nodes)
         end
         nodes.sort.uniq
       end
