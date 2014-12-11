@@ -23,7 +23,7 @@ require "droonga/catalog/dataset"
 module Droonga
   module Catalog
     class Version1 < Base
-      def initialize(raw_catalog, path)
+      def initialize(raw, path)
         super
         @errors = []
 
@@ -42,10 +42,10 @@ module Droonga
       end
 
       def get_partitions(name)
-        device = @raw_catalog["farms"][name]["device"]
+        device = @raw["farms"][name]["device"]
         pattern = Regexp.new("^#{name}\.")
         results = {}
-        @raw_catalog["datasets"].each do |dataset_name, dataset_data|
+        @raw["datasets"].each do |dataset_name, dataset_data|
           dataset = Dataset.new(dataset_name, dataset_data)
           workers = dataset["workers"]
           plugins = dataset["plugins"]
@@ -79,7 +79,7 @@ module Droonga
       private
       def prepare_data
         @datasets = {}
-        @raw_catalog["datasets"].each do |name, dataset|
+        @raw["datasets"].each do |name, dataset|
           @datasets[name] = Dataset.new(name, dataset)
           number_of_partitions = dataset["number_of_partitions"]
           next if number_of_partitions < 2
@@ -94,7 +94,7 @@ module Droonga
           end
           dataset["continuum"] = continuum.sort do |a, b| a[0] - b[0]; end
         end
-        @options = @raw_catalog["options"] || {}
+        @options = @raw["options"] || {}
       end
 
       def compute_total_weight(dataset)
@@ -104,7 +104,7 @@ module Droonga
       end
 
       def collect_all_nodes
-        @raw_catalog["zones"].sort
+        @raw["zones"].sort
       end
 
       def validate
@@ -190,13 +190,13 @@ module Droonga
       end
 
       def validate_effective_date
-        date = @raw_catalog["effective_date"]
+        date = @raw["effective_date"]
         validate_required_parameter(date, "effective_date")
         validate_valid_datetime(date, "effective_date")
       end
 
       def validate_farms
-        farms = @raw_catalog["farms"]
+        farms = @raw["farms"]
 
         validate_required_parameter(farms, "farms")
         validate_parameter_type(Hash, farms, "farms")
@@ -214,7 +214,7 @@ module Droonga
       end
 
       def validate_zones
-        zones = @raw_catalog["zones"]
+        zones = @raw["zones"]
 
         validate_required_parameter(zones, "zones")
         validate_parameter_type(Array, zones, "zones")
@@ -236,7 +236,7 @@ module Droonga
       end
 
       def validate_datasets
-        datasets = @raw_catalog["datasets"]
+        datasets = @raw["datasets"]
 
         validate_required_parameter(datasets, "datasets")
         validate_parameter_type(Hash, datasets, "datasets")
@@ -328,11 +328,11 @@ module Droonga
       end
 
       def validate_zone_relations
-        return unless @raw_catalog["zones"].is_a?(Array)
-        return unless @raw_catalog["farms"].is_a?(Hash)
+        return unless @raw["zones"].is_a?(Array)
+        return unless @raw["farms"].is_a?(Hash)
 
-        farms = @raw_catalog["farms"]
-        zones = @raw_catalog["zones"]
+        farms = @raw["farms"]
+        zones = @raw["zones"]
 
         all_farms = farms.keys
         all_zones = zones.flatten
@@ -351,14 +351,14 @@ module Droonga
       end
 
       def validate_database_relations
-        return unless @raw_catalog["farms"]
+        return unless @raw["farms"]
 
-        farm_names = @raw_catalog["farms"].keys.collect do |name|
+        farm_names = @raw["farms"].keys.collect do |name|
           Regexp.escape(name)
         end
         valid_farms_matcher = Regexp.new("^(#{farm_names.join("|")})\.")
 
-        @raw_catalog["datasets"].each do |dataset_name, dataset|
+        @raw["datasets"].each do |dataset_name, dataset|
           ring = dataset["ring"]
           next if ring.nil? or !ring.is_a?(Hash)
           ring.each do |ring_key, part|
