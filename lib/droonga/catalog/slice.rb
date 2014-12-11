@@ -16,25 +16,25 @@
 module Droonga
   module Catalog
     class Slice
-      def initialize(dataset, raw_slice)
+      def initialize(dataset, raw)
         @dataset = dataset
-        @raw_slice = raw_slice
+        @raw = raw
       end
 
       def weight
-        @raw_slice["weight"] || 1
+        @raw["weight"] || 1
       end
 
       def label
-        @raw_slice["label"]
+        @raw["label"]
       end
 
       def boundary
-        @raw_slice["boundary"]
+        @raw["boundary"]
       end
 
       def volume
-        @volume ||= Catalog::Volume.create(@dataset, @raw_slice["volume"])
+        @volume ||= Catalog::Volume.create(@dataset, @raw["volume"])
       end
 
       def replicas
