@@ -71,19 +71,19 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
-      def collect_routes_for(message, params)
-        routes = params[:routes] ||= []
+      def compute_routes(message, live_nodes)
+        routes = []
         case message["type"]
         when "broadcast"
           slices = select_slices
           slices.each do |slice|
-            slice.collect_routes_for(message, params)
+            routes += slice.compute_routes(message, live_nodes)
           end
         when "scatter"
           slice = choose_slice(message["record"])
-          slice.collect_routes_for(message, params)
+          routes += slice.compute_routes(message, live_nodes)
         end
-        routes
+        routes.sort.uniq
       end
 
       def sliced?

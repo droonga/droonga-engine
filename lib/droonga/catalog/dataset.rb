@@ -68,8 +68,7 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        @replicas.collect_routes_for(message,
-                                     :live_nodes => live_nodes)
+        @replicas.compute_routes(message, live_nodes)
       end
 
       def sliced?

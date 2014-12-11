@@ -77,21 +77,21 @@ module Droonga
         end
       end
 
-      def collect_routes_for(message, params)
-        routes = params[:routes] ||= []
+      def compute_routes(message, live_nodes)
+        routes = []
         case message["type"]
         when "broadcast"
-          volumes = select(message["replica"].to_sym, params[:live_nodes])
+          volumes = select(message["replica"].to_sym, live_nodes)
           volumes.each do |volume|
-            volume.collect_routes_for(message, params)
+            routes += volume.compute_routes(message, live_nodes)
           end
         when "scatter"
-          volumes = select(message["replica"].to_sym, params[:live_nodes])
+          volumes = select(message["replica"].to_sym, live_nodes)
           volumes.each do |volume|
-            volume.collect_routes_for(message, params)
+            routes += volume.compute_routes(message, live_nodes)
           end
         end
-        routes
+        routes.sort.uniq
       end
 
       def sliced?

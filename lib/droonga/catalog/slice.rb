@@ -57,15 +57,13 @@ module Droonga
         @all_nodes ||= volume.all_nodes
       end
 
-      def collect_routes_for(message, params)
+      def compute_routes(message, live_nodes)
         if replicas
-          replicas.collect_routes_for(message, params)
+          replicas.compute_routes(message, live_nodes)
         elsif slices
-          slices.collect_routes_for(message, params)
+          slices.compute_routes(message, live_nodes)
         else
-          routes = params[:routes] ||= []
-          routes << volume.address.to_s
-          routes
+          [volume.address.to_s]
         end
       end
     end
