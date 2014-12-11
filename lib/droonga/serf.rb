@@ -149,8 +149,21 @@ module Droonga
       run_once("tags", "-set", "#{name}=#{value}")
     end
 
+    def delete_tag(name)
+      ensure_serf
+      run_once("tags", "-delete", name)
+    end
+
     def update_cluster_id
       set_tag("cluster_id", cluster_id)
+    end
+
+    def suspended=(suspended)
+      if suspended
+        set_tag("suspended", "true")
+      else
+        delete_tag("suspended")
+      end
     end
 
     def cluster_id
