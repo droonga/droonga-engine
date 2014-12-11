@@ -132,7 +132,7 @@ module Droonga
       def collect_all_nodes
         nodes = []
         slices.each do |slice|
-          nodes += slice.all_nodes
+          nodes.concat(slice.all_nodes)
         end
         nodes.uniq.sort
       end
