@@ -37,34 +37,12 @@ module Droonga
         @volume ||= Catalog::Volume.create(@dataset, @raw["volume"])
       end
 
-      def replicas
-        if volume.is_a?(ReplicasVolume)
-          volume.replicas
-        else
-          nil
-        end
-      end
-
-      def slices
-        if volume.is_a?(SlicesVolume)
-          volume.slices
-        else
-          nil
-        end
-      end
-
       def all_nodes
         @all_nodes ||= volume.all_nodes
       end
 
       def compute_routes(message, live_nodes)
-        if replicas
-          replicas.compute_routes(message, live_nodes)
-        elsif slices
-          slices.compute_routes(message, live_nodes)
-        else
-          [volume.address.to_s]
-        end
+        volume.compute_routes(message, live_nodes)
       end
     end
   end
