@@ -73,9 +73,7 @@ module Droonga
 
       def sliced?
         # TODO: Support slice key
-        replicas.any? do |volume|
-          volume.sliced?
-        end
+        @replicas.sliced?
       end
     end
   end
