@@ -139,7 +139,7 @@ module Droonga
         end
 
         def key_type
-          @data["keyType"]
+          @raw["keyType"]
         end
 
         def key_type_groonga
