@@ -15,7 +15,6 @@
 
 require "droonga/catalog/schema"
 require "droonga/catalog/volume"
-require "droonga/catalog/volume_collection"
 
 module Droonga
   module Catalog
@@ -24,40 +23,44 @@ module Droonga
 
       attr_reader :name
 
-      def initialize(name, data)
+      def initialize(name, raw)
         @name = name
-        @data = data
+        @raw = raw
         @schema = nil
       end
 
       # provided for compatibility
       def [](key)
-        @data[key]
+        @raw[key]
       end
 
       # provided for compatibility
       def []=(key, value)
-        @data[key] = value
+        @raw[key] = value
       end
 
       def schema
-        @schema ||= Schema.new(@name, @data["schema"])
+        @schema ||= Schema.new(@name, @raw["schema"])
       end
 
       def plugins
-        @data["plugins"] || []
+        @raw["plugins"] || []
       end
 
       def fact
-        @data["fact"]
+        @raw["fact"]
       end
 
       def n_workers
-        @data["nWorkers"] || 0
+        @raw["nWorkers"] || 0
       end
 
+      #XXX Currently, dataset has a property named "replicas" so
+      #    can be parsed as a ReplicasVolume.
+      #    We must introduce a new property "volume" to provide
+      #    ReplicasVolume safely.
       def replicas
-        @replicas ||= VolumeCollection.new(create_volumes(@data["replicas"]))
+        @replicas ||= ReplicasVolume.new(self, @raw)
       end
 
       def all_nodes
@@ -65,39 +68,12 @@ module Droonga
       end
 
       def compute_routes(message, live_nodes)
-        routes = []
-        case message["type"]
-        when "broadcast"
-          volumes = replicas.select(message["replica"].to_sym, live_nodes)
-          volumes.each do |volume|
-            slices = volume.select_slices
-            slices.each do |slice|
-              routes << slice.volume.address.to_s
-            end
-          end
-        when "scatter"
-          volumes = replicas.select(message["replica"].to_sym, live_nodes)
-          volumes.each do |volume|
-            slice = volume.choose_slice(message["record"])
-            routes << slice.volume.address.to_s
-          end
-        end
-        routes
+        @replicas.compute_routes(message, live_nodes)
       end
 
-      def single_slice?
+      def sliced?
         # TODO: Support slice key
-        replicas.all? do |volume|
-          volume.is_a?(SingleVolume) or
-            volume.slices.size == 1
-        end
-      end
-
-      private
-      def create_volumes(raw_volumes)
-        raw_volumes.collect do |raw_volume|
-          Volume.create(self, raw_volume)
-        end
+        @replicas.sliced?
       end
     end
   end

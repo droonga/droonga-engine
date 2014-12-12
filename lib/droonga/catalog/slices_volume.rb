@@ -20,25 +20,23 @@ require "droonga/catalog/slice"
 
 module Droonga
   module Catalog
-    class CollectionVolume
-      def initialize(dataset, data)
+    class SlicesVolume
+      def initialize(dataset, raw)
         @dataset = dataset
-        @data = data
+        @raw = raw
         compute_continuum if ratio_scaled_slicer?
       end
 
       def dimension
-        @data["dimension"] || "_key"
+        @raw["dimension"] || "_key"
       end
 
       def slicer
-        @data["slicer"] || "hash"
+        @raw["slicer"] || "hash"
       end
 
       def slices
-        @slices ||= @data["slices"].collect do |raw_slice|
-          Slice.new(@dataset, raw_slice)
-        end
+        @slices ||= create_slices
       end
 
       def select_slices(range=0..-1)
@@ -71,6 +69,25 @@ module Droonga
 
       def all_nodes
         @all_nodes ||= collect_all_nodes
+      end
+
+      def compute_routes(message, live_nodes)
+        routes = []
+        case message["type"]
+        when "broadcast"
+          slices = select_slices
+          slices.each do |slice|
+            routes.concat(slice.compute_routes(message, live_nodes))
+          end
+        when "scatter"
+          slice = choose_slice(message["record"])
+          routes.concat(slice.compute_routes(message, live_nodes))
+        end
+        routes
+      end
+
+      def sliced?
+        slices.size > 1
       end
 
       private
@@ -106,10 +123,16 @@ module Droonga
         end
       end
 
+      def create_slices
+        @raw["slices"].collect do |raw_slice|
+          Slice.new(@dataset, raw_slice)
+        end
+      end
+
       def collect_all_nodes
         nodes = []
         slices.each do |slice|
-          nodes += slice.all_nodes
+          nodes.concat(slice.all_nodes)
         end
         nodes.uniq.sort
       end

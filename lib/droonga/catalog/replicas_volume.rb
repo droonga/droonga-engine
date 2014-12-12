@@ -15,15 +15,16 @@
 
 module Droonga
   module Catalog
-    class VolumeCollection
+    class ReplicasVolume
       include Enumerable
 
-      def initialize(volumes)
-        @volumes = volumes
+      def initialize(dataset, raw)
+        @dataset = dataset
+        @raw = raw
       end
 
       def each(&block)
-        @volumes.each(&block)
+        replicas.each(&block)
       end
 
       def ==(other)
@@ -40,37 +41,71 @@ module Droonga
       end
 
       def select(how=nil, live_nodes=nil)
-        volumes = live_volumes(live_nodes)
         case how
         when :top
-          [volumes.first]
+          replicas = live_replicas(live_nodes)
+          [replicas.first]
         when :random
-          [volumes.sample]
+          replicas = live_replicas(live_nodes)
+          [replicas.sample]
         when :all
-          @volumes
+          live_replicas(live_nodes)
         else
           super
         end
+      end
+
+      def replicas
+        @replicas ||= create_replicas
       end
 
       def all_nodes
         @all_nodes ||= collect_all_nodes
       end
 
-      def live_volumes(live_nodes=nil)
-        return @volumes unless live_nodes
+      def live_replicas(live_nodes=nil)
+        return replicas unless live_nodes
 
-        @volumes.select do |volume|
+        replicas.select do |volume|
           dead_nodes = volume.all_nodes - live_nodes
           dead_nodes.empty?
         end
       end
 
+      def compute_routes(message, live_nodes)
+        routes = []
+        case message["type"]
+        when "broadcast"
+          replicas = select(message["replica"].to_sym, live_nodes)
+          replicas.each do |volume|
+            routes.concat(volume.compute_routes(message, live_nodes))
+          end
+        when "scatter"
+          replicas = select(message["replica"].to_sym, live_nodes)
+          replicas.each do |volume|
+            routes.concat(volume.compute_routes(message, live_nodes))
+          end
+        end
+        routes
+      end
+
+      def sliced?
+        replicas.any? do |volume|
+          volume.sliced?
+        end
+      end
+
       private
+      def create_replicas
+        @raw["replicas"].collect do |raw_replica|
+          Catalog::Volume.create(@dataset, raw_replica)
+        end
+      end
+
       def collect_all_nodes
         nodes = []
-        @volumes.each do |volume|
-          nodes += volume.all_nodes
+        replicas.each do |volume|
+          nodes.concat(volume.all_nodes)
         end
         nodes.sort.uniq
       end

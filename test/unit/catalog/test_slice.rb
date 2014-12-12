@@ -88,11 +88,43 @@ class CatalogSliceTest < Test::Unit::TestCase
       assert_equal("127.0.0.1:10047/volume.000",
                    slice.volume.address.to_s)
     end
+  end
 
-    def test_all_nodes
+  class AllNodesTest < self
+    def test_single
       data = {
         "volume" => {
           "address" => "127.0.0.1:10047/volume.000",
+        },
+      }
+      slice = create_slice(data)
+      assert_equal(["127.0.0.1:10047/volume"],
+                   slice.all_nodes)
+    end
+
+    def test_replicas
+      data = {
+        "volume" => {
+          "replicas" => [
+            { "address" => "127.0.0.1:10047/volume.000" },
+          ],
+        },
+      }
+      slice = create_slice(data)
+      assert_equal(["127.0.0.1:10047/volume"],
+                   slice.all_nodes)
+    end
+
+    def test_slices
+      data = {
+        "volume" => {
+          "slices" => [
+            {
+              "volume" => {
+                "address" => "127.0.0.1:10047/volume.000",
+              },
+            },
+          ],
         },
       }
       slice = create_slice(data)

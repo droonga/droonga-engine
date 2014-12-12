@@ -22,8 +22,8 @@ module DistributedSearchPlannerHelper
     stub(stub_dataset).name do
       Droonga::Catalog::Dataset::DEFAULT_NAME
     end
-    stub(stub_dataset).single_slice? do
-      false
+    stub(stub_dataset).sliced? do
+      true
     end
     planner = Droonga::Plugins::Search::DistributedSearchPlanner.new(stub_dataset, search_request)
     planner.plan

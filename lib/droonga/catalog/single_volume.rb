@@ -19,9 +19,9 @@ module Droonga
   module Catalog
     class SingleVolume
       attr_reader :address
-      def initialize(data)
-        @data = data
-        @address = Address.parse(@data["address"])
+      def initialize(raw)
+        @raw = raw
+        @address = Address.parse(@raw["address"])
       end
 
       def node
@@ -30,6 +30,14 @@ module Droonga
 
       def all_nodes
         @all_nodes ||= [node]
+      end
+
+      def compute_routes(message, live_nodes)
+        [address.to_s]
+      end
+
+      def sliced?
+        false
       end
     end
   end

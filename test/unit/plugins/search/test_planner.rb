@@ -24,8 +24,8 @@ class SearchPlannerTest < Test::Unit::TestCase
     stub(stub_dataset).name do
       Droonga::Catalog::Dataset::DEFAULT_NAME
     end
-    stub(stub_dataset).single_slice? do
-      false
+    stub(stub_dataset).sliced? do
+      true
     end
     @plugin = Droonga::Plugins::Search::Planner.new(stub_dataset)
   end

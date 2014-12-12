@@ -24,7 +24,7 @@ require "droonga/catalog/version2_validator"
 module Droonga
   module Catalog
     class Version2 < Base
-      def initialize(data, path)
+      def initialize(raw, path)
         super
         validate
         prepare_data
@@ -69,13 +69,13 @@ module Droonga
 
       private
       def validate
-        validator = Version2Validator.new(@data, @path)
+        validator = Version2Validator.new(@raw, @path)
         validator.validate
       end
 
       def prepare_data
         @datasets = {}
-        @data["datasets"].each do |name, dataset|
+        @raw["datasets"].each do |name, dataset|
           @datasets[name] = Dataset.new(name, dataset)
         end
       end
@@ -83,7 +83,7 @@ module Droonga
       def collect_all_nodes
         nodes = []
         @datasets.each do |name, dataset|
-          nodes += dataset.all_nodes
+          nodes.concat(dataset.all_nodes)
         end
         nodes.sort.uniq
       end

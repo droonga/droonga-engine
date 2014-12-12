@@ -14,15 +14,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/dataset"
+require "droonga/catalog/slices_volume"
 
 class CatalogSingleVolumeTest < Test::Unit::TestCase
-  def create_collection_volume(data)
+  def create_slices(data)
     minimum_dataset_data = {
       "replicas" => {
       },
     }
     dataset = Droonga::Catalog::Dataset.new("DatasetName", minimum_dataset_data)
-    Droonga::Catalog::CollectionVolume.new(dataset, data)
+    Droonga::Catalog::SlicesVolume.new(dataset, data)
   end
 
   class DimensionTest < self
@@ -30,7 +31,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       data = {
         "slices" => [],
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
       assert_equal("_key", volume.dimension)
     end
 
@@ -39,7 +40,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
         "dimension" => "group",
         "slices" => [],
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
       assert_equal("group", volume.dimension)
     end
   end
@@ -49,7 +50,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       data = {
         "slices" => [],
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
       assert_equal("hash", volume.slicer)
     end
 
@@ -57,7 +58,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       data = {
         "slicer" => "ordinal",
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
       assert_equal("ordinal", volume.slicer)
     end
   end
@@ -67,7 +68,7 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       data = {
         "slices" => [],
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
       assert_equal([], volume.slices)
     end
   end
@@ -95,14 +96,14 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
 
       private
       def total_weight(data)
-        volume = create_collection_volume(data)
+        volume = create_slices(data)
         volume.send(:compute_total_weight)
       end
     end
   end
 
-  class NodesTest < self
-    def test_all_nodes
+  class AllNodesTest < self
+    def test_slices
       data = {
         "slices" => [
           { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
@@ -111,7 +112,67 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
           { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
         ],
       }
-      volume = create_collection_volume(data)
+      volume = create_slices(data)
+      assert_equal(["127.0.0.1:23003/droonga", "127.0.0.1:23004/droonga"],
+                   volume.all_nodes)
+    end
+
+    def test_replicas_in_slice
+      data = {
+        "slices" => [
+          {
+            "volume" => {
+              "replicas" => [
+                { "address" => "127.0.0.1:23003/droonga.000" },
+                { "address" => "127.0.0.1:23003/droonga.001" },
+              ],
+            },
+          },
+          {
+            "volume" => {
+              "replicas" => [
+                { "address" => "127.0.0.1:23004/droonga.100" },
+                { "address" => "127.0.0.1:23004/droonga.101" },
+              ],
+            },
+          },
+        ],
+      }
+      volume = create_slices(data)
+      assert_equal(["127.0.0.1:23003/droonga", "127.0.0.1:23004/droonga"],
+                   volume.all_nodes)
+    end
+
+    def test_slices_in_replicas_in_slice
+      data = {
+        "slices" => [
+          {
+            "volume" => {
+              "replicas" => [
+                {
+                  "slices" => [
+                    { "volume" => { "address" => "127.0.0.1:23003/droonga.000" } },
+                    { "volume" => { "address" => "127.0.0.1:23003/droonga.001" } },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            "volume" => {
+              "replicas" => [
+                {
+                  "slices" => [
+                    { "volume" => { "address" => "127.0.0.1:23004/droonga.100" } },
+                    { "volume" => { "address" => "127.0.0.1:23004/droonga.101" } },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      }
+      volume = create_slices(data)
       assert_equal(["127.0.0.1:23003/droonga", "127.0.0.1:23004/droonga"],
                    volume.all_nodes)
     end
