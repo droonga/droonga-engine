@@ -32,7 +32,8 @@ module Droonga
     end
 
     def ==(nodes_list)
-      nodes_list.all_nodes == all_nodes and
+      nodes_list.is_a?(self.class) and
+        nodes_list.all_nodes == all_nodes and
         nodes_list.dead_nodes == dead_nodes and
         nodes_list.suspended_nodes == suspended_nodes
     end
