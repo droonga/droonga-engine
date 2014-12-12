@@ -45,8 +45,7 @@ module Droonga
       @on_ready = nil
       @on_finish = nil
       @catalog = nil
-      @live_nodes = nil
-      @dead_nodes = []
+      @live_nodes_list = nil
     end
 
     def start
@@ -109,21 +108,56 @@ module Droonga
       @catalog.all_nodes
     end
 
+    # nodes who provide the service actually
+    #  * read-only messages  : deliver
+    #  * read-write messages : deliver
+    #  * responses           : returned
+    def active_nodes
+      all_nodes - dead_nodes - suspended_nodes
+    end
+
+    # nodes in the cluster
+    #  * read-only messages  : deliver
+    #  * read-write messages : deliver
+    #  * responses           : undetermined
     def live_nodes
-      @live_nodes || @catalog.all_nodes
+      all_nodes - dead_nodes
     end
 
-    def live_nodes=(nodes)
-      old_live_nodes = @live_nodes
-      @live_nodes = nodes
-      @dead_nodes = all_nodes - @live_nodes
-      @forwarder.resume if old_live_nodes != @live_nodes
-      @live_nodes
+    def dead_nodes
+      if @live_nodes_list
+        @live_nodes_list.dead_nodes
+      else
+        []
+      end
     end
 
-    def remove_dead_routes(routes)
+    # nodes who temporary suspended
+    # (going to join to the cluster, etc,)
+    #  * read-only messages  : don't deliver
+    #  * read-write messages : deliver
+    #  * responses           : not returned
+    def suspended_nodes
+      if @live_nodes_list
+        @live_nodes_list.suspended_nodes
+      else
+        []
+      end
+    end
+
+    def live_nodes_list=(new_nodes_list)
+      old_live_nodes_list = @live_nodes_list
+      @live_nodes_list = new_nodes_list
+      unless old_live_nodes_list == new_nodes_list
+        @forwarder.resume
+      end
+      @live_nodes_list
+    end
+
+    def remove_inactive_routes(routes)
       routes.reject do |route|
-        @dead_nodes.include?(farm_path(route))
+        node = farm_path(route)
+        dead_nodes.include?(node) or suspended_nodes.include?(node)
       end
     end
 

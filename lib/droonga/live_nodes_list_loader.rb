@@ -16,6 +16,8 @@
 require "pathname"
 require "json"
 
+require "droonga/live_nodes_list"
+
 module Droonga
   class LiveNodesListLoader
     def initialize(path)
@@ -24,7 +26,7 @@ module Droonga
 
     def load
       list = parse
-      list.keys
+      LiveNodesList.new(list)
     end
 
     private

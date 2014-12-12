@@ -192,7 +192,12 @@ module Droonga
       steps.each do |step|
         dataset = @catalog.dataset(step["dataset"])
         if dataset
-          routes = dataset.compute_routes(step, @engine_state.live_nodes)
+          if write_step?(step)
+            target_nodes = @engine_state.live_nodes
+          else
+            target_nodes = @engine_state.active_nodes
+          end
+          routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes
         else
           step["routes"] ||= [id]
@@ -345,8 +350,8 @@ module Droonga
           (step["outputs"] || []).each do |output|
             descendants[output] = []
             @descendants[output].each do |index|
-              live_routes = @engine_state.remove_dead_routes(step["routes"])
-              @steps[index]["n_of_expects"] += live_routes.size
+              active_routes = @engine_state.remove_inactive_routes(step["routes"])
+              @steps[index]["n_of_expects"] += active_routes.size
               descendants[output].concat(@steps[index]["routes"])
             end
           end

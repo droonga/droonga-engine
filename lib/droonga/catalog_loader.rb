@@ -20,11 +20,15 @@ require "droonga/catalog/version2"
 
 module Droonga
   class CatalogLoader
-    def initialize(path)
+    def initialize(path=nil)
       @path = path
     end
 
     def load
+      unless @path
+        raise Error.new("nothing specified")
+      end
+
       data = nil
       begin
         data = File.open(@path) do |file|
@@ -35,7 +39,10 @@ module Droonga
       rescue JSON::ParserError => error
         raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
       end
+      parse(data)
+    end
 
+    def parse(data)
       unless data.is_a?(Hash)
         raise Error.new("Root element of catalog must be an object in #{@path}")
       end

@@ -125,23 +125,23 @@ module Droonga
       result
     end
 
-    def live_nodes
+    def live_nodes_list
       ensure_serf
-      nodes = {}
+      nodes_list = {}
       result = run_once("members", "-format", "json")
       result[:result] = JSON.parse(result[:result])
       members = result[:result]
       current_cluster_id = cluster_id
       members["members"].each do |member|
-        if member["status"] == "alive" and
-           member["tags"]["cluster_id"] == current_cluster_id
-          nodes[member["name"]] = {
-            "serfAddress" => member["addr"],
-            "tags"        => member["tags"],
-          }
-        end
+        foreign = member["tags"]["cluster_id"] != current_cluster_id
+        nodes_list[member["name"]] = {
+          "live"        => member["status"] == "alive",
+          "foreign"     => foreign,
+          "serfAddress" => member["addr"],
+          "tags"        => member["tags"],
+        }
       end
-      nodes
+      nodes_list
     end
 
     def set_tag(name, value)
@@ -149,8 +149,21 @@ module Droonga
       run_once("tags", "-set", "#{name}=#{value}")
     end
 
+    def delete_tag(name)
+      ensure_serf
+      run_once("tags", "-delete", name)
+    end
+
     def update_cluster_id
       set_tag("cluster_id", cluster_id)
+    end
+
+    def suspended=(suspended)
+      if suspended
+        set_tag("suspended", "true")
+      else
+        delete_tag("suspended")
+      end
     end
 
     def cluster_id

@@ -227,7 +227,7 @@ install_master() {
     git clone $REPOSITORY_URL
     cd $NAME
     install_rroonga
-    bundle install
+    bundle install --path vendor/
   fi
   rm -rf pkg
   bundle exec rake build

@@ -23,6 +23,7 @@ require "droonga/engine/version"
 require "droonga/path"
 require "droonga/catalog_fetcher"
 require "droonga/catalog_generator"
+require "droonga/catalog_loader"
 require "droonga/serf"
 
 class UnjoinCommand
@@ -85,6 +86,23 @@ class UnjoinCommand
     "#{replica_remove_host}:#{port}/#{tag}"
   end
 
+  def cluster_id
+    catalog.cluster_id
+  end
+
+  def catalog
+    @catalog ||= parse_catalog
+  end
+
+  def parse_catalog
+    loader = Droonga::CatalogLoader.new
+    loader.parse(raw_catalog)
+  end
+
+  def raw_catalog
+    @raw_catalog ||= fetch_catalog
+  end
+
   def fetch_catalog
     fetcher = Droonga::CatalogFetcher.new(:host          => replica_remove_host,
                                           :port          => port,
@@ -98,9 +116,8 @@ class UnjoinCommand
   end
 
   def detect_remaining_node
-    catalog = fetch_catalog
     generator = Droonga::CatalogGenerator.new
-    generator.load(catalog)
+    generator.load(raw_catalog)
 
     dataset = generator.dataset_for_host(replica_remove_host)
     unless dataset
@@ -127,6 +144,7 @@ class UnjoinCommand
     puts "Unjoining replica from the cluster..."
 
     run_remote_command(remaining_node, "unjoin",
+                       "cluster_id" => cluster_id,
                        "dataset" => dataset_name,
                        "hosts"   => [replica_remove_host])
   end

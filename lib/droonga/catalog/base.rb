@@ -26,8 +26,8 @@ module Droonga
       attr_reader :path, :base_path
       def initialize(raw, path)
         @raw = raw
-        @path = path
-        @base_path = File.dirname(path)
+        @path = path || "/tmp/temporary-catalog.json"
+        @base_path = File.dirname(@path)
       end
 
       def have_dataset?(name)
@@ -44,8 +44,11 @@ module Droonga
 
       private
       def calculate_cluster_id
-        raw_id = all_nodes.sort.join(",")
-        Digest::SHA1.hexdigest(raw_id)
+        raw_id = []
+        datasets.each do |name, dataset|
+          raw_id << "#{name}-#{dataset.all_nodes.sort.join(",")}"
+        end
+        Digest::SHA1.hexdigest(raw_id.sort.join("|"))
       end
 
       def migrate_database_location(current_db_path, device, name)
