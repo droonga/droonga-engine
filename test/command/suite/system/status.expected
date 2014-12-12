@@ -5,7 +5,7 @@
   "body": {
     "nodes": {
       "127.0.0.1:23003/droonga": {
-        "live": true
+        "status": "active"
       }
     }
   }
