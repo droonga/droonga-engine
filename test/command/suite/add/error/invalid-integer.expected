@@ -4,7 +4,7 @@
   "type": "add.result",
   "body": {
     "name": "InvalidValue",
-    "message": "The column \"age\" cannot store the value \"secret\".",
+    "message": "The column \"age\" cannot store the value \"secret\": invalid argument: <User.age>: failed to cast to <Int32>: <\"secret\">: #<Groonga::FixSizeColumn ...>",
     "detail": {
       "table": "User",
       "key": "key",
@@ -18,7 +18,7 @@
       "statusCode": 400,
       "body": {
         "name": "InvalidValue",
-        "message": "The column \"age\" cannot store the value \"secret\".",
+        "message": "The column \"age\" cannot store the value \"secret\": invalid argument: <User.age>: failed to cast to <Int32>: <\"secret\">: #<Groonga::FixSizeColumn ...>",
         "detail": {
           "table": "User",
           "key": "key",
@@ -32,7 +32,7 @@
       "statusCode": 400,
       "body": {
         "name": "InvalidValue",
-        "message": "The column \"age\" cannot store the value \"secret\".",
+        "message": "The column \"age\" cannot store the value \"secret\": invalid argument: <User.age>: failed to cast to <Int32>: <\"secret\">: #<Groonga::FixSizeColumn ...>",
         "detail": {
           "table": "User",
           "key": "key",
