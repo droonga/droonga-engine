@@ -70,8 +70,8 @@ module Droonga
         end
 
         class InvalidValue < BadRequest
-          def initialize(column, value, request)
-            super("The column #{column.inspect} cannot store the value #{value.inspect}.",
+          def initialize(column, value, reason, request)
+            super("The column #{column.inspect} cannot store the value #{value.inspect}: #{reason}",
                   request)
           end
         end
@@ -117,10 +117,10 @@ module Droonga
               record[column] = value
             rescue ::Groonga::InvalidArgument => error
               record.delete if record.added?
-              raise InvalidValue.new(column, value, request)
+              raise InvalidValue.new(column, value, error.message, request)
             rescue ArgumentError => error
               record.delete if record.added?
-              raise InvalidValue.new(column, value, request)
+              raise InvalidValue.new(column, value, error.message, request)
             rescue ::Groonga::NoSuchColumn => error
               record.delete if record.added?
               raise UnknownColumn.new(column, request["table"], request)
