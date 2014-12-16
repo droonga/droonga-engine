@@ -43,10 +43,15 @@ module Droonga
       rescue Exception => exception
         #XXX Any exception blocks following serf operations.
         #    To keep it working, I rescue any exception for now.
-        FileUtils.mkdir_p(Path.serf_event_handler_errors)
-        File.open(Path.serf_event_handler_error_file, "w") do |file|
-          file.write(exception.inspect)
-          file.write(exception.backtrace)
+        begin
+          FileUtils.mkdir_p(Path.serf_event_handler_errors)
+          File.open(Path.serf_event_handler_error_file, "w") do |file|
+            file.write(exception.inspect)
+            file.write(exception.backtrace)
+          end
+        rescue Errno::EACCES => permission_denied_exception
+          puts exception.inspect
+          puts exception.backtrace
         end
         true
       end
