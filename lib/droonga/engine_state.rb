@@ -108,22 +108,6 @@ module Droonga
       @catalog.all_nodes
     end
 
-    # nodes who provide the service actually
-    #  * read-only messages  : deliver
-    #  * read-write messages : deliver
-    #  * responses           : returned
-    def active_nodes
-      all_nodes - dead_nodes - suspended_nodes
-    end
-
-    # nodes in the cluster
-    #  * read-only messages  : deliver
-    #  * read-write messages : deliver
-    #  * responses           : undetermined
-    def live_nodes
-      all_nodes - dead_nodes
-    end
-
     def dead_nodes
       if @live_nodes_list
         @live_nodes_list.dead_nodes
@@ -132,17 +116,12 @@ module Droonga
       end
     end
 
-    # nodes who temporary suspended
-    # (going to join to the cluster, etc,)
-    #  * read-only messages  : don't deliver
-    #  * read-write messages : deliver
-    #  * responses           : not returned
-    def suspended_nodes
-      if @live_nodes_list
-        @live_nodes_list.suspended_nodes
-      else
-        []
-      end
+    def readable_nodes
+      all_nodes - unreadable_nodes
+    end
+
+    def writable_nodes
+      all_nodes
     end
 
     def live_nodes_list=(new_nodes_list)
@@ -156,8 +135,7 @@ module Droonga
 
     def remove_inactive_routes(routes)
       routes.reject do |route|
-        node = farm_path(route)
-        dead_nodes.include?(node) or suspended_nodes.include?(node)
+        unreadable_nodes.include?(farm_path(route))
       end
     end
 
@@ -166,6 +144,14 @@ module Droonga
     end
 
     private
+    def unreadable_nodes
+      if @live_nodes_list
+        @live_nodes_list.unreadable_nodes
+      else
+        []
+      end
+    end
+
     def log_tag
       "engine_state"
     end

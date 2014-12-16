@@ -31,6 +31,10 @@ module Droonga
       @suspended_nodes ||= collect_suspended_nodes
     end
 
+    def unreadable_nodes
+      @unreadable_nodes ||= dead_nodes + suspended_nodes
+    end
+
     def ==(nodes_list)
       nodes_list.is_a?(self.class) and
         nodes_list.all_nodes == all_nodes and
