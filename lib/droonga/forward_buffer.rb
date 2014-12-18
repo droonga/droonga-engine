@@ -67,7 +67,7 @@ module Droonga
     private
     def output(buffered_message_path)
       buffered_message_path = Pathname(buffered_message_path)
-      time_stamp = buffered_message_path.basename(".#{SUFFIX}")
+      time_stamp = buffered_message_path.basename(SUFFIX)
       file_contents = buffered_message_path.read
       buffered_message = JSON.parse(file_contents)
       @forwarder.output(buffered_message["receiver"],
@@ -79,7 +79,7 @@ module Droonga
     end
 
     def file_path(time_stamp=Time.now)
-      @data_directory + "#{time_stamp.iso8601(6)}.#{SUFFIX}"
+      @data_directory + "#{time_stamp.iso8601(6)}#{SUFFIX}"
     end
 
     def log_tag
