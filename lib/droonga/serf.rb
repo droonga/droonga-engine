@@ -61,7 +61,7 @@ module Droonga
                    "-bind", "#{extract_host(@name)}:#{port}",
                    "-event-handler", "droonga-engine-serf-event-handler",
                    "-log-level", log_level,
-                   "-tag", "role=engine",
+                   "-tag", "role=#{role}",
                    "-tag", "cluster_id=#{cluster_id}",
                    *retry_joins)
       logger.trace("start: done")
