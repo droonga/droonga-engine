@@ -34,7 +34,7 @@ module Droonga
     end
 
     def absorb_destination_nodes
-      @absorb_destination_nodes ||= collect_destination_source_nodes
+      @absorb_destination_nodes ||= collect_absorb_destination_nodes
     end
 
     def service_provider_nodes
