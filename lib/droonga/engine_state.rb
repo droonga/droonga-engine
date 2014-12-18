@@ -142,7 +142,7 @@ module Droonga
     end
 
     def same_role_nodes
-      case node_status.get(:role)
+      case node_status.role
       when NodeStatus::Role::SERVICE_PROVIDER
         all_nodes & service_provider_nodes
       when NodeStatus::Role::ABSORB_SOURCE
@@ -159,7 +159,7 @@ module Droonga
     end
 
     def writable_nodes
-      case node_status.get(:role)
+      case node_status.role
       when NodeStatus::Role::SERVICE_PROVIDER
         all_nodes
       when NodeStatus::Role::ABSORB_SOURCE

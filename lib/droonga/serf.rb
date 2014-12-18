@@ -150,17 +150,13 @@ module Droonga
     end
 
     def role
-      node_status.get(:role) || NodeStatus::Role::SERVICE_PROVIDER
+      node_status.role
     end
 
     def role=(new_role)
-      if new_role
-        set_tag("role", new_role)
-        node_status.set(:role, new_role)
-      else
-        delete_tag("role")
-        node_status.delete(:role)
-      end
+      new_role ||= NodeStatus::Role::SERVICE_PROVIDER
+      set_tag("role", new_role)
+      node_status.role = new_role
     end
 
     def cluster_id

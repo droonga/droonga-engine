@@ -20,9 +20,9 @@ require "droonga/safe_file_writer"
 module Droonga
   class NodeStatus
     module Role
-      SERVICE_PROVIDER   = "service-provider"
-      ABSORB_SOURCE      = "absorb-source"
-      ABSORB_DESTINATION = "absorb-destination"
+      SERVICE_PROVIDER   = "engine"
+      ABSORB_SOURCE      = "engine-absorb-source"
+      ABSORB_DESTINATION = "engine-absorb-destination"
     end
 
     def initialize
@@ -49,6 +49,14 @@ module Droonga
       key = normalize_key(key)
       @status.delete(key)
       SafeFileWriter.write(status_file, JSON.pretty_generate(@status))
+    end
+
+    def role
+      get(:role) || Role::SERVICE_PROVIDER
+    end
+
+    def role=(new_role)
+      set(:role, new_role)
     end
 
     def reload
