@@ -129,7 +129,7 @@ module Droonga
 
     private
     def buffered_output(receiver, message, command, arguments, options={})
-      receiver_is_node = (receiver =~ /\A([^:]+:\d+\/[^\.]+)/)
+      receiver_is_node = (receiver =~ /\A([^:]+:\d+)/)
       node_name = $1
       unless receiver_is_node
         output(receiver, message, command, arguments, options)
