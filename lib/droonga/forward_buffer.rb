@@ -30,13 +30,13 @@ module Droonga
     SUFFIX = ".json"
 
     def initialize(node_name, params)
-      @node_name = node_name
       @forwarder = params[:forwarder]
 
       @packer = MessagePack::Packer.new
       @unpacker = MessagePack::Unpacker.new
 
-      @data_directory = Path.intentional_buffer + "#{@node_name}"
+      dirname = node_name.gsub("/", ":")
+      @data_directory = Path.intentional_buffer + dirname
       FileUtils.mkdir_p(@data_directory.to_s)
     end
 
