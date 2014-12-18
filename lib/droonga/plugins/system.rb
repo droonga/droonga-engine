@@ -26,7 +26,7 @@ module Droonga
 
         def handle(message)
           engine_state = @messenger.engine_state
-          active_nodes = engine_state.responsive_service_provider_nodes
+          active_nodes = engine_state.forwardable_nodes
           dead_nodes = engine_state.dead_nodes
           nodes = {}
           engine_state.all_nodes.collect do |identifier|

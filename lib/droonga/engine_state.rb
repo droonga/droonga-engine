@@ -21,6 +21,7 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
+require "droonga/node_status"
 
 module Droonga
   class EngineState
@@ -124,12 +125,35 @@ module Droonga
       end
     end
 
-    def responsive_service_provider_nodes
-      (all_nodes & service_provider_nodes) - dead_nodes
+    def absorb_source_nodes
+      if @live_nodes_list
+        @live_nodes_list.absorb_source_nodes
+      else
+        all_nodes
+      end
     end
 
-    def responsive_nodes
-      responsive_service_provider_nodes
+    def absorb_destination_nodes
+      if @live_nodes_list
+        @live_nodes_list.absorb_destination_nodes
+      else
+        all_nodes
+      end
+    end
+
+    def same_role_nodes
+      case node_status(:role)
+      when NodeStatus::Role::ABSORB_SOURCE
+        all_nodes & absorb_source_nodes
+      when NodeStatus::Role::ABSORB_DESTINATION
+        all_nodes & absorb_destination_nodes
+      else
+        all_nodes & service_provider_nodes
+      end
+    end
+
+    def forwardable_nodes
+      same_role_nodes - dead_nodes
     end
 
     def writable_nodes
@@ -146,7 +170,7 @@ module Droonga
     end
 
     def select_responsive_routes(routes)
-      selected_nodes = responsive_service_provider_nodes
+      selected_nodes = forwardable_nodes
       routes.select do |route|
         selected_nodes.include?(farm_path(route))
       end
@@ -157,6 +181,10 @@ module Droonga
     end
 
     private
+    def node_status
+      @node_status ||= NodeStatus.new
+    end
+
     def log_tag
       "engine_state"
     end
