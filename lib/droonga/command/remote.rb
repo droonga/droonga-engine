@@ -90,8 +90,7 @@ module Droonga
 
       class ChangeRole < Base
         def process
-          status = NodeStatus.new
-          status.set(:role, @params["role"])
+          @serf.role = @params["role"]
         end
       end
 

@@ -28,17 +28,8 @@ require "droonga/line_buffer"
 
 module Droonga
   class Serf
-    ROLE = {
-      :default => {
-        :port => 7946,
-      },
-      :source => {
-        :port => 7947,
-      },
-      :destination => {
-        :port => 7948,
-      },
-    }
+    # the port must be different from droonga-http-server's agent!
+    AGENT_PORT = 7946
 
     class << self
       def path
@@ -70,7 +61,7 @@ module Droonga
                    "-bind", "#{extract_host(@name)}:#{port}",
                    "-event-handler", "droonga-engine-serf-event-handler",
                    "-log-level", log_level,
-                   "-tag", "role=engine",
+                   "-tag", "role=#{role}",
                    "-tag", "cluster_id=#{cluster_id}",
                    *retry_joins)
       logger.trace("start: done")
@@ -158,12 +149,14 @@ module Droonga
       set_tag("cluster_id", cluster_id)
     end
 
-    def suspended=(suspended)
-      if suspended
-        set_tag("suspended", "true")
-      else
-        delete_tag("suspended")
-      end
+    def role
+      node_status.role
+    end
+
+    def role=(new_role)
+      new_role ||= NodeStatus::Role::SERVICE_PROVIDER
+      set_tag("role", new_role)
+      node_status.role = new_role
     end
 
     def cluster_id
@@ -240,18 +233,8 @@ module Droonga
       @node_status ||= NodeStatus.new
     end
 
-    def role
-      if node_status.have?(:role)
-        role = node_status.get(:role).to_sym
-        if self.class::ROLE.key?(role)
-          return role
-        end
-      end
-      :default
-    end
-
     def port
-      self.class::ROLE[role][:port]
+      AGENT_PORT
     end
 
     def detect_other_hosts
