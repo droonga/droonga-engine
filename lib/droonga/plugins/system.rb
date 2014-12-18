@@ -26,11 +26,11 @@ module Droonga
 
         def handle(message)
           engine_state = @messenger.engine_state
-          readable_nodes = engine_state.readable_nodes
+          active_nodes = engine_state.responsive_service_provider_nodes
           dead_nodes = engine_state.dead_nodes
           nodes = {}
           engine_state.all_nodes.collect do |identifier|
-            if readable_nodes.include?(identifier)
+            if active_nodes.include?(identifier)
               status = "active"
             elsif dead_nodes.include?(identifier)
               status = "dead"

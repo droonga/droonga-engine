@@ -19,6 +19,12 @@ require "droonga/safe_file_writer"
 
 module Droonga
   class NodeStatus
+    module Role
+      SERVICE_PROVIDER   = "service-provider"
+      ABSORB_SOURCE      = "absorb-source"
+      ABSORB_DESTINATION = "absorb-destination"
+    end
+
     def initialize
       reload
     end

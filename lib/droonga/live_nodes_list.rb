@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/node_status"
+
 module Droonga
   class LiveNodesList
     def initialize(nodes)
@@ -27,19 +29,24 @@ module Droonga
       @dead_nodes ||= collect_dead_nodes
     end
 
-    def suspended_nodes
-      @suspended_nodes ||= collect_suspended_nodes
+    def absorb_source_nodes
+      @absorb_source_nodes ||= collect_absorb_source_nodes
     end
 
-    def unreadable_nodes
-      @unreadable_nodes ||= dead_nodes + suspended_nodes
+    def absorb_destination_nodes
+      @absorb_destination_nodes ||= collect_destination_source_nodes
+    end
+
+    def service_provider_nodes
+      @service_provider_nodes ||= all_nodes - absorb_source_nodes - absorb_destination_nodes
     end
 
     def ==(nodes_list)
       nodes_list.is_a?(self.class) and
         nodes_list.all_nodes == all_nodes and
         nodes_list.dead_nodes == dead_nodes and
-        nodes_list.suspended_nodes == suspended_nodes
+        nodes_list.absorb_source_nodes == absorb_source_nodes and
+        nodes_list.absorb_destination_nodes == absorb_destination_nodes
     end
 
     private
@@ -53,15 +60,23 @@ module Droonga
       nodes.sort
     end
 
-    def collect_suspended_nodes
+    def collect_nodes_by_role(role)
       nodes = []
       @nodes.each do |name, state|
         if not state["foreign"] and
-             state["tags"]["suspended"] == "true"
+             state["tags"]["role"] == role
           nodes << name
         end
       end
       nodes.sort
+    end
+
+    def collect_absorb_source_nodes
+      collect_nodes_by_role(NodeStatus::Role::ABSORB_SOURCE)
+    end
+
+    def collect_absorb_destination_nodes
+      collect_nodes_by_role(NodeStatus::Role::ABSORB_DESTINATION)
     end
   end
 end

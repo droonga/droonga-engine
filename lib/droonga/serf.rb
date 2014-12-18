@@ -28,17 +28,8 @@ require "droonga/line_buffer"
 
 module Droonga
   class Serf
-    ROLE = {
-      :default => {
-        :port => 7946,
-      },
-      :source => {
-        :port => 7947,
-      },
-      :destination => {
-        :port => 7948,
-      },
-    }
+    # the port must be different from droonga-http-server's agent!
+    AGENT_PORT = 7946
 
     class << self
       def path
@@ -158,11 +149,17 @@ module Droonga
       set_tag("cluster_id", cluster_id)
     end
 
-    def suspended=(suspended)
-      if suspended
-        set_tag("suspended", "true")
+    def role
+      node_status.get(:role) || NodeStatus::Role::SERVICE_PROVIDER
+    end
+
+    def role=(new_role)
+      if new_role
+        set_tag("role", new_role)
+        node_status.set(:role, new_role)
       else
-        delete_tag("suspended")
+        delete_tag("role")
+        node_status.delete(:role)
       end
     end
 
@@ -240,18 +237,8 @@ module Droonga
       @node_status ||= NodeStatus.new
     end
 
-    def role
-      if node_status.have?(:role)
-        role = node_status.get(:role).to_sym
-        if self.class::ROLE.key?(role)
-          return role
-        end
-      end
-      :default
-    end
-
     def port
-      self.class::ROLE[role][:port]
+      AGENT_PORT
     end
 
     def detect_other_hosts

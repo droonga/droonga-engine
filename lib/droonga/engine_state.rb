@@ -116,8 +116,20 @@ module Droonga
       end
     end
 
-    def readable_nodes
-      all_nodes - unreadable_nodes
+    def service_provider_nodes
+      if @live_nodes_list
+        @live_nodes_list.service_provider_nodes
+      else
+        all_nodes
+      end
+    end
+
+    def responsive_service_provider_nodes
+      (all_nodes & service_provider_nodes) - dead_nodes
+    end
+
+    def responsive_nodes
+      responsive_service_provider_nodes
     end
 
     def writable_nodes
@@ -133,9 +145,10 @@ module Droonga
       @live_nodes_list
     end
 
-    def remove_inactive_routes(routes)
-      routes.reject do |route|
-        unreadable_nodes.include?(farm_path(route))
+    def select_responsive_routes(routes)
+      selected_nodes = responsive_service_provider_nodes
+      routes.select do |route|
+        selected_nodes.include?(farm_path(route))
       end
     end
 
@@ -144,14 +157,6 @@ module Droonga
     end
 
     private
-    def unreadable_nodes
-      if @live_nodes_list
-        @live_nodes_list.unreadable_nodes
-      else
-        []
-      end
-    end
-
     def log_tag
       "engine_state"
     end

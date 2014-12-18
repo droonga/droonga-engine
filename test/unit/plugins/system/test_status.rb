@@ -54,7 +54,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
       ]
     end
 
-    def readable_nodes
+    def responsive_service_provider_nodes
       [
         "127.0.0.1:10031/droonga",
       ]

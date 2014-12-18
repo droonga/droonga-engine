@@ -195,7 +195,7 @@ module Droonga
           if write_step?(step)
             target_nodes = @engine_state.writable_nodes
           else
-            target_nodes = @engine_state.readable_nodes
+            target_nodes = @engine_state.responsive_nodes
           end
           routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes
@@ -350,8 +350,8 @@ module Droonga
           (step["outputs"] || []).each do |output|
             descendants[output] = []
             @descendants[output].each do |index|
-              active_routes = @engine_state.remove_inactive_routes(step["routes"])
-              @steps[index]["n_of_expects"] += active_routes.size
+              responsive_routes = @engine_state.select_responsive_routes(step["routes"])
+              @steps[index]["n_of_expects"] += responsive_routes.size
               descendants[output].concat(@steps[index]["routes"])
             end
           end
