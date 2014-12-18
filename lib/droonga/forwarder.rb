@@ -19,6 +19,7 @@ require "droonga/loggable"
 require "droonga/path"
 require "droonga/event_loop"
 require "droonga/buffered_tcp_socket"
+require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
 
 module Droonga
@@ -28,6 +29,8 @@ module Droonga
     def initialize(loop, options={})
       @loop = loop
       @buffering = options[:buffering]
+      @engine_state = options[:engine_state]
+      @buffers = {}
       @senders = {}
     end
 
@@ -50,11 +53,15 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      output(receiver, message, command, arguments)
+      buffered_output(receiver, message, command, arguments)
       logger.trace("forward: done")
     end
 
     def resume
+      resume_from_accidents
+    end
+
+    def resume_from_accidents
       return unless Path.accidental_buffer.exist?
       Pathname.glob("#{Path.accidental_buffer}/*") do |path|
         next unless path.directory?
@@ -83,7 +90,6 @@ module Droonga
       end
     end
 
-    private
     def output(receiver, message, command, arguments, options={})
       logger.trace("output: start")
       if not receiver.is_a?(String) or not command.is_a?(String)
@@ -95,6 +101,7 @@ module Droonga
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"
       end
+
       host = $1
       port = $2
       tag  = $3
@@ -118,6 +125,27 @@ module Droonga
       sender.send(output_tag, message)
       logger.trace("output: post: done: #{log_info}")
       logger.trace("output: done")
+    end
+
+    private
+    def buffered_output(receiver, message, command, arguments, options={})
+      receiver_is_node = (receiver =~ /\A([^:]+:\d+\/[^\.]+)/)
+      node_name = $1
+      unless receiver_is_node
+        output(receiver, message, command, arguments, options)
+        return
+      end
+      
+      buffer = buffer_for(node_name)
+      if @engine_state and
+           @engine_state.unwritable_node?(node_name)
+        buffer.add(receiver, message, command, arguments, options)
+      elsif buffer.empty?
+        output(receiver, message, command, arguments, options)
+      else
+        buffer.add(receiver, message, command, arguments, options)
+        buffer.resume
+      end
     end
 
     def find_sender(host, port, params)
@@ -145,6 +173,11 @@ module Droonga
       sender = FluentMessageSender.new(@loop, host, port, options)
       sender.start
       sender
+    end
+
+    def buffer_for(node_name)
+      @buffers[node_name] ||= ForwardBuffer.new(node_name,
+                                                :forwarder => self)
     end
 
     def log_tag

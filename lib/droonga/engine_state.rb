@@ -41,7 +41,9 @@ module Droonga
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
-      @forwarder = Forwarder.new(@loop, :buffering => true)
+      @forwarder = Forwarder.new(@loop,
+                                 :buffering => true,
+                                 :engine_state => self)
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
@@ -63,6 +65,18 @@ module Droonga
 
     def local_route?(route)
       route.start_with?(@name) or route.start_with?(@internal_name)
+    end
+
+    def unwritable_node?(node_name)
+      case node_status.role
+      when NodeStatus::Role::SERVICE_PROVIDER
+        absorb_source_nodes.include?(node_name) or
+          absorb_destination_nodes.include?(node_name)
+      when NodeStatus::Role::ABSORB_SOURCE
+        absorb_destination_nodes.include?(node_name)
+      else
+        false
+      end
     end
 
     def farm_path(route)
@@ -129,7 +143,7 @@ module Droonga
       if @live_nodes_list
         @live_nodes_list.absorb_source_nodes
       else
-        all_nodes
+        []
       end
     end
 
@@ -137,7 +151,7 @@ module Droonga
       if @live_nodes_list
         @live_nodes_list.absorb_destination_nodes
       else
-        all_nodes
+        []
       end
     end
 
