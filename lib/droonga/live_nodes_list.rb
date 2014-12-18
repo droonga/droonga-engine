@@ -38,7 +38,7 @@ module Droonga
     end
 
     def service_provider_nodes
-      @service_provider_nodes ||= all_nodes - absorb_source_nodes - absorb_destination_nodes
+      @service_provider_nodes ||= collect_service_provider_nodes
     end
 
     def ==(nodes_list)
@@ -46,7 +46,8 @@ module Droonga
         nodes_list.all_nodes == all_nodes and
         nodes_list.dead_nodes == dead_nodes and
         nodes_list.absorb_source_nodes == absorb_source_nodes and
-        nodes_list.absorb_destination_nodes == absorb_destination_nodes
+        nodes_list.absorb_destination_nodes == absorb_destination_nodes and
+        nodes_list.service_provider_nodes == service_provider_nodes
     end
 
     private
@@ -69,6 +70,10 @@ module Droonga
         end
       end
       nodes.sort
+    end
+
+    def collect_service_provider_nodes
+      collect_nodes_by_role(NodeStatus::Role::SERVICE_PROVIDER)
     end
 
     def collect_absorb_source_nodes
