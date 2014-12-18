@@ -181,7 +181,7 @@ determine_hostname() {
 }
 
 download_url() {
-  if [ "$VERSION" = "master" ]; then
+  if [ "$VERSION" != "release" ]; then
     echo "$DOWNLOAD_URL_BASE/master/$1"
   else
     echo "$DOWNLOAD_URL_BASE/v$(installed_version)/$1"
@@ -211,7 +211,7 @@ install_rroonga() {
   gem install rroonga --no-ri --no-rdoc
 }
 
-install_master() {
+install_from_repository() {
   gem install bundler --no-ri --no-rdoc
 
   cd $TEMPDIR
@@ -222,10 +222,12 @@ install_master() {
     install_rroonga
     git reset --hard
     git pull --rebase
+    git checkout $VERSION
     bundle update
   else
     git clone $REPOSITORY_URL
     cd $NAME
+    git checkout $VERSION
     install_rroonga
     bundle install --path vendor/
   fi
@@ -262,7 +264,7 @@ prepare_environment_in_debian() {
     apt-get install -y libgroonga-dev
   fi
 
-  if [ "$VERSION" = "master" ]; then
+  if [ "$VERSION" != "release" ]; then
     apt-get install -y git
   fi
 }
@@ -297,7 +299,7 @@ prepare_environment_in_centos() {
     yum -y --enablerepo=groonga install groonga-devel
   fi
 
-  if [ "$VERSION" = "master" ]; then
+  if [ "$VERSION" != "release" ]; then
     yum -y install git
   fi
 }
@@ -312,9 +314,9 @@ install() {
   prepare_environment_in_$PLATFORM
 
   echo ""
-  if [ "$VERSION" = "master" ]; then
+  if [ "$VERSION" != "release" ]; then
     echo "Installing $NAME from the git repository..."
-    install_master
+    install_from_repository
   else
     echo "Installing $NAME from RubyGems..."
     gem install droonga-engine --no-rdoc --no-ri
