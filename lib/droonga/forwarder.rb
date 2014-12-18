@@ -55,8 +55,8 @@ module Droonga
     end
 
     def resume
-      return unless Path.buffer.exist?
-      Pathname.glob("#{Path.buffer}/*") do |path|
+      return unless Path.accidental_buffer.exist?
+      Pathname.glob("#{Path.accidental_buffer}/*") do |path|
         next unless path.directory?
 
         destination = path.basename.to_s
