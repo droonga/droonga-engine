@@ -143,12 +143,14 @@ module Droonga
 
     def same_role_nodes
       case node_status(:role)
+      when NodeStatus::Role::SERVICE_PROVIDER
+        all_nodes & service_provider_nodes
       when NodeStatus::Role::ABSORB_SOURCE
         all_nodes & absorb_source_nodes
       when NodeStatus::Role::ABSORB_DESTINATION
         all_nodes & absorb_destination_nodes
       else
-        all_nodes & service_provider_nodes
+        []
       end
     end
 
@@ -157,7 +159,16 @@ module Droonga
     end
 
     def writable_nodes
-      all_nodes
+      case node_status(:role)
+      when NodeStatus::Role::SERVICE_PROVIDER
+        all_nodes
+      when NodeStatus::Role::ABSORB_SOURCE
+        all_nodes & absorb_source_nodes
+      when NodeStatus::Role::ABSORB_DESTINATION
+        all_nodes & absorb_destination_nodes
+      else
+        []
+      end
     end
 
     def live_nodes_list=(new_nodes_list)
