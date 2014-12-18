@@ -141,18 +141,20 @@ module Droonga
       end
     end
 
-    def forwardable_nodes
-      same_role_nodes = nil
+    def same_role_nodes
       case node_status.role
       when NodeStatus::Role::SERVICE_PROVIDER
-        same_role_nodes = all_nodes & service_provider_nodes
+        all_nodes & service_provider_nodes
       when NodeStatus::Role::ABSORB_SOURCE
-        same_role_nodes = all_nodes & absorb_source_nodes
+        all_nodes & absorb_source_nodes
       when NodeStatus::Role::ABSORB_DESTINATION
-        same_role_nodes = all_nodes & absorb_destination_nodes
+        all_nodes & absorb_destination_nodes
       else
-        same_role_nodes = []
+        []
       end
+    end
+
+    def forwardable_nodes
       same_role_nodes - dead_nodes
     end
 
