@@ -16,8 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "fileutils"
-require "json"
 require "pathname"
+require "msgpack"
 
 require "droonga/loggable"
 require "droonga/path"
@@ -33,6 +33,9 @@ module Droonga
       @node_name = node_name
       @forwarder = params[:forwarder]
 
+      @packer = MessagePack::Packer.new
+      @unpacker = MessagePack::Unpacker.new
+
       @data_directory = Path.intentional_buffer + "#{@node_name}"
       FileUtils.mkdir_p(@data_directory.to_s)
     end
@@ -46,9 +49,11 @@ module Droonga
         "arguments" => arguments,
         "options"   => options,
       }
+      @packer.pack(buffered_message)
       SafeFileWriter.write(file_path) do |output, file|
-        output.puts(JSON.generate(buffered_message))
+        output.puts(@packer.to_s)
       end
+      @packer.clear
       logger.trace("add: done")
     end
 
@@ -69,7 +74,9 @@ module Droonga
       buffered_message_path = Pathname(buffered_message_path)
       time_stamp = buffered_message_path.basename(SUFFIX)
       file_contents = buffered_message_path.read
-      buffered_message = JSON.parse(file_contents)
+      @unpacker.feed(file_contents)
+      buffered_message = @unpacker.read
+      @unpacker.reset
       @forwarder.output(buffered_message["receiver"],
                         buffered_message["message"],
                         buffered_message["command"],
