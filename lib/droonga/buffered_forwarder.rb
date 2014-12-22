@@ -65,8 +65,7 @@ module Droonga
 
       buffer = @buffers[node_name] ||= ForwardBuffer.new(node_name, @forwarder)
 
-      if @engine_state and
-           @engine_state.unwritable_node?(node_name)
+      if writable_node?(node_name)
         buffer.add(message, destination)
       elsif buffer.empty?
         @forwarder.forward(message, destination)
@@ -79,6 +78,11 @@ module Droonga
     end
 
     private
+    def writable_node?(node_name)
+      @engine_state and
+        @engine_state.unwritable_node?(node_name)
+    end
+
     def log_tag
       "[#{Process.ppid}] buffered-forwarder"
     end
