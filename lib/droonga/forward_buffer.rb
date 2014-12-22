@@ -57,6 +57,7 @@ module Droonga
     def start_forward
       logger.trace("start_forward: start")
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
+        buffered_message_path = Pathname(buffered_message_path)
         output(buffered_message_path)
       end
       logger.trace("start_forward: done")
@@ -68,7 +69,6 @@ module Droonga
 
     private
     def output(buffered_message_path)
-      buffered_message_path = Pathname(buffered_message_path)
       time_stamp = buffered_message_path.basename(SUFFIX)
       file_contents = buffered_message_path.read
       @unpacker.feed(file_contents)
