@@ -46,6 +46,11 @@ module Droonga
 
     def resume
       @forwarder.resume
+      @buffers.each do |node_name, buffer|
+        if writable_node?(node_name)
+          buffer.start_forward
+        end
+      end
     end
 
     def forward(message, destination)
