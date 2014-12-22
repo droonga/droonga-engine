@@ -28,7 +28,6 @@ module Droonga
     def initialize(loop, options={})
       @loop = loop
       @buffering = options[:buffering]
-      @engine_state = options[:engine_state]
       @senders = {}
     end
 
@@ -56,10 +55,6 @@ module Droonga
     end
 
     def resume
-      resume_from_accidents
-    end
-
-    def resume_from_accidents
       return unless Path.accidental_buffer.exist?
       Pathname.glob("#{Path.accidental_buffer}/*") do |path|
         next unless path.directory?
@@ -100,7 +95,6 @@ module Droonga
       unless receiver =~ /\A(.*):(\d+)\/(.*?)(\?.+)?\z/
         raise "format: hostname:port/tag(?params)"
       end
-
       host = $1
       port = $2
       tag  = $3
