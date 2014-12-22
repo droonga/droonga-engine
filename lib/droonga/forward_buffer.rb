@@ -69,6 +69,7 @@ module Droonga
 
     private
     def output(buffered_message_path)
+      logger.trace("output: start (#{buffered_message_path})")
       time_stamp = buffered_message_path.basename(SUFFIX)
       file_contents = buffered_message_path.read
       @unpacker.feed(file_contents)
@@ -77,6 +78,7 @@ module Droonga
       @forwarder.forward(buffered_message["message"],
                          buffered_message["destination"])
       FileUtils.rm_f(buffered_message_path.to_s)
+      logger.trace("output: done (#{buffered_message_path})")
     end
 
     def file_path(time_stamp=Time.now)
