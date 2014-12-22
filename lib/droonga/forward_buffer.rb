@@ -55,11 +55,11 @@ module Droonga
     end
 
     def start_forward
-      logger.trace("resume: start")
+      logger.trace("start_forward: start")
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
         output(buffered_message_path)
       end
-      logger.trace("resume: done")
+      logger.trace("start_forward: done")
     end
 
     def empty?
