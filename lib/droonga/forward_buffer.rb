@@ -27,7 +27,7 @@ module Droonga
   class ForwardBuffer
     include Loggable
 
-    SUFFIX = ".json"
+    SUFFIX = ".msgpack"
 
     def initialize(node_name, forwarder)
       @forwarder = forwarder
