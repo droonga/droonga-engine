@@ -25,11 +25,9 @@ module Droonga
 
     def initialize(loop, options={})
       @loop = loop
-      @options = options
-      @buffering = options[:buffering]
       @engine_state = options[:engine_state]
       @buffers = {}
-      @forwarder = Forwarder.new(loop, options)
+      @forwarder = Forwarder.new(loop, :buffering => true)
     end
 
     def start
@@ -55,11 +53,6 @@ module Droonga
 
     def forward(message, destination)
       logger.trace("forward: start")
-      unless @buffering
-        @forwarder.forward(message, destination)
-        return
-      end
-
       receiver = destination["to"]
       receiver_is_node = (receiver =~ /\A([^:]+:\d+\/[^\.]+)/)
       node_name = $1
