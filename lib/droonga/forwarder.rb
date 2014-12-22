@@ -19,7 +19,6 @@ require "droonga/loggable"
 require "droonga/path"
 require "droonga/event_loop"
 require "droonga/buffered_tcp_socket"
-require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
 
 module Droonga
@@ -30,7 +29,6 @@ module Droonga
       @loop = loop
       @buffering = options[:buffering]
       @engine_state = options[:engine_state]
-      @buffers = {}
       @senders = {}
     end
 
@@ -53,7 +51,7 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      buffered_output(receiver, message, command, arguments)
+      output(receiver, message, command, arguments)
       logger.trace("forward: done")
     end
 
@@ -90,6 +88,7 @@ module Droonga
       end
     end
 
+    private
     def output(receiver, message, command, arguments, options={})
       logger.trace("output: start")
       if not receiver.is_a?(String) or not command.is_a?(String)
@@ -127,27 +126,6 @@ module Droonga
       logger.trace("output: done")
     end
 
-    private
-    def buffered_output(receiver, message, command, arguments, options={})
-      receiver_is_node = (receiver =~ /\A([^:]+:\d+\/[^\.]+)/)
-      node_name = $1
-      unless receiver_is_node
-        output(receiver, message, command, arguments, options)
-        return
-      end
-      
-      buffer = buffer_for(node_name)
-      if @engine_state and
-           @engine_state.unwritable_node?(node_name)
-        buffer.add(receiver, message, command, arguments, options)
-      elsif buffer.empty?
-        output(receiver, message, command, arguments, options)
-      else
-        buffer.add(receiver, message, command, arguments, options)
-        buffer.resume
-      end
-    end
-
     def find_sender(host, port, params)
       connection_id = extract_connection_id(params)
       destination = "#{host}:#{port}"
@@ -173,11 +151,6 @@ module Droonga
       sender = FluentMessageSender.new(@loop, host, port, options)
       sender.start
       sender
-    end
-
-    def buffer_for(node_name)
-      @buffers[node_name] ||= ForwardBuffer.new(node_name,
-                                                :forwarder => self)
     end
 
     def log_tag

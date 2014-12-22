@@ -29,8 +29,8 @@ module Droonga
 
     SUFFIX = ".json"
 
-    def initialize(node_name, params)
-      @forwarder = params[:forwarder]
+    def initialize(node_name, forwarder)
+      @forwarder = forwarder
 
       @packer = MessagePack::Packer.new
       @unpacker = MessagePack::Unpacker.new
@@ -40,14 +40,11 @@ module Droonga
       FileUtils.mkdir_p(@data_directory.to_s)
     end
 
-    def add(receiver, message, command, arguments, options)
+    def add(message, destination)
       logger.trace("add: start")
       buffered_message = {
-        "receiver"  => receiver,
-        "message"   => message,
-        "command"   => command,
-        "arguments" => arguments,
-        "options"   => options,
+        "message"     => message,
+        "destination" => destination,
       }
       @packer.pack(buffered_message)
       SafeFileWriter.write(file_path) do |output, file|
@@ -57,7 +54,7 @@ module Droonga
       logger.trace("add: done")
     end
 
-    def resume
+    def start_forward
       logger.trace("resume: start")
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
         output(buffered_message_path)
@@ -77,11 +74,8 @@ module Droonga
       @unpacker.feed(file_contents)
       buffered_message = @unpacker.read
       @unpacker.reset
-      @forwarder.output(buffered_message["receiver"],
-                        buffered_message["message"],
-                        buffered_message["command"],
-                        buffered_message["arguments"],
-                        buffered_message["options"])
+      @forwarder.forward(buffered_message["message"],
+                         buffered_message["destination"])
       FileUtils.rm_f(buffered_message_path.to_s)
     end
 

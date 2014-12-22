@@ -19,7 +19,7 @@ require "coolio"
 
 require "droonga/loggable"
 require "droonga/event_loop"
-require "droonga/forwarder"
+require "droonga/buffered_forwarder"
 require "droonga/replier"
 require "droonga/node_status"
 
@@ -41,7 +41,7 @@ module Droonga
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
-      @forwarder = Forwarder.new(@loop,
+      @forwarder = BufferedForwarder.new(@loop,
                                  :buffering => true,
                                  :engine_state => self)
       @replier = Replier.new(@forwarder)
