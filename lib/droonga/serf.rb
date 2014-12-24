@@ -25,6 +25,8 @@ require "droonga/catalog_loader"
 require "droonga/node_status"
 require "droonga/serf_downloader"
 require "droonga/line_buffer"
+require "droonga/safe_file_writer"
+require "droonga/service_installation"
 
 module Droonga
   class Serf
@@ -45,6 +47,7 @@ module Droonga
       @loop = loop
       @name = name
       @agent = nil
+      @service_installation = ServiceInstallation.new
     end
 
     def start
@@ -64,6 +67,7 @@ module Droonga
                    "-tag", "role=#{role}",
                    "-tag", "cluster_id=#{cluster_id}",
                    *retry_joins)
+      update_live_nodes_list
       logger.trace("start: done")
     end
 
@@ -114,6 +118,16 @@ module Droonga
         end
       end
       result
+    end
+
+    def update_live_nodes_list
+      path = Path.live_nodes_list
+      new_list = live_nodes_list
+      file_contents = JSON.pretty_generate(new_list)
+      SafeFileWriter.write(path) do |output, file|
+        output.puts(file_contents)
+        @service_installation.ensure_correct_file_permission(file)
+      end
     end
 
     def live_nodes_list
