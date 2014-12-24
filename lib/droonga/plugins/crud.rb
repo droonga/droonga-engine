@@ -146,6 +146,10 @@ module Droonga
             key.to_s
           end
         end
+
+        def log_tag
+          "add-handler"
+        end
       end
 
       define_single_step do |step|
