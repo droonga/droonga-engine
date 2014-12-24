@@ -84,11 +84,14 @@ module Droonga
         end
 
         def handle(message)
+          logger.trace("handle: start")
           process_add(message.request)
+          logger.trace("handle: done")
         end
 
         private
         def process_add(request)
+          logger.trace("process_add: start")
           raise MissingTableParameter.new unless request.include?("table")
 
           table = @context[request["table"]]
@@ -101,10 +104,13 @@ module Droonga
           end
 
           add_record(table, request)
+
+          logger.trace("process_add: done")
           true
         end
 
         def add_record(table, request)
+          logger.trace("add_record: start")
           record = nil
           if table.support_key?
             key = normalize_record_key(request["key"], table)
@@ -126,6 +132,7 @@ module Droonga
               raise UnknownColumn.new(column, request["table"], request)
             end
           end
+          logger.trace("add_record: done")
         end
 
         def normalize_record_key(key, table)
