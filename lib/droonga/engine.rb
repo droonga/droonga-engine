@@ -33,6 +33,7 @@ module Droonga
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
+      @state.live_nodes_list = load_live_nodes_list
       @catalog = load_catalog
       @state.catalog = @catalog
       @dispatcher = create_dispatcher
