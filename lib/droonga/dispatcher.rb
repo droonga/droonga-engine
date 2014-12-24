@@ -194,8 +194,10 @@ module Droonga
         if dataset
           if write_step?(step)
             target_nodes = @engine_state.writable_nodes
+            logger.trace("dispatch_steps: target_nodes = writable_nodes = #{target_nodes.inspect}")
           else
             target_nodes = @engine_state.forwardable_nodes
+            logger.trace("dispatch_steps: target_nodes = forwardable_nodes = #{target_nodes.inspect}")
           end
           routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes
