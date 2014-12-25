@@ -189,7 +189,7 @@ class JoinCommand
     last_progress = ""
     while true
       sleep(3)
-      response = run_remote_command(joining_node, "report_status",
+      response = run_remote_command(joining_node, "report_metadata",
                                     "node" => joining_node,
                                     "key"  => "absorbing")
       if response
@@ -208,14 +208,14 @@ class JoinCommand
   end
 
   def set_effective_message_timestamp
-    response = run_remote_command(source_node, "report_status",
+    response = run_remote_command(source_node, "report_metadata",
                                   "node" => source_node,
                                   "key" => "last_processed_message_timestamp")
     timestamp = response["value"]
     if timestamp and not timestamp.empty?
       puts "The timestamp of the last processed message in the source node: #{timestamp}"
       puts "Setting effective message timestamp for the destination node..."
-      response = run_remote_command(joining_node, "set_status",
+      response = run_remote_command(joining_node, "set_metadata",
                                     "node" => joining_node,
                                     "key" => "effective_message_timestamp",
                                     "value" => timestamp)
