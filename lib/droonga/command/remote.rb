@@ -94,14 +94,14 @@ module Droonga
         end
       end
 
-      class ReportStatus < Base
+      class ReportMetadata < Base
         def process
           metadata = NodeMetadata.new
           @response["value"] = metadata.get(@params["key"])
         end
       end
 
-      class SetStatus < Base
+      class SetMetadata < Base
         def process
           metadata = NodeMetadata.new
           metadata.set(@params["key"], @params["value"])

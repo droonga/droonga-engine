@@ -76,10 +76,10 @@ module Droonga
         case event_name
         when "change_role"
           Remote::ChangeRole
-        when "report_status"
-          Remote::ReportStatus
-        when "set_status"
-          Remote::SetStatus
+        when "report_metadata"
+          Remote::ReportMetadata
+        when "set_metadata"
+          Remote::SetMetadata
         when "join"
           Remote::Join
         when "unjoin"
