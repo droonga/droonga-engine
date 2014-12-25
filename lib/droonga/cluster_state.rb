@@ -67,11 +67,11 @@ module Droonga
 
     def same_role_nodes
       case node_metadata.role
-      when NodeStatus::Role::SERVICE_PROVIDER
+      when NodeMetadata::Role::SERVICE_PROVIDER
         all_nodes & service_provider_nodes
-      when NodeStatus::Role::ABSORB_SOURCE
+      when NodeMetadata::Role::ABSORB_SOURCE
         all_nodes & absorb_source_nodes
-      when NodeStatus::Role::ABSORB_DESTINATION
+      when NodeMetadata::Role::ABSORB_DESTINATION
         all_nodes & absorb_destination_nodes
       else
         []
