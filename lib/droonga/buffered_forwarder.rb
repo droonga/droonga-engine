@@ -25,7 +25,7 @@ module Droonga
 
     def initialize(loop, options={})
       @loop = loop
-      @engine_state = options[:engine_state]
+      @cluster_state = options[:cluster_state]
       @buffers = {}
       @forwarder = Forwarder.new(loop, :buffering => true)
     end
@@ -77,8 +77,8 @@ module Droonga
 
     private
     def writable_node?(node_name)
-      @engine_state.nil? or
-        not @engine_state.unwritable_node?(node_name)
+      @cluster_state.nil? or
+        not @cluster_state.unwritable_node?(node_name)
     end
 
     def log_tag
