@@ -45,7 +45,7 @@ module Droonga
       @current_id = 0
       @cluster = ClusterState.new
       @forwarder = BufferedForwarder.new(@loop,
-                                         :cluster_state => self)
+                                         :cluster_state => @cluster)
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
