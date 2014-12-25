@@ -21,10 +21,12 @@ module Droonga
     include Loggable
 
     attr_accessor :catalog
+    attr_writer :on_change
 
     def initialize
       @catalog = nil
       @live_nodes_list = nil
+      @on_change = nil
     end
 
     def all_nodes
@@ -78,6 +80,19 @@ module Droonga
 
     def forwardable_nodes
       same_role_nodes - dead_nodes
+    end
+
+    def live_nodes_list=(new_nodes_list)
+      old_live_nodes_list = @live_nodes_list
+      @live_nodes_list = new_nodes_list
+      unless old_live_nodes_list == new_nodes_list
+        on_change
+      end
+      @live_nodes_list
+    end
+
+    def on_change
+      @on_change.call if @on_change
     end
 
     private

@@ -33,13 +33,13 @@ module Droonga
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
-      @state.live_nodes_list = load_live_nodes_list
+      @state.cluster.live_nodes_list = load_live_nodes_list
       @catalog = load_catalog
       @state.catalog = @catalog
       @dispatcher = create_dispatcher
       @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes_list)
       @live_nodes_list_observer.on_change = lambda do
-        @state.live_nodes_list = load_live_nodes_list
+        @state.cluster.live_nodes_list = load_live_nodes_list
       end
       @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
       @node_metadata_observer.on_change = lambda do
