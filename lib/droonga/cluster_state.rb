@@ -82,6 +82,10 @@ module Droonga
       same_role_nodes - dead_nodes
     end
 
+    def writable_nodes
+      all_nodes
+    end
+
     def live_nodes_list=(new_nodes_list)
       old_live_nodes_list = @live_nodes_list
       @live_nodes_list = new_nodes_list
