@@ -48,6 +48,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   class StubEngineState
     def cluster
       @cluster ||= StubClusterState.new
+    end
   end
 
   class StubClusterState
