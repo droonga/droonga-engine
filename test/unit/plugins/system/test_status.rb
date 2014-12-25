@@ -46,6 +46,11 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   end
 
   class StubEngineState
+    def cluster
+      @cluster ||= StubClusterState.new
+  end
+
+  class StubClusterState
     def all_nodes
       [
         "127.0.0.1:10031/droonga",

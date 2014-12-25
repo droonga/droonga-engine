@@ -25,11 +25,11 @@ module Droonga
         action.synchronous = true
 
         def handle(message)
-          engine_state = @messenger.engine_state
-          active_nodes = engine_state.forwardable_nodes
-          dead_nodes = engine_state.dead_nodes
+          cluster = @messenger.engine_state.cluster
+          active_nodes = cluster.forwardable_nodes
+          dead_nodes = cluster.dead_nodes
           nodes = {}
-          engine_state.all_nodes.collect do |identifier|
+          cluster.all_nodes.collect do |identifier|
             if active_nodes.include?(identifier)
               status = "active"
             elsif dead_nodes.include?(identifier)

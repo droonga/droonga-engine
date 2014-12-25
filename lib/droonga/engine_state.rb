@@ -21,7 +21,7 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
-require "droonga/node_metadata"
+require "droonga/cluster_state"
 
 module Droonga
   class EngineState
@@ -33,20 +33,26 @@ module Droonga
     attr_reader :forwarder
     attr_reader :replier
     attr_writer :on_ready
+    attr_reader :catalog
+    attr_reader :cluster
     attr_accessor :on_finish
-    attr_accessor :catalog
+
     def initialize(loop, name, internal_name)
       @loop = loop
       @name = name
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
+      @cluster = ClusterState.new
       @forwarder = Forwarder.new(@loop, :buffering => true)
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
       @catalog = nil
-      @live_nodes_list = nil
+    end
+
+    def catalog=(catalog)
+      @catalog = @cluster.catalog = catalog
     end
 
     def start
@@ -105,95 +111,18 @@ module Droonga
       not @sessions.empty?
     end
 
-    def all_nodes
-      @catalog.all_nodes
-    end
-
-    def dead_nodes
-      if @live_nodes_list
-        @live_nodes_list.dead_nodes
-      else
-        []
-      end
-    end
-
-    def service_provider_nodes
-      if @live_nodes_list
-        @live_nodes_list.service_provider_nodes
-      else
-        all_nodes
-      end
-    end
-
-    def absorb_source_nodes
-      if @live_nodes_list
-        @live_nodes_list.absorb_source_nodes
-      else
-        all_nodes
-      end
-    end
-
-    def absorb_destination_nodes
-      if @live_nodes_list
-        @live_nodes_list.absorb_destination_nodes
-      else
-        all_nodes
-      end
-    end
-
-    def forwardable_nodes
-      same_role_nodes = nil
-      case node_metadata.role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        same_role_nodes = all_nodes & service_provider_nodes
-      when NodeMetadata::Role::ABSORB_SOURCE
-        same_role_nodes = all_nodes & absorb_source_nodes
-      when NodeMetadata::Role::ABSORB_DESTINATION
-        same_role_nodes = all_nodes & absorb_destination_nodes
-      else
-        same_role_nodes = []
-      end
-      same_role_nodes - dead_nodes
-    end
-
-    def writable_nodes
-      case node_metadata.role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        all_nodes
-      when NodeMetadata::Role::ABSORB_SOURCE
-        all_nodes & absorb_source_nodes
-      when NodeMetadata::Role::ABSORB_DESTINATION
-        all_nodes & absorb_destination_nodes
-      else
-        []
-      end
-    end
-
-    def live_nodes_list=(new_nodes_list)
-      old_live_nodes_list = @live_nodes_list
-      @live_nodes_list = new_nodes_list
-      unless old_live_nodes_list == new_nodes_list
-        @forwarder.resume
-      end
-      @live_nodes_list
+    def on_ready
+      @on_ready.call if @on_ready
     end
 
     def select_responsive_routes(routes)
-      selected_nodes = forwardable_nodes
+      selected_nodes = @cluster.forwardable_nodes
       routes.select do |route|
         selected_nodes.include?(farm_path(route))
       end
     end
 
-    def on_ready
-      @on_ready.call if @on_ready
-    end
-
     private
-    def node_metadata
-      @node_metadata ||= NodeMetadata.new
-    end
-
     def log_tag
       "engine_state"
     end

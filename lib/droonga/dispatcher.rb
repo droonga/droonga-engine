@@ -193,9 +193,9 @@ module Droonga
         dataset = @catalog.dataset(step["dataset"])
         if dataset
           if write_step?(step)
-            target_nodes = @engine_state.writable_nodes
+            target_nodes = @engine_state.cluster.writable_nodes
           else
-            target_nodes = @engine_state.forwardable_nodes
+            target_nodes = @engine_state.cluster.forwardable_nodes
           end
           routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes
