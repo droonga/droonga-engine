@@ -28,7 +28,7 @@ require "droonga/catalog_loader"
 require "droonga/safe_file_writer"
 require "droonga/data_absorber"
 require "droonga/serf"
-require "droonga/node_status"
+require "droonga/node_metadata"
 
 class JoinCommand
   def run
@@ -153,11 +153,11 @@ class JoinCommand
     if absorber.source_node_suspendable?
       run_remote_command(source_node, "change_role",
                          "node" => source_node,
-                         "role" => Droonga::NodeStatus::Role::ABSORB_SOURCE)
+                         "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
     end
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
-                       "role" => Droonga::NodeStatus::Role::ABSORB_DESTINATION)
+                       "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
     @node_role_changed = true
   end
 

@@ -17,7 +17,7 @@ require "json"
 
 require "droonga/path"
 require "droonga/serf"
-require "droonga/node_status"
+require "droonga/node_metadata"
 require "droonga/catalog_generator"
 require "droonga/catalog_modifier"
 require "droonga/catalog_fetcher"
@@ -96,15 +96,15 @@ module Droonga
 
       class ReportStatus < Base
         def process
-          status = NodeStatus.new
-          @response["value"] = status.get(@params["key"])
+          metadata = NodeMetadata.new
+          @response["value"] = metadata.get(@params["key"])
         end
       end
 
       class SetStatus < Base
         def process
-          status = NodeStatus.new
-          status.set(@params["key"], @params["value"])
+          metadata = NodeMetadata.new
+          metadata.set(@params["key"], @params["value"])
         end
       end
 
@@ -237,15 +237,15 @@ module Droonga
           end
           sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
 
-          status = NodeStatus.new
-          status.set(:absorbing, true)
+          metadata = NodeMetadata.new
+          metadata.set(:absorbing, true)
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => joining_host,
                               :port             => port,
                               :tag              => tag,
                               :messages_per_second => messages_per_second)
-          status.delete(:absorbing)
+          metadata.delete(:absorbing)
           sleep(1)
         end
       end
@@ -275,8 +275,8 @@ module Droonga
           log("port    = #{port}")
           log("tag     = #{tag}")
 
-          status = NodeStatus.new
-          status.set(:absorbing, true)
+          metadata = NodeMetadata.new
+          metadata.set(:absorbing, true)
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source,
                               :destination_host => host,
@@ -284,7 +284,7 @@ module Droonga
                               :tag              => tag,
                               :messages_per_second => messages_per_second,
                               :client           => "droonga-send")
-          status.delete(:absorbing)
+          metadata.delete(:absorbing)
         end
 
         private

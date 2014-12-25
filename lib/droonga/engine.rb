@@ -24,7 +24,7 @@ require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
 require "droonga/live_nodes_list_loader"
-require "droonga/node_status"
+require "droonga/node_metadata"
 
 module Droonga
   class Engine
@@ -41,11 +41,11 @@ module Droonga
       @live_nodes_list_observer.on_change = lambda do
         @state.live_nodes_list = load_live_nodes_list
       end
-      @node_status_observer = FileObserver.new(loop, Path.node_status)
-      @node_status_observer.on_change = lambda do
-        logger.trace("reloading node_status: start")
-        node_status.reload
-        logger.trace("reloading node_status: done")
+      @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
+      @node_metadata_observer.on_change = lambda do
+        logger.trace("reloading node_metadata: start")
+        node_metadata.reload
+        logger.trace("reloading node_metadata: done")
       end
       @on_ready = nil
     end
@@ -57,7 +57,7 @@ module Droonga
       end
       @state.start
       @live_nodes_list_observer.start
-      @node_status_observer.start
+      @node_metadata_observer.start
       @dispatcher.start
       logger.trace("start: done")
     end
@@ -65,7 +65,7 @@ module Droonga
     def stop_gracefully
       logger.trace("stop_gracefully: start")
       @live_nodes_list_observer.stop
-      @node_status_observer.stop
+      @node_metadata_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         save_last_processed_message_timestamp
@@ -90,7 +90,7 @@ module Droonga
       logger.trace("stop_immediately: start")
       save_last_processed_message_timestamp
       @live_nodes_list_observer.stop
-      @node_status_observer.stop
+      @node_metadata_observer.stop
       @dispatcher.stop_immediately
       @state.shutdown
       logger.trace("stop_immediately: done")
@@ -102,8 +102,8 @@ module Droonga
       @dispatcher.process_message(message)
     end
 
-    def node_status
-      @node_status ||= NodeStatus.new
+    def node_metadata
+      @node_metadata ||= NodeMetadata.new
     end
 
     private
@@ -134,7 +134,7 @@ module Droonga
     def save_last_processed_message_timestamp
       logger.trace("output_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
-        node_status.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+        node_metadata.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
       end
       logger.trace("output_last_processed_message_timestamp: done")
     end
@@ -148,13 +148,13 @@ module Droonga
       return false if effective_timestamp >= message_timestamp
 
       logger.trace("deleting obsolete effective_message_timestamp: start")
-      node_status.delete(:effective_message_timestamp)
+      node_metadata.delete(:effective_message_timestamp)
       logger.trace("deleting obsolete effective_message_timestamp: done")
       true
     end
 
     def effective_message_timestamp
-      timestamp = node_status.get(:effective_message_timestamp)
+      timestamp = node_metadata.get(:effective_message_timestamp)
       return nil unless timestamp
 
       begin

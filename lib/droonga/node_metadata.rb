@@ -18,7 +18,7 @@ require "droonga/path"
 require "droonga/safe_file_writer"
 
 module Droonga
-  class NodeStatus
+  class NodeMetadata
     module Role
       SERVICE_PROVIDER   = "engine"
       ABSORB_SOURCE      = "engine-absorb-source"
@@ -31,24 +31,24 @@ module Droonga
 
     def have?(key)
       key = normalize_key(key)
-      @status.include?(key)
+      @metadata.include?(key)
     end
 
     def get(key)
       key = normalize_key(key)
-      @status[key]
+      @metadata[key]
     end
 
     def set(key, value)
       key = normalize_key(key)
-      @status[key] = value
-      SafeFileWriter.write(status_file, JSON.pretty_generate(@status))
+      @metadata[key] = value
+      SafeFileWriter.write(metadata_file, JSON.pretty_generate(@metadata))
     end
 
     def delete(key)
       key = normalize_key(key)
-      @status.delete(key)
-      SafeFileWriter.write(status_file, JSON.pretty_generate(@status))
+      @metadata.delete(key)
+      SafeFileWriter.write(metadata_file, JSON.pretty_generate(@metadata))
     end
 
     def role
@@ -60,7 +60,7 @@ module Droonga
     end
 
     def reload
-      @status = load
+      @metadata = load
     end
 
     private
@@ -68,13 +68,13 @@ module Droonga
       key.to_sym
     end
 
-    def status_file
-      @status_file ||= Path.node_status
+    def metadata_file
+      @metadata_file ||= Path.node_metadata
     end
 
     def load
-      if status_file.exist?
-        contents = status_file.read
+      if metadata_file.exist?
+        contents = metadata_file.read
         unless contents.empty?
           return JSON.parse(contents, :symbolize_names => true)
         end

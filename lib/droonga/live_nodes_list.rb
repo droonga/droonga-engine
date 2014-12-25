@@ -13,7 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/node_status"
+require "droonga/node_metadata"
 
 module Droonga
   class LiveNodesList
@@ -73,15 +73,15 @@ module Droonga
     end
 
     def collect_service_provider_nodes
-      collect_nodes_by_role(NodeStatus::Role::SERVICE_PROVIDER)
+      collect_nodes_by_role(NodeMetadata::Role::SERVICE_PROVIDER)
     end
 
     def collect_absorb_source_nodes
-      collect_nodes_by_role(NodeStatus::Role::ABSORB_SOURCE)
+      collect_nodes_by_role(NodeMetadata::Role::ABSORB_SOURCE)
     end
 
     def collect_absorb_destination_nodes
-      collect_nodes_by_role(NodeStatus::Role::ABSORB_DESTINATION)
+      collect_nodes_by_role(NodeMetadata::Role::ABSORB_DESTINATION)
     end
   end
 end
