@@ -82,6 +82,19 @@ module Droonga
       same_role_nodes - dead_nodes
     end
 
+    def writable_nodes
+      case node_metadata.role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        all_nodes
+      when NodeMetadata::Role::ABSORB_SOURCE
+        all_nodes & absorb_source_nodes
+      when NodeMetadata::Role::ABSORB_DESTINATION
+        all_nodes & absorb_destination_nodes
+      else
+        []
+      end
+    end
+
     def live_nodes_list=(new_nodes_list)
       old_live_nodes_list = @live_nodes_list
       @live_nodes_list = new_nodes_list
