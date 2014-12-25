@@ -65,6 +65,7 @@ module Droonga
       nodes = []
       @nodes.each do |name, state|
         if not state["foreign"] and
+             state["tags"]["type"] == "engine" and
              state["tags"]["role"] == role
           nodes << name
         end

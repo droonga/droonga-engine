@@ -20,9 +20,9 @@ require "droonga/safe_file_writer"
 module Droonga
   class NodeMetadata
     module Role
-      SERVICE_PROVIDER   = "engine"
-      ABSORB_SOURCE      = "engine-absorb-source"
-      ABSORB_DESTINATION = "engine-absorb-destination"
+      SERVICE_PROVIDER   = "service-provider"
+      ABSORB_SOURCE      = "absorb-source"
+      ABSORB_DESTINATION = "absorb-destination"
     end
 
     def initialize
