@@ -67,7 +67,7 @@ module Droonga
     end
 
     def unwritable_node?(node_name)
-      case node_status.role
+      case node_metadata.role
       when NodeStatus::Role::SERVICE_PROVIDER
         absorb_source_nodes.include?(node_name) or
           absorb_destination_nodes.include?(node_name)
@@ -155,7 +155,7 @@ module Droonga
     end
 
     def same_role_nodes
-      case node_status.role
+      case node_metadata.role
       when NodeStatus::Role::SERVICE_PROVIDER
         all_nodes & service_provider_nodes
       when NodeStatus::Role::ABSORB_SOURCE
