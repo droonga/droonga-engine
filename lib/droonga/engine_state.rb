@@ -21,7 +21,7 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
-require "droonga/node_status"
+require "droonga/node_metadata"
 
 module Droonga
   class EngineState
@@ -143,12 +143,12 @@ module Droonga
 
     def forwardable_nodes
       same_role_nodes = nil
-      case node_status.role
-      when NodeStatus::Role::SERVICE_PROVIDER
+      case node_metadata.role
+      when NodeMetadata::Role::SERVICE_PROVIDER
         same_role_nodes = all_nodes & service_provider_nodes
-      when NodeStatus::Role::ABSORB_SOURCE
+      when NodeMetadata::Role::ABSORB_SOURCE
         same_role_nodes = all_nodes & absorb_source_nodes
-      when NodeStatus::Role::ABSORB_DESTINATION
+      when NodeMetadata::Role::ABSORB_DESTINATION
         same_role_nodes = all_nodes & absorb_destination_nodes
       else
         same_role_nodes = []
@@ -157,12 +157,12 @@ module Droonga
     end
 
     def writable_nodes
-      case node_status.role
-      when NodeStatus::Role::SERVICE_PROVIDER
+      case node_metadata.role
+      when NodeMetadata::Role::SERVICE_PROVIDER
         all_nodes
-      when NodeStatus::Role::ABSORB_SOURCE
+      when NodeMetadata::Role::ABSORB_SOURCE
         all_nodes & absorb_source_nodes
-      when NodeStatus::Role::ABSORB_DESTINATION
+      when NodeMetadata::Role::ABSORB_DESTINATION
         all_nodes & absorb_destination_nodes
       else
         []
@@ -190,8 +190,8 @@ module Droonga
     end
 
     private
-    def node_status
-      @node_status ||= NodeStatus.new
+    def node_metadata
+      @node_metadata ||= NodeMetadata.new
     end
 
     def log_tag

@@ -22,7 +22,7 @@ require "open3"
 require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
-require "droonga/node_status"
+require "droonga/node_metadata"
 require "droonga/serf_downloader"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
@@ -164,13 +164,13 @@ module Droonga
     end
 
     def role
-      node_status.role
+      node_metadata.role
     end
 
     def role=(new_role)
-      new_role ||= NodeStatus::Role::SERVICE_PROVIDER
+      new_role ||= NodeMetadata::Role::SERVICE_PROVIDER
       set_tag("role", new_role)
-      node_status.role = new_role
+      node_metadata.role = new_role
     end
 
     def cluster_id
@@ -243,8 +243,8 @@ module Droonga
       "#{extract_host(@name)}:7373"
     end
 
-    def node_status
-      @node_status ||= NodeStatus.new
+    def node_metadata
+      @node_metadata ||= NodeMetadata.new
     end
 
     def port

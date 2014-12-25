@@ -26,6 +26,7 @@ require "droonga/path"
 require "droonga/data_absorber"
 require "droonga/serf"
 require "droonga/client"
+require "droonga/node_metadata"
 
 class AbsorbDataCommand
   def run
@@ -216,8 +217,8 @@ class AbsorbDataCommand
     timestamp = response["value"]
     puts "The timestamp of the last processed message in the source node: #{timestamp}"
     if timestamp and not timestamp.empty?
-      status = NodeStatus.new
-      status.set(:effective_message_timestamp, timestamp)
+      metadata = NodeMetadata.new
+      metadata.set(:effective_message_timestamp, timestamp)
     end
   end
 

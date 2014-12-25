@@ -26,7 +26,7 @@ require "droonga/engine/version"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
-require "droonga/node_status"
+require "droonga/node_metadata"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
 
