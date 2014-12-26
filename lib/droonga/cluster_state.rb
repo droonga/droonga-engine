@@ -51,7 +51,7 @@ module Droonga
     def reload
       old_state = to_hash
       clear_cache
-      @state = state
+      @state = load_state_file
       if to_hash == old_state
         logger.info("cluster state not changed")
       else
@@ -166,7 +166,7 @@ module Droonga
       @absorb_destination_nodes = nil
     end
 
-    def state
+    def load_state_file
       path = Path.cluster_state
 
       return default_state unless path.exist?
