@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/loggable"
+require "droonga/file_observer"
 require "droonga/node_metadata"
 
 module Droonga
@@ -23,43 +24,74 @@ module Droonga
     attr_accessor :catalog
     attr_writer :on_change
 
-    def initialize
+    def initialize(loop)
+      @loop = loop
+
       @catalog = nil
-      @live_nodes_list = nil
+      @state = nil
       @on_change = nil
+
+      @file_observer = FileObserver.new(loop, Path.cluster_state)
+      @file_observer.on_change = lambda do
+        reload
+      end
+
+      reload
+    end
+
+    def start_observe
+      @file_observer.start
+    end
+
+    def stop_observe
+      @file_observer.stop
+    end
+
+    def reload
+      old_state = to_hash
+      clear_cache
+      @state = state
+      logger.info("live-nodes-list loaded")
+      unless to_hash == old_state
+        on_change
+      end
     end
 
     def all_nodes
-      @catalog.all_nodes
+      if @catalog
+        @catalog.all_nodes
+      else
+        []
+      end
     end
 
     def dead_nodes
-      if @live_nodes_list
-        @live_nodes_list.dead_nodes
+      if @state
+        @dead_nodes ||= collect_dead_nodes
       else
         []
       end
     end
 
     def service_provider_nodes
-      if @live_nodes_list
-        @live_nodes_list.service_provider_nodes
+      if @state
+        @service_provider_nodes ||= collect_nodes_by_role(NodeMetadata::Role::SERVICE_PROVIDER)
       else
         all_nodes
       end
     end
 
     def absorb_source_nodes
-      if @live_nodes_list
-        @live_nodes_list.absorb_source_nodes
+      if @state
+        @absorb_source_nodes ||= collect_nodes_by_role(NodeMetadata::Role::ABSORB_SOURCE)
       else
         []
       end
     end
 
     def absorb_destination_nodes
-      if @live_nodes_list
-        @live_nodes_list.absorb_destination_nodes
+      if @state
+        @absorb_destination_nodes ||= collect_nodes_by_role(NodeMetadata::Role::ABSORB_DESTINATION)
       else
         []
       end
@@ -107,20 +139,71 @@ module Droonga
       end
     end
 
-    def live_nodes_list=(new_nodes_list)
-      old_live_nodes_list = @live_nodes_list
-      @live_nodes_list = new_nodes_list
-      unless old_live_nodes_list == new_nodes_list
-        on_change
-      end
-      @live_nodes_list
-    end
-
     def on_change
       @on_change.call if @on_change
     end
 
     private
+    def to_hash
+      return nil unless @state
+
+      {
+        :all                => @state.keys,
+        :dead               => dead_nodes,
+        :service_provider   => service_provider_nodes,
+        :absorb_source      => absorb_source_nodes,
+        :absorb_destination => absorb_destination_nodes,
+      }
+    end
+
+    def clear_cache
+      @dead_nodes = nil
+      @service_provider_nodes = nil
+      @absorb_source_nodes = nil
+      @absorb_destination_nodes = nil
+    end
+
+    def state
+      path = Path.cluster_state
+
+      return default_state unless path.exist?
+
+      contents = path.read
+      return default_state if contents.empty?
+
+      begin
+        JSON.parse(contents)
+      rescue JSON::ParserError
+        default_state
+      end
+    end
+
+    def default_state
+      {}
+    end
+
+    def collect_dead_nodes
+      nodes = []
+      @state.each do |name, state|
+        unless state["live"]
+          nodes << name
+        end
+      end
+      nodes.sort
+    end
+
+    def collect_nodes_by_role(role)
+      nodes = []
+      @state.each do |name, state|
+        if not state["foreign"] and
+             state["tags"]["type"] == "engine" and
+             state["tags"]["role"] == role
+          nodes << name
+        end
+      end
+      nodes.sort
+    end
+
     def node_metadata
       @node_metadata ||= NodeMetadata.new
     end
