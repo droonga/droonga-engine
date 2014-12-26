@@ -75,18 +75,6 @@ module Droonga
       route.start_with?(@name) or route.start_with?(@internal_name)
     end
 
-    def unwritable_node?(node_name)
-      case node_metadata.role
-      when NodeStatus::Role::SERVICE_PROVIDER
-        absorb_source_nodes.include?(node_name) or
-          absorb_destination_nodes.include?(node_name)
-      when NodeStatus::Role::ABSORB_SOURCE
-        absorb_destination_nodes.include?(node_name)
-      else
-        false
-      end
-    end
-
     def farm_path(route)
       if /\A[^:]+:\d+\/[^.]+/ =~ route
         name = $MATCH

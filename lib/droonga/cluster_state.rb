@@ -95,6 +95,18 @@ module Droonga
       end
     end
 
+    def unwritable_node?(node_name)
+      case node_metadata.role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        absorb_source_nodes.include?(node_name) or
+          absorb_destination_nodes.include?(node_name)
+      when NodeMetadata::Role::ABSORB_SOURCE
+        absorb_destination_nodes.include?(node_name)
+      else
+        false
+      end
+    end
+
     def live_nodes_list=(new_nodes_list)
       old_live_nodes_list = @live_nodes_list
       @live_nodes_list = new_nodes_list
