@@ -389,7 +389,7 @@ module Droonga
       end
 
       class Dataset < Catalog::Dataset
-        def compute_routes(args, live_nodes=nil)
+        def compute_routes(args, active_nodes=nil)
           routes = []
           case args["type"]
           when "broadcast"

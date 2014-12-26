@@ -41,8 +41,8 @@ module Droonga
         @all_nodes ||= volume.all_nodes
       end
 
-      def compute_routes(message, live_nodes)
-        volume.compute_routes(message, live_nodes)
+      def compute_routes(message, active_nodes)
+        volume.compute_routes(message, active_nodes)
       end
     end
   end

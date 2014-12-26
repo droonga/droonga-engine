@@ -71,17 +71,17 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
-      def compute_routes(message, live_nodes)
+      def compute_routes(message, active_nodes)
         routes = []
         case message["type"]
         when "broadcast"
           slices = select_slices
           slices.each do |slice|
-            routes.concat(slice.compute_routes(message, live_nodes))
+            routes.concat(slice.compute_routes(message, active_nodes))
           end
         when "scatter"
           slice = choose_slice(message["record"])
-          routes.concat(slice.compute_routes(message, live_nodes))
+          routes.concat(slice.compute_routes(message, active_nodes))
         end
         routes
       end
