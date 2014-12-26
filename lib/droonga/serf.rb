@@ -127,7 +127,7 @@ module Droonga
     def update_cluster_state
       path = Path.cluster_state
       new_state = current_cluster_state
-      file_contents = JSON.pretty_generate(new_list)
+      file_contents = JSON.pretty_generate(new_state)
       SafeFileWriter.write(path) do |output, file|
         output.puts(file_contents)
         @service_installation.ensure_correct_file_permission(file)
