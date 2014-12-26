@@ -136,21 +136,22 @@ module Droonga
 
     def current_cluster_state
       ensure_serf
-      nodes_list = {}
+      nodes = {}
       result = run_once("members", "-format", "json")
       result[:result] = JSON.parse(result[:result])
       members = result[:result]
       current_cluster_id = cluster_id
       members["members"].each do |member|
         foreign = member["tags"]["cluster_id"] != current_cluster_id
-        nodes_list[member["name"]] = {
-          "live"        => member["status"] == "alive",
-          "foreign"     => foreign,
-          "serfAddress" => member["addr"],
-          "tags"        => member["tags"],
+        next if foreign
+
+        nodes[member["name"]] = {
+          "type" => member["tags"]["type"],
+          "role" => member["tags"]["role"],
+          "live" => member["status"] == "alive",
         }
       end
-      nodes_list
+      nodes
     end
 
     def set_tag(name, value)

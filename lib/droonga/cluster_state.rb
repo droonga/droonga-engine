@@ -173,8 +173,8 @@ module Droonga
 
     def collect_dead_nodes
       nodes = []
-      @state.each do |name, state|
-        unless state["live"]
+      @state.each do |name, node_state|
+        unless node_state["live"]
           nodes << name
         end
       end
@@ -183,10 +183,9 @@ module Droonga
 
     def collect_nodes_by_role(role)
       nodes = []
-      @state.each do |name, state|
-        if not state["foreign"] and
-             state["tags"]["type"] == "engine" and
-             state["tags"]["role"] == role
+      @state.each do |name, node_state|
+        if node_state["type"] == "engine" and
+             node_state["role"] == role
           nodes << name
         end
       end
