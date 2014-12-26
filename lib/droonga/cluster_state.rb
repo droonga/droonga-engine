@@ -52,8 +52,10 @@ module Droonga
       old_state = to_hash
       clear_cache
       @state = state
-      logger.info("live-nodes-list loaded")
-      unless to_hash == old_state
+      if to_hash == old_state
+        logger.info("cluster state not changed")
+      else
+        logger.info("cluster state changed")
         on_change
       end
     end
