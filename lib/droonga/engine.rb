@@ -122,8 +122,7 @@ module Droonga
       loader = LiveNodesListLoader.new(path)
       live_nodes_list = loader.load
       logger.info("live-nodes-list loaded",
-                  :path  => path.to_s,
-                  :mtime => path.mtime)
+                  :path  => path.to_s)
       live_nodes_list
     end
 
