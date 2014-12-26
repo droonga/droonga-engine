@@ -70,7 +70,7 @@ module Droonga
                    *retry_joins)
       Thread.new do
         sleep 1 # wait until the serf agent becomes running
-        update_live_nodes_list if @agent.running?
+        update_cluster_state if @agent.running?
       end
       logger.trace("start: done")
     end
@@ -124,9 +124,9 @@ module Droonga
       result
     end
 
-    def update_live_nodes_list
-      path = Path.live_nodes_list
-      new_list = live_nodes_list
+    def update_cluster_state
+      path = Path.cluster_state
+      new_state = current_cluster_state
       file_contents = JSON.pretty_generate(new_list)
       SafeFileWriter.write(path) do |output, file|
         output.puts(file_contents)
@@ -134,7 +134,7 @@ module Droonga
       end
     end
 
-    def live_nodes_list
+    def current_cluster_state
       ensure_serf
       nodes_list = {}
       result = run_once("members", "-format", "json")

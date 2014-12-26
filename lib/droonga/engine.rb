@@ -23,7 +23,6 @@ require "droonga/engine_state"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
-require "droonga/live_nodes_list_loader"
 require "droonga/node_metadata"
 
 module Droonga
@@ -33,14 +32,9 @@ module Droonga
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
-      @state.cluster.live_nodes_list = load_live_nodes_list
       @catalog = load_catalog
       @state.catalog = @catalog
       @dispatcher = create_dispatcher
-      @live_nodes_list_observer = FileObserver.new(loop, Path.live_nodes_list)
-      @live_nodes_list_observer.on_change = lambda do
-        @state.cluster.live_nodes_list = load_live_nodes_list
-      end
       @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
       @node_metadata_observer.on_change = lambda do
         logger.trace("reloading node_metadata: start")
@@ -56,7 +50,7 @@ module Droonga
         @on_ready.call if @on_ready
       end
       @state.start
-      @live_nodes_list_observer.start
+      @state.cluster.start_observe
       @node_metadata_observer.start
       @dispatcher.start
       logger.trace("start: done")
@@ -64,7 +58,7 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @live_nodes_list_observer.stop
+      @state.cluster.stop_observe
       @node_metadata_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
@@ -89,7 +83,7 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       save_last_processed_message_timestamp
-      @live_nodes_list_observer.stop
+      @state.cluster.stop_observe
       @node_metadata_observer.stop
       @dispatcher.stop_immediately
       @state.shutdown
@@ -115,15 +109,6 @@ module Droonga
                   :path  => catalog_path.to_s,
                   :mtime => catalog_path.mtime)
       catalog
-    end
-
-    def load_live_nodes_list
-      path = Path.live_nodes_list
-      loader = LiveNodesListLoader.new(path)
-      live_nodes_list = loader.load
-      logger.info("live-nodes-list loaded",
-                  :path  => path.to_s)
-      live_nodes_list
     end
 
     def create_dispatcher

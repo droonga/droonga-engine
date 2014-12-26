@@ -43,7 +43,7 @@ module Droonga
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
-      @cluster = ClusterState.new
+      @cluster = ClusterState.new(@loop)
       @forwarder = Forwarder.new(@loop, :buffering => true)
       @cluster.on_change = lambda do
         @forwarder.resume

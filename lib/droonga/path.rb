@@ -48,8 +48,8 @@ module Droonga
         state + "metadata.json"
       end
 
-      def live_nodes_list
-        state + "live-nodes.json"
+      def cluster_state
+        state + "cluster-state.json"
       end
 
       def config

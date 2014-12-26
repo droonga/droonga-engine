@@ -395,9 +395,9 @@ module Droonga
         end
       end
 
-      class UpdateLiveNodesList < Base
+      class UpdateClusterState < Base
         def process
-          @serf.update_live_nodes_list
+          @serf.update_cluster_state
         end
       end
     end
