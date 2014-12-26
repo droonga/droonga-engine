@@ -83,7 +83,16 @@ module Droonga
     end
 
     def writable_nodes
-      all_nodes
+      case node_metadata.role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        all_nodes
+      when NodeMetadata::Role::ABSORB_SOURCE
+        all_nodes & absorb_source_nodes
+      when NodeMetadata::Role::ABSORB_DESTINATION
+        all_nodes & absorb_destination_nodes
+      else
+        []
+      end
     end
 
     def live_nodes_list=(new_nodes_list)
