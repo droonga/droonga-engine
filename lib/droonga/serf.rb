@@ -68,7 +68,10 @@ module Droonga
                    "-tag", "role=#{role}",
                    "-tag", "cluster_id=#{cluster_id}",
                    *retry_joins)
-      update_live_nodes_list
+      Thread.new do
+        sleep 1 # wait until the serf agent becomes running
+        update_live_nodes_list if @agent.running?
+      end
       logger.trace("start: done")
     end
 
