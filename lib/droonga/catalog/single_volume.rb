@@ -32,7 +32,7 @@ module Droonga
         @all_nodes ||= [node]
       end
 
-      def compute_routes(message, live_nodes)
+      def compute_routes(message, active_nodes)
         [address.to_s]
       end
 

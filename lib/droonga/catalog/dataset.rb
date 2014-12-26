@@ -67,8 +67,8 @@ module Droonga
         @all_nodes ||= replicas.all_nodes
       end
 
-      def compute_routes(message, live_nodes)
-        @replicas.compute_routes(message, live_nodes)
+      def compute_routes(message, active_nodes)
+        @replicas.compute_routes(message, active_nodes)
       end
 
       def sliced?

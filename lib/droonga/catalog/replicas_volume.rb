@@ -40,16 +40,16 @@ module Droonga
         to_a.hash
       end
 
-      def select(how=nil, live_nodes=nil)
+      def select(how=nil, active_nodes=nil)
         case how
         when :top
-          replicas = live_replicas(live_nodes)
+          replicas = live_replicas(active_nodes)
           [replicas.first]
         when :random
-          replicas = live_replicas(live_nodes)
+          replicas = live_replicas(active_nodes)
           [replicas.sample]
         when :all
-          live_replicas(live_nodes)
+          live_replicas(active_nodes)
         else
           super
         end
@@ -63,27 +63,27 @@ module Droonga
         @all_nodes ||= collect_all_nodes
       end
 
-      def live_replicas(live_nodes=nil)
-        return replicas unless live_nodes
+      def live_replicas(active_nodes=nil)
+        return replicas unless active_nodes
 
         replicas.select do |volume|
-          dead_nodes = volume.all_nodes - live_nodes
+          dead_nodes = volume.all_nodes - active_nodes
           dead_nodes.empty?
         end
       end
 
-      def compute_routes(message, live_nodes)
+      def compute_routes(message, active_nodes)
         routes = []
         case message["type"]
         when "broadcast"
-          replicas = select(message["replica"].to_sym, live_nodes)
+          replicas = select(message["replica"].to_sym, active_nodes)
           replicas.each do |volume|
-            routes.concat(volume.compute_routes(message, live_nodes))
+            routes.concat(volume.compute_routes(message, active_nodes))
           end
         when "scatter"
-          replicas = select(message["replica"].to_sym, live_nodes)
+          replicas = select(message["replica"].to_sym, active_nodes)
           replicas.each do |volume|
-            routes.concat(volume.compute_routes(message, live_nodes))
+            routes.concat(volume.compute_routes(message, active_nodes))
           end
         end
         routes
