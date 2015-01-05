@@ -137,19 +137,19 @@ module Droonga
         end
 
         def host
-          @host || config["host"] || Address::DEFAULT_HOST
+          @host || config["host"] || default_host
         end
 
         def port
-          @port || config["port"] || Address::DEFAULT_PORT
+          @port || config["port"] || default_port
         end
 
         def tag
-          @port || config["tag"] || Address::DEFAULT_TAG
+          @port || config["tag"] || default_tag
         end
 
         def log_level
-          ENV["DROONGA_LOG_LEVEL"] || config["log_level"] || Logger::Level.default
+          ENV["DROONGA_LOG_LEVEL"] || config["log_level"] || default_log_level
         end
 
         def log_level=(level)
@@ -157,7 +157,7 @@ module Droonga
         end
 
         def log_file
-          file = @log_file || config["log_file"] || Path.default_log_file
+          file = @log_file || config["log_file"] || default_log_file
           File.expand_path(file)
         end
 
@@ -166,7 +166,7 @@ module Droonga
         end
 
         def pid_file_path
-          path = @pid_file_path || config["pid_file"]
+          path = @pid_file_path || config["pid_file"] || default_pid_file_path
           return nil if path.nil?
           Pathname.new(path.to_s).expand_path
         end
@@ -206,6 +206,30 @@ module Droonga
         end
 
         private
+        def default_host
+          Address::DEFAULT_HOST
+        end
+
+        def default_port
+          Address::DEFAULT_PORT
+        end
+
+        def default_tag
+          Address::DEFAULT_TAG
+        end
+
+        def default_log_level
+          ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
+        end
+
+        def default_log_file
+          Path.default_log_file
+        end
+
+        def default_pid_file_path
+          nil
+        end
+
         def config
           @config ||= load_config
         end
@@ -224,17 +248,17 @@ module Droonga
           parser.separator("Connection:")
           parser.on("--host=HOST",
                     "The host name of the Droonga engine",
-                    "(#{@host})") do |host|
+                    "(#{default_host})") do |host|
             @host = host
           end
           parser.on("--port=PORT", Integer,
                     "The port number of the Droonga engine",
-                    "(#{@port})") do |port|
+                    "(#{default_port})") do |port|
             @port = port
           end
           parser.on("--tag=TAG",
                     "The tag of the Droonga engine",
-                    "(#{@tag})") do |tag|
+                    "(#{default_tag})") do |tag|
             @tag = tag
           end
         end
