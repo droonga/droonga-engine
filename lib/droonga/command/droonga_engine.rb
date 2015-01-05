@@ -198,7 +198,7 @@ module Droonga
         end
 
         def listen_socket
-          @listen_socket ||= TCPServer.new(@host, @port)
+          @listen_socket ||= TCPServer.new(host, port)
         end
 
         def heartbeat_socket
@@ -319,7 +319,7 @@ module Droonga
 
         def bind_heartbeat_socket
           socket = UDPSocket.new(address_family)
-          socket.bind(@host, @port)
+          socket.bind(host, port)
           socket
         end
       end
