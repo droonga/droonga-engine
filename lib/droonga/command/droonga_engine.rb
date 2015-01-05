@@ -271,11 +271,12 @@ module Droonga
           parser.on("--log-level=LEVEL", levels,
                     "The log level of the Droonga engine",
                     "[#{levels_label}]",
-                    "(#{log_level})") do |level|
+                    "(#{default_log_level})") do |level|
             self.log_level = level
           end
           parser.on("--log-file=FILE",
-                    "Output logs to FILE") do |path|
+                    "Output logs to FILE",
+                    "(#{default_log_file_path})") do |path|
             self.log_file_path = path
           end
         end
