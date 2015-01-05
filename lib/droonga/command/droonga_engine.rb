@@ -55,11 +55,7 @@ module Droonga
           Process.daemon
         end
 
-        open_log_file do
-          write_pid_file do
-            run_main_loop
-          end
-        end
+        run_main_loop
       end
 
       private
@@ -89,33 +85,6 @@ module Droonga
       def run_main_loop
         main_loop = MainLoop.new(@configuration)
         main_loop.run
-      end
-
-      def open_log_file
-        if @configuration.log_file_path
-          @configuration.log_file_path.open("a") do |file|
-            $stdout.reopen(file)
-            $stderr.reopen(file)
-            yield
-          end
-        else
-          yield
-        end
-      end
-
-      def write_pid_file
-        if @configuration.pid_file_path
-          @configuration.pid_file_path.open("w") do |file|
-            file.puts(Process.pid)
-          end
-          begin
-            yield
-          ensure
-            FileUtils.rm_f(@configuration.pid_file_path.to_s)
-          end
-        else
-          yield
-        end
       end
 
       class Configuration
@@ -341,9 +310,40 @@ module Droonga
         def initialize(configuration)
           @configuration = configuration
           @loop = Coolio::Loop.default
+          @log_file = nil
         end
 
         def run
+          reopen_log_file
+          write_pid_file do
+            run_internal
+          end
+        end
+
+        private
+        def reopen_log_file
+          return if @configuration.log_file_path.nil?
+          @log_file = @configuration.log_file_path.open("a")
+          $stdout.reopen(@log_file)
+          $stderr.reopen(@log_file)
+        end
+
+        def write_pid_file
+          if @configuration.pid_file_path
+            @configuration.pid_file_path.open("w") do |file|
+              file.puts(Process.pid)
+            end
+            begin
+              yield
+            ensure
+              FileUtils.rm_f(@configuration.pid_file_path.to_s)
+            end
+          else
+            yield
+          end
+        end
+
+        def run_internal
           start_serf
           @service_runner = run_service
           setup_initial_on_ready
@@ -356,7 +356,6 @@ module Droonga
           @service_runner.success?
         end
 
-        private
         def setup_initial_on_ready
           return if @configuration.ready_notify_fd.nil?
           @service_runner.on_ready = lambda do
@@ -406,6 +405,7 @@ module Droonga
 
         def restart_graceful
           old_service_runner = @service_runner
+          reopen_log_file
           @service_runner = run_service
           @service_runner.on_ready = lambda do
             @service_runner.on_failure = nil
@@ -419,6 +419,7 @@ module Droonga
 
         def restart_immediately
           old_service_runner = @service_runner
+          reopen_log_file
           @service_runner = run_service
           old_service_runner.stop_immediately
         end
