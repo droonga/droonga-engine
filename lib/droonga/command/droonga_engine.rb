@@ -159,22 +159,11 @@ module Droonga
         end
 
         def log_file_path
-          path = @log_file_path || config["log_file"] || default_log_file_path
-          Pathname.new(path).expand_path
-        end
-
-        def log_file_path=(path)
-          @log_file_path = Pathname.new(path).expand_path
+          @log_file_path || config["log_file"] || default_log_file_path
         end
 
         def pid_file_path
-          path = @pid_file_path || config["pid_file"] || default_pid_file_path
-          return nil if path.nil?
-          Pathname.new(path.to_s).expand_path
-        end
-
-        def pid_file_path=(path)
-          @pid_file_path = Pathname.new(path).expand_path
+          @pid_file_path || config["pid_file"] || default_pid_file_path
         end
 
         def daemon?
@@ -232,6 +221,10 @@ module Droonga
           nil
         end
 
+        def expand_path(path)
+          Pathname.new(path).expand_path
+        end
+
         def config
           @config ||= load_config
         end
@@ -279,7 +272,7 @@ module Droonga
           parser.on("--log-file=FILE",
                     "Output logs to FILE",
                     "(#{default_log_file_path})") do |path|
-            self.log_file_path = path
+            @log_file_path = expand_path(path)
           end
         end
 
@@ -296,7 +289,7 @@ module Droonga
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
-            self.pid_file_path = path
+            @pid_file_path = expand_path(path)
           end
         end
 
