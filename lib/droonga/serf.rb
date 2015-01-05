@@ -53,8 +53,6 @@ module Droonga
     def start
       logger.trace("start: start")
       ensure_serf
-      ENV["SERF"] = @serf
-      ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
