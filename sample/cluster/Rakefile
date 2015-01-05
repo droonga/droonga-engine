@@ -91,6 +91,19 @@ class DroongaEngine
        "--hosts", hosts.join(","),
        "--port", self.class.port.to_s)
   end
+
+  def generate_config
+    config = {
+      "host"      => host,
+      "port"      => self.class.port,
+      # "log_file"  => "droonga-engine.log",
+      "log_level" => "info",
+      "pid_file"  => "droonga-engine.pid",
+    }
+    config_path.open("w") do |file|
+      file.puts(config.to_yaml)
+    end
+  end
 end
 
 namespace :droonga do
