@@ -66,20 +66,20 @@ module Droonga
     end
 
     def leave
-      run_once("leave")
+      run_command("leave")
     end
 
     def join(*hosts)
       nodes = hosts.collect do |host|
         "#{host}:#{agent_port}"
       end
-      run_once("join", *nodes)
+      run_command("join", *nodes)
     end
 
     def send_query(query, payload)
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
-      result = run_once("query", *options)
+      result = run_command("query", *options)
       result[:result] = JSON.parse(result[:result])
       if payload["node"]
         responses = result[:result]["Responses"]
@@ -109,7 +109,7 @@ module Droonga
 
     def current_cluster_state
       nodes = {}
-      result = run_once("members", "-format", "json")
+      result = run_command("members", "-format", "json")
       result[:result] = JSON.parse(result[:result])
       members = result[:result]
       current_cluster_id = cluster_id
@@ -127,11 +127,11 @@ module Droonga
     end
 
     def set_tag(name, value)
-      run_once("tags", "-set", "#{name}=#{value}")
+      run_command("tags", "-set", "#{name}=#{value}")
     end
 
     def delete_tag(name)
-      run_once("tags", "-delete", name)
+      run_command("tags", "-delete", name)
     end
 
     def update_cluster_id
@@ -175,7 +175,7 @@ module Droonga
       nil
     end
 
-    def run_once(command, *options)
+    def run_command(command, *options)
       ensure_serf
       command = Command.new(@serf, command,
                             "-rpc-addr", rpc_address,
