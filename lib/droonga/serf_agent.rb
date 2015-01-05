@@ -52,6 +52,7 @@ module Droonga
           @pid = spawn(env, @serf, "agent",
                        "-bind", "#{@host}:#{@bind_port}",
                        "-rpc-addr", "#{@host}:#{@rpc_port}",
+                       "-log-level", serf_log_level,
                        *@options, spawn_options)
         end
         start_ready_check
@@ -70,6 +71,18 @@ module Droonga
       end
 
       private
+      def serf_log_level
+        level = Logger::Level.default
+        case level
+        when "trace", "debug", "info", "warn"
+          level
+        when "error", "fatal"
+          "err"
+        else
+          level # Or error?
+        end
+      end
+
       def capture_output
         result = nil
         output_read, output_write = IO.pipe

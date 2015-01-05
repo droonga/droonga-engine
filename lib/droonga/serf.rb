@@ -52,7 +52,6 @@ module Droonga
                         extract_host(@name), agent_port, rpc_port,
                         "-node", @name,
                         "-event-handler", "droonga-engine-serf-event-handler",
-                        "-log-level", log_level,
                         "-tag", "type=engine",
                         "-tag", "role=#{role}",
                         "-tag", "cluster_id=#{cluster_id}",
@@ -198,18 +197,6 @@ module Droonga
 
     def extract_host(node_name)
       node_name.split(":").first
-    end
-
-    def log_level
-      level = Logger::Level.default
-      case level
-      when "trace", "debug", "info", "warn"
-        level
-      when "error", "fatal"
-        "err"
-      else
-        level # Or error?
-      end
     end
 
     def rpc_address
