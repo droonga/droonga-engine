@@ -125,6 +125,10 @@ module Droonga
           @daemon          = nil
           @pid_file_path   = nil
           @ready_notify_fd = nil
+
+          @listen_fd       = nil
+          @heartbeat_fd    = nil
+          @serf_agent_pid  = nil
         end
 
         def engine_name
@@ -182,7 +186,28 @@ module Droonga
           daemon
         end
 
-        def to_command_line
+        def to_engine_command_line
+          command_line_options = [
+            "--host", host,
+            "--port", port.to_s,
+            "--tag", tag,
+            "--log-level", log_level,
+          ]
+          if log_file_path
+            command_line_options.concat(["--log-file", log_file_path.to_s])
+          end
+          if pid_file_path
+            command_line_options.concat(["--pid-file", pid_file_path.to_s])
+          end
+          if daemon?
+            command_line_options << "--daemon"
+          else
+            command_line_options << "--no-daemon"
+          end
+          command_line_options
+        end
+
+        def to_service_command_line
           command_line_options = [
             "--engine-name", engine_name,
           ]
@@ -195,14 +220,19 @@ module Droonga
           add_process_options(parser)
           add_path_options(parser)
           add_notification_options(parser)
+          add_internal_options(parser)
         end
 
         def listen_socket
-          @listen_socket ||= TCPServer.new(host, port)
+          @listen_socket ||= create_listen_socket
         end
 
         def heartbeat_socket
-          @heartbeat_socket ||= bind_heartbeat_socket
+          @heartbeat_socket ||= create_heartbeat_socket
+        end
+
+        def serf_agent_pid
+          @serf_agent_pid
         end
 
         private
@@ -317,10 +347,41 @@ module Droonga
           end
         end
 
-        def bind_heartbeat_socket
-          socket = UDPSocket.new(address_family)
-          socket.bind(host, port)
-          socket
+        def add_internal_options(parser)
+          parser.separator("")
+          parser.separator("Internal:")
+          parser.on("--listen-fd=FD", Integer,
+                    "FD of listen socket") do |fd|
+            @listen_fd = fd
+          end
+          parser.on("--heartbeat-fd=FD", Integer,
+                    "FD of heartbeat socket") do |fd|
+            @heartbeat_fd = fd
+          end
+          parser.on("--serf-agent-pid=PID", Integer,
+                    "PID of Serf agent") do |pid|
+            @serf_agent_pid = pid
+          end
+        end
+
+        def create_listen_socket
+          begin
+            TCPServer.new(host, port)
+          rescue Errno::EADDRINUSE
+            raise if @listen_fd.nil?
+            TCPServer.for_fd(@listen_fd)
+          end
+        end
+
+        def create_heartbeat_socket
+          begin
+            socket = UDPSocket.new(address_family)
+            socket.bind(host, port)
+            socket
+          rescue Errno::EADDRINUSE
+            raise if @heartbeat_fd.nil?
+            UDPSocket.for_fd(@heartbeat_fd)
+          end
         end
       end
 
@@ -328,18 +389,51 @@ module Droonga
         def initialize(configuration)
           @configuration = configuration
           @loop = Coolio::Loop.default
+          @log_file = nil
+          @pid_file_path = nil
         end
 
         def run
-          @serf = run_serf
+          reopen_log_file
+          write_pid_file do
+            run_internal
+          end
+        end
+
+        private
+        def reopen_log_file
+          return if @configuration.log_file_path.nil?
+          @log_file = @configuration.log_file_path.open("a")
+          $stdout.reopen(@log_file)
+          $stderr.reopen(@log_file)
+        end
+
+        def write_pid_file
+          @pid_file_path = @configuration.pid_file_path
+          if @pid_file_path
+            @pid_file_path.open("w") do |file|
+              file.puts(Process.pid)
+            end
+            begin
+              yield
+            ensure
+              FileUtils.rm_f(@pid_file_path.to_s)
+            end
+          else
+            yield
+          end
+        end
+
+        def run_internal
+          start_serf
           @service_runner = run_service
           setup_initial_on_ready
+          @restart_observer = run_restart_observer
           @catalog_observer = run_catalog_observer
           @command_runner = run_command_runner
 
           trap_signals
           @loop.run
-          @serf.stop if @serf.running?
 
           @service_runner.success?
         end
@@ -380,15 +474,17 @@ module Droonga
 
         def stop_gracefully
           @command_runner.stop
-          @serf.stop
           @catalog_observer.stop
+          @restart_observer.stop
+          stop_serf
           @service_runner.stop_gracefully
         end
 
         def stop_immediately
           @command_runner.stop
-          @serf.stop
           @catalog_observer.stop
+          @restart_observer.stop
+          stop_serf
           @service_runner.stop_immediately
         end
 
@@ -411,16 +507,43 @@ module Droonga
           old_service_runner.stop_immediately
         end
 
+        def restart_self
+          old_pid_file_path = Pathname.new("#{@pid_file_path}.old")
+          FileUtils.mv(@pid_file_path.to_s, old_pid_file_path.to_s)
+          @pid_file_path = old_pid_file_path
+          stop_gracefully
+
+          engine_runner = EngineRunner.new(@configuration)
+          engine_runner.run
+        end
+
         def run_service
           service_runner = ServiceRunner.new(@loop, @configuration)
           service_runner.run
           service_runner
         end
 
-        def run_serf
-          serf = Serf.new(@loop, @configuration.engine_name)
-          serf.start
-          serf
+        def start_serf
+          @serf = Serf.new(@configuration.engine_name)
+          @serf_agent = @serf.run_agent(@loop)
+        end
+
+        def stop_serf
+          begin
+            @serf.leave
+          rescue Droonga::Serf::Command::Failure
+            logger.error("Failed to leave from Serf cluster: #{$!.message}")
+          end
+          @serf_agent.stop
+        end
+
+        def run_restart_observer
+          restart_observer = FileObserver.new(@loop, Path.restart)
+          restart_observer.on_change = lambda do
+            restart_self
+          end
+          restart_observer.start
+          restart_observer
         end
 
         def run_catalog_observer
@@ -440,6 +563,35 @@ module Droonga
           end
           command_runner.start
           command_runner
+        end
+
+        def log_tag
+          "droonga-engine"
+        end
+      end
+
+      class EngineRunner
+        def initialize(configuration)
+          @configuration = configuration
+        end
+
+        def run
+          listen_fd = @configuration.listen_socket.fileno
+          heartbeat_fd = @configuration.heartbeat_socket.fileno
+          env = {}
+          command_line = [
+            RbConfig.ruby,
+            "-S",
+            "droonga-engine",
+            "--listen-fd", listen_fd.to_s,
+            "--heartbeat-fd", heartbeat_fd.to_s,
+            *@configuration.to_engine_command_line,
+          ]
+          options = {
+            listen_fd => listen_fd,
+            heartbeat_fd => heartbeat_fd,
+          }
+          spawn(env, *command_line, options)
         end
       end
 
@@ -474,7 +626,7 @@ module Droonga
             "--heartbeat-fd", heartbeat_fd.to_s,
             "--control-read-fd", control_write_in.fileno.to_s,
             "--control-write-fd", control_read_out.fileno.to_s,
-            *@configuration.to_command_line,
+            *@configuration.to_service_command_line,
           ]
           options = {
             listen_fd => listen_fd,

@@ -65,13 +65,17 @@ module Droonga
         Pathname.new(base_file_name).expand_path(base)
       end
 
+      # TODO: Re-consider this approach
+      def restart
+        base + "restart.txt"
+      end
+
       def accidental_buffer
         state + "buffer" + "accidental"
       end
 
       def intentional_buffer
         state + "buffer" + "intentional"
-      end
 
       def serf_event_handler_errors
         state + "serf-event-handler-errors"
