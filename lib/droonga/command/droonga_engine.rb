@@ -214,15 +214,19 @@ module Droonga
         end
 
         def default_log_file_path
-          Path.default_log_file
+          nil
         end
 
         def default_pid_file_path
           nil
         end
 
-        def expand_path(path)
-          Pathname.new(path).expand_path
+        def normalize_path(path)
+          if path == "-"
+            nil
+          else
+            Pathname.new(path).expand_path
+          end
         end
 
         def config
@@ -282,7 +286,7 @@ module Droonga
           parser.on("--log-file=FILE",
                     "Output logs to FILE",
                     "(#{default_log_file_path})") do |path|
-            @log_file_path = expand_path(path)
+            @log_file_path = normalize_path(path)
           end
         end
 
@@ -299,7 +303,7 @@ module Droonga
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
-            @pid_file_path = expand_path(path)
+            @pid_file_path = normalize_path(path)
           end
         end
 
