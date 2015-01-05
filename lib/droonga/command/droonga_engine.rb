@@ -23,6 +23,7 @@ require "coolio"
 require "sigdump/setup"
 
 require "droonga/engine/version"
+require "droonga/loggable"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
@@ -335,6 +336,8 @@ module Droonga
       end
 
       class MainLoop
+        include Loggable
+
         def initialize(configuration)
           @configuration = configuration
           @loop = Coolio::Loop.default
@@ -390,16 +393,14 @@ module Droonga
         def stop_gracefully
           @command_runner.stop
           @catalog_observer.stop
-          @serf.leave
-          @serf_agent.stop
+          stop_serf
           @service_runner.stop_gracefully
         end
 
         def stop_immediately
           @command_runner.stop
           @catalog_observer.stop
-          @serf.leave
-          @serf_agent.stop
+          stop_serf
           @service_runner.stop_immediately
         end
 
@@ -433,6 +434,15 @@ module Droonga
           @serf_agent = @serf.run_agent(@loop)
         end
 
+        def stop_serf
+          begin
+            @serf.leave
+          rescue Droonga::Serf::Command::Failure
+            logger.error("Failed to leave from Serf cluster: #{$!.message}")
+          end
+          @serf_agent.stop
+        end
+
         def run_catalog_observer
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
@@ -450,6 +460,10 @@ module Droonga
           end
           command_runner.start
           command_runner
+        end
+
+        def log_tag
+          "droonga-engine"
         end
       end
 
