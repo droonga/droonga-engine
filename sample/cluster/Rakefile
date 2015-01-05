@@ -17,6 +17,7 @@
 
 require "pathname"
 require "json"
+require "yaml"
 
 base_dir_path = Pathname.new(__FILE__).dirname
 top_dir_path = base_dir_path.parent.parent
@@ -48,14 +49,12 @@ class DroongaEngine
     rm_rf(working_dir_path.to_s)
     mkdir_p(working_dir_path.to_s)
     generate_catalog(node_ids)
+    generate_config
   end
 
   def start
     @pid = spawn("droonga-engine",
-                 "--base-dir", working_dir_path.to_s,
-                 "--host", host,
-                 "--port", self.class.port.to_s,
-                 "--pid-file", pid_file_path.to_s)
+                 "--base-dir", working_dir_path.to_s)
   end
 
   def stop
@@ -77,8 +76,8 @@ class DroongaEngine
     working_dir_path + "catalog.json"
   end
 
-  def pid_file_path
-    working_dir_path + "droonga-engine.pid"
+  def config_path
+    working_dir_path + "droonga-engine.yaml"
   end
 
   def generate_catalog(node_ids)
@@ -90,6 +89,19 @@ class DroongaEngine
        "--n-workers", "3",
        "--hosts", hosts.join(","),
        "--port", self.class.port.to_s)
+  end
+
+  def generate_config
+    config = {
+      "host"      => host,
+      "port"      => self.class.port,
+      "log_file"  => "droonga-engine.log",
+      "log_level" => "info",
+      "pid_file"  => "droonga-engine.pid",
+    }
+    config_path.open("w") do |file|
+      file.puts(config.to_yaml)
+    end
   end
 end
 
