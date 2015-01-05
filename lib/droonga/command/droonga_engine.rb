@@ -231,11 +231,21 @@ module Droonga
 
         def load_config
           config_path = Path.config
-          if config_path.exist?
-            YAML.load_file(config_path)
-          else
-            {}
+          return {} unless config_path.exist?
+
+          config = YAML.load_file(config_path)
+          path_keys = ["log_file", "pid_file"]
+          path_keys.each do |path_key|
+            path = config[path_key]
+            next if path.nil?
+
+            path = Pathname.new(path)
+            unless path.absolute?
+              path = (config_path.dirname + path).expand_path
+            end
+            config[path_key] = path
           end
+          config
         end
 
         def add_connection_options(parser)
