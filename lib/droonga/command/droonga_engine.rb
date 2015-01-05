@@ -280,6 +280,7 @@ module Droonga
                     "Use DIR as the base directory",
                     "(#{Path.base})") do |dir|
             Path.base = File.expand_path(dir)
+            @config = nil
           end
         end
 
