@@ -95,6 +95,7 @@ class DroongaEngine
     config = {
       "host"      => host,
       "port"      => self.class.port,
+      # "log_file"  => "droonga-engine.log",
       "log_level" => "info",
       "pid_file"  => "droonga-engine.pid",
     }
