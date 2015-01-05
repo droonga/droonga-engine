@@ -48,6 +48,7 @@ module Droonga
         parse_command_line_arguments!(command_line_arguments)
 
         setup_path
+        setup_log
 
         if @configuration.daemon?
           Process.daemon
@@ -78,6 +79,10 @@ module Droonga
           ]
           ENV["PATH"] = new_paths.join(File::PATH_SEPARATOR)
         end
+      end
+
+      def setup_log
+        ENV["DROONGA_LOG_LEVEL"] = @configuration.log_level
       end
 
       def run_main_loop
@@ -121,6 +126,7 @@ module Droonga
           @port = nil
           @tag  = nil
 
+          @log_level       = nil
           @log_file        = nil
           @daemon          = nil
           @pid_file_path   = nil
@@ -149,11 +155,7 @@ module Droonga
         end
 
         def log_level
-          ENV["DROONGA_LOG_LEVEL"] || config["log_level"] || default_log_level
-        end
-
-        def log_level=(level)
-          ENV["DROONGA_LOG_LEVEL"] = level
+          @log_level || config["log_level"] || default_log_level
         end
 
         def log_file_path
@@ -272,7 +274,7 @@ module Droonga
                     "The log level of the Droonga engine",
                     "[#{levels_label}]",
                     "(#{default_log_level})") do |level|
-            self.log_level = level
+            @log_level = level
           end
           parser.on("--log-file=FILE",
                     "Output logs to FILE",
