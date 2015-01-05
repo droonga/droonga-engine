@@ -235,9 +235,9 @@ module Droonga
         end
 
         def load_config
-          config = Path.config
-          if config.exist?
-            YAML.load_file(config)
+          config_path = Path.config
+          if config_path.exist?
+            YAML.load_file(config_path)
           else
             {}
           end
