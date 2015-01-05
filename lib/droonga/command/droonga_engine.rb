@@ -86,8 +86,8 @@ module Droonga
       end
 
       def open_log_file
-        if @configuration.log_file
-          File.open(@configuration.log_file, "a") do |file|
+        if @configuration.log_file_path
+          @configuration.log_file_path.open("a") do |file|
             $stdout.reopen(file)
             $stderr.reopen(file)
             yield
@@ -156,13 +156,13 @@ module Droonga
           ENV["DROONGA_LOG_LEVEL"] = level
         end
 
-        def log_file
-          file = @log_file || config["log_file"] || default_log_file
-          File.expand_path(file)
+        def log_file_path
+          path = @log_file_path || config["log_file"] || default_log_file_path
+          Pathname.new(path).expand_path
         end
 
-        def log_file=(file)
-          @log_file = File.expand_path(file)
+        def log_file_path=(path)
+          @log_file_path = Pathname.new(path).expand_path
         end
 
         def pid_file_path
@@ -222,7 +222,7 @@ module Droonga
           ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
         end
 
-        def default_log_file
+        def default_log_file_path
           Path.default_log_file
         end
 
@@ -275,8 +275,8 @@ module Droonga
             self.log_level = level
           end
           parser.on("--log-file=FILE",
-                    "Output logs to FILE") do |file|
-            self.log_file = file
+                    "Output logs to FILE") do |path|
+            self.log_file_path = path
           end
         end
 
