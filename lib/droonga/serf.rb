@@ -37,6 +37,7 @@ module Droonga
     include Loggable
 
     def initialize(name)
+      @serf = nil
       @name = name
       @service_installation = ServiceInstallation.new
     end
@@ -161,7 +162,7 @@ module Droonga
 
     private
     def ensure_serf
-      @serf = find_system_serf
+      @serf ||= find_system_serf
       return if @serf
 
       serf_path = self.class.path
