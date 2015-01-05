@@ -61,6 +61,10 @@ class DroongaEngine
     Process.kill(:TERM, @pid)
     Process.waitpid(@pid)
     @pid = nil
+    if pid_path.exist?
+      pid = Integer(pid_path.read)
+      Process.kill(:TERM, pid)
+    end
   end
 
   def host
@@ -80,6 +84,14 @@ class DroongaEngine
     working_dir_path + "droonga-engine.yaml"
   end
 
+  def pid_path_base_name
+    "droonga-engine.pid"
+  end
+
+  def pid_path
+    working_dir_path + pid_path_base_name
+  end
+
   def generate_catalog(node_ids)
     hosts = node_ids.collect do |node_id|
       self.class.host(node_id)
@@ -97,7 +109,7 @@ class DroongaEngine
       "port"      => self.class.port,
       # "log_file"  => "droonga-engine.log",
       "log_level" => "info",
-      "pid_file"  => "droonga-engine.pid",
+      "pid_file"  => pid_path_base_name,
     }
     config_path.open("w") do |file|
       file.puts(config.to_yaml)
