@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -37,12 +37,18 @@ module Droonga
     end
 
     def start
+      n_slices = @slices.size
+      if n_slices.zero?
+        on_ready
+        return
+      end
+
       n_ready_slices = 0
       @slices.each_value do |slice|
         slice.on_ready = lambda do
           n_ready_slices += 1
-          if n_ready_slices == @slices.size
-            @on_ready.call if @on_ready
+          if n_ready_slices == n_slices
+            on_ready
           end
         end
         slice.start
@@ -51,6 +57,11 @@ module Droonga
 
     def stop_gracefully
       n_slices = @slices.size
+      if n_slices.zero?
+        yield if block_given?
+        return
+      end
+
       n_done_slices = 0
       @slices.each_value do |slice|
         slice.stop_gracefully do
@@ -70,6 +81,11 @@ module Droonga
 
     def process(slice_name, message)
       @slices[slice_name].process(message)
+    end
+
+    private
+    def on_ready
+      @on_ready.call if @on_ready
     end
   end
 end
