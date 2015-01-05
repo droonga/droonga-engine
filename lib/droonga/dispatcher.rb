@@ -89,7 +89,7 @@ module Droonga
       @adapter_runners.each_value do |adapter_runner|
         adapter_runner.shutdown
       end
-      @farm.shutdown
+      @farm.stop_immediately
       logger.trace("stop_immediately: done")
     end
 
