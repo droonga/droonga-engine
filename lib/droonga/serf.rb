@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,6 @@
 
 require "json"
 require "coolio"
-require "open3"
 
 require "droonga/path"
 require "droonga/loggable"
@@ -23,6 +22,7 @@ require "droonga/catalog_loader"
 require "droonga/node_metadata"
 require "droonga/serf_downloader"
 require "droonga/serf_agent"
+require "droonga/serf_command"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
@@ -183,10 +183,10 @@ module Droonga
     end
 
     def run_once(command, *options)
-      process = SerfProcess.new(@serf, command,
-                                "-rpc-addr", rpc_address,
-                                *options)
-      process.run_once
+      command = Command.new(@serf, command,
+                            "-rpc-addr", rpc_address,
+                            *options)
+      command.run
     end
 
     def additional_options_from_payload(payload)
@@ -242,25 +242,6 @@ module Droonga
 
     def log_tag
       "serf"
-    end
-
-    class SerfProcess
-      include Loggable
-
-      def initialize(serf, command, *options)
-        @serf = serf
-        @command = command
-        @options = options
-      end
-
-      def run_once
-        stdout, stderror, status = Open3.capture3(@serf, @command, *@options, :pgroup => true)
-        {
-          :result => stdout,
-          :error  => stderror,
-          :status => status,
-        }
-      end
     end
   end
 end
