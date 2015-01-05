@@ -151,7 +151,7 @@ module Droonga
         end
 
         def tag
-          @port || config["tag"] || default_tag
+          @tag || config["tag"] || default_tag
         end
 
         def log_level
