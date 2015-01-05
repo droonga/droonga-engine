@@ -390,15 +390,15 @@ module Droonga
 
         def stop_gracefully
           @command_runner.stop
-          @serf.stop
           @catalog_observer.stop
+          @serf.stop
           @service_runner.stop_gracefully
         end
 
         def stop_immediately
           @command_runner.stop
-          @serf.stop
           @catalog_observer.stop
+          @serf.stop
           @service_runner.stop_immediately
         end
 
@@ -437,7 +437,7 @@ module Droonga
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
             restart_graceful
-            @serf.update_cluster_id if @serf and @serf.running?
+            @serf.update_cluster_id
           end
           catalog_observer.start
           catalog_observer
