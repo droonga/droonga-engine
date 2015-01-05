@@ -30,6 +30,7 @@ module Droonga
       MAX_N_READ_CHECKS = 10
 
       attr_writer :on_ready
+      attr_writer :on_failure
       def initialize(loop, serf, host, bind_port, rpc_port, *options)
         @loop = loop
         @serf = serf
@@ -39,6 +40,7 @@ module Droonga
         @options = options
         @pid = nil
         @on_ready = nil
+        @on_failure = nil
         @n_ready_checks = 0
       end
 
@@ -179,7 +181,7 @@ module Droonga
 
         on_connect_failed = lambda do
           if @n_ready_checks >= MAX_N_READ_CHECKS
-            # TODO: @on_fail.call if @on_fail
+            @on_failure.call if @on_failure
           else
             timer = Coolio::TimerWatcher.new(1)
             on_timer = lambda do
