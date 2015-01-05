@@ -341,7 +341,7 @@ module Droonga
         end
 
         def run
-          @serf = run_serf
+          start_serf
           @service_runner = run_service
           setup_initial_on_ready
           @catalog_observer = run_catalog_observer
@@ -390,14 +390,16 @@ module Droonga
         def stop_gracefully
           @command_runner.stop
           @catalog_observer.stop
-          @serf.stop
+          @serf.leave
+          @serf_agent.stop
           @service_runner.stop_gracefully
         end
 
         def stop_immediately
           @command_runner.stop
           @catalog_observer.stop
-          @serf.stop
+          @serf.leave
+          @serf_agent.stop
           @service_runner.stop_immediately
         end
 
@@ -426,10 +428,9 @@ module Droonga
           service_runner
         end
 
-        def run_serf
-          serf = Serf.new(@loop, @configuration.engine_name)
-          serf.start
-          serf
+        def start_serf
+          @serf = Serf.new(@configuration.engine_name)
+          @serf_agent = @serf.run_agent(@loop)
         end
 
         def run_catalog_observer

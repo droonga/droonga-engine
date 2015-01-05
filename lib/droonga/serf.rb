@@ -13,8 +13,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "English"
-
 require "json"
 require "coolio"
 require "open3"
@@ -24,15 +22,13 @@ require "droonga/loggable"
 require "droonga/catalog_loader"
 require "droonga/node_metadata"
 require "droonga/serf_downloader"
+require "droonga/serf_agent"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
 
 module Droonga
   class Serf
-    # the port must be different from droonga-http-server's agent!
-    AGENT_PORT = 7946
-
     class << self
       def path
         Droonga::Path.base + "serf"
@@ -41,61 +37,44 @@ module Droonga
 
     include Loggable
 
-    def initialize(loop, name)
-      # TODO: Don't allow nil for loop. It reduces nil checks and
-      # simplifies source code.
-      @loop = loop
+    def initialize(name)
       @name = name
-      @agent = nil
       @service_installation = ServiceInstallation.new
     end
 
-    def start
-      logger.trace("start: start")
+    def run_agent(loop)
+      logger.trace("run_agent: start")
       ensure_serf
       retry_joins = []
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
-      @agent = run("agent",
-                   "-node", @name,
-                   "-bind", "#{extract_host(@name)}:#{port}",
-                   "-event-handler", "droonga-engine-serf-event-handler",
-                   "-log-level", log_level,
-                   "-tag", "type=engine",
-                   "-tag", "role=#{role}",
-                   "-tag", "cluster_id=#{cluster_id}",
-                   *retry_joins)
-      Thread.new do
-        sleep 1 # wait until the serf agent becomes running
-        update_cluster_state if @agent.running?
+      agent = Agent.new(loop, @serf,
+                        extract_host(@name), agent_port, rpc_port,
+                        "-node", @name,
+                        "-event-handler", "droonga-engine-serf-event-handler",
+                        "-log-level", log_level,
+                        "-tag", "type=engine",
+                        "-tag", "role=#{role}",
+                        "-tag", "cluster_id=#{cluster_id}",
+                        *retry_joins)
+      agent.on_ready = lambda do
+        update_cluster_state
       end
-      logger.trace("start: done")
+      agent.start
+      logger.trace("run_agent: done")
+      agent
     end
 
-    def running?
-      @agent and @agent.running?
-    end
-
-    def stop
-      logger.trace("stop: start")
-      run("leave").stop
-      @agent.stop
-      @agent = nil
-      logger.trace("stop: done")
-    end
-
-    def restart
-      logger.trace("restart: start")
-      stop
-      start
-      logger.trace("restart: done")
+    def leave
+      ensure_serf
+      run_once("leave")
     end
 
     def join(*hosts)
       ensure_serf
       nodes = hosts.collect do |host|
-        "#{host}:#{port}"
+        "#{host}:#{agent_port}"
       end
       run_once("join", *nodes)
     end
@@ -203,16 +182,8 @@ module Droonga
       nil
     end
 
-    def run(command, *options)
-      process = SerfProcess.new(@loop, @serf, command,
-                                "-rpc-addr", rpc_address,
-                                *options)
-      process.start
-      process
-    end
-
     def run_once(command, *options)
-      process = SerfProcess.new(@loop, @serf, command,
+      process = SerfProcess.new(@serf, command,
                                 "-rpc-addr", rpc_address,
                                 *options)
       process.run_once
@@ -243,15 +214,19 @@ module Droonga
     end
 
     def rpc_address
-      "#{extract_host(@name)}:7373"
+      "#{extract_host(@name)}:#{rpc_port}"
+    end
+
+    def rpc_port
+      7373
     end
 
     def node_metadata
       @node_metadata ||= NodeMetadata.new
     end
 
-    def port
-      AGENT_PORT
+    def agent_port
+      Agent::PORT
     end
 
     def detect_other_hosts
@@ -272,35 +247,10 @@ module Droonga
     class SerfProcess
       include Loggable
 
-      def initialize(loop, serf, command, *options)
-        @loop = loop
+      def initialize(serf, command, *options)
         @serf = serf
         @command = command
         @options = options
-        @pid = nil
-      end
-
-      def start
-        capture_output do |output_write, error_write|
-          env = {}
-          spawn_options = {
-            :out => output_write,
-            :err => error_write,
-          }
-          @pid = spawn(env, @serf, @command, *@options, spawn_options)
-        end
-      end
-
-      def stop
-        return if @pid.nil?
-        Process.waitpid(@pid)
-        @output_io.close
-        @error_io.close
-        @pid = nil
-      end
-
-      def running?
-        not @pid.nil?
       end
 
       def run_once
@@ -310,98 +260,6 @@ module Droonga
           :error  => stderror,
           :status => status,
         }
-      end
-
-      private
-      def capture_output
-        result = nil
-        output_read, output_write = IO.pipe
-        error_read, error_write = IO.pipe
-
-        begin
-          result = yield(output_write, error_write)
-        rescue
-          output_read.close  unless output_read.closed?
-          output_write.close unless output_write.closed?
-          error_read.close   unless error_read.closed?
-          error_write.close  unless error_write.closed?
-          raise
-        end
-
-        output_line_buffer = LineBuffer.new
-        on_read_output = lambda do |data|
-          on_standard_output(output_line_buffer, data)
-        end
-        @output_io = Coolio::IO.new(output_read)
-        @output_io.on_read do |data|
-          on_read_output.call(data)
-        end
-        # TODO: Don't allow nil for loop. It reduces nil checks and
-        # simplifies source code.
-        @loop.attach(@output_io) if @loop
-
-        error_line_buffer = LineBuffer.new
-        on_read_error = lambda do |data|
-          on_error_output(error_line_buffer, data)
-        end
-        @error_io = Coolio::IO.new(error_read)
-        @error_io.on_read do |data|
-          on_read_error.call(data)
-        end
-        # TODO: Don't allow nil for loop. It reduces nil checks and
-        # simplifies source code.
-        @loop.attach(@error_io) if @loop
-
-        result
-      end
-
-      def on_standard_output(line_buffer, data)
-        line_buffer.feed(data) do |line|
-          line = line.chomp
-          case line
-          when /\A==> /
-            content = $POSTMATCH
-            logger.info(content)
-          when /\A    /
-            content = $POSTMATCH
-            case content
-            when /\A(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2}) \[(\w+)\] /
-              year, month, day = $1, $2, $3
-              hour, minute, second = $4, $5, $6
-              level = $7
-              content = $POSTMATCH
-              level = normalize_level(level)
-              logger.send(level, content)
-            else
-              logger.info(content)
-            end
-          else
-            logger.info(line)
-          end
-        end
-      end
-
-      def normalize_level(level)
-        level = level.downcase
-        case level
-        when "err"
-          "error"
-        else
-          level
-        end
-      end
-
-      def on_error_output(line_buffer, data)
-        line_buffer.feed(data) do |line|
-          line = line.chomp
-          logger.error(line.gsub(/\A==> /, ""))
-        end
-      end
-
-      def log_tag
-        tag = "serf"
-        tag << "[#{@pid}]" if @pid
-        tag
       end
     end
   end
