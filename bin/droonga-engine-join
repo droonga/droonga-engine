@@ -125,11 +125,8 @@ class JoinCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(nil, target)
-    result = serf.send_query(command, options)
-    #puts(result[:result])
-    puts(result[:error]) unless result[:error].empty?
-    result[:response]
+    serf = Droonga::Serf.new(target)
+    serf.send_query(command, options)
   end
 
   def absorber

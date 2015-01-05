@@ -79,22 +79,25 @@ module Droonga
     def send_query(query, payload)
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
-      result = run_command("query", *options)
-      result[:result] = JSON.parse(result[:result])
-      if payload["node"]
-        responses = result[:result]["Responses"]
-        response = responses[payload["node"]]
+      raw_serf_response = run_command("query", *options)
+      serf_response = JSON.parse(raw_serf_response)
+
+      node = payload["node"]
+      if node
+        responses = serf_response["Responses"]
+        response = responses[node]
         if response.is_a?(String)
           begin
-            result[:response] = JSON.parse(response)
+            JSON.parse(response)
           rescue JSON::ParserError
-            result[:response] = response
+            response
           end
         else
-          result[:response] = response
+          response
         end
+      else
+        response
       end
-      result
     end
 
     def update_cluster_state
@@ -108,12 +111,12 @@ module Droonga
     end
 
     def current_cluster_state
-      nodes = {}
-      result = run_command("members", "-format", "json")
-      result[:result] = JSON.parse(result[:result])
-      members = result[:result]
+      raw_response = run_command("members", "-format", "json")
+      response = JSON.parse(raw_response)
+
       current_cluster_id = cluster_id
-      members["members"].each do |member|
+      nodes = {}
+      response["members"].each do |member|
         foreign = member["tags"]["cluster_id"] != current_cluster_id
         next if foreign
 

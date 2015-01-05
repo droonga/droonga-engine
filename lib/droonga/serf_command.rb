@@ -20,6 +20,20 @@ require "droonga/loggable"
 module Droonga
   class Serf
     class Command
+      class Failed < Error
+        attr_reader :command_line, :exit_status, :output, :error
+        def initialize(command_line, exit_status, output, error)
+          @command_line = command_line
+          @exit_status = exit_status
+          @output = output
+          @error = error
+          message = "Failed to run serf: (#{@exit_status}): "
+          message << "#{@error}[#{@output}]: "
+          message << @command_line..join(" ")
+          super(message)
+        end
+      end
+
       include Loggable
 
       def initialize(serf, command, *options)
@@ -29,12 +43,14 @@ module Droonga
       end
 
       def run
-        stdout, stderror, status = Open3.capture3(@serf, @command, *@options, :pgroup => true)
-        {
-          :result => stdout,
-          :error  => stderror,
-          :status => status,
-        }
+        command_line = [@serf, @command] + @options
+        stdout, stderror, status = Open3.capture3(*command_line,
+                                                  :pgroup => true)
+        unless status.success?
+          raise Failed.new(command_line, status.to_i, stdout, stderror)
+        end
+        logger.error("run: #{stderror}") unless stderror.empty?
+        stdout
       end
 
       def log_tag
