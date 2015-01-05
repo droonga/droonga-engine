@@ -349,7 +349,6 @@ module Droonga
 
           trap_signals
           @loop.run
-          @serf.stop if @serf.running?
 
           @service_runner.success?
         end
