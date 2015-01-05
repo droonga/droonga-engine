@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -113,58 +113,62 @@ module Droonga
       end
 
       class Configuration
-        attr_reader :host, :port, :tag, :log_file, :pid_file_path
         attr_reader :ready_notify_fd
         def initialize
-          config = load_config
+          @config = nil
 
-          @host = config["host"] || Address::DEFAULT_HOST
-          @port = config["port"] || Address::DEFAULT_PORT
-          @tag  = config["tag"]  || Address::DEFAULT_TAG
+          @host = nil
+          @port = nil
+          @tag  = nil
 
           @log_file        = nil
-          @daemon          = false
+          @daemon          = nil
           @pid_file_path   = nil
           @ready_notify_fd = nil
-
-          if have_config_file?
-            self.pid_file_path = config["pid_file"] if config["pid_file"]
-            self.log_file  = config["log_file"] || Path.default_log_file
-            self.log_level = config["log_level"] if config.include?("log_level")
-          end
-        end
-
-        def have_config_file?
-          File.exist?(Path.config)
-        end
-
-        def load_config
-          if have_config_file?
-            YAML.load_file(Path.config)
-          else
-            {}
-          end
         end
 
         def engine_name
-          "#{@host}:#{@port}/#{@tag}"
+          "#{host}:#{port}/#{tag}"
         end
 
         def address_family
-          ip_address = IPAddr.new(IPSocket.getaddress(@host))
+          ip_address = IPAddr.new(IPSocket.getaddress(host))
           ip_address.family
         end
 
+        def host
+          @host || config["host"] || Address::DEFAULT_HOST
+        end
+
+        def port
+          @port || config["port"] || Address::DEFAULT_PORT
+        end
+
+        def tag
+          @port || config["tag"] || Address::DEFAULT_TAG
+        end
+
         def log_level
-          ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
+          ENV["DROONGA_LOG_LEVEL"] || config["log_level"] || Logger::Level.default
         end
 
         def log_level=(level)
           ENV["DROONGA_LOG_LEVEL"] = level
         end
 
+        def log_file
+          file = @log_file || config["log_file"] || Path.default_log_file
+          File.expand_path(file)
+        end
+
         def log_file=(file)
           @log_file = File.expand_path(file)
+        end
+
+        def pid_file_path
+          path = @pid_file_path || config["pid_file"]
+          return nil if path.nil?
+          Pathname.new(path.to_s).expand_path
         end
 
         def pid_file_path=(path)
@@ -172,7 +176,10 @@ module Droonga
         end
 
         def daemon?
-          @daemon
+          daemon = @daemon
+          daemon = config["daemon"] if daemon.nil?
+          daemon = false if daemon.nil?
+          daemon
         end
 
         def to_command_line
@@ -199,6 +206,19 @@ module Droonga
         end
 
         private
+        def config
+          @config ||= load_config
+        end
+
+        def load_config
+          config = Path.config
+          if config.exist?
+            YAML.load_file(config)
+          else
+            {}
+          end
+        end
+
         def add_connection_options(parser)
           parser.separator("")
           parser.separator("Connection:")
