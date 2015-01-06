@@ -91,19 +91,27 @@ module Droonga
     end
 
     def dead_nodes
-      engine_nodes.collect(&:dead?).collect(&:name)
+      engine_nodes.select do |node|
+        node.dead?
+      end.collect(&:name)
     end
 
     def service_provider_nodes
-      engine_nodes.collect(&:service_provider?).collect(&:name)
+      engine_nodes.select do |node|
+        node.service_provider?
+      end.collect(&:name)
     end
 
     def absorb_source_nodes
-      engine_nodes.collect(&:absorb_source?).collect(&:name)
+      engine_nodes.select do |node|
+        node.absorb_source?
+      end.collect(&:name)
     end
 
     def absorb_destination_nodes
-      engine_nodes.collect(&:absorb_destination?).collect(&:name)
+      engine_nodes.select do |node|
+        node.absorb_destination?
+      end.collect(&:name)
     end
 
     def same_role_nodes
