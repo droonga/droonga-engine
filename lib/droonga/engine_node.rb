@@ -33,7 +33,8 @@ module Droonga
 
     def start
       logger.trace("start: start")
-      resume
+      @forwarder.start
+      @buffer.start_forward if really_writable?
       logger.trace("start: done")
     end
 
@@ -41,11 +42,6 @@ module Droonga
       logger.trace("shutdown: start")
       @forwarder.shutdown
       logger.trace("shutdown: done")
-    end
-
-    def resume
-      @forwarder.resume
-      @buffer.start_forward if really_writable?
     end
 
     def forward(message, destination)

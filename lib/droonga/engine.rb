@@ -52,7 +52,7 @@ module Droonga
         @on_ready.call if @on_ready
       end
       @state.start
-      @cluster.start_observe
+      @cluster.start
       @node_metadata_observer.start
       @dispatcher.start
       logger.trace("start: done")
@@ -66,6 +66,7 @@ module Droonga
         logger.trace("stop_gracefully/on_finish: start")
         save_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
+          @cluster.shutdown
           @state.shutdown
           yield
         end
@@ -88,6 +89,7 @@ module Droonga
       @cluster.stop_observe
       @node_metadata_observer.stop
       @dispatcher.stop_immediately
+      @cluster.shutdown
       @state.shutdown
       logger.trace("stop_immediately: done")
     end
