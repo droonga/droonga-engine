@@ -91,25 +91,25 @@ module Droonga
     end
 
     def dead_nodes
-      engine_nodes.select do |node|
+      @dead_nodes ||= engine_nodes.select do |node|
         node.dead?
       end.collect(&:name)
     end
 
     def service_provider_nodes
-      engine_nodes.select do |node|
+      @service_provider_nodes ||= engine_nodes.select do |node|
         node.service_provider?
       end.collect(&:name)
     end
 
     def absorb_source_nodes
-      engine_nodes.select do |node|
+      @absorb_source_nodes ||= engine_nodes.select do |node|
         node.absorb_source?
       end.collect(&:name)
     end
 
     def absorb_destination_nodes
-      engine_nodes.select do |node|
+      @absorb_destination_nodes ||= engine_nodes.select do |node|
         node.absorb_destination?
       end.collect(&:name)
     end
