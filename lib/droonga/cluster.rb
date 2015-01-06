@@ -71,11 +71,13 @@ module Droonga
     end
 
     def engine_nodes_status
-      engine_nodes.collect do |node|
-        nodes[node.name] = {
+      nodes_status = {}
+      engine_nodes.each do |node|
+        nodes_status[node.name] = {
           "status" => node.status,
         }
       end
+      nodes_status
     end
 
     def forward(message, destination)
