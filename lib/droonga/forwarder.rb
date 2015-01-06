@@ -17,8 +17,6 @@
 
 require "droonga/loggable"
 require "droonga/path"
-require "droonga/event_loop"
-require "droonga/buffered_tcp_socket"
 require "droonga/fluent_message_sender"
 
 module Droonga
@@ -27,13 +25,11 @@ module Droonga
 
     def initialize(loop, options={})
       @loop = loop
-      @buffering = options[:buffering]
       @senders = {}
     end
 
     def start
       logger.trace("start: start")
-      resume
       logger.trace("start: done")
     end
 
@@ -52,35 +48,6 @@ module Droonga
       arguments = destination["arguments"]
       output(receiver, message, command, arguments)
       logger.trace("forward: done")
-    end
-
-    def resume
-      return unless Path.buffer.exist?
-      Pathname.glob("#{Path.buffer}/*") do |path|
-        next unless path.directory?
-
-        destination = path.basename.to_s
-        sender = @senders[destination]
-        if sender
-          sender.resume
-          next
-        end
-
-        chunk_loader = BufferedTCPSocket::ChunkLoader.new(path)
-        unless chunk_loader.have_any_chunk?
-          #FileUtils.rm_rf(path.to_s) # TODO re-enable this
-          next
-        end
-
-        components = destination.split(":")
-        port = components.pop.to_i
-        next if port.zero?
-        host = components.join(":")
-
-        sender = create_sender(host, port)
-        sender.resume
-        @senders[destination] = sender
-      end
     end
 
     private
@@ -139,10 +106,7 @@ module Droonga
     end
 
     def create_sender(host, port)
-      options = {
-        :buffering => @buffering,
-      }
-      sender = FluentMessageSender.new(@loop, host, port, options)
+      sender = FluentMessageSender.new(@loop, host, port)
       sender.start
       sender
     end
