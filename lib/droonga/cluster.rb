@@ -92,14 +92,6 @@ module Droonga
       false
     end
 
-    def all_nodes
-      if @catalog
-        @catalog.all_nodes
-      else
-        []
-      end
-    end
-
     def forwardable_nodes
       @forwardable_nodes ||= engine_nodes.select do |node|
         node.forwardable?
