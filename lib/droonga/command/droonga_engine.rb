@@ -23,6 +23,7 @@ require "coolio"
 require "sigdump/setup"
 
 require "droonga/engine/version"
+require "droonga/loggable"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
@@ -48,16 +49,13 @@ module Droonga
         parse_command_line_arguments!(command_line_arguments)
 
         setup_path
+        setup_log
 
         if @configuration.daemon?
           Process.daemon
         end
 
-        open_log_file do
-          write_pid_file do
-            run_main_loop
-          end
-        end
+        run_main_loop
       end
 
       private
@@ -80,36 +78,13 @@ module Droonga
         end
       end
 
+      def setup_log
+        ENV["DROONGA_LOG_LEVEL"] = @configuration.log_level
+      end
+
       def run_main_loop
         main_loop = MainLoop.new(@configuration)
         main_loop.run
-      end
-
-      def open_log_file
-        if @configuration.log_file
-          File.open(@configuration.log_file, "a") do |file|
-            $stdout.reopen(file)
-            $stderr.reopen(file)
-            yield
-          end
-        else
-          yield
-        end
-      end
-
-      def write_pid_file
-        if @configuration.pid_file_path
-          @configuration.pid_file_path.open("w") do |file|
-            file.puts(Process.pid)
-          end
-          begin
-            yield
-          ensure
-            FileUtils.rm_f(@configuration.pid_file_path.to_s)
-          end
-        else
-          yield
-        end
       end
 
       class Configuration
@@ -121,6 +96,7 @@ module Droonga
           @port = nil
           @tag  = nil
 
+          @log_level       = nil
           @log_file        = nil
           @daemon          = nil
           @pid_file_path   = nil
@@ -149,34 +125,19 @@ module Droonga
         end
 
         def tag
-          @port || config["tag"] || default_tag
+          @tag || config["tag"] || default_tag
         end
 
         def log_level
-          ENV["DROONGA_LOG_LEVEL"] || config["log_level"] || default_log_level
+          @log_level || config["log_level"] || default_log_level
         end
 
-        def log_level=(level)
-          ENV["DROONGA_LOG_LEVEL"] = level
-        end
-
-        def log_file
-          file = @log_file || config["log_file"] || default_log_file
-          File.expand_path(file)
-        end
-
-        def log_file=(file)
-          @log_file = File.expand_path(file)
+        def log_file_path
+          @log_file_path || config["log_file"] || default_log_file_path
         end
 
         def pid_file_path
-          path = @pid_file_path || config["pid_file"] || default_pid_file_path
-          return nil if path.nil?
-          Pathname.new(path.to_s).expand_path
-        end
-
-        def pid_file_path=(path)
-          @pid_file_path = Pathname.new(path).expand_path
+          @pid_file_path || config["pid_file"] || default_pid_file_path
         end
 
         def daemon?
@@ -252,12 +213,20 @@ module Droonga
           ENV["DROONGA_LOG_LEVEL"] || Logger::Level.default
         end
 
-        def default_log_file
-          Path.default_log_file
+        def default_log_file_path
+          nil
         end
 
         def default_pid_file_path
           nil
+        end
+
+        def normalize_path(path)
+          if path == "-"
+            nil
+          else
+            Pathname.new(path).expand_path
+          end
         end
 
         def config
@@ -265,12 +234,22 @@ module Droonga
         end
 
         def load_config
-          config = Path.config
-          if config.exist?
-            YAML.load_file(config)
-          else
-            {}
+          config_path = Path.config
+          return {} unless config_path.exist?
+
+          config = YAML.load_file(config_path)
+          path_keys = ["log_file", "pid_file"]
+          path_keys.each do |path_key|
+            path = config[path_key]
+            next if path.nil?
+
+            path = Pathname.new(path)
+            unless path.absolute?
+              path = (config_path.dirname + path).expand_path
+            end
+            config[path_key] = path
           end
+          config
         end
 
         def add_connection_options(parser)
@@ -301,12 +280,13 @@ module Droonga
           parser.on("--log-level=LEVEL", levels,
                     "The log level of the Droonga engine",
                     "[#{levels_label}]",
-                    "(#{log_level})") do |level|
-            self.log_level = level
+                    "(#{default_log_level})") do |level|
+            @log_level = level
           end
           parser.on("--log-file=FILE",
-                    "Output logs to FILE") do |file|
-            self.log_file = file
+                    "Output logs to FILE",
+                    "(#{default_log_file_path})") do |path|
+            @log_file_path = normalize_path(path)
           end
         end
 
@@ -323,7 +303,7 @@ module Droonga
           end
           parser.on("--pid-file=PATH",
                     "Put PID to PATH") do |path|
-            self.pid_file_path = path
+            @pid_file_path = normalize_path(path)
           end
         end
 
@@ -386,6 +366,8 @@ module Droonga
       end
 
       class MainLoop
+        include Loggable
+
         def initialize(configuration)
           @configuration = configuration
           @loop = Coolio::Loop.default
@@ -438,7 +420,6 @@ module Droonga
           @service_runner.success?
         end
 
-        private
         def setup_initial_on_ready
           return if @configuration.ready_notify_fd.nil?
           @service_runner.on_ready = lambda do
@@ -490,6 +471,7 @@ module Droonga
 
         def restart_graceful
           old_service_runner = @service_runner
+          reopen_log_file
           @service_runner = run_service
           @service_runner.on_ready = lambda do
             @service_runner.on_failure = nil
@@ -503,6 +485,7 @@ module Droonga
 
         def restart_immediately
           old_service_runner = @service_runner
+          reopen_log_file
           @service_runner = run_service
           old_service_runner.stop_immediately
         end
@@ -550,7 +533,7 @@ module Droonga
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
             restart_graceful
-            @serf.update_cluster_id if @serf and @serf.running?
+            @serf.update_cluster_id
           end
           catalog_observer.start
           catalog_observer

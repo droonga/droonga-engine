@@ -37,7 +37,7 @@ module Droonga
           @response  = {
             "log" => []
           }
-          @serf = Serf.new(nil, @serf_name)
+          @serf = Serf.new(@serf_name)
 
           @service_installation = ServiceInstallation.new
           @service_installation.ensure_using_service_base_directory

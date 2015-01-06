@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,11 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "English"
-
 require "json"
-require "coolio"
-require "open3"
 
 require "droonga/path"
 require "droonga/loggable"
@@ -32,9 +28,6 @@ require "droonga/service_installation"
 
 module Droonga
   class Serf
-    # the port must be different from droonga-http-server's agent!
-    AGENT_PORT = 7946
-
     class << self
       def path
         Droonga::Path.base + "serf"
@@ -43,87 +36,68 @@ module Droonga
 
     include Loggable
 
-    def initialize(loop, name)
-      # TODO: Don't allow nil for loop. It reduces nil checks and
-      # simplifies source code.
-      @loop = loop
+    def initialize(name)
+      @serf = nil
       @name = name
-      @agent = nil
       @service_installation = ServiceInstallation.new
     end
 
-    def start
-      logger.trace("start: start")
+    def run_agent(loop)
+      logger.trace("run_agent: start")
       ensure_serf
-      ENV["SERF"] = @serf
-      ENV["SERF_RPC_ADDRESS"] = rpc_address
       retry_joins = []
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
-      @agent = run("agent",
-                   "-node", @name,
-                   "-bind", "#{extract_host(@name)}:#{port}",
-                   "-event-handler", "droonga-engine-serf-event-handler",
-                   "-log-level", log_level,
-                   "-tag", "type=engine",
-                   "-tag", "role=#{role}",
-                   "-tag", "cluster_id=#{cluster_id}",
-                   *retry_joins)
-      Thread.new do
-        sleep 1 # wait until the serf agent becomes running
-        update_cluster_state if @agent.running?
+      agent = Agent.new(loop, @serf,
+                        extract_host(@name), agent_port, rpc_port,
+                        "-node", @name,
+                        "-event-handler", "droonga-engine-serf-event-handler",
+                        "-tag", "type=engine",
+                        "-tag", "role=#{role}",
+                        "-tag", "cluster_id=#{cluster_id}",
+                        *retry_joins)
+      agent.on_ready = lambda do
+        update_cluster_state
       end
-      logger.trace("start: done")
+      agent.start
+      logger.trace("run_agent: done")
+      agent
     end
 
-    def running?
-      @agent and @agent.running?
-    end
-
-    def stop
-      logger.trace("stop: start")
-      run("leave").stop
-      @agent.stop
-      @agent = nil
-      logger.trace("stop: done")
-    end
-
-    def restart
-      logger.trace("restart: start")
-      stop
-      start
-      logger.trace("restart: done")
+    def leave
+      run_command("leave")
     end
 
     def join(*hosts)
-      ensure_serf
       nodes = hosts.collect do |host|
-        "#{host}:#{port}"
+        "#{host}:#{agent_port}"
       end
-      run_once("join", *nodes)
+      run_command("join", *nodes)
     end
 
     def send_query(query, payload)
-      ensure_serf
       options = ["-format", "json"] + additional_options_from_payload(payload)
       options += [query, JSON.generate(payload)]
-      result = run_once("query", *options)
-      result[:result] = JSON.parse(result[:result])
-      if payload["node"]
-        responses = result[:result]["Responses"]
-        response = responses[payload["node"]]
+      raw_serf_response = run_command("query", *options)
+      serf_response = JSON.parse(raw_serf_response)
+
+      node = payload["node"]
+      if node
+        responses = serf_response["Responses"]
+        response = responses[node]
         if response.is_a?(String)
           begin
-            result[:response] = JSON.parse(response)
+            JSON.parse(response)
           rescue JSON::ParserError
-            result[:response] = response
+            response
           end
         else
-          result[:response] = response
+          response
         end
+      else
+        response
       end
-      result
     end
 
     def update_cluster_state
@@ -137,13 +111,12 @@ module Droonga
     end
 
     def current_cluster_state
-      ensure_serf
-      nodes = {}
-      result = run_once("members", "-format", "json")
-      result[:result] = JSON.parse(result[:result])
-      members = result[:result]
+      raw_response = run_command("members", "-format", "json")
+      response = JSON.parse(raw_response)
+
       current_cluster_id = cluster_id
-      members["members"].each do |member|
+      nodes = {}
+      response["members"].each do |member|
         foreign = member["tags"]["cluster_id"] != current_cluster_id
         next if foreign
 
@@ -157,13 +130,11 @@ module Droonga
     end
 
     def set_tag(name, value)
-      ensure_serf
-      run_once("tags", "-set", "#{name}=#{value}")
+      run_command("tags", "-set", "#{name}=#{value}")
     end
 
     def delete_tag(name)
-      ensure_serf
-      run_once("tags", "-delete", name)
+      run_command("tags", "-delete", name)
     end
 
     def update_cluster_id
@@ -188,7 +159,7 @@ module Droonga
 
     private
     def ensure_serf
-      @serf = find_system_serf
+      @serf ||= find_system_serf
       return if @serf
 
       serf_path = self.class.path
@@ -207,19 +178,12 @@ module Droonga
       nil
     end
 
-    def run(command, *options)
-      process = SerfProcess.new(@loop, @serf, command,
-                                "-rpc-addr", rpc_address,
-                                *options)
-      process.start
-      process
-    end
-
-    def run_once(command, *options)
-      process = SerfProcess.new(@loop, @serf, command,
-                                "-rpc-addr", rpc_address,
-                                *options)
-      process.run_once
+    def run_command(command, *options)
+      ensure_serf
+      command = Command.new(@serf, command,
+                            "-rpc-addr", rpc_address,
+                            *options)
+      command.run
     end
 
     def additional_options_from_payload(payload)
@@ -234,28 +198,20 @@ module Droonga
       node_name.split(":").first
     end
 
-    def log_level
-      level = Logger::Level.default
-      case level
-      when "trace", "debug", "info", "warn"
-        level
-      when "error", "fatal"
-        "err"
-      else
-        level # Or error?
-      end
+    def rpc_address
+      "#{extract_host(@name)}:#{rpc_port}"
     end
 
-    def rpc_address
-      "#{extract_host(@name)}:7373"
+    def rpc_port
+      7373
     end
 
     def node_metadata
       @node_metadata ||= NodeMetadata.new
     end
 
-    def port
-      AGENT_PORT
+    def agent_port
+      Agent::PORT
     end
 
     def detect_other_hosts
@@ -271,142 +227,6 @@ module Droonga
 
     def log_tag
       "serf"
-    end
-
-    class SerfProcess
-      include Loggable
-
-      def initialize(loop, serf, command, *options)
-        @loop = loop
-        @serf = serf
-        @command = command
-        @options = options
-        @pid = nil
-      end
-
-      def start
-        capture_output do |output_write, error_write|
-          env = {}
-          spawn_options = {
-            :out => output_write,
-            :err => error_write,
-          }
-          @pid = spawn(env, @serf, @command, *@options, spawn_options)
-        end
-      end
-
-      def stop
-        return if @pid.nil?
-        Process.waitpid(@pid)
-        @output_io.close
-        @error_io.close
-        @pid = nil
-      end
-
-      def running?
-        not @pid.nil?
-      end
-
-      def run_once
-        stdout, stderror, status = Open3.capture3(@serf, @command, *@options, :pgroup => true)
-        {
-          :result => stdout,
-          :error  => stderror,
-          :status => status,
-        }
-      end
-
-      private
-      def capture_output
-        result = nil
-        output_read, output_write = IO.pipe
-        error_read, error_write = IO.pipe
-
-        begin
-          result = yield(output_write, error_write)
-        rescue
-          output_read.close  unless output_read.closed?
-          output_write.close unless output_write.closed?
-          error_read.close   unless error_read.closed?
-          error_write.close  unless error_write.closed?
-          raise
-        end
-
-        output_line_buffer = LineBuffer.new
-        on_read_output = lambda do |data|
-          on_standard_output(output_line_buffer, data)
-        end
-        @output_io = Coolio::IO.new(output_read)
-        @output_io.on_read do |data|
-          on_read_output.call(data)
-        end
-        # TODO: Don't allow nil for loop. It reduces nil checks and
-        # simplifies source code.
-        @loop.attach(@output_io) if @loop
-
-        error_line_buffer = LineBuffer.new
-        on_read_error = lambda do |data|
-          on_error_output(error_line_buffer, data)
-        end
-        @error_io = Coolio::IO.new(error_read)
-        @error_io.on_read do |data|
-          on_read_error.call(data)
-        end
-        # TODO: Don't allow nil for loop. It reduces nil checks and
-        # simplifies source code.
-        @loop.attach(@error_io) if @loop
-
-        result
-      end
-
-      def on_standard_output(line_buffer, data)
-        line_buffer.feed(data) do |line|
-          line = line.chomp
-          case line
-          when /\A==> /
-            content = $POSTMATCH
-            logger.info(content)
-          when /\A    /
-            content = $POSTMATCH
-            case content
-            when /\A(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2}) \[(\w+)\] /
-              year, month, day = $1, $2, $3
-              hour, minute, second = $4, $5, $6
-              level = $7
-              content = $POSTMATCH
-              level = normalize_level(level)
-              logger.send(level, content)
-            else
-              logger.info(content)
-            end
-          else
-            logger.info(line)
-          end
-        end
-      end
-
-      def normalize_level(level)
-        level = level.downcase
-        case level
-        when "err"
-          "error"
-        else
-          level
-        end
-      end
-
-      def on_error_output(line_buffer, data)
-        line_buffer.feed(data) do |line|
-          line = line.chomp
-          logger.error(line.gsub(/\A==> /, ""))
-        end
-      end
-
-      def log_tag
-        tag = "serf"
-        tag << "[#{@pid}]" if @pid
-        tag
-      end
     end
   end
 end
