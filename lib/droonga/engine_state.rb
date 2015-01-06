@@ -21,7 +21,7 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/buffered_forwarder"
 require "droonga/replier"
-require "droonga/cluster_state"
+require "droonga/cluster"
 
 module Droonga
   class EngineState
@@ -43,9 +43,8 @@ module Droonga
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
-      @cluster = ClusterState.new(@loop)
-      @forwarder = BufferedForwarder.new(@loop,
-                                         :cluster_state => @cluster)
+      @cluster = Cluster.new(@loop)
+      @forwarder = Forwarder.new(@loop, :buffering => true)
       @cluster.on_change = lambda do
         @forwarder.resume
       end
