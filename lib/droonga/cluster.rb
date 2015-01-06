@@ -100,36 +100,6 @@ module Droonga
       end
     end
 
-    def dead_nodes
-      @dead_nodes ||= engine_nodes.select do |node|
-        node.dead?
-      end.collect(&:name)
-    end
-
-    def service_provider_nodes
-      @service_provider_nodes ||= engine_nodes.select do |node|
-        node.service_provider?
-      end.collect(&:name)
-    end
-
-    def absorb_source_nodes
-      @absorb_source_nodes ||= engine_nodes.select do |node|
-        node.absorb_source?
-      end.collect(&:name)
-    end
-
-    def absorb_destination_nodes
-      @absorb_destination_nodes ||= engine_nodes.select do |node|
-        node.absorb_destination?
-      end.collect(&:name)
-    end
-
-    def same_role_nodes
-      @same_role_nodes ||= engine_nodes.select do |node|
-        node.role == node_metadata.role
-      end.collect(&:name)
-    end
-
     def forwardable_nodes
       @forwardable_nodes ||= engine_nodes.select do |node|
         node.forwardable?
