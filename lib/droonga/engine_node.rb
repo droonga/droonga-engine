@@ -127,5 +127,10 @@ module Droonga
     def on_change
       @sender.resume
     end
+
+    private
+    def log_tag
+      "[#{Process.ppid}] engine-node"
+    end
   end
 end
