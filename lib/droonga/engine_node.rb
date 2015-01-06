@@ -69,34 +69,6 @@ module Droonga
       end
     end
 
-    def live?
-      @state.nil? or @state["live"]
-    end
-
-    def dead?
-      not live?
-    end
-
-    def service_provider?
-      role == NodeMetadata::Role::SERVICE_PROVIDER
-    end
-
-    def absorb_source?
-      role == NodeMetadata::Role::ABSORB_SOURCE
-    end
-
-    def absorb_destination?
-      role == NodeMetadata::Role::ABSORB_DESTINATION
-    end
-
-    def role
-      if @state
-        @state["role"]
-      else
-        NodeMetadata::Role::SERVICE_PROVIDER
-      end
-    end
-
     def forwardable?
       return false unless live?
       role == @sender_role
@@ -142,6 +114,34 @@ module Droonga
     end
 
     private
+    def role
+      if @state
+        @state["role"]
+      else
+        NodeMetadata::Role::SERVICE_PROVIDER
+      end
+    end
+
+    def live?
+      @state.nil? or @state["live"]
+    end
+
+    def dead?
+      not live?
+    end
+
+    def service_provider?
+      role == NodeMetadata::Role::SERVICE_PROVIDER
+    end
+
+    def absorb_source?
+      role == NodeMetadata::Role::ABSORB_SOURCE
+    end
+
+    def absorb_destination?
+      role == NodeMetadata::Role::ABSORB_DESTINATION
+    end
+
     def output(message, destination)
       command = destination["type"]
       receiver = destination["to"]
