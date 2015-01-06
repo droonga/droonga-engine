@@ -52,20 +52,7 @@ module Droonga
     end
 
     def forward(message, destination)
-      command = destination["type"]
-      receiver = destination["to"]
-      arguments = destination["arguments"]
-
-      override_message = {
-        "type" => command,
-      }
-      override_message["arguments"] = arguments if arguments
-      message = message.merge(override_message)
-      output_tag = "#{tag}.message"
-      log_info = "<#{receiver}>:<#{output_tag}>"
-      logger.trace("forward: start: #{log_info}")
-      @sender.send(output_tag, message)
-      logger.trace("forward: end")
+      output(message, destination)
     end
 
     def live?
@@ -129,6 +116,23 @@ module Droonga
     end
 
     private
+    def output(message, destination)
+      command = destination["type"]
+      receiver = destination["to"]
+      arguments = destination["arguments"]
+
+      override_message = {
+        "type" => command,
+      }
+      override_message["arguments"] = arguments if arguments
+      message = message.merge(override_message)
+      output_tag = "#{tag}.message"
+      log_info = "<#{receiver}>:<#{output_tag}>"
+      logger.trace("forward: start: #{log_info}")
+      @sender.send(output_tag, message)
+      logger.trace("forward: end")
+    end
+
     def log_tag
       "[#{Process.ppid}] engine-node"
     end
