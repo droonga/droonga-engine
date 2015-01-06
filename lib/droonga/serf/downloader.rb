@@ -34,6 +34,8 @@ module Droonga
       MAX_RETRY_COUNT = 5
       RETRY_INTERVAL  = 10
 
+      TARGET_VERSION  = "0.6.3"
+
       def initialize(output_path)
         @output_path = output_path
         @retry_count = 0
@@ -41,9 +43,8 @@ module Droonga
 
       def download
         detect_platform
-        version = "0.6.3"
         url_base = "https://dl.bintray.com/mitchellh/serf"
-        base_name = "#{version}_#{@os}_#{@architecture}.zip"
+        base_name = "#{TARGET_VERSION}_#{@os}_#{@architecture}.zip"
         connection = Faraday.new(url_base) do |builder|
           builder.response(:follow_redirects)
           builder.adapter(Faraday.default_adapter)
