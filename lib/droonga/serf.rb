@@ -19,9 +19,9 @@ require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog_loader"
 require "droonga/node_metadata"
-require "droonga/serf_downloader"
-require "droonga/serf_agent"
-require "droonga/serf_command"
+require "droonga/serf/downloader"
+require "droonga/serf/agent"
+require "droonga/serf/command"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
@@ -165,7 +165,7 @@ module Droonga
       serf_path = self.class.path
       @serf = serf_path.to_s
       return if serf_path.executable?
-      downloader = SerfDownloader.new(serf_path)
+      downloader = Downloader.new(serf_path)
       downloader.download
     end
 
