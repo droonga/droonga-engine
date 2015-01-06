@@ -24,7 +24,7 @@ require "archive/zip"
 require "droonga/loggable"
 
 module Droonga
-  class SerfDownloader
+  class Serf::Downloader
     include Loggable
 
     class DownloadFailed < StandardError
