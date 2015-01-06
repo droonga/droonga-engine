@@ -87,18 +87,6 @@ module Droonga
       end
     end
 
-    def really_writable?
-      return false unless writable?
-      case @sender_role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        service_provider?
-      when NodeMetadata::Role::ABSORB_SOURCE
-        not absorb_destination?
-      else
-        true
-      end
-    end
-
     def status
       if forwardable?
         "active"
@@ -140,6 +128,18 @@ module Droonga
 
     def absorb_destination?
       role == NodeMetadata::Role::ABSORB_DESTINATION
+    end
+
+    def really_writable?
+      return false unless writable?
+      case @sender_role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        service_provider?
+      when NodeMetadata::Role::ABSORB_SOURCE
+        not absorb_destination?
+      else
+        true
+      end
     end
 
     def output(message, destination)
