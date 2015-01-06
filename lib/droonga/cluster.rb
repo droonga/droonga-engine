@@ -61,12 +61,25 @@ module Droonga
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed")
+        engine_nodes.each(&:on_change)
         on_change
       end
     end
 
     def engine_nodes
       @engine_nodes ||= create_engine_nodes
+    end
+
+    def forward(message, destination)
+      receiver = destination["to"]
+      receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
+      @engine_nodes.each do |node|
+        if node.name == receiver_node_name
+          node.forwarder.forward(message, destination)
+          return true
+        end
+      end
+      false
     end
 
     def all_nodes
@@ -156,7 +169,7 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(name, node_state)
+        EngineNode.new(name, node_state, @loop)
       end
     end
 
