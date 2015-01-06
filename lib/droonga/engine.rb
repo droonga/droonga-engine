@@ -20,6 +20,7 @@ require "fileutils"
 require "droonga/engine/version"
 require "droonga/loggable"
 require "droonga/engine_state"
+require "droonga/cluster"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
@@ -32,8 +33,9 @@ module Droonga
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @state = EngineState.new(loop, name, internal_name)
+      @cluster = Cluster.new(loop)
       @catalog = load_catalog
-      @state.catalog = @catalog
+      @state.catalog = @cluster.catalog = @catalog
       @dispatcher = create_dispatcher
       @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
       @node_metadata_observer.on_change = lambda do
@@ -50,7 +52,7 @@ module Droonga
         @on_ready.call if @on_ready
       end
       @state.start
-      @state.cluster.start_observe
+      @cluster.start_observe
       @node_metadata_observer.start
       @dispatcher.start
       logger.trace("start: done")
@@ -58,7 +60,7 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @state.cluster.stop_observe
+      @cluster.stop_observe
       @node_metadata_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
@@ -83,7 +85,7 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       save_last_processed_message_timestamp
-      @state.cluster.stop_observe
+      @cluster.stop_observe
       @node_metadata_observer.stop
       @dispatcher.stop_immediately
       @state.shutdown
@@ -112,7 +114,7 @@ module Droonga
     end
 
     def create_dispatcher
-      Dispatcher.new(@state, @catalog)
+      Dispatcher.new(@state, @cluster, @catalog)
     end
 
     def save_last_processed_message_timestamp
