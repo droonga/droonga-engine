@@ -13,15 +13,18 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/forwarder"
 require "droonga/node_metadata"
 
 module Droonga
   class EngineNode
-    attr_reader :name
+    attr_reader :name, :forwarder
 
-    def initialize(name, state)
+    def initialize(name, state, loop)
       @name  = name
       @state = state
+
+      @forwarder = Forwarder.new(loop, :buffering => true)
     end
 
     def live?
@@ -67,6 +70,10 @@ module Droonga
       else
         false
       end
+    end
+
+    def on_change
+      @forwarder.resume
     end
   end
 end

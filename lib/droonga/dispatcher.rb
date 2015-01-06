@@ -115,6 +115,9 @@ module Droonga
 
     def forward(message, destination)
       logger.trace("forward start")
+      unless local?(destination)
+        return if @cluster.forward(message, destination)
+      end
       @forwarder.forward(message, destination)
       logger.trace("forward done")
     end
@@ -179,9 +182,13 @@ module Droonga
       if local?(destination)
         process_internal_message(message)
       else
-        @forwarder.forward(@message.merge("body" => message),
-                           "type" => "dispatcher",
-                           "to"   => destination)
+        forward_message = @message.merge("body" => message)
+        forward_destination = {
+          "type" => "dispatcher",
+          "to"   => destination,
+        }
+        @cluster.forward(forward_message, forward_destination) ||
+          @forwarder.forward(forward_message, forward_destination)
       end
     end
 
