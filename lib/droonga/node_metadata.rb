@@ -23,6 +23,17 @@ module Droonga
       SERVICE_PROVIDER   = "service-provider"
       ABSORB_SOURCE      = "absorb-source"
       ABSORB_DESTINATION = "absorb-destination"
+
+      ROLES = [
+        SERVICE_PROVIDER,
+        ABSORB_SOURCE,
+        ABSORB_DESTINATION,
+      ]
+
+      module_function
+      def valid?(role)
+        ROLES.include?(role)
+      end
     end
 
     def initialize
@@ -52,11 +63,11 @@ module Droonga
     end
 
     def role
-      get(:role) || Role::SERVICE_PROVIDER
+      normalize_role(get(:role))
     end
 
     def role=(new_role)
-      set(:role, new_role)
+      set(:role, normalize_role(new_role))
     end
 
     def reload
@@ -66,6 +77,11 @@ module Droonga
     private
     def normalize_key(key)
       key.to_sym
+    end
+
+    def normalize_role(role)
+      role = Role::SERVICE_PROVIDER unless Role.valid?(role)
+      role
     end
 
     def metadata_file
