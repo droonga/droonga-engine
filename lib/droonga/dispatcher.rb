@@ -52,9 +52,6 @@ module Droonga
       @engine_state = engine_state
       @cluster = cluster
       @forwarder = @engine_state.forwarder
-      @cluster.on_change = lambda do
-        @forwarder.resume
-      end
       @replier = @engine_state.replier
       @catalog = catalog
       @adapter_runners = create_adapter_runners
