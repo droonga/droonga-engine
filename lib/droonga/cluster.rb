@@ -33,20 +33,36 @@ module Droonga
       @state = nil
       @on_change = nil
 
-      @file_observer = FileObserver.new(loop, Path.cluster_state)
-      @file_observer.on_change = lambda do
-        reload
-      end
-
       reload
     end
 
     def start_observe
+      return if @file_observer
+      @file_observer = FileObserver.new(@loop, Path.cluster_state)
+      @file_observer.on_change = lambda do
+        reload
+      end
       @file_observer.start
     end
 
     def stop_observe
+      return unless @file_observer
       @file_observer.stop
+      @file_observer = nil
+    end
+
+    def start
+      engine_nodes.each do |node|
+        node.start
+      end
+      start_observe
+    end
+
+    def shutdown
+      stop_observe
+      engine_nodes.each do |node|
+        node.shutdown
+      end
     end
 
     def reload
@@ -85,7 +101,7 @@ module Droonga
       receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
       @engine_nodes.each do |node|
         if node.name == receiver_node_name
-          node.forwarder.forward(message, destination)
+          node.forward(message, destination)
           return true
         end
       end

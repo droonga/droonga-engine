@@ -28,6 +28,22 @@ module Droonga
       @forwarder = Forwarder.new(loop, :buffering => true)
     end
 
+    def start
+      logger.trace("start: start")
+      @forwarder.start
+      logger.trace("start: done")
+    end
+
+    def shutdown
+      logger.trace("shutdown: start")
+      @forwarder.shutdown
+      logger.trace("shutdown: done")
+    end
+
+    def forward(message, destination)
+      @forwarder.forward(message, destination)
+    end
+
     def live?
       @state.nil? or @state["live"]
     end
