@@ -24,7 +24,8 @@ require "archive/zip"
 require "droonga/loggable"
 
 module Droonga
-  class Serf::Downloader
+  class Serf
+    class Downloader
     include Loggable
 
     class DownloadFailed < StandardError
@@ -111,5 +112,6 @@ module Droonga
     def log_tag
       "serf-downloader"
     end
+    end
   end
-end
+endi
