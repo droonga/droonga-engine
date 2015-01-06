@@ -16,10 +16,11 @@
 require "droonga/loggable"
 require "droonga/path"
 require "droonga/file_observer"
+require "droonga/engine_node"
 require "droonga/node_metadata"
 
 module Droonga
-  class ClusterState
+  class Cluster
     include Loggable
 
     attr_accessor :catalog
@@ -49,15 +50,23 @@ module Droonga
     end
 
     def reload
-      old_state = to_hash
+      if @state
+        old_state = @state.dup
+      else
+        old_state = nil
+      end
       clear_cache
       @state = load_state_file
-      if to_hash == old_state
+      if @state == old_state
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed")
         on_change
       end
+    end
+
+    def engine_nodes
+      @engine_nodes ||= create_engine_nodes
     end
 
     def all_nodes
@@ -69,64 +78,42 @@ module Droonga
     end
 
     def dead_nodes
-      if @state
-        @dead_nodes ||= collect_dead_nodes
-      else
-        []
-      end
+      engine_nodes.collect(&:dead?).collect(&:name)
     end
 
     def service_provider_nodes
-      if @state
-        @service_provider_nodes ||= collect_nodes_by_role(NodeMetadata::Role::SERVICE_PROVIDER)
-      else
-        all_nodes
-      end
+      engine_nodes.collect(&:service_provider?).collect(&:name)
     end
 
     def absorb_source_nodes
-      if @state
-        @absorb_source_nodes ||= collect_nodes_by_role(NodeMetadata::Role::ABSORB_SOURCE)
-      else
-        []
-      end
+      engine_nodes.collect(&:absorb_source?).collect(&:name)
     end
 
     def absorb_destination_nodes
-      if @state
-        @absorb_destination_nodes ||= collect_nodes_by_role(NodeMetadata::Role::ABSORB_DESTINATION)
-      else
-        []
-      end
+      engine_nodes.collect(&:absorb_destination?).collect(&:name)
     end
 
     def same_role_nodes
-      case node_metadata.role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        all_nodes & service_provider_nodes
-      when NodeMetadata::Role::ABSORB_SOURCE
-        all_nodes & absorb_source_nodes
-      when NodeMetadata::Role::ABSORB_DESTINATION
-        all_nodes & absorb_destination_nodes
-      else
-        []
+      engine_nodes.select do |node|
+        node.role == node_metadata.role
+      end.collect do |node|
+        node.name
       end
     end
 
     def forwardable_nodes
-      same_role_nodes - dead_nodes
+      engine_nodes.select do |node|
+        node.live? and node.role == node_metadata.role
+      end.collect do |node|
+        node.name
+      end
     end
 
     def writable_nodes
-      case node_metadata.role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        all_nodes
-      when NodeMetadata::Role::ABSORB_SOURCE
-        all_nodes & absorb_source_nodes
-      when NodeMetadata::Role::ABSORB_DESTINATION
-        all_nodes & absorb_destination_nodes
-      else
-        []
+      engine_nodes.select do |node|
+        node.writable_by?(node_metadata.role)
+      end.collect do |node|
+        node.name
       end
     end
 
@@ -135,19 +122,8 @@ module Droonga
     end
 
     private
-    def to_hash
-      return nil unless @state
-
-      {
-        :all                => @state.keys,
-        :dead               => dead_nodes,
-        :service_provider   => service_provider_nodes,
-        :absorb_source      => absorb_source_nodes,
-        :absorb_destination => absorb_destination_nodes,
-      }
-    end
-
     def clear_cache
+      @engine_nodes = nil
       @dead_nodes = nil
       @service_provider_nodes = nil
       @absorb_source_nodes = nil
@@ -169,29 +145,23 @@ module Droonga
       end
     end
 
+    def all_node_names
+      if @catalog
+        @catalog.all_nodes
+      else
+        []
+      end
+    end
+
+    def create_engine_nodes
+      all_node_names.collect do |name|
+        node_state = @state[name] || {}
+        EngineNode.new(name, node_state)
+      end
+    end
+
     def default_state
       {}
-    end
-
-    def collect_dead_nodes
-      nodes = []
-      @state.each do |name, node_state|
-        unless node_state["live"]
-          nodes << name
-        end
-      end
-      nodes.sort
-    end
-
-    def collect_nodes_by_role(role)
-      nodes = []
-      @state.each do |name, node_state|
-        if node_state["type"] == "engine" and
-             node_state["role"] == role
-          nodes << name
-        end
-      end
-      nodes.sort
     end
 
     def node_metadata
