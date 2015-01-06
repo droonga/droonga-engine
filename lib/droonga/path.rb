@@ -76,6 +76,7 @@ module Droonga
 
       def intentional_buffer
         state + "buffer" + "intentional"
+      end
 
       def serf_event_handler_errors
         state + "serf-event-handler-errors"
