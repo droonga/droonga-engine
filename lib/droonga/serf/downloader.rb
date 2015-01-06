@@ -115,4 +115,4 @@ module Droonga
       end
     end
   end
-endi
+end
