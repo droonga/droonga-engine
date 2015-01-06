@@ -30,17 +30,11 @@ module Droonga
       @sender_role = sender_role
 
       @buffer = ForwardBuffer.new(name)
-      @buffer.on_forward = lambda do |message, destination|
-        output(message, destination)
-      end
 
-      unless @name =~ /\A(.*):(\d+)\/([^.]+)\z/
-        raise "name format: hostname:port/tag"
-      end
-      host = $1
-      port = $2
-      tag  = $3
-      @sender = FluentMessageSender.new(loop, host, port,
+      parsed_name = parse_node_name(@name)
+      @sender = FluentMessageSender.new(loop,
+                                        parsed_name[:host],
+                                        parsed_name[:port],
                                         :buffering => true)
       @sender.start
     end
@@ -102,6 +96,17 @@ module Droonga
     end
 
     private
+    def parse_node_name(name)
+      unless name =~ /\A(.*):(\d+)\/([^.]+)\z/
+        raise "name format: hostname:port/tag"
+      end
+      {
+        :host => $1,
+        :port => $2,
+        :tag  => $3,
+      }
+    end
+
     def role
       if @state
         @state["role"]
@@ -146,13 +151,14 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
+      parsed_receiver = parse_node_name(receiver)
 
       override_message = {
         "type" => command,
       }
       override_message["arguments"] = arguments if arguments
       message = message.merge(override_message)
-      output_tag = "#{tag}.message"
+      output_tag = "#{parsed_receiver[:tag]}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       logger.trace("forward: start: #{log_info}")
       @sender.send(output_tag, message)
