@@ -115,27 +115,21 @@ module Droonga
     end
 
     def same_role_nodes
-      engine_nodes.select do |node|
+      @same_role_nodes ||= engine_nodes.select do |node|
         node.role == node_metadata.role
-      end.collect do |node|
-        node.name
-      end
+      end.collect(&:name)
     end
 
     def forwardable_nodes
-      engine_nodes.select do |node|
+      @forwardable_nodes ||= engine_nodes.select do |node|
         node.live? and node.role == node_metadata.role
-      end.collect do |node|
-        node.name
-      end
+      end.collect(&:name)
     end
 
     def writable_nodes
-      engine_nodes.select do |node|
+      @writable_nodes ||= engine_nodes.select do |node|
         node.writable_by?(node_metadata.role)
-      end.collect do |node|
-        node.name
-      end
+      end.collect(&:name)
     end
 
     def unwritable_node?(node_name)
@@ -161,6 +155,9 @@ module Droonga
       @service_provider_nodes = nil
       @absorb_source_nodes = nil
       @absorb_destination_nodes = nil
+      @same_role_nodes = nil
+      @forwardable_nodes = nil
+      @writable_nodes = nil
     end
 
     def load_state_file
