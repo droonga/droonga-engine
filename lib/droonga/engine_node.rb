@@ -27,7 +27,10 @@ module Droonga
       @state = state
       @sender_role = sender_role
 
-      @buffer = ForwardBuffer.new(name, @forwarder)
+      @buffer = ForwardBuffer.new(name)
+      @buffer.on_forward = lambda do |message, destination|
+        output(message, destination)
+      end
 
       unless @name =~ /\A(.*):(\d+)\/([^.]+)\z/
         raise "name format: hostname:port/tag"

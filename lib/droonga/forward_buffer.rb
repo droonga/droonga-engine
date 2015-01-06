@@ -29,8 +29,10 @@ module Droonga
 
     SUFFIX = ".msgpack"
 
-    def initialize(node_name, forwarder)
-      @forwarder = forwarder
+    attr_writer :on_forward
+
+    def initialize(node_name)
+      @on_forward = nil
 
       @packer = MessagePack::Packer.new
       @unpacker = MessagePack::Unpacker.new
@@ -73,14 +75,18 @@ module Droonga
       @unpacker.feed(file_contents)
       buffered_message = @unpacker.read
       @unpacker.reset
-      @forwarder.forward(buffered_message["message"],
-                         buffered_message["destination"])
+      on_forward(buffered_message["message"],
+                 buffered_message["destination"])
       FileUtils.rm_f(buffered_message_path.to_s)
       logger.trace("forward: done (#{buffered_message_path})")
     end
 
     def file_path(time_stamp=Time.now)
       @data_directory + "#{time_stamp.iso8601(6)}#{SUFFIX}"
+    end
+
+    def on_forward(message, destination)
+      @on_forward.call(message, destination) if @on_forward
     end
 
     def log_tag
