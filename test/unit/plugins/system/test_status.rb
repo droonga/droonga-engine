@@ -28,7 +28,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   def setup_handler
     @worker = StubWorker.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
-    @messenger.engine_state = StubEngineState.new
+    @messenger.cluster = StubCluster.new
     @loop = nil
     @handler = Droonga::Plugins::System::StatusHandler.new("name",
                                                            @worker.context,
@@ -43,12 +43,6 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   def process(request)
     message = Droonga::Test::StubHandlerMessage.new(request)
     @handler.handle(message)
-  end
-
-  class StubEngineState
-    def cluster
-      @cluster ||= StubCluster.new
-    end
   end
 
   class StubCluster
