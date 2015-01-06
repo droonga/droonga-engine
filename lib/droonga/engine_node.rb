@@ -21,7 +21,7 @@ module Droonga
   class EngineNode
     include Loggable
 
-    attr_reader :name, :forwarder
+    attr_reader :name
 
     def initialize(name, state, sender_role, loop)
       @name  = name
