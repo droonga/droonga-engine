@@ -119,11 +119,6 @@ module Droonga
     private
     def clear_cache
       @engine_nodes = nil
-      @dead_nodes = nil
-      @service_provider_nodes = nil
-      @absorb_source_nodes = nil
-      @absorb_destination_nodes = nil
-      @same_role_nodes = nil
       @forwardable_nodes = nil
       @writable_nodes = nil
     end
