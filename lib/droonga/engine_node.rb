@@ -20,6 +20,8 @@ require "droonga/node_metadata"
 
 module Droonga
   class EngineNode
+    include Loggable
+
     attr_reader :name, :forwarder
 
     def initialize(name, state, sender_role, loop)
