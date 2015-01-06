@@ -13,7 +13,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/loggable"
 require "droonga/forwarder"
+require "droonga/forward_buffer"
 require "droonga/node_metadata"
 
 module Droonga
@@ -26,6 +28,35 @@ module Droonga
       @sender_role = sender_role
 
       @forwarder = Forwarder.new(loop, :buffering => true)
+      @buffer = ForwardBuffer.new(name, @forwarder)
+    end
+
+    def start
+      logger.trace("start: start")
+      resume
+      logger.trace("start: done")
+    end
+
+    def shutdown
+      logger.trace("shutdown: start")
+      @forwarder.shutdown
+      logger.trace("shutdown: done")
+    end
+
+    def resume
+      @forwarder.resume
+      @buffer.start_forward if really_writable?
+    end
+
+    def forward(message, destination)
+      if not really_writable?
+        @buffer.add(message, destination)
+      elsif @buffer.empty?
+        @forwarder.forward(message, destination)
+      else
+        @buffer.add(message, destination)
+        @buffer.start_forward
+      end
     end
 
     def live?
@@ -74,6 +105,18 @@ module Droonga
       end
     end
 
+    def really_writable?
+      return false unless writable?
+      case @sender_role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        service_provider?
+      when NodeMetadata::Role::ABSORB_SOURCE
+        not absorb_destination?
+      else
+        true
+      end
+    end
+
     def status
       if forwardable?
         "active"
@@ -84,8 +127,13 @@ module Droonga
       end
     end
 
+    private
     def on_change
       @forwarder.resume
+    end
+
+    def log_tag
+      "[#{Process.ppid}] engine-node"
     end
   end
 end

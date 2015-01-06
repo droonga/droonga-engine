@@ -85,7 +85,7 @@ module Droonga
       receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
       @engine_nodes.each do |node|
         if node.name == receiver_node_name
-          node.forwarder.forward(message, destination)
+          node.forward(message, destination)
           return true
         end
       end
@@ -140,18 +140,6 @@ module Droonga
       @writable_nodes ||= engine_nodes.select do |node|
         node.writable?
       end.collect(&:name)
-    end
-
-    def unwritable_node?(node_name)
-      case node_metadata.role
-      when NodeMetadata::Role::SERVICE_PROVIDER
-        absorb_source_nodes.include?(node_name) or
-          absorb_destination_nodes.include?(node_name)
-      when NodeMetadata::Role::ABSORB_SOURCE
-        absorb_destination_nodes.include?(node_name)
-      else
-        false
-      end
     end
 
     def on_change

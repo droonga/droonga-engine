@@ -19,7 +19,7 @@ require "coolio"
 
 require "droonga/loggable"
 require "droonga/event_loop"
-require "droonga/buffered_forwarder"
+require "droonga/forwarder"
 require "droonga/replier"
 
 module Droonga
