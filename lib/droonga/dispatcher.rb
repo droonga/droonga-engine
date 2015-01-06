@@ -46,16 +46,21 @@ module Droonga
       end
     end
 
-    attr_reader :engine_state
+    attr_reader :engine_state, :cluster
 
-    def initialize(engine_state, catalog)
+    def initialize(engine_state, cluster, catalog)
       @engine_state = engine_state
+      @cluster = cluster
       @forwarder = @engine_state.forwarder
+      @cluster.on_change = lambda do
+        @forwarder.resume
+      end
       @replier = @engine_state.replier
       @catalog = catalog
       @adapter_runners = create_adapter_runners
       @farm = Farm.new(@engine_state.name, @catalog, @engine_state.loop,
                        :engine_state => @engine_state,
+                       :cluster => @cluster,
                        :dispatcher => self,
                        :forwarder  => @forwarder)
       @collector_runners = create_collector_runners
@@ -116,7 +121,7 @@ module Droonga
     def forward(message, destination)
       logger.trace("forward start")
       unless local?(destination)
-        return if @engine_state.cluster.forward(message, destination)
+        return if @cluster.forward(message, destination)
       end
       @forwarder.forward(message, destination)
       logger.trace("forward done")
@@ -163,7 +168,7 @@ module Droonga
       else
         steps = message["steps"]
         if steps
-          session_planner = SessionPlanner.new(@engine_state, steps)
+          session_planner = SessionPlanner.new(@engine_state, @cluster, steps)
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
@@ -187,7 +192,7 @@ module Droonga
           "type" => "dispatcher",
           "to"   => destination,
         }
-        @engine_state.cluster.forward(forward_message, forward_destination) ||
+        @cluster.forward(forward_message, forward_destination) ||
           @forwarder.forward(forward_message, forward_destination)
       end
     end
@@ -200,9 +205,9 @@ module Droonga
         dataset = @catalog.dataset(step["dataset"])
         if dataset
           if write_step?(step)
-            target_nodes = @engine_state.cluster.writable_nodes
+            target_nodes = @cluster.writable_nodes
           else
-            target_nodes = @engine_state.cluster.forwardable_nodes
+            target_nodes = @cluster.forwardable_nodes
           end
           routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes
@@ -314,8 +319,9 @@ module Droonga
     class SessionPlanner
       attr_reader :steps
 
-      def initialize(engine_state, steps)
+      def initialize(engine_state, cluster, steps)
         @engine_state = engine_state
+        @cluster = cluster
         @steps = steps
       end
 
@@ -357,12 +363,19 @@ module Droonga
           (step["outputs"] || []).each do |output|
             descendants[output] = []
             @descendants[output].each do |index|
-              responsive_routes = @engine_state.select_responsive_routes(step["routes"])
+              responsive_routes = select_responsive_routes(step["routes"])
               @steps[index]["n_of_expects"] += responsive_routes.size
               descendants[output].concat(@steps[index]["routes"])
             end
           end
           step["descendants"] = descendants
+        end
+      end
+
+      def select_responsive_routes(routes)
+        selected_nodes = @cluster.forwardable_nodes
+        routes.select do |route|
+          selected_nodes.include?(@engine_state.farm_path(route))
         end
       end
     end

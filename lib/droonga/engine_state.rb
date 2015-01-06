@@ -21,7 +21,6 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
-require "droonga/cluster"
 
 module Droonga
   class EngineState
@@ -33,8 +32,7 @@ module Droonga
     attr_reader :forwarder
     attr_reader :replier
     attr_writer :on_ready
-    attr_reader :catalog
-    attr_reader :cluster
+    attr_accessor :catalog
     attr_accessor :on_finish
 
     def initialize(loop, name, internal_name)
@@ -43,19 +41,11 @@ module Droonga
       @internal_name = internal_name
       @sessions = {}
       @current_id = 0
-      @cluster = Cluster.new(@loop)
       @forwarder = Forwarder.new(@loop, :buffering => true)
-      @cluster.on_change = lambda do
-        @forwarder.resume
-      end
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
       @catalog = nil
-    end
-
-    def catalog=(catalog)
-      @catalog = @cluster.catalog = catalog
     end
 
     def start
@@ -116,13 +106,6 @@ module Droonga
 
     def on_ready
       @on_ready.call if @on_ready
-    end
-
-    def select_responsive_routes(routes)
-      selected_nodes = @cluster.forwardable_nodes
-      routes.select do |route|
-        selected_nodes.include?(farm_path(route))
-      end
     end
 
     private
