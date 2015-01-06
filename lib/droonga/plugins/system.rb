@@ -26,24 +26,8 @@ module Droonga
 
         def handle(message)
           cluster = @messenger.cluster
-          active_nodes = cluster.forwardable_nodes
-          dead_nodes = cluster.dead_nodes
-          nodes = {}
-          cluster.all_nodes.collect do |identifier|
-            if active_nodes.include?(identifier)
-              status = "active"
-            elsif dead_nodes.include?(identifier)
-              status = "dead"
-            else
-              status = "inactive"
-            end
-            nodes[identifier] = {
-              "status" => status,
-            }
-          end
-
           {
-            "nodes" => nodes,
+            "nodes" => cluster.engine_nodes_status,
           }
         end
       end

@@ -20,9 +20,10 @@ module Droonga
   class EngineNode
     attr_reader :name, :forwarder
 
-    def initialize(name, state, loop)
+    def initialize(name, state, sender_role, loop)
       @name  = name
       @state = state
+      @sender_role = sender_role
 
       @forwarder = Forwarder.new(loop, :buffering => true)
     end
@@ -56,11 +57,12 @@ module Droonga
     end
 
     def forwardable?
-      not dead?
+      return false unless live?
+      role == @sender_role
     end
 
-    def writable_by?(sender_role)
-      case sender_role
+    def writable?
+      case @sender_role
       when NodeMetadata::Role::SERVICE_PROVIDER
         true
       when NodeMetadata::Role::ABSORB_SOURCE
@@ -69,6 +71,16 @@ module Droonga
         absorb_destination?
       else
         false
+      end
+    end
+
+    def status
+      if forwardable?
+        "active"
+      elsif dead?
+        "dead"
+      else
+        "inactive"
       end
     end
 

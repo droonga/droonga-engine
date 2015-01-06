@@ -46,24 +46,18 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
   end
 
   class StubCluster
-    def all_nodes
-      [
-        "127.0.0.1:10031/droonga",
-        "127.0.0.1:10032/droonga",
-        "127.0.0.1:10033/droonga",
-      ]
-    end
-
-    def forwardable_nodes
-      [
-        "127.0.0.1:10031/droonga",
-      ]
-    end
-
-    def dead_nodes
-      [
-        "127.0.0.1:10033/droonga",
-      ]
+    def engine_nodes_status
+      {
+        "127.0.0.1:10031/droonga" => {
+          "status" => "active",
+        },
+        "127.0.0.1:10032/droonga" => {
+          "status" => "inactive",
+        },
+        "127.0.0.1:10033/droonga" => {
+          "status" => "dead",
+        },
+      }
     end
   end
 

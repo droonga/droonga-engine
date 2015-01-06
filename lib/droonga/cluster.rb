@@ -70,6 +70,14 @@ module Droonga
       @engine_nodes ||= create_engine_nodes
     end
 
+    def engine_nodes_status
+      engine_nodes.collect do |node|
+        nodes[node.name] = {
+          "status" => node.status,
+        }
+      end
+    end
+
     def forward(message, destination)
       receiver = destination["to"]
       receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
@@ -122,13 +130,13 @@ module Droonga
 
     def forwardable_nodes
       @forwardable_nodes ||= engine_nodes.select do |node|
-        node.live? and node.role == node_metadata.role
+        node.forwardable?
       end.collect(&:name)
     end
 
     def writable_nodes
       @writable_nodes ||= engine_nodes.select do |node|
-        node.writable_by?(node_metadata.role)
+        node.writable?
       end.collect(&:name)
     end
 
@@ -186,7 +194,7 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(name, node_state, @loop)
+        EngineNode.new(name, node_state, node_metadata.role, @loop)
       end
     end
 
