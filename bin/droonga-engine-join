@@ -45,7 +45,7 @@ class JoinCommand
     set_node_role
     do_join
     sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
-    do_copy unless @options["no-copy"]
+    monitor_copying_state unless @options["no-copy"]
     set_effective_message_timestamp
     update_other_nodes
     reset_node_role
@@ -180,7 +180,7 @@ class JoinCommand
                        "copy"    => !@options["no-copy"])
   end
 
-  def do_copy
+  def monitor_copying_state
     @start_time_in_seconds = Time.new.to_i
     puts("Copying data from the source node...")
     last_progress = ""
