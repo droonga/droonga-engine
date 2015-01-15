@@ -224,6 +224,8 @@ module Droonga
 
           @serf.join(*@other_hosts)
           sleep(5)
+
+          @serf.update_cluster_state
         end
 
         def absorb_data
