@@ -135,7 +135,7 @@ module Droonga
     end
 
     def source_node_suspendable?
-      (source_replica_hosts - [@source_host]).size > 1
+      (source_replica_hosts - [@source_host]).size >= 1
     end
 
     private
