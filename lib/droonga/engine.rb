@@ -130,8 +130,16 @@ module Droonga
     def effective_message?(message)
       effective_timestamp = effective_message_timestamp
       return true if effective_timestamp.nil?
+      return true unless message["date"]
 
-      message_timestamp = Time.parse(message["date"])
+      begin
+        message_timestamp = Time.parse(message["date"])
+      rescue ArgumentError => error
+        logger.error("failed to parse the \"date\" field of a message date",
+                     :message => message)
+        return false
+      end
+
       logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(message_timestamp)")
       return false if effective_timestamp >= message_timestamp
 
