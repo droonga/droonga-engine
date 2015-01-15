@@ -91,6 +91,14 @@ module Droonga
       end
     end
 
+    def to_json
+      {
+        "name"   => name,
+        "role"   => role,
+        "status" => status
+      }
+    end
+
     def on_change
       @sender.resume
     end

@@ -21,6 +21,7 @@ require "droonga/loggable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
+require "droonga/node_metadata"
 
 module Droonga
   class EngineState
@@ -104,11 +105,19 @@ module Droonga
       not @sessions.empty?
     end
 
+    def role
+      node_metadata.role
+    end
+
     def on_ready
       @on_ready.call if @on_ready
     end
 
     private
+    def node_metadata
+      @node_metadata ||= NodeMetadata.new
+    end
+
     def log_tag
       "engine_state"
     end
