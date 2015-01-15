@@ -84,7 +84,7 @@ module Droonga
       {
         "name"   => name,
         "role"   => role,
-        "status" => status
+        "status" => status,
       }
     end
 

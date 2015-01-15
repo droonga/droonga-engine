@@ -206,14 +206,14 @@ module Droonga
             if target_nodes.empty?
               logger.error("there is no node to dispath a write message!",
                            :my_role   => @engine_state.role,
-                           :all_nodes => @cluster.engine_nodes(&:to_json))
+                           :all_nodes => @cluster.engine_nodes.collect(&:to_json))
             end
           else
             target_nodes = @cluster.forwardable_nodes
             if target_nodes.empty?
               logger.error("there is no node to dispath a read message!",
                            :my_role   => @engine_state.role,
-                           :all_nodes => @cluster.engine_nodes(&:to_json))
+                           :all_nodes => @cluster.engine_nodes.collect(&:to_json))
             end
           end
           routes = dataset.compute_routes(step, target_nodes)
