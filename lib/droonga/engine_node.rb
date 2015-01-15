@@ -95,6 +95,7 @@ module Droonga
       {
         "name"   => name,
         "role"   => role,
+        "live"   => live?,
         "status" => status,
       }
     end
