@@ -148,10 +148,12 @@ class JoinCommand
 
   def set_node_role
     if absorber.source_node_suspendable?
+      puts("Changing role of the source node...")
       run_remote_command(source_node, "change_role",
                          "node" => source_node,
                          "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
     end
+    puts("Changing role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
@@ -160,10 +162,12 @@ class JoinCommand
 
   def reset_node_role
     if absorber.source_node_suspendable?
+      puts("Restoring role of the source node...")
       run_remote_command(source_node, "change_role",
                          "node" => source_node,
                          "role" => nil)
     end
+    puts("Restoring role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => nil)
