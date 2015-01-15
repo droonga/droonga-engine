@@ -229,6 +229,7 @@ module Droonga
           end
 
           @serf.join(*@other_hosts)
+          sleep(5)
         end
 
         def absorb_data
