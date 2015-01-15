@@ -44,10 +44,18 @@ module Droonga
         case how
         when :top
           replicas = live_replicas(active_nodes)
-          [replicas.first]
+          if replicas.empty?
+            []
+          else
+            [replicas.first]
+          end
         when :random
           replicas = live_replicas(active_nodes)
-          [replicas.sample]
+          if replicas.empty?
+            []
+          else
+            [replicas.sample]
+          end
         when :all
           live_replicas(active_nodes)
         else
