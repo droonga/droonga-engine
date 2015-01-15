@@ -23,10 +23,10 @@ module Droonga
 
     attr_reader :name
 
-    def initialize(name, state, sender_role, loop)
+    def initialize(name, state, loop, options={})
       @name  = name
       @state = state
-      @sender_role = sender_role
+      @sender_node_metadata ||= options[:metadata]
 
       parsed_name = parse_node_name(@name)
       @sender = FluentMessageSender.new(loop,
@@ -54,11 +54,11 @@ module Droonga
 
     def forwardable?
       return false unless live?
-      role == @sender_role
+      role == sender_role
     end
 
     def writable?
-      case @sender_role
+      case sender_role
       when NodeMetadata::Role::SERVICE_PROVIDER
         true
       when NodeMetadata::Role::ABSORB_SOURCE
@@ -131,6 +131,14 @@ module Droonga
 
     def absorb_destination?
       role == NodeMetadata::Role::ABSORB_DESTINATION
+    end
+
+    def sender_role
+      sender_node_metadata.role
+    end
+
+    def sender_node_metadata
+      @sender_node_metadata ||= NodeMetadata.new
     end
 
     def output(message, destination)

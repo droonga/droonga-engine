@@ -36,7 +36,7 @@ module Droonga
     attr_accessor :catalog
     attr_accessor :on_finish
 
-    def initialize(loop, name, internal_name)
+    def initialize(loop, name, internal_name, options={})
       @loop = loop
       @name = name
       @internal_name = internal_name
@@ -47,6 +47,7 @@ module Droonga
       @on_ready = nil
       @on_finish = nil
       @catalog = nil
+      @node_metadata = options[:metadata]
     end
 
     def start

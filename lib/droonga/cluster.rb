@@ -26,12 +26,13 @@ module Droonga
     attr_accessor :catalog
     attr_writer :on_change
 
-    def initialize(loop)
+    def initialize(loop, options={})
       @loop = loop
 
       @catalog = nil
       @state = nil
       @on_change = nil
+      @node_metadata = options[:metadata]
 
       reload
     end
@@ -157,7 +158,10 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(name, node_state, node_metadata.role, @loop)
+        EngineNode.new(name,
+                       node_state,
+                       @loop,
+                       :metadata => node_metadata)
       end
     end
 

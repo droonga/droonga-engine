@@ -32,8 +32,11 @@ module Droonga
 
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
-      @state = EngineState.new(loop, name, internal_name)
-      @cluster = Cluster.new(loop)
+      @state = EngineState.new(loop, name,
+                               internal_name,
+                               :metadata => node_metadata)
+      @cluster = Cluster.new(loop,
+                             :metadata => node_metadata)
       @catalog = load_catalog
       @state.catalog = @cluster.catalog = @catalog
       @dispatcher = create_dispatcher
