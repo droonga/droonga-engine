@@ -192,13 +192,13 @@ module Droonga
           log("other_hosts = #{other_hosts}")
           return if other_hosts.empty?
 
+          @serf.role = NodeMetadata::Role::ABSORB_DESTINATION
+
           # restart self with the fetched catalog.
           SafeFileWriter.write(Path.catalog) do |output, file|
             output.puts(JSON.pretty_generate(@catalog))
             @service_installation.ensure_correct_file_permission(file)
           end
-
-          absorb_data if should_absorb_data?
 
           log("joining to the cluster: update myself")
 
@@ -209,6 +209,10 @@ module Droonga
           end
 
           @serf.join(*other_hosts)
+
+          absorb_data if should_absorb_data?
+
+          @serf.role = nil
         end
 
         def replica_hosts
