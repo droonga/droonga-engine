@@ -192,13 +192,8 @@ module Droonga
           log("other_hosts = #{@other_hosts}")
           return if @other_hosts.empty?
 
-          @serf.role = NodeMetadata::Role::ABSORB_DESTINATION
-
           join_to_cluster
-
           absorb_data if should_absorb_data?
-
-          @serf.role = nil
         end
 
         def replica_hosts

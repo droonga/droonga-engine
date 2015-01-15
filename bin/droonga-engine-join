@@ -152,6 +152,10 @@ class JoinCommand
                          "node" => source_node,
                          "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
     end
+    run_remote_command(joining_node, "change_role",
+                       "node" => joining_node,
+                       "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
+    @node_role_changed = true
   end
 
   def reset_node_role
@@ -160,6 +164,10 @@ class JoinCommand
                          "node" => source_node,
                          "role" => nil)
     end
+    run_remote_command(joining_node, "change_role",
+                       "node" => joining_node,
+                       "role" => nil)
+    @node_role_changed = false
   end
 
   def do_join
