@@ -188,27 +188,13 @@ module Droonga
 
           @catalog = fetch_catalog
 
-          other_hosts = replica_hosts
-          log("other_hosts = #{other_hosts}")
-          return if other_hosts.empty?
+          @other_hosts = replica_hosts
+          log("other_hosts = #{@other_hosts}")
+          return if @other_hosts.empty?
 
           @serf.role = NodeMetadata::Role::ABSORB_DESTINATION
 
-          # restart self with the fetched catalog.
-          SafeFileWriter.write(Path.catalog) do |output, file|
-            output.puts(JSON.pretty_generate(@catalog))
-            @service_installation.ensure_correct_file_permission(file)
-          end
-
-          log("joining to the cluster: update myself")
-
-          CatalogModifier.modify do |modifier, file|
-            modifier.datasets[dataset_name].replicas.hosts += other_hosts
-            modifier.datasets[dataset_name].replicas.hosts.uniq!
-            @service_installation.ensure_correct_file_permission(file)
-          end
-
-          @serf.join(*other_hosts)
+          join_to_cluster
 
           absorb_data if should_absorb_data?
 
@@ -232,14 +218,26 @@ module Droonga
           fetcher.fetch(:dataset => dataset_name)
         end
 
-        def absorb_data
-          log("starting to copy data from #{source_host}")
-
-          CatalogModifier.modify do |modifier, file|
-            modifier.datasets[dataset_name].replicas.hosts = [host]
+        def join_to_cluster
+          # restart self with the fetched catalog.
+          SafeFileWriter.write(Path.catalog) do |output, file|
+            output.puts(JSON.pretty_generate(@catalog))
             @service_installation.ensure_correct_file_permission(file)
           end
-          sleep(5) #TODO: wait for restart. this should be done more safely, to avoid starting of absorbing with old catalog.json.
+
+          log("joining to the cluster: update myself")
+
+          CatalogModifier.modify do |modifier, file|
+            modifier.datasets[dataset_name].replicas.hosts += @other_hosts
+            modifier.datasets[dataset_name].replicas.hosts.uniq!
+            @service_installation.ensure_correct_file_permission(file)
+          end
+
+          @serf.join(*@other_hosts)
+        end
+
+        def absorb_data
+          log("starting to copy data from #{source_host}")
 
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
