@@ -146,7 +146,7 @@ module Droonga
 
     def really_writable?
       return false unless writable?
-      case @sender_role
+      case sender_role
       when NodeMetadata::Role::SERVICE_PROVIDER
         service_provider?
       when NodeMetadata::Role::ABSORB_SOURCE
