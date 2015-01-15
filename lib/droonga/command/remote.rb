@@ -214,12 +214,6 @@ module Droonga
         end
 
         def join_to_cluster
-          # restart self with the fetched catalog.
-          SafeFileWriter.write(Path.catalog) do |output, file|
-            output.puts(JSON.pretty_generate(@catalog))
-            @service_installation.ensure_correct_file_permission(file)
-          end
-
           log("joining to the cluster: update myself")
 
           CatalogModifier.modify do |modifier, file|
