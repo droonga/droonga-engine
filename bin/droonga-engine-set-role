@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Droonga Project
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 2.1 as published by the Free Software Foundation.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+require "slop"
+require "socket"
+
+require "droonga/engine/version"
+require "droonga/catalog_generator"
+require "droonga/serf"
+
+class SetRoleCommand
+  def run
+    parse_options
+    puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
+    set_node_role
+    puts("Done.")
+    exit(true)
+  end
+
+  private
+  def parse_options
+    options = Slop.parse(:help => true) do |option|
+      option.on(:role=,
+                "New role for the target node.",
+                :required => true)
+
+      option.separator("Connections:")
+      option.on(:host=,
+                "Host name of the target node.",
+                :required => true)
+      option.on("receiver-host=",
+                "Host name of this host.",
+                :default => Socket.gethostname)
+      option.on(:dataset=,
+                "Dataset name of for the target node.",
+                :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
+      option.on(:port=,
+                "Port number of the source cluster to be connected.",
+                :as => Integer,
+                :default => Droonga::CatalogGenerator::DEFAULT_PORT)
+      option.on(:tag=,
+                "Tag name of the soruce cluster to be connected.",
+                :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+    end
+    @options = options
+  rescue Slop::MissingOptionError => error
+    $stderr.puts(error)
+    exit(false)
+  end
+
+  def target_node
+    "#{@options[:host]}:#{@options[:port]}/#{@options[:tag]}"
+  end
+
+  def run_remote_command(target, command, options)
+    serf = Droonga::Serf.new(target)
+    serf.send_query(command, options)
+  end
+
+  def set_node_role
+    run_remote_command(target_node, "change_role",
+                       "node" => target_node,
+                       "role" => @options[:role])
+  end
+end
+
+SetRoleCommand.new.run
