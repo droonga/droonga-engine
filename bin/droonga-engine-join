@@ -43,11 +43,11 @@ class JoinCommand
     puts ""
 
     set_node_role
+    update_existing_nodes
     do_join
     sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
     monitor_copying_state unless @options["no-copy"]
     set_effective_message_timestamp
-    update_other_nodes
     reset_node_role
     puts("Done.")
     exit(true)
@@ -219,7 +219,7 @@ class JoinCommand
     end
   end
 
-  def update_other_nodes
+  def update_existing_nodes
     puts("Update existing hosts in the cluster...")
     run_remote_command(source_node, "add_replicas",
                        "cluster_id" => source_cluster_id,
