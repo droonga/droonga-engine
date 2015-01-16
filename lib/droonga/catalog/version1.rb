@@ -440,6 +440,14 @@ module Droonga
         def all_nodes
           self["ring"].keys
         end
+
+        def sliced?
+          self["ring"].each do |ring_key, part|
+            next unless part["partitions"].is_a?(Array)
+            return true if part["partitions"].size > 1
+          end
+          return false
+        end
       end
     end
   end
