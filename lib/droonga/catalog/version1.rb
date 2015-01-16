@@ -436,6 +436,10 @@ module Droonga
             end
           end
         end
+
+        def all_nodes
+          self["ring"].keys
+        end
       end
     end
   end
