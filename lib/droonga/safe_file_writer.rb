@@ -24,7 +24,7 @@ module Droonga
         # Don't output the file directly to prevent loading of incomplete file!
         path = Pathname(path).expand_path
         FileUtils.mkdir_p(path.dirname.to_s)
-        Tempfile.open(path.basename.to_s, path.dirname.to_s, "w") do |output|
+        Tempfile.open(path.basename.to_s, path.dirname.to_s) do |output|
           if block_given?
             yield(output, output.path)
           else
