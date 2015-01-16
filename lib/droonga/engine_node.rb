@@ -24,10 +24,10 @@ module Droonga
 
     attr_reader :name
 
-    def initialize(name, state, loop, options={})
+    def initialize(name, state, loop, params)
       @name  = name
       @state = state
-      @sender_node_metadata ||= options[:metadata]
+      @sender_node_metadata = params[:metadata]
 
       @buffer = ForwardBuffer.new(name)
 
@@ -157,11 +157,7 @@ module Droonga
     end
 
     def sender_role
-      sender_node_metadata.role
-    end
-
-    def sender_node_metadata
-      @sender_node_metadata ||= NodeMetadata.new
+      @sender_node_metadata.role
     end
 
     def output(message, destination)

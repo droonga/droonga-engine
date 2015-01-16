@@ -40,6 +40,7 @@ module Droonga
       @serf = nil
       @name = name
       @service_installation = ServiceInstallation.new
+      @node_metadata = NodeMetadata.new
     end
 
     def run_agent(loop)
@@ -142,13 +143,13 @@ module Droonga
     end
 
     def role
-      node_metadata.role
+      @node_metadata.role
     end
 
     def role=(new_role)
       new_role ||= NodeMetadata::Role::SERVICE_PROVIDER
       set_tag("role", new_role)
-      node_metadata.role = new_role
+      @node_metadata.role = new_role
     end
 
     def cluster_id
@@ -204,10 +205,6 @@ module Droonga
 
     def rpc_port
       7373
-    end
-
-    def node_metadata
-      @node_metadata ||= NodeMetadata.new
     end
 
     def agent_port
