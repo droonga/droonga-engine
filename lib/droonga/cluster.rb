@@ -23,6 +23,9 @@ module Droonga
   class Cluster
     include Loggable
 
+    class NoCatalogLoaded < Error
+    end
+
     attr_accessor :catalog
     attr_writer :on_change
 
@@ -148,11 +151,8 @@ module Droonga
     end
 
     def all_node_names
-      if @catalog
-        @catalog.all_nodes
-      else
-        []
-      end
+      raise NoCatalogLoaded.new unless @catalog
+      @catalog.all_nodes
     end
 
     def create_engine_nodes
