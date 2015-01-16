@@ -46,7 +46,7 @@ module Droonga
       @replier = Replier.new(@forwarder)
       @on_ready = nil
       @on_finish = nil
-      @catalog = nil
+      @catalog = params[:catalog]
       @node_metadata = params[:metadata]
     end
 

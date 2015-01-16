@@ -29,7 +29,7 @@ module Droonga
     def initialize(loop, params)
       @loop = loop
 
-      @catalog = nil
+      @catalog = params[:catalog]
       @state = nil
       @on_change = nil
       @node_metadata = params[:metadata]
