@@ -23,7 +23,7 @@ module Droonga
   class Cluster
     include Loggable
 
-    class NoCatalogLoaded < Error
+    class NoCatalogLoaded < StandardError
     end
 
     attr_accessor :catalog
