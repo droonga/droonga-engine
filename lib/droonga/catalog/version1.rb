@@ -407,6 +407,7 @@ module Droonga
         def get_partition(key)
           continuum = self["continuum"]
           return self["ring"].keys[0] unless continuum
+          key = key.to_s unless key.is_a?(String)
           hash = Zlib.crc32(key)
           min = 0
           max = continuum.size - 1
