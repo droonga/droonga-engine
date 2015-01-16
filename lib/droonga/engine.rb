@@ -32,20 +32,24 @@ module Droonga
 
     attr_writer :on_ready
     def initialize(loop, name, internal_name)
+      @node_metadata = NodeMetadata.new
       @state = EngineState.new(loop, name,
                                internal_name,
-                               :metadata => node_metadata)
+                               :metadata => @node_metadata)
       @cluster = Cluster.new(loop,
-                             :metadata => node_metadata)
+                             :metadata => @node_metadata)
       @catalog = load_catalog
       @state.catalog = @cluster.catalog = @catalog
+
       @dispatcher = create_dispatcher
+
       @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
       @node_metadata_observer.on_change = lambda do
         logger.trace("reloading node_metadata: start")
-        node_metadata.reload
+        @node_metadata.reload
         logger.trace("reloading node_metadata: done")
       end
+
       @on_ready = nil
     end
 
@@ -103,10 +107,6 @@ module Droonga
       @dispatcher.process_message(message)
     end
 
-    def node_metadata
-      @node_metadata ||= NodeMetadata.new
-    end
-
     private
     def load_catalog
       catalog_path = Path.catalog
@@ -125,7 +125,7 @@ module Droonga
     def save_last_processed_message_timestamp
       logger.trace("output_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
-        node_metadata.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+        @node_metadata.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
       end
       logger.trace("output_last_processed_message_timestamp: done")
     end
@@ -147,13 +147,13 @@ module Droonga
       return false if effective_timestamp >= message_timestamp
 
       logger.trace("deleting obsolete effective_message_timestamp: start")
-      node_metadata.delete(:effective_message_timestamp)
+      @node_metadata.delete(:effective_message_timestamp)
       logger.trace("deleting obsolete effective_message_timestamp: done")
       true
     end
 
     def effective_message_timestamp
-      timestamp = node_metadata.get(:effective_message_timestamp)
+      timestamp = @node_metadata.get(:effective_message_timestamp)
       return nil unless timestamp
 
       begin
