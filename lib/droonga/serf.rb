@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "json"
+require "fileutils"
 
 require "droonga/path"
 require "droonga/loggable"
@@ -25,6 +26,7 @@ require "droonga/serf/command"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
+require "droonga/restarter"
 
 module Droonga
   class Serf
@@ -150,6 +152,7 @@ module Droonga
       new_role ||= NodeMetadata::Role::SERVICE_PROVIDER
       set_tag("role", new_role)
       @node_metadata.role = new_role
+      Restarter.restart
     end
 
     def cluster_id

@@ -25,6 +25,7 @@ require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
 require "droonga/node_metadata"
+require "droonga/restarter"
 
 module Droonga
   class Engine
@@ -44,13 +45,6 @@ module Droonga
 
       @dispatcher = create_dispatcher
 
-      @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
-      @node_metadata_observer.on_change = lambda do
-        logger.trace("reloading node_metadata: start")
-        @node_metadata.reload
-        logger.trace("reloading node_metadata: done")
-      end
-
       @on_ready = nil
     end
 
@@ -61,7 +55,6 @@ module Droonga
       end
       @state.start
       @cluster.start
-      @node_metadata_observer.start
       @dispatcher.start
       logger.trace("start: done")
     end
@@ -69,7 +62,6 @@ module Droonga
     def stop_gracefully
       logger.trace("stop_gracefully: start")
       @cluster.stop_observe
-      @node_metadata_observer.stop
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         save_last_processed_message_timestamp
@@ -95,7 +87,6 @@ module Droonga
       logger.trace("stop_immediately: start")
       save_last_processed_message_timestamp
       @cluster.stop_observe
-      @node_metadata_observer.stop
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown

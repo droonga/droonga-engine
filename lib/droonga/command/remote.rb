@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "json"
+require "fileutils"
 
 require "droonga/path"
 require "droonga/serf"
@@ -24,6 +25,7 @@ require "droonga/catalog_fetcher"
 require "droonga/data_absorber"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
+require "droonga/restarter"
 
 module Droonga
   module Command
@@ -105,11 +107,12 @@ module Droonga
         def process
           metadata = NodeMetadata.new
           metadata.set(@params["key"], @params["value"])
+          Restarter.restart
         end
       end
 
       class Join < Base
-        def process
+        def processt
           log("type = #{type}")
           case type
           when "replica"
@@ -233,14 +236,17 @@ module Droonga
 
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
+          Restarter.restart(5)
+
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source_host,
                               :destination_host => joining_host,
                               :port             => port,
                               :tag              => tag,
                               :messages_per_second => messages_per_second)
+
           metadata.delete(:absorbing)
-          sleep(1)
+          Restarter.restart(5)
         end
       end
 
@@ -271,6 +277,8 @@ module Droonga
 
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
+          Restarter.restart(5)
+
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source,
                               :destination_host => host,
@@ -278,7 +286,9 @@ module Droonga
                               :tag              => tag,
                               :messages_per_second => messages_per_second,
                               :client           => "droonga-send")
+
           metadata.delete(:absorbing)
+          Restarter.restart(5)
         end
 
         private
