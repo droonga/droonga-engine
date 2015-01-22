@@ -25,7 +25,6 @@ require "droonga/catalog_loader"
 require "droonga/dispatcher"
 require "droonga/file_observer"
 require "droonga/node_metadata"
-require "droonga/restarter"
 
 module Droonga
   class Engine
