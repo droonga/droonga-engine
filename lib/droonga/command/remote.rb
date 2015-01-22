@@ -111,7 +111,7 @@ module Droonga
       end
 
       class Join < Base
-        def processt
+        def process
           log("type = #{type}")
           case type
           when "replica"
