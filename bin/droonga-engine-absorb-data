@@ -27,6 +27,7 @@ require "droonga/data_absorber"
 require "droonga/serf"
 require "droonga/client"
 require "droonga/node_metadata"
+require "droonga/restarter"
 
 class AbsorbDataCommand
   def run
@@ -216,6 +217,7 @@ class AbsorbDataCommand
     if timestamp and not timestamp.empty?
       metadata = NodeMetadata.new
       metadata.set(:effective_message_timestamp, timestamp)
+      Droonga::Restarter.restart
     end
   end
 
