@@ -439,7 +439,7 @@ module Droonga
         end
 
         def all_nodes
-          self["ring"].keys
+          @all_nodes ||= collect_all_nodes
         end
 
         def sliced?
@@ -448,6 +448,18 @@ module Droonga
             return true if part["partitions"].size > 1
           end
           return false
+        end
+
+        private
+        def collect_all_nodes
+          nodes = []
+          self["ring"].each do |ring_key, part|
+            part["partitions"].collect do |partition|
+              partition =~ /\A([^:]+:[0-9]+\/[^\.]+)/
+              nodes << $1
+            end
+          end
+          nodes.sort.uniq
         end
       end
     end
