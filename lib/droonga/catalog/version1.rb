@@ -454,7 +454,7 @@ module Droonga
         def collect_all_nodes
           nodes = []
           self["ring"].each do |ring_key, part|
-            part["partitions"].collect do |partition|
+            part["partitions"].each do |partition|
               partition =~ /\A([^:]+:[0-9]+\/[^\.]+)/
               nodes << $1
             end
