@@ -25,6 +25,26 @@
               }
             }
           ]
+        },
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice010",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.010"
+              }
+            },
+            {
+              "label": "slice011",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.011"
+              }
+            }
+          ]
         }
       ]
     }
