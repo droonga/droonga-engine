@@ -422,11 +422,27 @@ module Droonga
 
         def setup_initial_on_ready
           return if @configuration.ready_notify_fd.nil?
+
+          rest_tasks = 0
+
           @service_runner.on_ready = lambda do
-            output = IO.new(@configuration.ready_notify_fd)
-            output.puts("ready")
-            output.close
+            rest_tasks -= 1
+            notify_initial_ready if rest_tasks.zero?
           end
+          rest_tasks += 1
+
+          @serf_agent.on_ready = lambda do
+            @serf.update_cluster_state
+            rest_tasks -= 1
+            notify_initial_ready if rest_tasks.zero?
+          end
+          rest_tasks += 1
+        end
+
+        def notify_initial_ready
+          output = IO.new(@configuration.ready_notify_fd)
+          output.puts("ready")
+          output.close
         end
 
         def trap_signals
@@ -509,6 +525,9 @@ module Droonga
         def start_serf
           @serf = Serf.new(@configuration.engine_name)
           @serf_agent = @serf.run_agent(@loop)
+          @serf_agent.on_ready = lambda do
+            @serf.update_cluster_state
+          end
         end
 
         def stop_serf
