@@ -59,9 +59,6 @@ module Droonga
                         "-tag", "role=#{role}",
                         "-tag", "cluster_id=#{cluster_id}",
                         *retry_joins)
-      agent.on_ready = lambda do
-        update_cluster_state
-      end
       agent.start
       logger.trace("run_agent: done")
       agent
