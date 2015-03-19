@@ -138,6 +138,7 @@ module Droonga
               hour, minute, second = $4, $5, $6
               level = $7
               content = $POSTMATCH
+              return if suppressed_log_message?(content)
               level = normalize_level(level)
               logger.send(level, content)
             else
@@ -146,6 +147,16 @@ module Droonga
           else
             logger.info(line)
           end
+        end
+      end
+
+      def suppressed_log_message?(content)
+        case content
+        when /memberlist: Failed to receive remote state: EOF/
+          # See also: https://github.com/hashicorp/consul/issues/598#issuecomment-71576948
+          true
+        else
+          false
         end
       end
 
