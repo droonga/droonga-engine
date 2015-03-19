@@ -155,6 +155,9 @@ module Droonga
         when /memberlist: Failed to receive remote state: EOF/
           # See also: https://github.com/hashicorp/consul/issues/598#issuecomment-71576948
           true
+        when /agent: Script .*droonga-engine-serf-event-handler.* slow, execution exceeding/
+          # Droonga's serf event handler can be slow for absorbing or some operations.
+          true
         else
           false
         end
