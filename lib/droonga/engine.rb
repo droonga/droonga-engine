@@ -130,7 +130,7 @@ module Droonga
 
       begin
         message_timestamp = Time.parse(message["date"])
-      rescue ArgumentError => error
+      rescue ArgumentError
         logger.error("failed to parse the \"date\" field of a message",
                      :message => message)
         return false
