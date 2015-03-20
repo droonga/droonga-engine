@@ -152,10 +152,10 @@ module Droonga
 
       def suppressed_log_message?(content)
         case content
-        when /memberlist: Failed to receive remote state: EOF/
+        when /\Amemberlist: Failed to receive remote state: EOF\z/
           # See also: https://github.com/hashicorp/consul/issues/598#issuecomment-71576948
           true
-        when /agent: Script .*droonga-engine-serf-event-handler.* slow, execution exceeding/
+        when /\Aagent: Script .*droonga-engine-serf-event-handler.* slow, execution exceeding/
           # Droonga's serf event handler can be slow for absorbing or some operations.
           true
         else
