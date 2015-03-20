@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/loggable"
+require "droonga/changable"
 require "droonga/path"
 require "droonga/file_observer"
 require "droonga/engine_node"
@@ -22,19 +23,18 @@ require "droonga/node_metadata"
 module Droonga
   class Cluster
     include Loggable
+    include Changable
 
     class NoCatalogLoaded < StandardError
     end
 
     attr_accessor :catalog
-    attr_writer :on_change
 
     def initialize(loop, params)
       @loop = loop
 
       @catalog = params[:catalog]
       @state = nil
-      @on_change = nil
       @node_metadata = params[:metadata]
 
       reload
@@ -81,7 +81,7 @@ module Droonga
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed")
-        engine_nodes.each(&:on_change)
+        engine_nodes.each(&:resume)
         on_change
       end
     end
@@ -122,10 +122,6 @@ module Droonga
       @writable_nodes ||= engine_nodes.select do |node|
         node.writable?
       end.collect(&:name)
-    end
-
-    def on_change
-      @on_change.call if @on_change
     end
 
     private

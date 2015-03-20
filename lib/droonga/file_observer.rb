@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,14 @@ require "coolio"
 
 require "droonga/path"
 require "droonga/loggable"
+require "droonga/changable"
 
 module Droonga
   class FileObserver
     include Loggable
+    include Changable
 
     CHECK_INTERVAL = 1
-
-    attr_accessor :on_change
 
     def initialize(loop, path)
       @loop = loop
@@ -36,7 +36,6 @@ module Droonga
       else
         @mtime = nil
       end
-      @on_change = nil
     end
 
     def start
@@ -44,7 +43,7 @@ module Droonga
       on_timer = lambda do
         if updated?
           @mtime = @path.mtime
-          @on_change.call if @on_change
+          on_change
         end
       end
       @watcher.on_timer do
