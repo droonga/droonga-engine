@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@ require "English"
 require "coolio"
 
 require "droonga/loggable"
+require "droonga/deferrable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
@@ -26,13 +27,13 @@ require "droonga/node_metadata"
 module Droonga
   class EngineState
     include Loggable
+    include Deferrable
 
     attr_reader :loop
     attr_reader :name
     attr_reader :internal_name
     attr_reader :forwarder
     attr_reader :replier
-    attr_writer :on_ready
     attr_accessor :catalog
     attr_accessor :on_finish
 
@@ -44,7 +45,6 @@ module Droonga
       @current_id = 0
       @forwarder = Forwarder.new(@loop)
       @replier = Replier.new(@forwarder)
-      @on_ready = nil
       @on_finish = nil
       @catalog = params[:catalog]
       @node_metadata = params[:metadata]
@@ -108,10 +108,6 @@ module Droonga
 
     def role
       @node_metadata.role
-    end
-
-    def on_ready
-      @on_ready.call if @on_ready
     end
 
     private

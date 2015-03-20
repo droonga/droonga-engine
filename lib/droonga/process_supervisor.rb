@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,19 +15,21 @@
 
 require "coolio"
 
+require "droonga/deferrable"
 require "droonga/process_control_protocol"
 require "droonga/line_buffer"
 
 module Droonga
   class ProcessSupervisor
+    include Deferrable
     include ProcessControlProtocol
+
+    attr_writer :on_finish
 
     def initialize(loop, input, output)
       @loop = loop
       @input = create_input(input)
       @output = create_output(output)
-      @on_ready = nil
-      @on_finish = nil
     end
 
     def start
@@ -46,14 +48,6 @@ module Droonga
 
     def stop_immediately
       @output.write(Messages::STOP_IMMEDIATELY)
-    end
-
-    def on_ready=(callback)
-      @on_ready = callback
-    end
-
-    def on_finish=(callback)
-      @on_finish = callback
     end
 
     private
@@ -78,10 +72,6 @@ module Droonga
 
     def create_output(raw_output)
       Coolio::IO.new(raw_output)
-    end
-
-    def on_ready
-      @on_ready.call if @on_ready
     end
 
     def on_finish

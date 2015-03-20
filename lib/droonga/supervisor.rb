@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,18 +14,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/loggable"
+require "droonga/deferrable"
 require "droonga/process_supervisor"
 
 module Droonga
   class Supervisor
     include Loggable
+    include Deferrable
 
-    attr_writer :on_ready
     def initialize(loop, n_workers, config)
       @loop = loop
       @n_workers = n_workers
       @config = config
-      @on_ready = nil
     end
 
     def start
@@ -35,7 +35,7 @@ module Droonga
         worker_runner.on_ready = lambda do
           n_ready_workers += 1
           if n_ready_workers == @n_workers
-            @on_ready.call if @on_ready
+            on_ready
           end
         end
         worker_runner.start
@@ -87,15 +87,12 @@ module Droonga
 
     class WorkerRunner
       include Loggable
+      include Deferrable
 
-      attr_writer :on_ready
-      attr_writer :on_failure
       def initialize(loop, id, config)
         @loop = loop
         @id = id
         @config = config
-        @on_ready = nil
-        @on_failure = nil
         @stop_gracefully_callback = nil
       end
 
@@ -156,15 +153,6 @@ module Droonga
           on_finish
         end
         supervisor
-      end
-
-      def on_ready
-        @on_ready.call if @on_ready
-      end
-
-      def on_failure
-        # TODO: log
-        @on_failure.call if @on_failure
       end
 
       def on_finish

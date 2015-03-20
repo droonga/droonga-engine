@@ -24,6 +24,7 @@ require "sigdump/setup"
 
 require "droonga/engine/version"
 require "droonga/loggable"
+require "droonga/deferrable"
 require "droonga/path"
 require "droonga/address"
 require "droonga/serf"
@@ -586,20 +587,12 @@ module Droonga
       end
 
       class ServiceRunner
+        include Deferrable
+
         def initialize(raw_loop, configuration)
           @raw_loop = raw_loop
           @configuration = configuration
           @success = false
-          @on_ready = nil
-          @on_failure = nil
-        end
-
-        def on_ready=(callback)
-          @on_ready = callback
-        end
-
-        def on_failure=(callback)
-          @on_failure = callback
         end
 
         def run
@@ -654,14 +647,6 @@ module Droonga
             on_finish
           end
           supervisor
-        end
-
-        def on_ready
-          @on_ready.call if @on_ready
-        end
-
-        def on_failure
-          @on_failure.call if @on_failure
         end
 
         def on_finish
