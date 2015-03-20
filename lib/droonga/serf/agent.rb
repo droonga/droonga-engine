@@ -18,6 +18,7 @@ require "English"
 require "coolio"
 
 require "droonga/loggable"
+require "droonga/deferrable"
 
 module Droonga
   class Serf
@@ -26,11 +27,10 @@ module Droonga
       PORT = 7946
 
       include Loggable
+      include Deferrable
 
       MAX_N_READ_CHECKS = 10
 
-      attr_writer :on_ready
-      attr_writer :on_failure
       def initialize(loop, serf, host, bind_port, rpc_port, *options)
         @loop = loop
         @serf = serf
@@ -39,8 +39,6 @@ module Droonga
         @rpc_port = rpc_port
         @options = options
         @pid = nil
-        @on_ready = nil
-        @on_failure = nil
         @n_ready_checks = 0
       end
 
@@ -186,7 +184,7 @@ module Droonga
         checker = Coolio::TCPSocket.connect(@host, @bind_port)
 
         on_connect = lambda do
-          @on_ready.call if @on_ready
+          on_ready
           checker.close
         end
         checker.on_connect do
@@ -195,7 +193,7 @@ module Droonga
 
         on_connect_failed = lambda do
           if @n_ready_checks >= MAX_N_READ_CHECKS
-            @on_failure.call if @on_failure
+            on_failure
           else
             timer = Coolio::TimerWatcher.new(1)
             on_timer = lambda do

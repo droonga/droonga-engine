@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/loggable"
+require "droonga/deferrable"
 require "droonga/supervisor"
 require "droonga/event_loop"
 require "droonga/job_pusher"
@@ -23,8 +24,8 @@ require "droonga/schema_applier"
 module Droonga
   class Slice
     include Loggable
+    include Deferrable
 
-    attr_writer :on_ready
     def initialize(dataset, loop, options={})
       @dataset = dataset
       @loop = loop
@@ -34,7 +35,6 @@ module Droonga
       @job_pusher = JobPusher.new(@loop, @database_path)
       @processor = Processor.new(@loop, @job_pusher, @options)
       @supervisor = nil
-      @on_ready = nil
     end
 
     def start
@@ -121,10 +121,6 @@ module Droonga
         on_ready
       end
       @supervisor.start
-    end
-
-    def on_ready
-      @on_ready.call if @on_ready
     end
 
     def log_tag

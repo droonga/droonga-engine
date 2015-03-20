@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@ require "time"
 require "fileutils"
 require "droonga/engine/version"
 require "droonga/loggable"
+require "droonga/deferrable"
 require "droonga/engine_state"
 require "droonga/cluster"
 require "droonga/catalog_loader"
@@ -29,8 +30,8 @@ require "droonga/node_metadata"
 module Droonga
   class Engine
     include Loggable
+    include Deferrable
 
-    attr_writer :on_ready
     def initialize(loop, name, internal_name)
       @catalog = load_catalog
       @node_metadata = NodeMetadata.new
@@ -43,14 +44,15 @@ module Droonga
                              :metadata => @node_metadata)
 
       @dispatcher = create_dispatcher
-
-      @on_ready = nil
     end
 
     def start
       logger.trace("start: start")
       @state.on_ready = lambda do
-        @on_ready.call if @on_ready
+        on_ready
+      end
+      @state.on_failure = lambda do
+        on_failure
       end
       @state.start
       @cluster.start

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -60,14 +60,12 @@ module Droonga
                        :cluster => @cluster,
                        :dispatcher => self,
                        :forwarder  => @forwarder)
+      @engine_state.wait_until_ready(@farm)
       @collector_runners = create_collector_runners
       @step_runners = create_step_runners
     end
 
     def start
-      @farm.on_ready = lambda do
-        @engine_state.on_ready
-      end
       @farm.start
     end
 
