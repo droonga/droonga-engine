@@ -19,6 +19,7 @@ require "droonga/path"
 require "droonga/file_observer"
 require "droonga/engine_node"
 require "droonga/node_metadata"
+require "droonga/restarter"
 
 module Droonga
   class Cluster
@@ -33,6 +34,7 @@ module Droonga
     def initialize(loop, params)
       @loop = loop
 
+      @my_name = params[:my_name]
       @catalog = params[:catalog]
       @state = nil
       @node_metadata = params[:metadata]
@@ -44,7 +46,7 @@ module Droonga
       return if @file_observer
       @file_observer = FileObserver.new(@loop, Path.cluster_state)
       @file_observer.on_change = lambda do
-        reload
+        on_state_change
       end
       @file_observer.start
     end
@@ -159,6 +161,18 @@ module Droonga
                        @loop,
                        :metadata => @node_metadata)
       end
+    end
+
+    def on_state_change
+      unless @state.nil?
+        old_state = @state.dup
+        new_state = load_state_file
+        if old_state[@my_name] != new_state[@my_name]
+          Restarter.restart
+          return
+        end
+      end
+      reload
     end
 
     def default_state
