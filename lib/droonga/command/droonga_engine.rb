@@ -408,40 +408,31 @@ module Droonga
 
         def run_internal
           start_serf
-          @service_runner = run_service
-          setup_initial_on_ready
-          @restart_observer = run_restart_observer
-          @catalog_observer = run_catalog_observer
-          @command_runner = run_command_runner
+          @serf_agent.on_ready = lambda do
+            @serf.update_cluster_state
+            @service_runner = run_service
+            setup_initial_on_ready
+            @restart_observer = run_restart_observer
+            @catalog_observer = run_catalog_observer
+            @command_runner = run_command_runner
+          end
 
           trap_signals
           @loop.run
+
+          while @service_runner.nil? do
+            sleep 1
+          end
 
           @service_runner.success?
         end
 
         def setup_initial_on_ready
           return if @configuration.ready_notify_fd.nil?
-
-          n_rest_tasks = 0
-          on_ready = lambda do
-            n_rest_tasks -= 1
-            return unless n_rest_tasks.zero?
-
+          @service_runner.on_ready = lambda do
             output = IO.new(@configuration.ready_notify_fd)
             output.puts("ready")
             output.close
-          end
-
-          n_rest_tasks += 1
-          @service_runner.on_ready = lambda do
-            on_ready.call
-          end
-
-          n_rest_tasks += 1
-          @serf_agent.on_ready = lambda do
-            @serf.update_cluster_state
-            on_ready.call
           end
         end
 
@@ -525,9 +516,6 @@ module Droonga
         def start_serf
           @serf = Serf.new(@configuration.engine_name)
           @serf_agent = @serf.run_agent(@loop)
-          @serf_agent.on_ready = lambda do
-            @serf.update_cluster_state
-          end
         end
 
         def stop_serf
