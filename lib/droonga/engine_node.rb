@@ -89,7 +89,7 @@ module Droonga
       }
     end
 
-    def on_change
+    def resume
       @sender.resume
     end
 
