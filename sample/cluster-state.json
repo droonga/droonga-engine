@@ -1,0 +1,7 @@
+{
+  "127.0.0.1:23003/droonga": {
+    "type": "engine",
+    "role": "service-provider",
+    "live": true
+  }
+}
