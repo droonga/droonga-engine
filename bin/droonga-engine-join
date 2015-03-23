@@ -45,7 +45,7 @@ class JoinCommand
     set_node_role
     update_existing_nodes
     do_join
-    sleep(5) #TODO: wait for restarting of the joining node. this should be done more safely.
+    wait_until_restarted(joining_node, source_node)
     monitor_copying_state unless @options["no-copy"]
     set_effective_message_timestamp
     reset_node_role
@@ -251,6 +251,11 @@ class JoinCommand
   def do_cancel
     #XXX we have to write more codes to cancel remote processes!
     reset_node_role if @node_role_changed
+  end
+
+  def wait_until_restarted(*nodes)
+    #TODO: wait for restarting of the given nodes. this should be done more safely.
+    sleep(5)
   end
 end
 
