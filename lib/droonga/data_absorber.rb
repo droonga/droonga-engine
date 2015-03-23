@@ -36,6 +36,9 @@ module Droonga
     end
 
     attr_reader :params
+    attr_reader :dataset, :port, :tag, :messages_per_second
+    attr_reader :source_host, :destination_host, :receiver_host, :receiver_port
+
     def initialize(params)
       @params = params
 
