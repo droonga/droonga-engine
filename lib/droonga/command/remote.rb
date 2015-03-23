@@ -179,10 +179,6 @@ module Droonga
           @tag ||= (source_node =~ NODE_PATTERN && $3)
         end
 
-        def should_absorb_data?
-          @params["copy"]
-        end
-
         def join_as_replica
           return unless valid_params?
 
@@ -195,7 +191,6 @@ module Droonga
           return if @other_hosts.empty?
 
           join_to_cluster
-          absorb_data if should_absorb_data?
         end
 
         def replica_hosts
@@ -218,34 +213,13 @@ module Droonga
         def join_to_cluster
           log("joining to the cluster: update myself")
 
+          @serf.join(*@other_hosts)
+
           CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset_name].replicas.hosts += @other_hosts
             modifier.datasets[dataset_name].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
           end
-
-          @serf.join(*@other_hosts)
-          sleep(5)
-
-          @serf.update_cluster_state
-        end
-
-        def absorb_data
-          log("starting to copy data from #{source_host}")
-
-          metadata = NodeMetadata.new
-          metadata.set(:absorbing, true)
-          Restarter.restart(5)
-
-          DataAbsorber.absorb(:dataset          => dataset_name,
-                              :source_host      => source_host,
-                              :destination_host => joining_host,
-                              :port             => port,
-                              :tag              => tag,
-                              :messages_per_second => messages_per_second)
-
-          metadata.delete(:absorbing)
-          Restarter.restart(5)
         end
       end
 
