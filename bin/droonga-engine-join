@@ -171,6 +171,7 @@ class JoinCommand
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => nil)
+    wait_until_restarted(joining_node)
     @node_role_changed = false
   end
 
