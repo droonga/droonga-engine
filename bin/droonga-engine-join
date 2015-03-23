@@ -45,7 +45,7 @@ class JoinCommand
     set_node_role
     update_existing_nodes
     do_join
-    monitor_copying_state unless @options["no-copy"]
+    copy_data unless @options["no-copy"]
     set_effective_message_timestamp
     reset_node_role
     puts("Done.")
@@ -180,14 +180,23 @@ class JoinCommand
                        "node"    => joining_node,
                        "type"    => "replica",
                        "source"  => source_node,
-                       "dataset" => @options[:dataset],
-                       "copy"    => !@options["no-copy"])
+                       "dataset" => @options[:dataset])
     wait_until_restarted(joining_node, source_node)
   end
 
-  def monitor_copying_state
-    @start_time_in_seconds = Time.new.to_i
+  def copy_data
     puts("Copying data from the source node...")
+
+    @start_time_in_seconds = Time.new.to_i
+
+    run_remote_command(joining_node, "absorb_data",
+                       "node"    => joining_node,
+                       "source"  => source_node,
+                       "port"    => absorber.port,
+                       "tag"     => absorber.tag,
+                       "dataset" => absorber.dataset,
+                       "messages_per_second" => absorber.messages_per_second)
+
     last_progress = ""
     while true
       sleep(3)
