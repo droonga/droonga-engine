@@ -45,7 +45,6 @@ class JoinCommand
     set_node_role
     update_existing_nodes
     do_join
-    wait_until_restarted(joining_node, source_node)
     monitor_copying_state unless @options["no-copy"]
     set_effective_message_timestamp
     reset_node_role
@@ -183,6 +182,7 @@ class JoinCommand
                        "source"  => source_node,
                        "dataset" => @options[:dataset],
                        "copy"    => !@options["no-copy"])
+    wait_until_restarted(joining_node, source_node)
   end
 
   def monitor_copying_state
@@ -221,6 +221,7 @@ class JoinCommand
                                     "node" => joining_node,
                                     "key" => "effective_message_timestamp",
                                     "value" => timestamp)
+      wait_until_restarted(joining_node)
     end
   end
 
@@ -230,6 +231,7 @@ class JoinCommand
                        "cluster_id" => source_cluster_id,
                        "dataset" => @options[:dataset],
                        "hosts"   => [@options[:host]])
+    wait_until_restarted(source_node)
   end
 
   def trap_signals
