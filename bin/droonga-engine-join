@@ -168,13 +168,13 @@ class JoinCommand
       puts("Restoring role of the source node...")
       run_remote_command(source_node, "change_role",
                          "node" => source_node,
-                         "role" => nil)
+                         "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
       wait_until_restarted(source_node)
     end
     puts("Restoring role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
-                       "role" => nil)
+                       "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
     wait_until_restarted(joining_node)
     @node_role_changed = false
   end
