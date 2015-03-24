@@ -110,9 +110,9 @@ module Droonga
       class ChangeRole < Base
         def process
           log("old role: #{@serf.role}")
+          # this changes cluster information and triggers restarting!
           @serf.role = @params["role"]
           log("new role: #{@serf.role}")
-          Restarter.restart
         end
       end
 
