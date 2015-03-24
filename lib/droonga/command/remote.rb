@@ -278,7 +278,7 @@ module Droonga
           metadata.set(:absorbing, true)
 
           DataAbsorber.absorb(:dataset          => dataset_name,
-                              :source_host      => source,
+                              :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
                               :tag              => tag,
@@ -291,6 +291,10 @@ module Droonga
         private
         def source
           @params["source"]
+        end
+
+        def source_host
+          @source_host ||= (source =~ NODE_PATTERN && $1)
         end
 
         def dataset_name
