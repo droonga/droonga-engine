@@ -50,9 +50,9 @@ module Droonga
             file.write(exception.backtrace)
           end
         rescue Errno::EACCES => permission_denied_exception
-          puts exception.inspect
-          puts exception.backtrace
         end
+        puts exception.inspect
+        puts exception.backtrace
         true
       end
 
