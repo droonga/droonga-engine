@@ -146,8 +146,9 @@ module Droonga
 
     def role=(new_role)
       new_role ||= NodeMetadata::Role::SERVICE_PROVIDER
-      set_tag("role", new_role)
       @node_metadata.role = new_role
+      # this changes cluster information and triggers restarting!
+      set_tag("role", new_role)
     end
 
     def cluster_id
