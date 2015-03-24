@@ -51,20 +51,26 @@ module Droonga
         end
 
         def should_process?
+          if @params.nil?
+            log("anonymous query (to be processed)")
+            return true
+          end
           unless for_this_cluster?
             log("query for different cluster (to be ignroed)")
             return false
           end
-          if for_me?
-            log("query for this node (to be processed)")
+
+          unless @params.include?("node")
+            log("anonymous node query (to be processed)")
             return true
           end
-          if @params.nil? or not @params.include?("node")
-            log("anonymous query (to be processed)")
-            return true
+          unless for_me?
+            log("query for different node (to be ignored)")
+            return false
           end
-          log("query for different node (to be ignored)")
-          return false
+
+          log("query for this node (to be processed)")
+          true
         end
 
         private
