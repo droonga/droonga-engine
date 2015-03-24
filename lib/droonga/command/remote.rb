@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@ require "json"
 
 require "droonga/path"
 require "droonga/serf"
+require "droonga/node_name"
 require "droonga/node_metadata"
 require "droonga/catalog_generator"
 require "droonga/catalog_modifier"
@@ -75,11 +76,11 @@ module Droonga
 
         private
         def node
-          @serf_name
+          @node ||= NodeName.new(@serf_name)
         end
 
         def host
-          node.split(":").first
+          node.host
         end
 
         def cluster_id
@@ -87,11 +88,15 @@ module Droonga
         end
 
         def target_cluster
-          @params && @params["cluster_id"]
+          return nil unless @params
+          @params["cluster_id"]
         end
 
         def target_node
-          @params && @params["node"]
+          return nil unless @params
+          @target_node ||= NodeName.parse(@params["node"] || "")
+        rescue ArgumentError
+          nil
         end
 
         def for_this_cluster?
@@ -139,29 +144,26 @@ module Droonga
       class CrossNodeCommandBase < Base
         private
         def source_node
-          @params["source"]
+          return nil unless @params
+          @source_node ||= NodeName.parse(@params["source"] || "")
+        rescue ArgumentError
+          nil
         end
 
         def dataset
           @dataset ||= @params["dataset"]
         end
 
-        NODE_PATTERN = /\A([^:]+):(\d+)\/(.+)\z/
-
-        def valid_node?(node)
-          node =~ NODE_PATTERN
-        end
-
         def source_host
-          @source_host ||= (source_node =~ NODE_PATTERN && $1)
+          source_node.host
         end
 
         def port
-          @port ||= (source_node =~ NODE_PATTERN && $2 && $2.to_i)
+          @port ||= @params["port"] || source_node.port
         end
 
         def tag
-          @tag ||= (source_node =~ NODE_PATTERN && $3)
+          @tag ||= @params["tag"] || source_node.tag
         end
       end
 
@@ -180,28 +182,17 @@ module Droonga
         end
 
         def joining_node
-          @params["node"]
-        end
-
-        def valid_params?
-          have_required_params? and
-            valid_node?(source_node) and
-            valid_node?(joining_node)
-        end
-
-        def have_required_params?
-          required_params = [
-            source_node,
-            joining_node,
-            dataset,
-          ]
-          required_params.all? do |param|
-            not param.nil?
-          end
+          target_node
         end
 
         def joining_host
-          @joining_host ||= (joining_node =~ NODE_PATTERN && $1)
+          joining_node.host
+        end
+
+        def valid_params?
+          not dataset.nil? and
+            not source_node.nil? and
+            not joining_node.nil?
         end
 
         def join_as_replica
@@ -293,18 +284,8 @@ module Droonga
         end
 
         def valid_params?
-          have_required_params? and
-            valid_node?(source_node)
-        end
-
-        def have_required_params?
-          required_params = [
-            source_node,
-            dataset,
-          ]
-          required_params.all? do |param|
-            not param.nil?
-          end
+          not dataset.nil? and
+            not source_node.nil?
         end
       end
 
