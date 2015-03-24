@@ -12,7 +12,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/address"
+require "socket"
 
 module Droonga
   class NodeName
@@ -42,14 +42,19 @@ module Droonga
       end
     end
 
+    DEFAULT_HOST = Socket.gethostname
+    DEFAULT_HOST.force_encoding("US-ASCII") if DEFAULT_HOST.ascii_only?
+    DEFAULT_PORT = 10031
+    DEFAULT_TAG  = "droonga"
+
     attr_reader :host
     attr_reader :port
     attr_reader :tag
 
     def initialize(components={})
-      @host = components[:host] || Address::DEFAULT_HOST
-      @port = components[:port] || Address::DEFAULT_PORT
-      @tag  = components[:tag]  || Address::DEFAULT_TAG
+      @host = components[:host] || DEFAULT_HOST
+      @port = components[:port] || DEFAULT_PORT
+      @tag  = components[:tag]  || DEFAULT_TAG
     end
 
     def to_s
