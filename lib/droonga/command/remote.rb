@@ -133,7 +133,6 @@ module Droonga
           log("old value: #{metadata.get(@params["key"])}")
           metadata.set(@params["key"], @params["value"])
           log("new value: #{metadata.get(@params["key"])}")
-          Restarter.restart
         end
       end
 
@@ -277,7 +276,6 @@ module Droonga
 
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
-          Restarter.restart(5)
 
           DataAbsorber.absorb(:dataset          => dataset_name,
                               :source_host      => source,
@@ -288,7 +286,6 @@ module Droonga
                               :client           => "droonga-send")
 
           metadata.delete(:absorbing)
-          Restarter.restart(5)
         end
 
         private
