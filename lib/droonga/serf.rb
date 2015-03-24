@@ -37,9 +37,10 @@ module Droonga
 
     include Loggable
 
-    def initialize(name)
+    def initialize(name, options={})
       @serf = nil
       @name = name
+      @verbose = @options[:verbose] || false
       @service_installation = ServiceInstallation.new
       @node_metadata = NodeMetadata.new
     end
@@ -183,6 +184,7 @@ module Droonga
       command = Command.new(@serf, command,
                             "-rpc-addr", rpc_address,
                             *options)
+      command.verbose = @verbose
       command.run
     end
 

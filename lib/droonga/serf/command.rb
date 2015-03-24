@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "open3"
+require "pp"
 
 require "droonga/loggable"
 
@@ -22,11 +23,13 @@ module Droonga
     class Command
       class Failure < Error
         attr_reader :command_line, :exit_status, :output, :error
+        attr_accessor :verbose
         def initialize(command_line, exit_status, output, error)
           @command_line = command_line
           @exit_status = exit_status
           @output = output
           @error = error
+          @verbose = false
           message = "Failed to run serf: (#{@exit_status}): "
           message << "#{@error.strip}[#{@output.strip}]: "
           message << @command_line.join(" ")
@@ -44,12 +47,20 @@ module Droonga
 
       def run
         command_line = [@serf, @command] + @options
+        p command_line if @verbose
         stdout, stderror, status = Open3.capture3(*command_line,
                                                   :pgroup => true)
         unless status.success?
           raise Failure.new(command_line, status.to_i, stdout, stderror)
         end
         logger.error("run: #{stderror}") unless stderror.empty?
+        if @verbose
+          begin
+            pp JSON.parse(stdout)
+          rescue JSON::ParserError
+            p stdout
+          end
+        end
         stdout
       end
 
