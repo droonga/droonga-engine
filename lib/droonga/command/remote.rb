@@ -63,7 +63,7 @@ module Droonga
             log("anonymous query (to be processed)")
             return true
           end
-          log("query for different query (to be ignored)")
+          log("query for different node (to be ignored)")
           return false
         end
 
