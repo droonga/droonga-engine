@@ -56,7 +56,7 @@ module Droonga
             return true
           end
           unless for_this_cluster?
-            log("query for different cluster (to be ignroed)")
+            log("query for different cluster (mine: #{cluster_id}, to be ignroed)")
             return false
           end
 
@@ -65,7 +65,7 @@ module Droonga
             return true
           end
           unless for_me?
-            log("query for different node (to be ignored)")
+            log("query for different node (me: #{@serf_name}, to be ignored)")
             return false
           end
 
