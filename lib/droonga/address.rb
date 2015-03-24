@@ -33,6 +33,15 @@ module Droonga
           raise ArgumentError, message
         end
       end
+
+      def valid?(string)
+        begin
+          parse(string)
+          true
+        rescue ArgumentError
+          false
+        end
+      end
     end
 
     DEFAULT_HOST = Socket.gethostname
