@@ -40,7 +40,7 @@ module Droonga
     def initialize(name, options={})
       @serf = nil
       @name = name
-      @verbose = @options[:verbose] || false
+      @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
       @node_metadata = NodeMetadata.new
     end
