@@ -51,8 +51,20 @@ module Droonga
         end
 
         def should_process?
-          return false unless for_this_cluster?
-          for_me? or @params.nil? or not @params.include?("node")
+          unless for_this_cluster?
+            log("query for different cluster (to be ignroed)")
+            return false
+          end
+          unless for_me?
+            log("query for different node (to be ignored)")
+            return false
+          end
+          if @params.nil? or not @params.include?("node")
+            log("anonymous query (to be processed)")
+            return true
+          end
+          log("invalid query (to be ignored)")
+          return false
         end
 
         private
@@ -91,7 +103,9 @@ module Droonga
 
       class ChangeRole < Base
         def process
+          log("old role: #{@serf.role}")
           @serf.role = @params["role"]
+          log("new role: #{@serf.role}")
         end
       end
 
@@ -105,7 +119,9 @@ module Droonga
       class SetMetadata < Base
         def process
           metadata = NodeMetadata.new
+          log("old value: #{metadata.get(@params["key"])}")
           metadata.set(@params["key"], @params["value"])
+          log("new value: #{metadata.get(@params["key"])}")
           Restarter.restart
         end
       end
@@ -344,10 +360,12 @@ module Droonga
 
           log("removing replicas: #{hosts.join(",")}")
 
+          log("removing replicas from the cluster")
           CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts -= hosts
             @service_installation.ensure_correct_file_permission(file)
           end
+          log("done")
         end
       end
 
@@ -357,6 +375,7 @@ module Droonga
 
           log("unjoining replicas: #{hosts.join(",")}")
 
+          log("unjoining from the cluster")
           CatalogModifier.modify do |modifier, file|
             if unjoining_node?
               modifier.datasets[dataset].replicas.hosts = hosts
@@ -365,6 +384,7 @@ module Droonga
             end
             @service_installation.ensure_correct_file_permission(file)
           end
+          log("done")
         end
 
         private
@@ -375,7 +395,9 @@ module Droonga
 
       class UpdateClusterState < Base
         def process
+          log("updating cluster state")
           @serf.update_cluster_state
+          log("done")
         end
       end
     end
