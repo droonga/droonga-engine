@@ -214,9 +214,9 @@ module Droonga
           log("joining to the cluster")
           @serf.join(*@other_hosts)
 
-          log("update catalog.json")
-          CatalogModifier.modify do |modifier, file|
-            modifier.datasets[dataset_name].replicas.hosts += @other_hosts
+          log("update catalog.json from fetched catalog")
+          CatalogModifier.modify(@catalog) do |modifier, file|
+            modifier.datasets[dataset_name].replicas.hosts += [joining_host]
             modifier.datasets[dataset_name].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
           end
