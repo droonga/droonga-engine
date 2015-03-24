@@ -136,7 +136,36 @@ module Droonga
         end
       end
 
-      class Join < Base
+      class CrossNodeCommandBase < Base
+        private
+        def source_node
+          @params["source"]
+        end
+
+        def dataset
+          @dataset ||= @params["dataset"]
+        end
+
+        NODE_PATTERN = /\A([^:]+):(\d+)\/(.+)\z/
+
+        def valid_node?(node)
+          node =~ NODE_PATTERN
+        end
+
+        def source_host
+          @source_host ||= (source_node =~ NODE_PATTERN && $1)
+        end
+
+        def port
+          @port ||= (source_node =~ NODE_PATTERN && $2 && $2.to_i)
+        end
+
+        def tag
+          @tag ||= (source_node =~ NODE_PATTERN && $3)
+        end
+      end
+
+      class Join < CrossNodeCommandBase
         def process
           log("type = #{type}")
           case type
@@ -150,20 +179,8 @@ module Droonga
           @params["type"]
         end
 
-        def source_node
-          @params["source"]
-        end
-
         def joining_node
           @params["node"]
-        end
-
-        def dataset_name
-          @params["dataset"]
-        end
-
-        def messages_per_second
-          @params["messages_per_second"]
         end
 
         def valid_params?
@@ -176,33 +193,15 @@ module Droonga
           required_params = [
             source_node,
             joining_node,
-            dataset_name,
+            dataset,
           ]
           required_params.all? do |param|
             not param.nil?
           end
         end
 
-        NODE_PATTERN = /\A([^:]+):(\d+)\/(.+)\z/
-
-        def valid_node?(node)
-          node =~ NODE_PATTERN
-        end
-
-        def source_host
-          @source_host ||= (source_node =~ NODE_PATTERN && $1)
-        end
-
         def joining_host
           @joining_host ||= (joining_node =~ NODE_PATTERN && $1)
-        end
-
-        def port
-          @port ||= (source_node =~ NODE_PATTERN && $2 && $2.to_i)
-        end
-
-        def tag
-          @tag ||= (source_node =~ NODE_PATTERN && $3)
         end
 
         def join_as_replica
@@ -233,7 +232,7 @@ module Droonga
                                        :port          => port,
                                        :tag           => tag,
                                        :receiver_host => host)
-          fetcher.fetch(:dataset => dataset_name)
+          fetcher.fetch(:dataset => dataset)
         end
 
         def join_to_cluster
@@ -242,42 +241,40 @@ module Droonga
 
           log("update catalog.json from fetched catalog")
           CatalogModifier.new(catalog).modify do |modifier, file|
-            modifier.datasets[dataset_name].replicas.hosts += [joining_host]
-            modifier.datasets[dataset_name].replicas.hosts.uniq!
+            modifier.datasets[dataset].replicas.hosts += [joining_host]
+            modifier.datasets[dataset].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
           end
           log("done")
         end
       end
 
-      class AbsorbData < Base
-        attr_writer :dataset_name, :port, :tag
-
+      class AbsorbData < CrossNodeCommandBase
         def process
-          return unless source
+          return unless valid_params?
 
-          log("start to absorb data from #{source}")
+          log("start to absorb data from #{source_node}")
 
-          if dataset_name.nil? or port.nil? or tag.nil?
+          if dataset.nil? or port.nil? or tag.nil?
             generator = CatalogGenerator.new
             generator.load(catalog)
 
-            dataset = generator.dataset_for_host(source)
-            return unless dataset
+            dataset_info = generator.dataset_for_host(source_host)
+            return unless dataset_info
 
-            self.dataset_name = dataset.name
-            self.port         = dataset.replicas.port
-            self.tag          = dataset.replicas.tag
+            @dataset = dataset_info.name
+            @port    = dataset_info.replicas.port
+            @tag     = dataset_info.replicas.tag
           end
 
-          log("dataset = #{dataset_name}")
+          log("dataset = #{dataset}")
           log("port    = #{port}")
           log("tag     = #{tag}")
 
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
 
-          DataAbsorber.absorb(:dataset          => dataset_name,
+          DataAbsorber.absorb(:dataset          => dataset,
                               :source_host      => source_host,
                               :destination_host => host,
                               :port             => port,
@@ -289,28 +286,23 @@ module Droonga
         end
 
         private
-        def source
-          @params["source"]
-        end
-
-        def source_host
-          @source_host ||= (source =~ NODE_PATTERN && $1)
-        end
-
-        def dataset_name
-          @dataset_name ||= @params["dataset"]
-        end
-
-        def port
-          @port ||= @params["port"]
-        end
-
-        def tag
-          @tag ||= @params["tag"]
-        end
-
         def messages_per_second
-          @messages_per_second ||= @params["messages_per_second"]
+          @params["messages_per_second"]
+        end
+
+        def valid_params?
+          have_required_params? and
+            valid_node?(source_node)
+        end
+
+        def have_required_params?
+          required_params = [
+            source_node,
+            dataset,
+          ]
+          required_params.all? do |param|
+            not param.nil?
+          end
         end
       end
 
