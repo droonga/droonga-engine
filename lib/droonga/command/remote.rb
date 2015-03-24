@@ -102,6 +102,10 @@ module Droonga
           target_node == @serf_name
         end
 
+        def catalog
+          @catalog ||= JSON.parse(Path.catalog.read)
+        end
+
         def log(message)
           @response["log"] << message
         end
@@ -218,7 +222,7 @@ module Droonga
 
         def replica_hosts
           generator = CatalogGenerator.new
-          generator.load(@catalog)
+          generator.load(catalog)
           dataset = generator.dataset_for_host(source_host) ||
                       generator.dataset_for_host(host)
           return [] unless dataset
@@ -238,7 +242,7 @@ module Droonga
           @serf.join(*@other_hosts)
 
           log("update catalog.json from fetched catalog")
-          CatalogModifier.modify(@catalog) do |modifier, file|
+          CatalogModifier.modify(catalog) do |modifier, file|
             modifier.datasets[dataset_name].replicas.hosts += [joining_host]
             modifier.datasets[dataset_name].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
@@ -256,9 +260,8 @@ module Droonga
           log("start to absorb data from #{source}")
 
           if dataset_name.nil? or port.nil? or tag.nil?
-            current_catalog = JSON.parse(Path.catalog.read)
             generator = CatalogGenerator.new
-            generator.load(current_catalog)
+            generator.load(catalog)
 
             dataset = generator.dataset_for_host(source)
             return unless dataset
@@ -338,7 +341,7 @@ module Droonga
           @serf.join(*hosts)
 
           log("setting replicas to the cluster")
-          CatalogModifier.modify do |modifier, file|
+          CatalogModifier(catalog).modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts = hosts
             @service_installation.ensure_correct_file_permission(file)
           end
@@ -358,7 +361,7 @@ module Droonga
           @serf.join(*added_hosts)
 
           log("adding replicas to the cluster")
-          CatalogModifier.modify do |modifier, file|
+          CatalogModifier(catalog).modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts += added_hosts
             modifier.datasets[dataset].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
@@ -374,7 +377,7 @@ module Droonga
           log("removing replicas: #{hosts.join(",")}")
 
           log("removing replicas from the cluster")
-          CatalogModifier.modify do |modifier, file|
+          CatalogModifier(catalog).modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts -= hosts
             @service_installation.ensure_correct_file_permission(file)
           end
@@ -389,7 +392,7 @@ module Droonga
           log("unjoining replicas: #{hosts.join(",")}")
 
           log("unjoining from the cluster")
-          CatalogModifier.modify do |modifier, file|
+          CatalogModifier(catalog).modify do |modifier, file|
             if unjoining_node?
               modifier.datasets[dataset].replicas.hosts = hosts
             else
