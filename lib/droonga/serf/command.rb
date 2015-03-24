@@ -23,13 +23,11 @@ module Droonga
     class Command
       class Failure < Error
         attr_reader :command_line, :exit_status, :output, :error
-        attr_accessor :verbose
         def initialize(command_line, exit_status, output, error)
           @command_line = command_line
           @exit_status = exit_status
           @output = output
           @error = error
-          @verbose = false
           message = "Failed to run serf: (#{@exit_status}): "
           message << "#{@error.strip}[#{@output.strip}]: "
           message << @command_line.join(" ")
@@ -39,10 +37,13 @@ module Droonga
 
       include Loggable
 
+      attr_accessor :verbose
+
       def initialize(serf, command, *options)
         @serf = serf
         @command = command
         @options = options
+        @verbose = false
       end
 
       def run
