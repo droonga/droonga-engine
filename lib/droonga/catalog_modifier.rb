@@ -22,16 +22,16 @@ require "droonga/safe_file_writer"
 module Droonga
   class CatalogModifier
     class << self
-      def modify
-        new.modify do |generator, file|
+      def modify(source_catalog=nil)
+        new(source_catalog).modify do |generator, file|
           yield(generator, file)
         end
       end
     end
 
-    def initialize
+    def initialize(source_catalog=nil)
       @generator = CatalogGenerator.new
-      @catalog = JSON.parse(Path.catalog.read)
+      @catalog = source_catalog || JSON.parse(Path.catalog.read)
       @generator.load(@catalog)
     end
 
