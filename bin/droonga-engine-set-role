@@ -55,6 +55,10 @@ class SetRoleCommand
       option.on(:tag=,
                 "Tag name of the soruce cluster to be connected.",
                 :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+
+      option.separator("Miscellaneous:")
+      option.on(:verbose, "Output details for internal operations.",
+                :default => false)
     end
     @options = options
   rescue Slop::MissingOptionError => error
@@ -67,7 +71,7 @@ class SetRoleCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(target)
+    serf = Droonga::Serf.new(target, :verbose => @options[:verbose])
     serf.send_query(command, options)
   end
 

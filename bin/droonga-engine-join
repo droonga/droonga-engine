@@ -83,6 +83,10 @@ class JoinCommand
                   "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
                 :as => Integer,
                 :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND)
+
+      option.separator("Miscellaneous:")
+      option.on(:verbose, "Output details for internal operations.",
+                :default => false)
     end
     @options = options
   rescue Slop::MissingOptionError => error
@@ -124,7 +128,7 @@ class JoinCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(target)
+    serf = Droonga::Serf.new(target, :verbose => @options[:verbose])
     serf.send_query(command, options)
   end
 
