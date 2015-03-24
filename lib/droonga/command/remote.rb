@@ -274,6 +274,7 @@ module Droonga
           metadata = NodeMetadata.new
           metadata.set(:absorbing, true)
 
+          log("start")
           DataAbsorber.absorb(:dataset          => dataset,
                               :source_host      => source_host,
                               :destination_host => host,
@@ -283,6 +284,7 @@ module Droonga
                               :client           => "droonga-send")
 
           metadata.delete(:absorbing)
+          log("done")
         end
 
         private
