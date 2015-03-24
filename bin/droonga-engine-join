@@ -181,7 +181,7 @@ class JoinCommand
                        "type"    => "replica",
                        "source"  => source_node,
                        "dataset" => @options[:dataset])
-    wait_until_restarted(joining_node, source_node)
+    wait_until_restarted(joining_node)
   end
 
   def copy_data
@@ -230,7 +230,6 @@ class JoinCommand
                                     "node" => joining_node,
                                     "key" => "effective_message_timestamp",
                                     "value" => timestamp)
-      wait_until_restarted(joining_node)
     end
   end
 
