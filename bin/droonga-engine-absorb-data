@@ -63,6 +63,7 @@ class AbsorbDataCommand
     options.remote  = true
     options.receiver_host = Socket.gethostname
     options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
+    options.verbose = false
     parser = OptionParser.new
     parser.version = Droonga::Engine::VERSION
 
@@ -111,6 +112,14 @@ class AbsorbDataCommand
       options.messages_per_second = n
     end
 
+    parser.separator("")
+    parser.separator("Miscellaneous:")
+    parser.on("--[no-]verbose",
+              "Output details for internal operations.",
+              "(#{options.verbose})") do |verbose|
+      options.verbose = verbose
+    end
+
     parser.parse!(ARGV)
     @options = options
   end
@@ -133,7 +142,7 @@ class AbsorbDataCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(target)
+    serf = Droonga::Serf.new(target, :verbose => @options.verbose)
     serf.send_query(command, options)
   end
 
