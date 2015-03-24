@@ -55,15 +55,15 @@ module Droonga
             log("query for different cluster (to be ignroed)")
             return false
           end
-          unless for_me?
-            log("query for different node (to be ignored)")
-            return false
+          if for_me?
+            log("query for this node (to be processed)")
+            return true
           end
           if @params.nil? or not @params.include?("node")
             log("anonymous query (to be processed)")
             return true
           end
-          log("invalid query (to be ignored)")
+          log("query for different query (to be ignored)")
           return false
         end
 
