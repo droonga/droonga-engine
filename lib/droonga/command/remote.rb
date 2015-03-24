@@ -112,6 +112,7 @@ module Droonga
           log("old role: #{@serf.role}")
           @serf.role = @params["role"]
           log("new role: #{@serf.role}")
+          Restarter.restart
         end
       end
 
