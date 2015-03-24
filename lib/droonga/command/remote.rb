@@ -327,12 +327,15 @@ module Droonga
 
           log("new replicas: #{hosts.join(",")}")
 
+          log("joining to the cluster")
+          @serf.join(*hosts)
+
+          log("setting replicas to the cluster")
           CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts = hosts
             @service_installation.ensure_correct_file_permission(file)
           end
-
-          @serf.join(*hosts)
+          log("done")
         end
       end
 
@@ -344,13 +347,16 @@ module Droonga
           log("adding replicas: #{added_hosts.join(",")}")
           return if added_hosts.empty?
 
+          log("joining to the cluster")
+          @serf.join(*added_hosts)
+
+          log("adding replicas to the cluster")
           CatalogModifier.modify do |modifier, file|
             modifier.datasets[dataset].replicas.hosts += added_hosts
             modifier.datasets[dataset].replicas.hosts.uniq!
             @service_installation.ensure_correct_file_permission(file)
           end
-
-          @serf.join(*added_hosts)
+          log("done")
         end
       end
 
