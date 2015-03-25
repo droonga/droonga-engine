@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
 require "droonga/node_name"
 
 module Droonga
-  class Address < NodeName
+  class Address
     class << self
       def parse(string)
         if /\A(.+):(\d+)\/([^.]+)(?:\.(.+))?\z/ =~ string
@@ -37,18 +37,34 @@ module Droonga
 
     attr_reader :local_name
     def initialize(components={})
-      super
+      @node_name  = NodeName.new(components)
       @local_name = components[:local_name]
     end
 
+    def host
+      @node_name.host
+    end
+
+    def port
+      @node_name.port
+    end
+
+    def tag
+      @node_name.tag
+    end
+
+    def node
+      @node_name.node
+    end
+
     def to_s
-      string = super
+      string = @node_name.node
       string << ".#{@local_name}" if @local_name
       string
     end
 
     def to_a
-      super + [@local_name]
+      @node_name.to_a + [@local_name]
     end
 
     def ==(other)
