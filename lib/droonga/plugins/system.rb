@@ -25,9 +25,11 @@ module Droonga
         action.synchronous = true
 
         def handle(message)
+          engine_state = @messenger.engine_state
+          reporter     = "#{engine_state.internal_name} @ #{engine_state.name}"
           {
             "nodes"    => @messenger.cluster.engine_nodes_status,
-            "reporter" => @messenger.engine_state.internal_name,
+            "reporter" => reporter,
           }
         end
       end
