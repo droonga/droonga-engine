@@ -76,7 +76,7 @@ module Droonga
 
         private
         def node
-          @node ||= NodeName.new(@serf_name)
+          @node ||= NodeName.parse(@serf_name)
         end
 
         def host
