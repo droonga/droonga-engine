@@ -26,7 +26,7 @@ require "droonga/engine/version"
 require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/path"
-require "droonga/address"
+require "droonga/node_name"
 require "droonga/serf"
 require "droonga/node_metadata"
 require "droonga/file_observer"
@@ -199,15 +199,15 @@ module Droonga
 
         private
         def default_host
-          Address::DEFAULT_HOST
+          NodeName::DEFAULT_HOST
         end
 
         def default_port
-          Address::DEFAULT_PORT
+          NodeName::DEFAULT_PORT
         end
 
         def default_tag
-          Address::DEFAULT_TAG
+          NodeName::DEFAULT_TAG
         end
 
         def default_log_level
