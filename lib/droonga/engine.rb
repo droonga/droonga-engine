@@ -40,7 +40,6 @@ module Droonga
                                :catalog  => @catalog,
                                :metadata => @node_metadata)
       @cluster = Cluster.new(loop,
-                             :my_name  => internal_name,
                              :catalog  => @catalog,
                              :metadata => @node_metadata)
 
