@@ -22,12 +22,12 @@ module Droonga
 
     def initialize(forwarder, message, options={})
       @forwarder = forwarder
-      @message = message
-      @options = options
-      @replier = Replier.new(@forwarder)
-      @dispatcher = options[:dispatcher]
-      @engine_state = options[:engine_state]
-      @cluster = options[:cluster]
+      @message   = message
+      @options   = options
+      @replier   = Replier.new(@forwarder)
+      @dispatcher    = options[:dispatcher]
+      @engine_state  = options[:engine_state]
+      @cluster       = options[:cluster]
       @database_name = options[:database]
     end
 
