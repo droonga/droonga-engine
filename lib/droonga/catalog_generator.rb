@@ -41,9 +41,9 @@ module Droonga
     end
 
     def initialize
-      @version = 2
+      @version        = 2
       @effective_date = Time.now
-      @datasets = {}
+      @datasets       = {}
     end
 
     def add_dataset(name, options)
@@ -172,10 +172,10 @@ module Droonga
       attr_reader :port, :tag, :n_slices
 
       def initialize(options={})
-        @hosts      = options[:hosts] || DEFAULT_HOSTS
-        @port       = options[:port]
-        @tag        = options[:tag]
-        @n_slices   = options[:n_slices]
+        @hosts    = options[:hosts] || DEFAULT_HOSTS
+        @port     = options[:port]
+        @tag      = options[:tag]
+        @n_slices = options[:n_slices]
       end
 
       def load(catalog_replicas)
@@ -189,7 +189,7 @@ module Droonga
         @n_slices = slices.size
         single_volume_address = slices.first.volume.address
         @port = single_volume_address.port
-        @tag = single_volume_address.tag
+        @tag  = single_volume_address.tag
       end
 
       def to_catalog
@@ -206,10 +206,10 @@ module Droonga
 
     class Replica
       def initialize(host, options={})
-        @host       = host
-        @port       = options[:port]     || DEFAULT_PORT
-        @tag        = options[:tag]      || DEFAULT_TAG
-        @n_slices   = options[:n_slices] || DEFAULT_N_SLICES
+        @host     = host
+        @port     = options[:port]     || DEFAULT_PORT
+        @tag      = options[:tag]      || DEFAULT_TAG
+        @n_slices = options[:n_slices] || DEFAULT_N_SLICES
       end
 
       def to_catalog
