@@ -25,9 +25,8 @@ module Droonga
         action.synchronous = true
 
         def handle(message)
-          cluster = @messenger.cluster
           {
-            "nodes" => cluster.engine_nodes_status,
+            "nodes"    => @messenger.cluster.engine_nodes_status,
             "reporter" => @messenger.engine_state.internal_name,
           }
         end
