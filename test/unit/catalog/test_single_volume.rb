@@ -24,11 +24,11 @@ class CatalogSingleVolumeTest < Test::Unit::TestCase
       @volume = Droonga::Catalog::SingleVolume.new(data)
     end
 
-    def address(host, port, tag, name)
+    def address(host, port, tag, local_name)
       Droonga::Address.new(:host => host,
                            :port => port,
                            :tag  => tag,
-                           :name => name)
+                           :local_name => local_name)
     end
 
     def test_address

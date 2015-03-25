@@ -24,31 +24,31 @@ module Droonga
             :host => $1,
             :port => $2.to_i,
             :tag  => $3,
-            :name => $4
+            :local_name => $4
           }
           new(components)
         else
-          format = "${host_name}:${port_number}/${tag}.${name}"
+          format = "${host_name}:${port_number}/${tag}.${local_name}"
           message = "volume address must be <#{format}> format: <#{string}>"
           raise ArgumentError, message
         end
       end
     end
 
-    attr_reader :name
+    attr_reader :local_name
     def initialize(components={})
       super
-      @name = components[:name]
+      @local_name = components[:local_name]
     end
 
     def to_s
       string = super
-      string << ".#{@name}" if @name
+      string << ".#{@local_name}" if @local_name
       string
     end
 
     def to_a
-      super + [@name]
+      super + [@local_name]
     end
 
     def ==(other)

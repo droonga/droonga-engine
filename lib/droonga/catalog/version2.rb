@@ -44,10 +44,10 @@ module Droonga
             volume.slices.each do |slice|
               volume_address = slice.volume.address
               if volume_address.node == node
-                name = volume_address.name
+                local_name = volume_address.local_name
                 path = Path.databases(base_path) +
-                         device + name + "db"
-                migrate_database_location(path, device, name)
+                         device + local_name + "db"
+                migrate_database_location(path, device, local_name)
 
                 options = {
                   :dataset => dataset_name,
