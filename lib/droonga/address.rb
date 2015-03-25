@@ -16,7 +16,7 @@
 require "droonga/node_name"
 
 module Droonga
-  class Address
+  class Address < NodeName
     class << self
       def parse(string)
         if /\A(.+):(\d+)\/([^.]+)(?:\.(.+))?\z/ =~ string
@@ -37,38 +37,22 @@ module Droonga
 
     attr_reader :name
     def initialize(components={})
-      @node = NodeName.new(components)
+      super
       @name = components[:name]
     end
 
-    def host
-      @node.host
-    end
-
-    def port
-      @node.port
-    end
-
-    def tag
-      @node.tag
-    end
-
     def to_s
-      string = node
+      string = super
       string << ".#{@name}" if @name
       string
     end
 
     def to_a
-      @node.to_a + [@name]
+      super + [@name]
     end
 
     def ==(other)
       other.is_a?(self.class) and to_a == other.to_a
-    end
-
-    def node
-      @node.to_s
     end
   end
 end

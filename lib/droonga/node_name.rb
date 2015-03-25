@@ -58,6 +58,10 @@ module Droonga
     end
 
     def to_s
+      node
+    end
+
+    def node
       "#{@host}:#{@port}/#{@tag}"
     end
 
