@@ -28,6 +28,7 @@ module Droonga
           cluster = @messenger.cluster
           {
             "nodes" => cluster.engine_nodes_status,
+            "reporter" => @messenger.engine_state.internal_name,
           }
         end
       end
