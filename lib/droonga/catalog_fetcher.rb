@@ -17,7 +17,7 @@ require "socket"
 
 require "droonga/client"
 
-require "droonga/address"
+require "droonga/node_name"
 require "droonga/catalog/dataset"
 
 module Droonga
@@ -41,8 +41,8 @@ module Droonga
     def default_options
       {
         :host          => "127.0.0.1",
-        :port          => Address::DEFAULT_PORT,
-        :tag           => Address::DEFAULT_TAG,
+        :port          => NodeName::DEFAULT_PORT,
+        :tag           => NodeName::DEFAULT_TAG,
         :protocol      => :droonga,
         :timeout       => 1,
         :receiver_host => Socket.gethostname,
