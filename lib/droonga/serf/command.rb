@@ -35,11 +35,24 @@ module Droonga
         end
       end
 
+      class ForbiddenCommandInEventHandler < Error
+        def initialize(command)
+          message = "#{command} is forbidden in an event handler script."
+          super(message)
+        end
+      end
+
+      DANGEROUS_COMMANDS_IN_EVENT_HANDLER = [
+        "event",
+        "query",
+      ]
+
       include Loggable
 
       attr_accessor :verbose
 
       def initialize(serf, command, *options)
+        assert_safe_command(command)
         @serf = serf
         @command = command
         @options = options
@@ -63,6 +76,14 @@ module Droonga
           end
         end
         stdout
+      end
+
+      private
+      def assert_safe_command(command)
+        if ENV.key?("SERF_EVENT") and
+             DANGEROUS_COMMANDS_IN_EVENT_HANDLER.include?(command)
+          raise ForbiddenCommandInEventHandler.new(command)
+        end
       end
 
       def log_tag
