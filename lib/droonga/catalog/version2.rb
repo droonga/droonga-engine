@@ -50,10 +50,10 @@ module Droonga
                 migrate_database_location(path, device, local_name)
 
                 options = {
-                  :dataset => dataset_name,
-                  :database => path.to_s,
+                  :dataset   => dataset_name,
+                  :database  => path.to_s,
                   :n_workers => n_workers,
-                  :plugins => plugins
+                  :plugins   => plugins
                 }
                 results[volume_address.to_s] = options
               end
