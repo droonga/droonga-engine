@@ -16,6 +16,7 @@
 require "droonga/loggable"
 require "droonga/changable"
 require "droonga/path"
+require "droonga/file_observer"
 require "droonga/engine_node"
 require "droonga/node_metadata"
 
@@ -60,13 +61,30 @@ module Droonga
       reload
     end
 
+    def start_observe
+      return if @file_observer
+      @file_observer = FileObserver.new(@loop, Path.cluster_state)
+      @file_observer.on_change = lambda do
+        reload
+      end
+      @file_observer.start
+    end
+
+    def stop_observe
+      return unless @file_observer
+      @file_observer.stop
+      @file_observer = nil
+    end
+
     def start
       engine_nodes.each do |node|
         node.start
       end
+      start_observe
     end
 
     def shutdown
+      stop_observe
       engine_nodes.each do |node|
         node.shutdown
       end
