@@ -128,9 +128,9 @@ module Droonga
 
     private
     def clear_cache
-      @engine_nodes = nil
+      @engine_nodes      = nil
       @forwardable_nodes = nil
-      @writable_nodes = nil
+      @writable_nodes    = nil
     end
 
     def load_state_file
