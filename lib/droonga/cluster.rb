@@ -16,10 +16,8 @@
 require "droonga/loggable"
 require "droonga/changable"
 require "droonga/path"
-require "droonga/file_observer"
 require "droonga/engine_node"
 require "droonga/node_metadata"
-require "droonga/restarter"
 
 module Droonga
   class Cluster
@@ -27,6 +25,27 @@ module Droonga
     include Changable
 
     class NoCatalogLoaded < StandardError
+    end
+
+    class << self
+      def load_state_file
+        path = Path.cluster_state
+
+        return default_state unless path.exist?
+
+        contents = path.read
+        return default_state if contents.empty?
+
+        begin
+          JSON.parse(contents)
+        rescue JSON::ParserError
+          default_state
+        end
+      end
+
+      def default_state
+        {}
+      end
     end
 
     attr_accessor :catalog
@@ -42,30 +61,13 @@ module Droonga
       reload
     end
 
-    def start_observe
-      return if @file_observer
-      @file_observer = FileObserver.new(@loop, Path.cluster_state)
-      @file_observer.on_change = lambda do
-        on_state_change
-      end
-      @file_observer.start
-    end
-
-    def stop_observe
-      return unless @file_observer
-      @file_observer.stop
-      @file_observer = nil
-    end
-
     def start
       engine_nodes.each do |node|
         node.start
       end
-      start_observe
     end
 
     def shutdown
-      stop_observe
       engine_nodes.each do |node|
         node.shutdown
       end
@@ -78,7 +80,7 @@ module Droonga
         old_state = nil
       end
       clear_cache
-      @state = load_state_file
+      @state = self.class.load_state_file
       if @state == old_state
         logger.info("cluster state not changed")
       else
@@ -133,21 +135,6 @@ module Droonga
       @writable_nodes    = nil
     end
 
-    def load_state_file
-      path = Path.cluster_state
-
-      return default_state unless path.exist?
-
-      contents = path.read
-      return default_state if contents.empty?
-
-      begin
-        JSON.parse(contents)
-      rescue JSON::ParserError
-        default_state
-      end
-    end
-
     def all_node_names
       raise NoCatalogLoaded.new unless @catalog
       @catalog.all_nodes
@@ -161,22 +148,6 @@ module Droonga
                        @loop,
                        :metadata => @node_metadata)
       end
-    end
-
-    def on_state_change
-      unless @state.nil?
-        old_state = @state.dup
-        new_state = load_state_file
-        if old_state[@my_name] != new_state[@my_name]
-          Restarter.restart
-          return
-        end
-      end
-      reload
-    end
-
-    def default_state
-      {}
     end
 
     def log_tag

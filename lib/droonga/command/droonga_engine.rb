@@ -28,6 +28,7 @@ require "droonga/deferrable"
 require "droonga/path"
 require "droonga/node_name"
 require "droonga/serf"
+require "droonga/cluster"
 require "droonga/node_metadata"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
@@ -415,6 +416,7 @@ module Droonga
             setup_initial_on_ready
             @restart_observer = run_restart_observer
             @catalog_observer = run_catalog_observer
+            @cluster_state_observer = run_cluster_state_observer
             @command_runner = run_command_runner
           end
 
@@ -463,6 +465,7 @@ module Droonga
 
         def stop_gracefully
           @command_runner.stop
+          @cluster_state_observer.stop
           @catalog_observer.stop
           @restart_observer.stop
           stop_serf
@@ -471,6 +474,7 @@ module Droonga
 
         def stop_immediately
           @command_runner.stop
+          @cluster_state_observer.stop
           @catalog_observer.stop
           @restart_observer.stop
           stop_serf
@@ -545,6 +549,22 @@ module Droonga
           end
           catalog_observer.start
           catalog_observer
+        end
+
+        def run_cluster_state_observer
+          previous_state = nil
+          cluster_state_observer = FileObserver.new(@loop, Path.cluster_state)
+          cluster_state_observer.on_change = lambda do
+            my_name   = @configuration.engine_name
+            new_state = Cluster.load_state_file
+            if new_state and previous_state and
+                 new_state[my_name] != previous_state[my_name]
+              restart_graceful
+            end
+            previous_state = new_state
+          end
+          cluster_state_observer.start
+          cluster_state_observer
         end
 
         def run_command_runner
