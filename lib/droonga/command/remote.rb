@@ -104,7 +104,7 @@ module Droonga
         end
 
         def for_me?
-          target_node == @serf_name
+          target_node == node
         end
 
         def catalog
