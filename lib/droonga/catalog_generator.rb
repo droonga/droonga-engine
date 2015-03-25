@@ -226,11 +226,11 @@ module Droonga
 
       private
       def catalog_slice(nth_slice)
-        name = "%03d" % nth_slice
+        local_name = "%03d" % nth_slice
         {
           "weight" => weight,
           "volume" => {
-            "address" => "#{@host}:#{@port}/#{@tag}.#{name}",
+            "address" => "#{@host}:#{@port}/#{@tag}.#{local_name}",
           },
         }
       end
