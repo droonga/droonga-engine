@@ -29,6 +29,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     @worker = StubWorker.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
     @messenger.cluster = StubCluster.new
+    @messenger.engine_state = StubEngineState.new
     @loop = nil
     @handler = Droonga::Plugins::System::StatusHandler.new("name",
                                                            @worker.context,
@@ -61,6 +62,16 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     end
   end
 
+  class StubEngineState
+    def name
+      "127.0.0.1:10031/droonga"
+    end
+
+    def internal_name
+      "127.0.0.1:12345/droonga"
+    end
+  end
+
   public
   def test_request
     request = {}
@@ -77,6 +88,7 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
           "status" => "dead",
         },
       },
+      "reporter" => "127.0.0.1:12345/droonga @ 127.0.0.1:10031/droonga",
     }
     assert_equal(status, response)
   end
