@@ -54,8 +54,7 @@ class JoinCommand
     rescue Exception => exception
       puts("Unexpected exception: #{exception.message}")
       puts(exception.backtrace.join("\n"))
-      unregister_from_existing_nodes
-      reset_node_role
+      do_cancel
       exit(false)
     end
   end
