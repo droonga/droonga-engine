@@ -58,6 +58,10 @@ module Droonga
       @receiver_host    = @params[:receiver_host] || @destination_host
 
       @receiver_port = @params[:receiver_port]
+
+      #XXX We must instanciate the number of total soruce records before absorbing,
+      #    because parallel commands while doing "dump" can be timed out.
+      @required_time_in_seconds = calculate_required_time_in_seconds
     end
 
     MESSAGES_PER_SECOND_MATCHER = /(\d+(\.\d+)?) messages\/second/
@@ -65,10 +69,6 @@ module Droonga
     def absorb
       drndump_command_line = [@drndump] + drndump_options
       client_command_line  = [@client] + client_options(@client)
-
-      #XXX We must instanciate the number of total soruce records before absorbing,
-      #    because parallel commands while doing "dump" can be timed out.
-      required_time_in_seconds
 
       start_time_in_seconds = Time.new.to_i
       env = {}
@@ -89,12 +89,8 @@ module Droonga
     end
 
     def can_report_remaining_time?
-      required_time_in_seconds != Droonga::DataAbsorber::TIME_UNKNOWN and
-        required_time_in_seconds > 0
-    end
-
-    def required_time_in_seconds
-      @required_time_in_seconds ||= calculate_required_time_in_seconds
+      @required_time_in_seconds != Droonga::DataAbsorber::TIME_UNKNOWN and
+        @required_time_in_seconds > 0
     end
 
     ONE_MINUTE_IN_SECONDS = 60
@@ -104,10 +100,10 @@ module Droonga
       return nil unless can_report_remaining_time?
 
       elapsed_time = Time.new.to_i - start_time_in_seconds
-      progress = elapsed_time.to_f / required_time_in_seconds
+      progress = elapsed_time.to_f / @required_time_in_seconds
       progress = [(progress * 100).to_i, 100].min
 
-      remaining_seconds  = [required_time_in_seconds - elapsed_time, 0].max
+      remaining_seconds  = [@required_time_in_seconds - elapsed_time, 0].max
       remaining_hours    = (remaining_seconds / ONE_HOUR_IN_SECONDS).floor
       remaining_seconds -= remaining_hours * ONE_HOUR_IN_SECONDS
       remaining_minutes  = (remaining_seconds / ONE_MINUTE_IN_SECONDS).floor
