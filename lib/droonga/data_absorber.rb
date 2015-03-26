@@ -66,6 +66,10 @@ module Droonga
       drndump_command_line = [@drndump] + drndump_options
       client_command_line  = [@client] + client_options(@client)
 
+      #XXX We must instanciate the number of total soruce records before absorbing,
+      #    because parallel commands while doing "dump" can be timed out.
+      required_time_in_seconds
+
       start_time_in_seconds = Time.new.to_i
       env = {}
       Open3.pipeline_r([env, *drndump_command_line],
