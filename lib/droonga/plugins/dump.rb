@@ -286,6 +286,8 @@ module Droonga
                 element
               end
             end
+          when Hash
+            value["_key"]
           else
             value
           end
