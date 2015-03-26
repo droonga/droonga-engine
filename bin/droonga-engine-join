@@ -44,13 +44,13 @@ class JoinCommand
 
     set_node_role
     begin
-    register_to_existing_nodes
-    do_join
-    copy_data unless @options["no-copy"]
-    set_effective_message_timestamp
-    reset_node_role
-    puts("Done.")
-    exit(true)
+      register_to_existing_nodes
+      do_join
+      copy_data unless @options["no-copy"]
+      set_effective_message_timestamp
+      reset_node_role
+      puts("Done.")
+      exit(true)
     rescue Exception => exception
       puts("Unexpected exception: #{exception.message}")
       puts(exception.backtrace.join("\n"))
