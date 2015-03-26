@@ -253,6 +253,7 @@ class JoinCommand
                        "dataset" => @options[:dataset],
                        "hosts"   => [@options[:host]])
     wait_until_restarted(source_node)
+    @node_registered = true
   end
 
   def unregister_from_existing_nodes
@@ -262,6 +263,7 @@ class JoinCommand
                        "dataset" => @options[:dataset],
                        "hosts"   => [@options[:host]])
     wait_until_restarted(source_node)
+    @node_registered = false
   end
 
   def trap_signals
@@ -283,6 +285,7 @@ class JoinCommand
 
   def do_cancel
     #XXX we have to write more codes to cancel remote processes!
+    unregister_from_existing_nodes if @node_registered
     reset_node_role if @node_role_changed
   end
 
