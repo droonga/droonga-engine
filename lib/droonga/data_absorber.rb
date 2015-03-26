@@ -207,7 +207,8 @@ module Droonga
     def source_tables
       response = source_client.request("dataset" => @dataset,
                                        "type"    => "table_list")
-      body = response["body"][1]
+      message_body = response["body"]
+      body = message_body[1]
       tables = body[1..-1]
       tables.collect do |table|
         table[1]
