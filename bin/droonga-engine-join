@@ -267,18 +267,18 @@ class JoinCommand
 
   def trap_signals
     trap(:TERM) do
-      do_cancel
       trap(:TERM, "DEFAULT")
+      do_cancel
     end
 
     trap(:INT) do
-      do_cancel
       trap(:INT, "DEFAULT")
+      do_cancel
     end
 
     trap(:QUIT) do
-      do_cancel
       trap(:QUIT, "DEFAULT")
+      do_cancel
     end
   end
 
