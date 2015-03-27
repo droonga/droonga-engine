@@ -167,7 +167,7 @@ class AbsorbDataCommand
     start_time_in_seconds = Time.new.to_i
     run_remote_command(destination_node, "absorb_data",
                        "node"    => destination_node,
-                       "source"  => @options.source_host,
+                       "source"  => source_node,
                        "port"    => @options.port,
                        "tag"     => @options.tag,
                        "dataset" => @options.dataset,
