@@ -31,11 +31,6 @@ module Droonga
 
       @buffer = ForwardBuffer.new(name)
 
-      @node_metadata_observer = FileObserver.new(@loop, Path.node_metadata)
-      @node_metadata_observer.on_change = lambda do
-        @sender_node_metadata.reload
-      end
-
       parsed_name = parse_node_name(@name)
       @sender = FluentMessageSender.new(loop,
                                         parsed_name[:host],
@@ -48,13 +43,11 @@ module Droonga
       logger.trace("start: start")
       @sender.resume
       @buffer.start_forward if really_writable?
-      @node_metadata_observer.start
       logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      @node_metadata_observer.stop
       @sender.shutdown
       logger.trace("shutdown: done")
     end
