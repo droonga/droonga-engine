@@ -162,11 +162,13 @@ class JoinCommand
       run_remote_command(source_node, "change_role",
                          "node" => source_node,
                          "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
+      wait_until_restarted(source_node)
     end
     puts("Changing role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
+    wait_until_restarted(joining_node)
     @node_role_changed = true
   end
 
