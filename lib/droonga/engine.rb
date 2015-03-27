@@ -24,7 +24,6 @@ require "droonga/engine_state"
 require "droonga/cluster"
 require "droonga/catalog_loader"
 require "droonga/dispatcher"
-require "droonga/file_observer"
 require "droonga/node_metadata"
 
 module Droonga
