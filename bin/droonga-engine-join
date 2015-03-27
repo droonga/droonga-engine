@@ -50,13 +50,13 @@ class JoinCommand
       set_effective_message_timestamp
       reset_node_role
       puts("Done.")
-      exit(true)
     rescue Exception => exception
       puts("Unexpected exception: #{exception.message}")
       puts(exception.backtrace.join("\n"))
       do_cancel
       exit(false)
     end
+    exit(true)
   end
 
   private
