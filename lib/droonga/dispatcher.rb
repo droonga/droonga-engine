@@ -94,6 +94,7 @@ module Droonga
     end
 
     def process_message(message)
+      logger.trace("process_message: start", :message => message)
       @message = message
       if message["type"] == "dispatcher"
         process_internal_message(message["body"])
@@ -111,6 +112,7 @@ module Droonga
                 "body"       => formatted_error.response_body)
         end
       end
+      logger.trace("process_message: done")
     end
 
     def forward(message, destination)
@@ -156,11 +158,14 @@ module Droonga
     end
 
     def process_internal_message(message)
+      logger.trace("process_internal_message: start", :message => message)
       id = message["id"]
       session = @engine_state.find_session(id)
       if session
+        logger.trace("process_internal_message: session exists")
         session.receive(message["input"], message["value"])
       else
+        logger.trace("process_internal_message: no session")
         steps = message["steps"]
         if steps
           session_planner = SessionPlanner.new(@engine_state, @cluster, steps)
@@ -176,9 +181,11 @@ module Droonga
         session.start
       end
       @engine_state.unregister_session(id) if session.done?
+      logger.trace("process_internal_message: done")
     end
 
     def dispatch(message, destination)
+      logger.trace("dispatch: start", :message => message, :destination => destination)
       if local?(destination)
         process_internal_message(message)
       else
@@ -190,9 +197,11 @@ module Droonga
         @cluster.forward(forward_message, forward_destination) ||
           @forwarder.forward(forward_message, forward_destination)
       end
+      logger.trace("dispatch: done")
     end
 
     def dispatch_steps(steps)
+      logger.trace("dispatch_steps: start", :steps => steps)
       id = @engine_state.generate_id
 
       destinations = []
@@ -230,9 +239,12 @@ module Droonga
       destinations.uniq.each do |destination|
         dispatch(dispatch_message, destination)
       end
+
+      logger.trace("dispatch_steps: done")
     end
 
     def process_local_message(local_message)
+      logger.trace("process_local_message: start", :steps => local_message)
       task = local_message["task"]
       slice_name = task["route"]
       step = task["step"]
@@ -247,6 +259,7 @@ module Droonga
       farm_message = @message.merge("body" => local_message,
                                     "type" => command)
       @farm.process(slice_name, farm_message)
+      logger.trace("process_local_message: done")
     end
 
     def local?(route)
@@ -279,6 +292,7 @@ module Droonga
       distributor = Distributor.new(self, plan)
       distributor.distribute
     rescue Droonga::UnsupportedMessageError => error
+      logger.trace("process_input_message: rescue", :error => error)
       target_message = error.message
       raise UnknownType.new(target_message["type"], target_message["dataset"])
     end
