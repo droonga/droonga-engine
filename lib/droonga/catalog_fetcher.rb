@@ -37,12 +37,13 @@ module Droonga
         "dataset" => options[:dataset] || Catalog::Dataset::DEFAULT_NAME,
         "type"    => "catalog.fetch"
       }
+      response = nil
       Droonga::Client.open(@client_options) do |client|
         response = client.request(message)
-        raise EmptyResponse.new unless response
-        raise EmptyCatalog.new unless response["body"]
-        response["body"]
       end
+      raise EmptyResponse.new unless response
+      raise EmptyCatalog.new unless response["body"]
+      response["body"]
     end
 
     private
