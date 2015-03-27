@@ -214,8 +214,8 @@ module Droonga
       response = source_client.request("dataset" => @dataset,
                                        "type"    => "table_list")
 
-      raise EmptyResponse("table_list") unless response
-      raise EmptyBody("table_list") unless response["body"]
+      raise EmptyResponse.new("table_list") unless response
+      raise EmptyBody.new("table_list") unless response["body"]
 
       message_body = response["body"]
       body = message_body[1]
@@ -241,8 +241,8 @@ module Droonga
                                          "queries" => queries,
                                        })
 
-      raise EmptyResponse("search") unless response
-      raise EmptyBody("search") unless response["body"]
+      raise EmptyResponse.new("search") unless response
+      raise EmptyBody.new("search") unless response["body"]
 
       n_records = 0
       response["body"].each do |query_name, result|
