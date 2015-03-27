@@ -24,6 +24,12 @@ module Droonga
   class DataAbsorber
     include Loggable
 
+    class EmptyResponse < StandardError
+    end
+
+    class EmptyBody < StandardError
+    end
+
     DEFAULT_MESSAGES_PER_SECOND = 100
 
     TIME_UNKNOWN = -1
@@ -207,6 +213,10 @@ module Droonga
     def source_tables
       response = source_client.request("dataset" => @dataset,
                                        "type"    => "table_list")
+
+      raise EmptyResponse("table_list") unless response
+      raise EmptyBody("table_list") unless response["body"]
+
       message_body = response["body"]
       body = message_body[1]
       tables = body[1..-1]
@@ -230,6 +240,10 @@ module Droonga
                                        "body"    => {
                                          "queries" => queries,
                                        })
+
+      raise EmptyResponse("search") unless response
+      raise EmptyBody("search") unless response["body"]
+
       n_records = 0
       response["body"].each do |query_name, result|
         n_records += result["count"]
