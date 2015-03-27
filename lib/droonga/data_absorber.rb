@@ -59,7 +59,7 @@ module Droonga
 
       @receiver_port = @params[:receiver_port]
 
-      #XXX We must instanciate the number of total soruce records before absorbing,
+      #XXX We must instantiate the number of total soruce records before absorbing,
       #    because parallel commands while doing "dump" can be timed out.
       @required_time_in_seconds = calculate_required_time_in_seconds
     end
