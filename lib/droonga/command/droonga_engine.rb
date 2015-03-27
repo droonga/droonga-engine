@@ -511,7 +511,6 @@ module Droonga
             @restarting = false
             logger.trace("restart_graceful: failed")
           end
-          logger.trace("restart_graceful: done")
         end
 
         def restart_immediately
