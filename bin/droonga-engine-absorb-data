@@ -190,6 +190,9 @@ class AbsorbDataCommand
         last_progress = progress
       end
     end
+    printf("%s", "#{" " * last_progress.size}\r")
+    printf("%s", "#{progress}\r")
+    puts "100% done"
     puts ""
 
     response = run_remote_command(source_node, "report_metadata",
