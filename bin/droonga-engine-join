@@ -292,7 +292,7 @@ class JoinCommand
 
   def wait_until_restarted(*nodes)
     #TODO: wait for restarting of the given nodes. this should be done more safely.
-    sleep(10)
+    sleep(30)
   end
 end
 
