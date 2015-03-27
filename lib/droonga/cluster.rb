@@ -102,6 +102,7 @@ module Droonga
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed")
+        logger.info(@state)
         engine_nodes.each(&:resume)
         on_change
       end
