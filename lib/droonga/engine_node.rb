@@ -17,7 +17,6 @@ require "droonga/loggable"
 require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
 require "droonga/node_metadata"
-require "droonga/file_observer"
 
 module Droonga
   class EngineNode
