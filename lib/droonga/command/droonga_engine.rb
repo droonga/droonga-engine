@@ -569,6 +569,7 @@ module Droonga
         def run_catalog_observer
           catalog_observer = FileObserver.new(@loop, Path.catalog)
           catalog_observer.on_change = lambda do
+            logger.info("restart by updated catalog.json")
             restart_graceful
             @serf.update_cluster_id
           end
@@ -584,6 +585,7 @@ module Droonga
             new_state = Cluster.load_state_file
             if new_state and previous_state and
                  new_state[my_name] != previous_state[my_name]
+              logger.info("restart by updated cluster-state.json")
               restart_graceful
             end
             previous_state = new_state
