@@ -229,6 +229,9 @@ class JoinCommand
         last_progress = progress
       end
     end
+    printf("%s", "#{" " * last_progress.size}\r")
+    printf("%s", "#{progress}\r")
+    puts "100% done"
     puts ""
   end
 
