@@ -514,10 +514,13 @@ module Droonga
         end
 
         def restart_immediately
+          return if @restarting
+          @restarting = true
           old_service_runner = @service_runner
           reopen_log_file
           @service_runner = run_service
           old_service_runner.stop_immediately
+          @restarting = false
         end
 
         def restart_self
