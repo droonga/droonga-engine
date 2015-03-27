@@ -44,7 +44,8 @@ module Droonga
 
     def parse(data)
       unless data.is_a?(Hash)
-        raise Error.new("Root element of catalog must be an object in #{@path}")
+        raise Error.new("Root element of catalog must be an object in #{@path}: " +
+                          "#{JSON.generate(data)}")
       end
 
       version = data["version"]
