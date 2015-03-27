@@ -491,6 +491,8 @@ module Droonga
         end
 
         def restart_graceful
+          return if @restarting
+          @restarting = true
           logger.trace("restart_graceful: start")
           old_service_runner = @service_runner
           reopen_log_file
