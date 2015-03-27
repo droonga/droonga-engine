@@ -55,7 +55,7 @@ module Droonga
     end
 
     def set(key, value)
-      logger.debug("setting: #{key}=#{new_role}")
+      logger.debug("setting: #{key}=#{value}")
       key = normalize_key(key)
       @metadata[key] = value
       SafeFileWriter.write(metadata_file, JSON.pretty_generate(@metadata))
