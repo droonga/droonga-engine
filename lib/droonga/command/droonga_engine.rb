@@ -409,8 +409,10 @@ module Droonga
         end
 
         def run_internal
+          logger.trace("run_internal: start")
           start_serf
           @serf_agent.on_ready = lambda do
+            logger.trace("run_internal: serf agent is ready")
             @serf.update_cluster_state
             @service_runner = run_service
             setup_initial_on_ready
@@ -427,7 +429,9 @@ module Droonga
             sleep 1
           end
 
-          @service_runner.success?
+          succeeded = @service_runner.success?
+          logger.trace("run_internal: done")
+          succeeded
         end
 
         def setup_initial_on_ready
@@ -464,12 +468,17 @@ module Droonga
         end
 
         def stop_gracefully
+          logger.trace("stop_gracefully: start")
           @command_runner.stop
+          logger.trace("stop_gracefully: stopping cluster_state_observer")
           @cluster_state_observer.stop
+          logger.trace("stop_gracefully: stopping catalog_observer")
           @catalog_observer.stop
+          logger.trace("stop_gracefully: stopping restart_observer")
           @restart_observer.stop
           stop_serf
           @service_runner.stop_gracefully
+          logger.trace("stop_gracefully: done")
         end
 
         def stop_immediately
@@ -482,17 +491,21 @@ module Droonga
         end
 
         def restart_graceful
+          logger.trace("restart_graceful: start")
           old_service_runner = @service_runner
           reopen_log_file
           @service_runner = run_service
           @service_runner.on_ready = lambda do
+            logger.info("restart_graceful: new service runner is ready")
             @service_runner.on_failure = nil
             old_service_runner.stop_gracefully
           end
           @service_runner.on_failure = lambda do
+            logger.info("restart_graceful: failed to setup new service runner")
             @service_runner.on_failure = nil
             @service_runner = old_service_runner
           end
+          logger.trace("restart_graceful: done")
         end
 
         def restart_immediately
@@ -503,6 +516,7 @@ module Droonga
         end
 
         def restart_self
+          logger.trace("restart_self: start")
           old_pid_file_path = Pathname.new("#{@pid_file_path}.old")
           FileUtils.mv(@pid_file_path.to_s, old_pid_file_path.to_s)
           @pid_file_path = old_pid_file_path
@@ -510,6 +524,7 @@ module Droonga
 
           engine_runner = EngineRunner.new(@configuration)
           engine_runner.run
+          logger.trace("restart_self: done")
         end
 
         def run_service
@@ -524,12 +539,14 @@ module Droonga
         end
 
         def stop_serf
+          logger.trace("stop_serf: start")
           begin
             @serf.leave
           rescue Droonga::Serf::Command::Failure
             logger.error("Failed to leave from Serf cluster: #{$!.message}")
           end
           @serf_agent.stop
+          logger.trace("stop_serf: done")
         end
 
         def run_restart_observer
@@ -607,6 +624,7 @@ module Droonga
       end
 
       class ServiceRunner
+        include Loggable
         include Deferrable
 
         def initialize(raw_loop, configuration)
@@ -646,11 +664,15 @@ module Droonga
         end
 
         def stop_gracefully
+          logger.trace("stop_gracefully: start")
           @supervisor.stop_gracefully
+          logger.trace("stop_gracefully: done")
         end
 
         def stop_immediately
+          logger.trace("stop_immediately: start")
           @supervisor.stop_immediately
+          logger.trace("stop_immediately: done")
         end
 
         def success?
@@ -675,9 +697,15 @@ module Droonga
           @supervisor.stop
           on_failure unless success?
         end
+
+        def log_tag
+          "service_runner"
+        end
       end
 
       class CommandRunner
+        include Loggable
+
         attr_writer :on_command
         def initialize(loop)
           @loop = loop
@@ -686,6 +714,7 @@ module Droonga
         end
 
         def start
+          logger.trace("stert: stert")
           @async_watcher = Coolio::AsyncWatcher.new
           on_signal = lambda do
             commands = @commands.uniq
@@ -699,12 +728,15 @@ module Droonga
             on_signal.call
           end
           @loop.attach(@async_watcher)
+          logger.trace("stert: done")
         end
 
         def stop
           return if @async_watcher.nil?
+          logger.trace("stop: stert")
           @async_watcher.detach
           @async_watcher = nil
+          logger.trace("stop: done")
         end
 
         def push_command(command)
@@ -712,6 +744,10 @@ module Droonga
           first_command_p = @commands.empty?
           @commands << command
           @async_watcher.signal if first_command_p
+        end
+
+        def log_tag
+          "command_runner"
         end
       end
     end

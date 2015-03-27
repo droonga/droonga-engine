@@ -15,12 +15,14 @@
 
 require "coolio"
 
+require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/process_control_protocol"
 require "droonga/line_buffer"
 
 module Droonga
   class ProcessSupervisor
+    include Loggable
     include Deferrable
     include ProcessControlProtocol
 
@@ -43,11 +45,15 @@ module Droonga
     end
 
     def stop_gracefully
+      logger.trace("stop_gracefully: start")
       @output.write(Messages::STOP_GRACEFUL)
+      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
+      logger.trace("stop_immediately: start")
       @output.write(Messages::STOP_IMMEDIATELY)
+      logger.trace("stop_immediately: done")
     end
 
     private
@@ -76,6 +82,10 @@ module Droonga
 
     def on_finish
       @on_finish.call if @on_finish
+    end
+
+    def log_tag
+      "process_supervisor"
     end
   end
 end
