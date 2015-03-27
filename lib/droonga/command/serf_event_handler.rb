@@ -38,12 +38,12 @@ module Droonga
         serf_name = ENV["SERF_SELF_NAME"]
         command = command_class.new(serf_name, @payload)
         begin
-        command.process if command.should_process?
+          command.process if command.should_process?
         rescue Exception => exception
           log("Exception: #{exception.inspect}, #{exception.message}, #{exception.backtrace.join(", ")}")
           raise exception
         ensure
-        output_response(command.response)
+          output_response(command.response)
         end
         true
       rescue Exception => exception
