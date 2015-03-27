@@ -202,16 +202,18 @@ module Droonga
           if write_step?(step)
             target_nodes = @cluster.writable_nodes
             if target_nodes.empty?
-              logger.error("there is no node to dispath a write message!",
+              logger.error("there is no node to dispath a write step!",
                            :my_role   => @engine_state.role,
-                           :all_nodes => @cluster.engine_nodes.collect(&:to_json))
+                           :all_nodes => @cluster.engine_nodes.collect(&:to_json),
+                           :step      => step)
             end
           else
             target_nodes = @cluster.forwardable_nodes
             if target_nodes.empty?
-              logger.error("there is no node to dispath a read message!",
+              logger.error("there is no node to dispath a read step!",
                            :my_role   => @engine_state.role,
-                           :all_nodes => @cluster.engine_nodes.collect(&:to_json))
+                           :all_nodes => @cluster.engine_nodes.collect(&:to_json),
+                           :step      => step)
             end
           end
           routes = dataset.compute_routes(step, target_nodes)
