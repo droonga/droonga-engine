@@ -63,34 +63,43 @@ module Droonga
 
     def start_observe
       return if @file_observer
+      logger.trace("start_observe: start")
       @file_observer = FileObserver.new(@loop, Path.cluster_state)
       @file_observer.on_change = lambda do
         reload
       end
       @file_observer.start
+      logger.trace("start_observe: done")
     end
 
     def stop_observe
       return unless @file_observer
+      logger.trace("stop_observe: start")
       @file_observer.stop
       @file_observer = nil
+      logger.trace("stop_observe: done")
     end
 
     def start
+      logger.trace("start: start")
       engine_nodes.each do |node|
         node.start
       end
       start_observe
+      logger.trace("start: done")
     end
 
     def shutdown
+      logger.trace("shutdown: start")
       stop_observe
       engine_nodes.each do |node|
         node.shutdown
       end
+      logger.trace("shutdown: done")
     end
 
     def reload
+      logger.trace("reload: start")
       if @state
         old_state = @state.dup
       else
@@ -105,6 +114,7 @@ module Droonga
         engine_nodes.each(&:resume)
         on_change
       end
+      logger.trace("reload: done")
     end
 
     def engine_nodes
