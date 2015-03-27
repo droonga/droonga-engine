@@ -104,13 +104,21 @@ module Droonga
         on_close.call
       end
       @loop.attach(@socket)
+      logger.trace("connect: new socket watcher attached",
+                   :watcher => @socket,
+                   :host => @host,
+                   :port => @port)
 
       logger.trace("connect: done")
     end
 
     def shutdown_socket
       return unless connected?
-      @socket.close unless @socket.closed?
+      unless @socket.closed?
+        @socket.close
+        logger.trace("shutdown_socket: socket watcher detached",
+                     :watcher => @socket)
+      end
     end
 
     def create_packed_fluent_message(tag, data)

@@ -33,7 +33,11 @@ module Droonga
     def start
       logger.trace("start: start")
       @loop.attach(@input)
+      logger.trace("start: new input watcher attached",
+                   :watcher => @input)
       @loop.attach(@output)
+      logger.trace("start: new output watcher attached",
+                   :watcher => @output)
       logger.trace("start: done")
     end
 
@@ -44,11 +48,15 @@ module Droonga
         output.write(Messages::FINISH)
         output.on_write_complete do
           output.close
+          logger.trace("stop: output watcher detached",
+                       :watcher => output)
         end
       end
       if @input
         @input, input = nil, @input
         input.close
+        logger.trace("stop: input watcher detached",
+                     :watcher => input)
       end
       logger.trace("stop: done")
     end

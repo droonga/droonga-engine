@@ -113,13 +113,19 @@ module Droonga
               dumper.resume
             rescue FiberError
               timer.detach
+              logger.trace("start_dump: watcher detached on FiberError",
+                           :watcher => timer)
             rescue
               timer.detach
+              logger.trace("start_dump: watcher detached on unexpected exception",
+                           :watcher => timer)
               on_error.call($!)
             end
           end
 
           @loop.attach(timer)
+          logger.trace("start_dump: new watcher attached",
+                       :watcher => timer)
         end
 
         private

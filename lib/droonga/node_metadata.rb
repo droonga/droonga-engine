@@ -92,6 +92,7 @@ module Droonga
     def stop_observe
       return unless @file_observer
       @file_observer.stop
+      @file_observer = nil
     end
 
     private

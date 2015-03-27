@@ -738,6 +738,7 @@ module Droonga
             on_signal.call
           end
           @loop.attach(@async_watcher)
+          logger.trace("start: new watcher attached", :watcher => @async_watcher)
           logger.trace("start: done")
         end
 
@@ -745,6 +746,7 @@ module Droonga
           return if @async_watcher.nil?
           logger.trace("stop: stert")
           @async_watcher.detach
+          logger.trace("stop: watcher detached", :watcher => @async_watcher)
           @async_watcher = nil
           logger.trace("stop: done")
         end

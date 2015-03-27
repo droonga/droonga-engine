@@ -37,15 +37,21 @@ module Droonga
       end
       FileUtils.chmod(0600, @socket_path)
       @loop.attach(@server)
+      logger.trace("connect: new server watcher attached",
+                   :watcher => @socket,
+                   :socket_path => @socket_path)
     end
 
     def close
-      @server.close if @server
+      return unless @server
+      @server.close
+      logger.trace("close: server watcher detached",
+                   :watcher => @socket)
     end
 
     def shutdown
       logger.trace("shutdown: start")
-      @server.close if @server
+      close
       @job_queue.close
       FileUtils.rm_f(@socket_path)
       logger.trace("shutdown: done")

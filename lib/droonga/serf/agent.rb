@@ -62,7 +62,11 @@ module Droonga
         return if @pid.nil?
         Process.waitpid(@pid)
         @output_io.close
+        logger.trace("stop: output_io watcher detached",
+                     :watcher => @output_io)
         @error_io.close
+        logger.trace("stop: error_io watcher detached",
+                     :watcher => @error_io)
         @pid = nil
       end
 
@@ -107,6 +111,8 @@ module Droonga
           on_read_output.call(data)
         end
         @loop.attach(@output_io)
+        logger.trace("capture_output: new output_io watcher attached",
+                     :watcher => @output_io)
 
         error_line_buffer = LineBuffer.new
         on_read_error = lambda do |data|
@@ -117,6 +123,8 @@ module Droonga
           on_read_error.call(data)
         end
         @loop.attach(@error_io)
+        logger.trace("capture_output: new error_io watcher attached",
+                     :watcher => @error_io)
 
         result
       end
@@ -186,6 +194,8 @@ module Droonga
         on_connect = lambda do
           on_ready
           checker.close
+          logger.trace("start_ready_check: checker watcher detached",
+                       :watcher => checker)
         end
         checker.on_connect do
           on_connect.call
@@ -199,11 +209,15 @@ module Droonga
             on_timer = lambda do
               start_ready_check
               timer.detach
+              logger.trace("start_ready_check: timer watcher detached",
+                           :watcher => timer)
             end
             timer.on_timer do
               on_timer.call
             end
             @loop.attach(timer)
+            logger.trace("start_ready_check: new timer watcher attached",
+                         :watcher => timer)
           end
         end
         checker.on_connect_failed do
@@ -211,6 +225,8 @@ module Droonga
         end
 
         @loop.attach(checker)
+        logger.trace("start_ready_check: new checker watcher attached",
+                     :watcher => checker)
       end
 
       def log_tag
