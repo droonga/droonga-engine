@@ -101,7 +101,7 @@ module Droonga
       if @state == old_state
         logger.info("cluster state not changed")
       else
-        logger.info("cluster state changed: #{JSON.generate(@state)}")
+        logger.info("cluster state changed", :state => @state)
         engine_nodes.each(&:resume)
         on_change
       end

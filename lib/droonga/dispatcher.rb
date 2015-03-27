@@ -169,7 +169,7 @@ module Droonga
           session = session_planner.create_session(id, self, collector_runner)
           @engine_state.register_session(id, session)
         else
-          logger.error("no steps error: id=#{id}, message=#{message}")
+          logger.error("no steps error", :id => id, :message => message)
           return
           #todo: take cases receiving result before its query into account
         end
