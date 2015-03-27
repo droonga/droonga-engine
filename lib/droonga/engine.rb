@@ -33,6 +33,7 @@ module Droonga
     include Deferrable
 
     def initialize(loop, name, internal_name)
+      @loop = loop
       @catalog = load_catalog
       @node_metadata = NodeMetadata.new
       @state = EngineState.new(loop, name,
@@ -48,6 +49,7 @@ module Droonga
 
     def start
       logger.trace("start: start")
+      @node_metadata.start_observe(@loop)
       @state.on_ready = lambda do
         on_ready
       end
@@ -62,6 +64,7 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
+      @node_metadata.stop_observe
       @cluster.stop_observe
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")

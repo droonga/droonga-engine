@@ -80,6 +80,20 @@ module Droonga
       @metadata = load
     end
 
+    def start_observe(loop)
+      return if @file_observer
+      @file_observer = FileObserver.new(loop, metadata_file)
+      @file_observer.on_change = lambda do
+        reload
+      end
+      @file_observer.start
+    end
+
+    def stop_observe
+      return unless @file_observer
+      @file_observer.stop
+    end
+
     private
     def normalize_key(key)
       key.to_sym

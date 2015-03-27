@@ -273,6 +273,7 @@ module Droonga
                               :messages_per_second => messages_per_second,
                               :client           => "droonga-send")
 
+          metadata.reload
           metadata.delete(:absorbing)
           log("done")
         end
