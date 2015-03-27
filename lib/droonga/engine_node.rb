@@ -29,7 +29,7 @@ module Droonga
       @state = state
       @sender_node_metadata = params[:metadata]
 
-      @node_metadata_observer = FileObserver.new(loop, Path.node_metadata)
+      @node_metadata_observer = FileObserver.new(@loop, Path.node_metadata)
       @node_metadata_observer.on_change = lambda do
         @sender_node_metadata.reload
       end
