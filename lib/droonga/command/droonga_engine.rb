@@ -501,11 +501,15 @@ module Droonga
             logger.info("restart_graceful: new service runner is ready")
             @service_runner.on_failure = nil
             old_service_runner.stop_gracefully
+            @restarting = false
+            logger.trace("restart_graceful: done")
           end
           @service_runner.on_failure = lambda do
             logger.info("restart_graceful: failed to setup new service runner")
             @service_runner.on_failure = nil
             @service_runner = old_service_runner
+            @restarting = false
+            logger.trace("restart_graceful: failed")
           end
           logger.trace("restart_graceful: done")
         end
