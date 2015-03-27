@@ -104,5 +104,9 @@ module Droonga
       end
       {}
     end
+
+    def log_tag
+      "node_metadata"
+    end
   end
 end
