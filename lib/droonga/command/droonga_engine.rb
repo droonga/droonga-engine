@@ -724,7 +724,7 @@ module Droonga
         end
 
         def start
-          logger.trace("stert: stert")
+          logger.trace("start: stert")
           @async_watcher = Coolio::AsyncWatcher.new
           on_signal = lambda do
             commands = @commands.uniq
@@ -738,7 +738,7 @@ module Droonga
             on_signal.call
           end
           @loop.attach(@async_watcher)
-          logger.trace("stert: done")
+          logger.trace("start: done")
         end
 
         def stop
