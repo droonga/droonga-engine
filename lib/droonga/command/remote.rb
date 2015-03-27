@@ -74,6 +74,10 @@ module Droonga
           true
         end
 
+        def log(message)
+          @response["log"] << message
+        end
+
         private
         def node
           @node ||= NodeName.parse(@serf_name)
@@ -109,10 +113,6 @@ module Droonga
 
         def catalog
           @catalog ||= JSON.parse(Path.catalog.read)
-        end
-
-        def log(message)
-          @response["log"] << message
         end
       end
 

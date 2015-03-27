@@ -40,7 +40,7 @@ module Droonga
         begin
           command.process if command.should_process?
         rescue Exception => exception
-          log("Exception: #{exception.inspect}, #{exception.message}, #{exception.backtrace.join(", ")}")
+          command.log("Exception: #{exception.inspect}, #{exception.message}, #{exception.backtrace.join(", ")}")
           raise exception
         ensure
           output_response(command.response)
