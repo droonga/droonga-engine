@@ -89,6 +89,10 @@ module Droonga
         @clients << client
       end
       @loop.attach(@server)
+      logger.trace("start_server: new server watcher attached",
+                   :watcher => @server,
+                   :listen_fd => @listen_fd,
+                   :heartbeat_fd => @heartbeat_fd)
 
       logger.trace("start_server: done")
     end
@@ -100,6 +104,8 @@ module Droonga
     def shutdown_server
       logger.trace("shutdown_server: start")
       @server.close
+      logger.trace("shutdown_server: server watcher detached",
+                   :watcher => @server)
       logger.trace("shutdown_server: done")
     end
 
@@ -108,6 +114,8 @@ module Droonga
     end
 
     class HeartbeatReceiver
+      include Loggable
+
       def initialize(loop, fd)
         @loop = loop
         @fd = fd
@@ -124,11 +132,17 @@ module Droonga
           on_readable.call
         end
         @loop.attach(@watcher)
+        logger.trace("start: new heartbeat watcher attached",
+                     :watcher => @watcher,
+                     :fd => @fd)
       end
 
       def shutdown
         @socket.close
         @watcher.detach
+        logger.trace("shutdown: heartbeat watcher detached",
+                     :watcher => @watcher,
+                     :fd => @fd)
       end
 
       private
@@ -152,6 +166,10 @@ module Droonga
           @socket.send(data, flags, host, port)
         rescue SystemCallError
         end
+      end
+
+      def log_tag
+        "heartbeat-receiver"
       end
     end
 
