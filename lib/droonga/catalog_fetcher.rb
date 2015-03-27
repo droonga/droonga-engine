@@ -22,6 +22,9 @@ require "droonga/catalog/dataset"
 
 module Droonga
   class CatalogFetcher
+    class EmptyResponse < StandardError
+    end
+
     class EmptyCatalog < StandardError
     end
 
@@ -36,7 +39,8 @@ module Droonga
       }
       Droonga::Client.open(@client_options) do |client|
         response = client.request(message)
-        raise EmptyCatalog.new unless response
+        raise EmptyResponse.new unless response
+        raise EmptyCatalog.new unless response["body"]
         response["body"]
       end
     end
