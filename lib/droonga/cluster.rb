@@ -157,6 +157,7 @@ module Droonga
 
     private
     def clear_cache
+      @engine_nodes.each(&:shutdown) if @engine_nodes
       @engine_nodes      = nil
       @forwardable_nodes = nil
       @writable_nodes    = nil
