@@ -52,13 +52,19 @@ module Droonga
     def send(tag, data)
       logger.trace("send: start")
       packed_fluent_message = create_packed_fluent_message(tag, data)
-      connect unless connected?
+      unless connected?
+        logger.trace("send: reconnect to #{@host}:#{@port}")
+        connect
+      end
       @socket.write(packed_fluent_message)
       logger.trace("send: done")
     end
 
     def resume
-      connect unless connected?
+      unless connected?
+        logger.trace("resume: reconnect to #{@host}:#{@port}")
+        connect
+      end
     end
 
     private
@@ -80,6 +86,7 @@ module Droonga
         @socket = nil
       end
       on_close = lambda do
+        logger.trace("connection to #{@host}:#{@port} is closed by someone")
         @socket = nil
       end
 
@@ -115,9 +122,10 @@ module Droonga
     def shutdown_socket
       return unless connected?
       unless @socket.closed?
-        @socket.close
-        logger.trace("shutdown_socket: socket watcher detached",
+        logger.trace("shutdown_socket: socket watcher detaching",
                      :watcher => @socket)
+        @socket.close
+        logger.trace("shutdown_socket: socket watcher detached")
       end
     end
 
