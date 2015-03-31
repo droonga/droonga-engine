@@ -64,12 +64,11 @@ module Droonga
     def stop_gracefully
       logger.trace("stop_gracefully: start")
       @node_metadata.stop_observe
-      @cluster.stop_observe
+      @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
         save_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
-          @cluster.shutdown
           @state.shutdown
           yield
         end
