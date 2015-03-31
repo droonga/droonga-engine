@@ -48,7 +48,6 @@ module Droonga
 
     def start
       logger.trace("start: start")
-      @node_metadata.start_observe(@loop)
       @state.on_ready = lambda do
         on_ready
       end
@@ -63,7 +62,6 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @node_metadata.stop_observe
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
