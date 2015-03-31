@@ -36,6 +36,7 @@
 NAME=droonga-engine
 DOWNLOAD_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
+RROONGA_REPOSITORY_URL=https://github.com/ranguba/rroonga.git
 USER=$NAME
 GROUP=droonga
 DROONGA_BASE_DIR=/home/$USER/droonga
@@ -192,10 +193,28 @@ installed_version() {
   $NAME --version | cut -d " " -f 2
 }
 
+install_rroonga_master() {
+  cd $TEMPDIR
+
+  if [ -d rroonga ]
+  then
+    cd rroonga
+    git reset --hard
+    git pull --rebase
+    git checkout master
+    bundle update
+  else
+    git clone $RROONGA_REPOSITORY_URL
+    cd rroonga
+    git checkout master
+    bundle install --path vendor/
+  fi
+  rm -rf pkg
+  bundle exec rake build
+  gem install "pkg/*.gem" --no-ri --no-rdoc
+}
 
 install_rroonga() {
-  # Install Rroonga globally from a public gem, because custom build
-  # doesn't work as we expect for Droonga...
   if exist_command grndump; then
     local current_version=$(grndump -v | cut -d " " -f 2)
     local version_matcher=$(cat $NAME.gemspec | \
@@ -208,7 +227,8 @@ install_rroonga() {
     local compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
     if [ "$compare_result" = "true" ]; then return 0; fi
   fi
-  gem install rroonga --no-ri --no-rdoc
+  # gem install rroonga --no-ri --no-rdoc
+  install_rroonga_master
 }
 
 install_from_repository() {
