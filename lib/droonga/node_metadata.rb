@@ -57,8 +57,6 @@ module Droonga
     def set(key, value)
       logger.debug("setting: #{key}=#{value}")
       key = normalize_key(key)
-      # we must reload this to avoid losing of modifications made by other processes
-      reload
       @metadata[key] = value
       SafeFileWriter.write(metadata_file, JSON.pretty_generate(@metadata))
     end
@@ -66,8 +64,6 @@ module Droonga
     def delete(key)
       logger.debug("deleting: #{key}")
       key = normalize_key(key)
-      # we must reload this to avoid losing of modifications made by other processes
-      reload
       @metadata.delete(key)
       SafeFileWriter.write(metadata_file, JSON.pretty_generate(@metadata))
     end
@@ -82,6 +78,21 @@ module Droonga
 
     def reload
       @metadata = load
+    end
+
+    def start_observe(loop)
+      return if @file_observer
+      @file_observer = FileObserver.new(loop, metadata_file)
+      @file_observer.on_change = lambda do
+        reload
+      end
+      @file_observer.start
+    end
+
+    def stop_observe
+      return unless @file_observer
+      @file_observer.stop
+      @file_observer = nil
     end
 
     private
