@@ -70,8 +70,12 @@ module Droonga
         base + "restart.txt"
       end
 
-      def buffer
-        state + "buffer"
+      def accidental_buffer
+        state + "buffer" + "accidental"
+      end
+
+      def intentional_buffer
+        state + "buffer" + "intentional"
       end
 
       def serf_event_handler_errors

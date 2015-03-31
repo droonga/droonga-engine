@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/loggable"
+require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
 require "droonga/node_metadata"
 
@@ -29,6 +30,8 @@ module Droonga
       @state = state
       @sender_node_metadata = params[:metadata]
 
+      @buffer = ForwardBuffer.new(name)
+
       parsed_name = parse_node_name(@name)
       @sender = FluentMessageSender.new(loop,
                                         parsed_name[:host],
@@ -41,6 +44,7 @@ module Droonga
     def start
       logger.trace("start: start")
       @sender.resume
+      @buffer.start_forward if really_writable?
       logger.trace("start: done")
     end
 
@@ -51,7 +55,14 @@ module Droonga
     end
 
     def forward(message, destination)
-      output(message, destination)
+      if not really_writable?
+        @buffer.add(message, destination)
+      elsif @buffer.empty?
+        output(message, destination)
+      else
+        @buffer.add(message, destination)
+        @buffer.start_forward
+      end
     end
 
     def forwardable?
@@ -135,6 +146,18 @@ module Droonga
 
     def absorb_destination?
       role == NodeMetadata::Role::ABSORB_DESTINATION
+    end
+
+    def really_writable?
+      return false unless writable?
+      case sender_role
+      when NodeMetadata::Role::SERVICE_PROVIDER
+        service_provider?
+      when NodeMetadata::Role::ABSORB_SOURCE
+        not absorb_destination?
+      else
+        true
+      end
     end
 
     def sender_role

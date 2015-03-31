@@ -91,7 +91,7 @@ module Droonga
       end
 
       if @buffering
-        data_directory = Path.buffer + "#{@host}:#{@port}"
+        data_directory = Path.accidental_buffer + "#{@host}:#{@port}"
         FileUtils.mkdir_p(data_directory.to_s)
         @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
         @socket.resume
