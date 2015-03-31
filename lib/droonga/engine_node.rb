@@ -25,6 +25,7 @@ module Droonga
     attr_reader :name
 
     def initialize(name, state, loop, params)
+      logger.trace("initialize: start")
       @name  = name
       @state = state
       @sender_node_metadata = params[:metadata]
@@ -37,6 +38,7 @@ module Droonga
                                         parsed_name[:port],
                                         :buffering => true)
       @sender.start
+      logger.trace("initialize: done")
     end
 
     def start
@@ -101,7 +103,9 @@ module Droonga
     end
 
     def resume
+      logger.trace("resume: start")
       @sender.resume
+      logger.trace("resume: done")
     end
 
     private
