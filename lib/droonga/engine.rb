@@ -89,7 +89,6 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       save_last_processed_message_timestamp
-      @cluster.stop_observe
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
