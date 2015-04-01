@@ -28,6 +28,12 @@ module Droonga
     class NoCatalogLoaded < StandardError
     end
 
+    class NotStartedYet < StandardError
+    end
+
+    class UnknownTarget < StandardError
+    end
+
     class << self
       def load_state_file
         path = Path.cluster_state
@@ -134,13 +140,14 @@ module Droonga
     def forward(message, destination)
       receiver = destination["to"]
       receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
+      raise NotStartedYet unless @engine_nodes
       @engine_nodes.each do |node|
         if node.name == receiver_node_name
           node.forward(message, destination)
-          return true
+          return
         end
       end
-      false
+      raise UnknownTarget.new(receiver)
     end
 
     def readable_nodes
