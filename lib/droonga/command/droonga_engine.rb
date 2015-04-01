@@ -372,7 +372,7 @@ module Droonga
 
         def initialize(configuration)
           @configuration = configuration
-          ENV["DROONGA_ENGINE_NAME"] = @configuration.name
+          ENV["DROONGA_ENGINE_NAME"] = @configuration.engine_name
           @loop = Coolio::Loop.default
           @log_file = nil
           @pid_file_path = nil
