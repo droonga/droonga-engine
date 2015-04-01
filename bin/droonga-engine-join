@@ -290,7 +290,7 @@ class JoinCommand
   def do_cancel
     #XXX we have to write more codes to cancel remote processes!
     unregister_from_existing_nodes if @node_registered
-    reset_node_role if @node_role_changed
+    reset_nodes_role if @node_role_changed
   end
 
   def wait_until_restarted(*nodes)
