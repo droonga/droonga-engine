@@ -143,9 +143,9 @@ module Droonga
       false
     end
 
-    def forwardable_nodes
-      @forwardable_nodes ||= engine_nodes.select do |node|
-        node.forwardable?
+    def readable_nodes
+      @readable_nodes ||= engine_nodes.select do |node|
+        node.readable?
       end.collect(&:name)
     end
 
@@ -159,7 +159,7 @@ module Droonga
     def clear_cache
       @engine_nodes.each(&:shutdown) if @engine_nodes
       @engine_nodes      = nil
-      @forwardable_nodes = nil
+      @readable_nodes = nil
       @writable_nodes    = nil
     end
 

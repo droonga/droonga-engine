@@ -217,7 +217,7 @@ module Droonga
                            :step      => step)
             end
           else
-            target_nodes = @cluster.forwardable_nodes
+            target_nodes = @cluster.readable_nodes
             if target_nodes.empty?
               logger.error("there is no node to dispath a read step!",
                            :my_role   => @engine_state.role,
@@ -394,7 +394,7 @@ module Droonga
       end
 
       def select_responsive_routes(routes)
-        selected_nodes = @cluster.forwardable_nodes
+        selected_nodes = @cluster.readable_nodes
         routes.select do |route|
           selected_nodes.include?(@engine_state.farm_path(route))
         end

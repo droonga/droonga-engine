@@ -70,6 +70,10 @@ module Droonga
       role == sender_role
     end
 
+    def readable?
+      forwardable? and @buffer.empty?
+    end
+
     def writable?
       case sender_role
       when NodeMetadata::Role::SERVICE_PROVIDER
@@ -84,8 +88,10 @@ module Droonga
     end
 
     def status
-      if forwardable?
+      if readable?
         "active"
+      elsif forwardable?
+        "inactive"
       elsif dead?
         "dead"
       else
