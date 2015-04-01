@@ -199,6 +199,7 @@ module Droonga
           @fowrarder.forward(forward_message, forward_destination)
         else
           @cluster.forward(forward_message, forward_destination)
+        end
       end
       logger.trace("dispatch: done")
     end
