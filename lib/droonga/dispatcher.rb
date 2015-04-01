@@ -117,7 +117,7 @@ module Droonga
 
     def forward(message, destination)
       logger.trace("forward start")
-      if local?(destination)
+      if local_route?(destination) or direct_route?(destination)
         @forwarder.forward(message, destination)
       else
         @cluster.forward(message, destination)
@@ -195,7 +195,10 @@ module Droonga
           "type" => "dispatcher",
           "to"   => destination,
         }
-        @cluster.forward(forward_message, forward_destination)
+        if direct_route?(forward_destination)
+          @fowrarder.forward(forward_message, forward_destination)
+        else
+          @cluster.forward(forward_message, forward_destination)
       end
       logger.trace("dispatch: done")
     end
@@ -262,8 +265,13 @@ module Droonga
       logger.trace("process_local_message: done")
     end
 
-    def local?(route)
+    def local_route?(route)
       @engine_state.local_route?(route)
+    end
+
+    def direct_route?(route)
+      receiver = destination["to"]
+      not @cluster.engine_nodes.key?(receiver)
     end
 
     def write_step?(step)
