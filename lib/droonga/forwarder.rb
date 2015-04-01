@@ -23,7 +23,7 @@ module Droonga
   class Forwarder
     include Loggable
 
-    class AlreadyShutdown < Error
+    class AlreadyShutdown < StandardError
     end
 
     def initialize(loop, options={})
