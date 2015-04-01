@@ -34,11 +34,13 @@ module Droonga
 
     def start
       tasks = @inputs[nil] || []
+      logger.trace("start: no task!") if tasks.empty?
       tasks.each do |task|
         local_message = {
           "id"   => @id,
           "task" => task,
         }
+        logger.trace("start: dispatching local message", :message => local_message)
         @dispatcher.process_local_message(local_message)
         @n_dones += 1
       end
@@ -46,6 +48,8 @@ module Droonga
 
     def receive(name, value)
       tasks = @inputs[name]
+      logger.trace("receive: process response",
+                   :name => name, :value => value, :task => tasks)
       unless tasks
         #TODO: result arrived before its query
         return
