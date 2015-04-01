@@ -22,6 +22,7 @@ require "msgpack"
 require "droonga/loggable"
 require "droonga/path"
 require "droonga/safe_file_writer"
+require "droonga/serf"
 
 module Droonga
   class ForwardBuffer
@@ -37,6 +38,9 @@ module Droonga
       @packer = MessagePack::Packer.new
       @unpacker = MessagePack::Unpacker.new
 
+      @target = node_name
+      @serf = Serf.new(ENV["DROONGA_ENGINE_NAME"])
+
       dirname = node_name.gsub("/", ":")
       @data_directory = Path.intentional_buffer + dirname
       FileUtils.mkdir_p(@data_directory.to_s)
@@ -44,6 +48,7 @@ module Droonga
 
     def add(message, destination)
       logger.trace("add: start")
+      @serf.set_have_unprocessed_messages_for(@target)
       buffered_message = {
         "message"     => message,
         "destination" => destination,
@@ -61,6 +66,7 @@ module Droonga
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
         forward(buffered_message_path)
       end
+      @serf.reset_have_unprocessed_messages_for(@target)
       logger.trace("start_forward: done")
     end
 

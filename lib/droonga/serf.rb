@@ -141,6 +141,14 @@ module Droonga
       set_tag("cluster_id", cluster_id)
     end
 
+    def set_have_unprocessed_messages_for(node_name)
+      set_tag("have-unprocessed-messages-for-#{node-name}", true)
+    end
+
+    def reset_have_unprocessed_messages_for(node_name)
+      delete_tag("have-unprocessed-messages-for-#{node-name}")
+    end
+
     def role
       @node_metadata.reload
       @node_metadata.role
