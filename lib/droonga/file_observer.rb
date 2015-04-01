@@ -57,7 +57,7 @@ module Droonga
 
     def stop
       @watcher.detach
-      logger.trace("start: file watcher detached",
+      logger.trace("stop: file watcher detached",
                    :watcher => @watcher,
                    :path => @path)
     end
