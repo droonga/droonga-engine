@@ -25,11 +25,13 @@ module Droonga
 
     module Role
       SERVICE_PROVIDER   = "service-provider"
+      INCOMPLETE_SERVICE_PROVIDER = "incomplete-service-provider"
       ABSORB_SOURCE      = "absorb-source"
       ABSORB_DESTINATION = "absorb-destination"
 
       ROLES = [
         SERVICE_PROVIDER,
+        INCOMPLETE_SERVICE_PROVIDER,
         ABSORB_SOURCE,
         ABSORB_DESTINATION,
       ]
