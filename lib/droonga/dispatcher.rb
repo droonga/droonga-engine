@@ -196,7 +196,7 @@ module Droonga
           "to"   => destination,
         }
         if direct_route?(forward_destination)
-          @fowrarder.forward(forward_message, forward_destination)
+          @forwarder.forward(forward_message, forward_destination)
         else
           @cluster.forward(forward_message, forward_destination)
         end
