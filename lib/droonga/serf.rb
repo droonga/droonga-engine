@@ -43,6 +43,7 @@ module Droonga
       @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
       @node_metadata = NodeMetadata.new
+      @tags_cache = {}
     end
 
     def run_agent(loop)
@@ -131,10 +132,12 @@ module Droonga
 
     def set_tag(name, value)
       run_command("tags", "-set", "#{name}=#{value}")
+      @tags_cache[name] = value
     end
 
     def delete_tag(name)
       run_command("tags", "-delete", name)
+      @tags_cache.delete(name)
     end
 
     def update_cluster_id
@@ -142,11 +145,12 @@ module Droonga
     end
 
     def set_have_unprocessed_messages_for(node_name)
-      set_tag("have-unprocessed-messages-for-#{node_name}", true)
+      tag = have_unprocessed_messages_tag_for(node_name)
+      set_tag(tag, true) unless @tags_cache.key?(tag)
     end
 
     def reset_have_unprocessed_messages_for(node_name)
-      delete_tag("have-unprocessed-messages-for-#{node_name}")
+      delete_tag(have_unprocessed_messages_tag_for(node_name))
     end
 
     def role
@@ -231,6 +235,10 @@ module Droonga
       other_nodes.collect do |node|
         extract_host(node)
       end
+    end
+
+    def have_unprocessed_messages_tag_for(node_name)
+      "have-unprocessed-messages-for-#{node_name}"
     end
 
     def log_tag
