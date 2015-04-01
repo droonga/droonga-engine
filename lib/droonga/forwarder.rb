@@ -23,9 +23,13 @@ module Droonga
   class Forwarder
     include Loggable
 
+    class AlreadyShutdown < Error
+    end
+
     def initialize(loop, options={})
       @loop = loop
       @senders = {}
+      @shutting_down = false
     end
 
     def start
@@ -35,6 +39,7 @@ module Droonga
 
     def shutdown
       logger.trace("shutdown: start")
+      @shutting_down = true
       @senders.each_value do |sender|
         sender.shutdown
       end
@@ -43,6 +48,7 @@ module Droonga
 
     def forward(message, destination)
       logger.trace("forward: start")
+      raise AlreadyShutdown.new if @shutting_down
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
