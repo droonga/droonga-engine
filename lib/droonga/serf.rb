@@ -142,11 +142,11 @@ module Droonga
     end
 
     def set_have_unprocessed_messages_for(node_name)
-      set_tag("have-unprocessed-messages-for-#{node-name}", true)
+      set_tag("have-unprocessed-messages-for-#{node_name}", true)
     end
 
     def reset_have_unprocessed_messages_for(node_name)
-      delete_tag("have-unprocessed-messages-for-#{node-name}")
+      delete_tag("have-unprocessed-messages-for-#{node_name}")
     end
 
     def role
