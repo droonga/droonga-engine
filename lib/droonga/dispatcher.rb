@@ -163,7 +163,7 @@ module Droonga
       id = message["id"]
       session = @engine_state.find_session(id)
       if session
-        logger.trace("process_internal_message: session exists")
+        logger.trace("process_internal_message: session exists", :session => session)
         session.receive(message["input"], message["value"])
       else
         logger.trace("process_internal_message: no session")
@@ -173,6 +173,7 @@ module Droonga
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
+          logger.trace("process_internal_message: session created", :session => session)
           @engine_state.register_session(id, session)
         else
           logger.error("no steps error", :id => id, :message => message)
