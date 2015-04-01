@@ -117,10 +117,11 @@ module Droonga
 
     def forward(message, destination)
       logger.trace("forward start")
-      unless local?(destination)
-        return if @cluster.forward(message, destination)
+      if local?(destination)
+        @forwarder.forward(message, destination)
+      else
+        @cluster.forward(message, destination)
       end
-      @forwarder.forward(message, destination)
       logger.trace("forward done")
     end
 
@@ -194,8 +195,7 @@ module Droonga
           "type" => "dispatcher",
           "to"   => destination,
         }
-        @cluster.forward(forward_message, forward_destination) ||
-          @forwarder.forward(forward_message, forward_destination)
+        @cluster.forward(forward_message, forward_destination)
       end
       logger.trace("dispatch: done")
     end
