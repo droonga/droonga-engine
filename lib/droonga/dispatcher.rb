@@ -271,7 +271,7 @@ module Droonga
     end
 
     def direct_route?(route)
-      receiver = destination["to"]
+      receiver = route["to"]
       @cluster.engine_nodes.all? do |node|
         node.name != receiver
       end
