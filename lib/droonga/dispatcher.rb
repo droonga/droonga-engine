@@ -187,7 +187,7 @@ module Droonga
 
     def dispatch(message, destination)
       logger.trace("dispatch: start", :message => message, :destination => destination)
-      if local?(destination)
+      if local_route?(destination)
         process_internal_message(message)
       else
         forward_message = @message.merge("body" => message)
