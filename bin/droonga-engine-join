@@ -42,13 +42,13 @@ class JoinCommand
     puts "Source Cluster ID: #{source_cluster_id}"
     puts ""
 
-    set_node_role
+    set_nodes_role
     begin
       register_to_existing_nodes
       do_join
       copy_data unless @options["no-copy"]
       set_effective_message_timestamp
-      reset_node_role
+      reset_nodes_role
       puts("Done.")
     rescue Exception => exception
       puts("Unexpected exception: #{exception.message}")
@@ -156,7 +156,7 @@ class JoinCommand
     Droonga::DataAbsorber.new(absorber_options)
   end
 
-  def set_node_role
+  def set_nodes_role
     if absorber.source_node_suspendable?
       puts("Changing role of the source node...")
       run_remote_command(source_node, "change_role",
@@ -172,7 +172,7 @@ class JoinCommand
     @node_role_changed = true
   end
 
-  def reset_node_role
+  def reset_nodes_role
     if absorber.source_node_suspendable?
       puts("Restoring role of the source node...")
       run_remote_command(source_node, "change_role",
