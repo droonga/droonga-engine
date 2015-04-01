@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -347,7 +347,7 @@ install() {
     exit 1
   fi
 
-  curl -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
+  curl -s -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
   if ! source $TEMPDIR/functions.sh; then
     echo "ERROR: Failed to download post-installation script!"
     exit 1

@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@ register_service() {
   local USER=$2
   local GROUP=$3
 
-  curl -o /etc/init.d/$NAME $(download_url "install/debian/$NAME")
+  curl -s -o /etc/init.d/$NAME $(download_url "install/debian/$NAME")
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to download service script!"
     exit 1
