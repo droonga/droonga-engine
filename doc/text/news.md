@@ -1,14 +1,24 @@
 # News
 
-## 1.1.0: 2014-12-29 (planned)
+## 1.1.0: 2015-03-29 (planned)
 
- * Better compatibility to Groonga's `delete` command:
-   * Works correctly for tables with integer key types.
-     [The report by funa1g](http://sourceforge.jp/projects/groonga/lists/archive/dev/2014-December/002995.html) inspired this improvement. Thanks!
-   * Accepts requests with automatically-convertible mismatched type keys.
-     For example, a numeric key `1` is available for a table with the key type `ShortText`.
- * `add` command now accepts requests with automatically-convertible mismatched type keys.
-   For example, a string key `"1"` is available for a table with the key type `UInt32`.
+ * General:
+   * Graceful stopping/restarting works correctly with continual inpouring messages.
+   * `add` command now accepts requests with automatically-convertible mismatched type keys.
+     For example, a string key `"1"` is available for a table with the key type `UInt32`.
+   * `dump` command: the value of a column referring any record of another table are correctly exported as its key string, instead of object value (it's invalid value for a message of the `add` command).
+     As the result, now tables with reference columns are correctly copied between multiple clusters.
+   * `system.status` command: now the reporter node and its internal name is reported as a part of response body.
+ * Command line utilities:
+   * `droonga-engine-join` and `droonga-engine-absorb-data` commands work more surely.
+   * A new option `--verbose` is introduced to monitor internal Serf operations, for `droonga-engine-join` and `droonga-engine-absorb-data`.
+   * A new command line utility `droonga-engine-set-role` is available (mainly for debugging).
+ * Compatibility with Groonga:
+   * Better compatibility to Groonga's `delete` command:
+     * Works correctly for tables with integer key types.
+       [The report by funa1g](http://sourceforge.jp/projects/groonga/lists/archive/dev/2014-December/002995.html) inspired this improvement. Thanks!
+     * Accepts requests with automatically-convertible mismatched type keys.
+       For example, a numeric key `1` is available for a table with the key type `ShortText`.
 
 ## 1.0.9: 2014-12-01
 
