@@ -79,6 +79,7 @@ module Droonga
       on_read = lambda do |data|
         line_buffer = LineBuffer.new
         line_buffer.feed(data) do |line|
+          logger.trace("line buffer feeded", :line => line);
           case line
           when Messages::STOP_GRACEFUL
             on_stop_gracefully
