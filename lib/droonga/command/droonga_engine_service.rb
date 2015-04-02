@@ -182,6 +182,8 @@ module Droonga
       end
 
       def on_message(tag, time, record)
+        logger.trace("on_message: start", :record => record)
+
         prefix, type, *arguments = tag.split(/\./)
         if type.nil? or type.empty? or type == "message"
           message = record
@@ -201,6 +203,8 @@ module Droonga
         end
 
         @engine.process(message)
+
+        logger.trace("on_message: done")
       end
 
       def stop_gracefully

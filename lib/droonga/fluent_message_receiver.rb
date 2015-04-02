@@ -81,7 +81,9 @@ module Droonga
       @clients = []
       @server = create_server do |connection|
         client = Client.new(connection) do |tag, time, record|
+          logger.trace("Client: on_message: start")
           @on_message.call(tag, time, record)
+          logger.trace("Client: on_message: done")
         end
         client.on_close = lambda do
           @clients.delete(client)
@@ -206,6 +208,7 @@ module Droonga
       private
       def feed(data)
         @unpacker.feed_each(data) do |object|
+          logger.trace("Client: feed_each: start", :object => object)
           tag = object[0]
           case object[1]
           when String # PackedForward message
@@ -221,6 +224,7 @@ module Droonga
           entries.each do |time, record|
             @on_message.call(tag, time || Time.now.to_i, record)
           end
+          logger.trace("Client: feed_each: done")
         end
       end
 
