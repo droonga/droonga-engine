@@ -1,6 +1,6 @@
 # News
 
-## 1.1.0: 2015-03-29 (planned)
+## 1.1.0: 2015-04-29 (planned)
 
  * General:
    * Graceful stopping/restarting works correctly with continual inpouring messages.
