@@ -230,7 +230,9 @@ module Droonga
             end
           end
           routes = dataset.compute_routes(step, target_nodes)
-          step["routes"] = routes
+          step["routes"] = routes.collect do |route|
+            farm_path(route)
+          end
         else
           step["routes"] ||= [id]
         end
