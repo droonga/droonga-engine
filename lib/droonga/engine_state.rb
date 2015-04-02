@@ -101,7 +101,7 @@ module Droonga
       end
     end
 
-    def farm_path(route)
+    def public_farm_path(route)
       if FARM_PATH_MATCHER =~ route
         name = $MATCH
         if name == @internal_name
