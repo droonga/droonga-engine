@@ -212,6 +212,7 @@ module Droonga
         dataset = @catalog.dataset(step["dataset"])
         if dataset
           if write_step?(step)
+            step["write"] = true
             target_nodes = @cluster.writable_nodes
             if target_nodes.empty?
               logger.error("there is no node to dispath a write step!",

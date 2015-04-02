@@ -55,9 +55,21 @@ module Droonga
     end
 
     def forward(message, destination)
-      if not really_writable?
+      if read_message?(message)
+        # A node can receive read messages for other nodes,
+        # while changing its role. They must not be buffered.
+        output(message, destination)
+        return
+      end
+
+      unless really_writable?
+        # The target node is not ready. We should send the message later.
         @buffer.add(message, destination)
-      elsif @buffer.empty?
+        return
+      end
+
+      # The target node is ready.
+      if @buffer.empty?
         output(message, destination)
       else
         @buffer.add(message, destination)
@@ -168,6 +180,14 @@ module Droonga
 
     def sender_role
       @sender_node_metadata.role
+    end
+
+    def read_message?(message)
+      steps = message["body"]["steps"]
+      return false unless steps
+      steps.all? do |step|
+        not step["write"]
+      end
     end
 
     def output(message, destination)
