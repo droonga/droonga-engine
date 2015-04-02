@@ -66,11 +66,24 @@ module Droonga
       route.start_with?(@name) or route.start_with?(@internal_name)
     end
 
-    def farm_path(route)
+    def actual_route(route)
       if /\A[^:]+:\d+\/[^.]+/ =~ route
         name = $MATCH
         if name == @name or name == @internal_name
           @internal_name
+        else
+          name
+        end
+      else
+        route
+      end
+    end
+
+    def farm_path(route)
+      if /\A[^:]+:\d+\/[^.]+/ =~ route
+        name = $MATCH
+        if name == @internal_name
+          @name
         else
           name
         end

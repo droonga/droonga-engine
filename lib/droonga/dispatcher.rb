@@ -231,13 +231,13 @@ module Droonga
           end
           routes = dataset.compute_routes(step, target_nodes)
           step["routes"] = routes.collect do |route|
-            farm_path(route)
+            actual_route(route)
           end
         else
           step["routes"] ||= [id]
         end
         destinations += step["routes"].collect do |route|
-          farm_path(route)
+          actual_route(route)
         end
       end
 
@@ -253,12 +253,13 @@ module Droonga
       logger.trace("process_local_message: start", :steps => local_message)
       task = local_message["task"]
       slice_name = task["route"]
+      slice_name = farm_path(slice_name)
       step = task["step"]
       command = step["command"]
       descendants = {}
       step["descendants"].each do |name, routes|
         descendants[name] = routes.collect do |route|
-          farm_path(route)
+          actual_route(route)
         end
       end
       local_message["descendants"] = descendants
@@ -290,6 +291,10 @@ module Droonga
     end
 
     private
+    def actual_route(route)
+      @engine_state.actual_route(route)
+    end
+
     def farm_path(route)
       @engine_state.farm_path(route)
     end
@@ -407,7 +412,7 @@ module Droonga
       def select_responsive_routes(routes)
         selected_nodes = @cluster.readable_nodes
         routes.select do |route|
-          selected_nodes.include?(@engine_state.farm_path(route))
+          selected_nodes.include?(@engine_state.actual_route(route))
         end
       end
     end
