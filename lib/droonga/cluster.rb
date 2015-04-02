@@ -150,6 +150,10 @@ module Droonga
       raise UnknownTarget.new(receiver)
     end
 
+    def engine_node_names
+      @engine_node_names ||= engine_nodes.collect(&:name)
+    end
+
     def readable_nodes
       @readable_nodes ||= engine_nodes.select do |node|
         node.readable?
@@ -166,6 +170,7 @@ module Droonga
     def clear_cache
       @engine_nodes.each(&:shutdown) if @engine_nodes
       @engine_nodes   = nil
+      @engine_node_names = nil
       @readable_nodes = nil
       @writable_nodes = nil
     end
