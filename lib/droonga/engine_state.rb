@@ -68,7 +68,12 @@ module Droonga
 
     def farm_path(route)
       if /\A[^:]+:\d+\/[^.]+/ =~ route
-        $MATCH
+        name = $MATCH
+        if name == @name or name == @internal_name
+          @internal_name
+        else
+          name
+        end
       else
         route
       end
