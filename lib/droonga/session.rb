@@ -26,6 +26,7 @@ module Droonga
       @tasks = tasks
       @n_dones = 0
       @inputs = inputs
+      logger.trage("initialized", :tasks => tasks, :inputs => inputs)
     end
 
     def done?
