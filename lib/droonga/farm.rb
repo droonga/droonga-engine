@@ -22,6 +22,13 @@ module Droonga
   class Farm
     include Deferrable
 
+    class NoSlice < StandardError
+      def initialize(message, extra_informations={})
+        message = "#{message}: #{extra_informations.inspect}"
+        super(message)
+      end
+    end
+
     def initialize(name, catalog, loop, options={})
       @name = name
       @catalog = catalog
@@ -82,6 +89,9 @@ module Droonga
     end
 
     def process(slice_name, message)
+      unless @slices.key?(slice_name)
+        raise NoSlice.new(slice_name, :message => message, :slices => @slices.keys)
+      end
       @slices[slice_name].process(message)
     end
   end
