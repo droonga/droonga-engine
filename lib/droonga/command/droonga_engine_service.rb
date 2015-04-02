@@ -129,6 +129,7 @@ module Droonga
 
       def create_internal_message_receiver
         InternalFluentMessageReceiver.new(@loop, host) do |tag, time, record|
+          logger.trace("InternalFluentMessageReceiver receive")
           on_message(tag, time, record)
         end
       end
@@ -177,6 +178,7 @@ module Droonga
           :heartbeat_fd => @heartbeat_fd,
         }
         FluentMessageReceiver.new(@loop, options) do |tag, time, record|
+          logger.trace("FluentMessageReceiver receive")
           on_message(tag, time, record)
         end
       end
