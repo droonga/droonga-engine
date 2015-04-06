@@ -138,14 +138,19 @@ module Droonga
       previous_timer = @auto_close_timers[destination]
       previous_timer.detach if previous_timer
 
-      timer = Coolio::TimerWatcher.new(@auto_close_timeout_seconds) do
+      timer = Coolio::TimerWatcher.new(@auto_close_timeout_seconds)
+      on_timeout = lambda do
         timer.detach
         @auto_close_timers.delete(destination)
         sender = @senders[destination]
         if sender
+          logger.info("sender for #{destination} is automatically closed by timeout.")
           sender.shutdown
           @senders.delete(destination)
         end
+      end
+      timer.on_timer do
+        on_timeout.call
       end
       @loop.attach(timer)
       @auto_close_timers[destination] = timer
