@@ -44,9 +44,9 @@ class JoinCommand
 
     begin
       set_joining_node_role
+      do_join
       register_to_existing_nodes
       set_source_node_role
-      do_join
       copy_data unless @options["no-copy"]
       set_effective_message_timestamp
       reset_source_node_role
