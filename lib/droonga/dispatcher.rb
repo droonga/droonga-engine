@@ -241,7 +241,10 @@ module Droonga
         end
       end
 
-      dispatch_message = { "id" => id, "steps" => steps }
+      dispatch_message = {
+        "id"    => id,
+        "steps" => steps,
+      }
       destinations.uniq.each do |destination|
         dispatch(dispatch_message, destination)
       end
