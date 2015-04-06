@@ -42,13 +42,15 @@ class JoinCommand
     puts "Source Cluster ID: #{source_cluster_id}"
     puts ""
 
-    set_nodes_role
     begin
+      set_joining_node_role
       register_to_existing_nodes
+      set_source_node_role
       do_join
       copy_data unless @options["no-copy"]
       set_effective_message_timestamp
-      reset_nodes_role
+      reset_source_node_role
+      reset_joining_node_role
       puts("Done.")
     rescue Exception => exception
       puts("Unexpected exception: #{exception.message}")
@@ -156,7 +158,7 @@ class JoinCommand
     Droonga::DataAbsorber.new(absorber_options)
   end
 
-  def set_nodes_role
+  def set_source_node_role
     if absorber.source_node_suspendable?
       puts("Changing role of the source node...")
       run_remote_command(source_node, "change_role",
@@ -164,15 +166,19 @@ class JoinCommand
                          "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
       wait_until_restarted(source_node)
     end
+    @source_node_role_changed = true
+  end
+
+  def set_joining_node_role
     puts("Changing role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
     wait_until_restarted(joining_node)
-    @node_role_changed = true
+    @joining_node_role_changed = true
   end
 
-  def reset_nodes_role
+  def reset_source_node_role
     if absorber.source_node_suspendable?
       puts("Restoring role of the source node...")
       run_remote_command(source_node, "change_role",
@@ -180,12 +186,16 @@ class JoinCommand
                          "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
       wait_until_restarted(source_node)
     end
+    @source_node_role_changed = false
+  end
+
+  def reset_joining_node_role
     puts("Restoring role of the joining node...")
     run_remote_command(joining_node, "change_role",
                        "node" => joining_node,
                        "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
     wait_until_restarted(joining_node)
-    @node_role_changed = false
+    @joining_node_role_changed = false
   end
 
   def do_join
@@ -290,7 +300,8 @@ class JoinCommand
   def do_cancel
     #XXX we have to write more codes to cancel remote processes!
     unregister_from_existing_nodes if @node_registered
-    reset_nodes_role if @node_role_changed
+    reset_joining_node_role if @joining_node_role_changed
+    reset_source_node_role if @source_node_role_changed
   end
 
   def wait_until_restarted(*nodes)
