@@ -39,30 +39,30 @@ module Droonga
     end
 
     def start
-      logger.trace("start: start")
-      logger.trace("start: done")
+      logger.trace("start: start for #{target_node}")
+      logger.trace("start: done for #{target_node}")
     end
 
     def shutdown
-      logger.trace("shutdown: start")
+      logger.trace("shutdown: start for #{target_node}")
       shutdown_socket
-      logger.trace("shutdown: done")
+      logger.trace("shutdown: done for #{target_node}")
     end
 
     def send(tag, data)
-      logger.trace("send: start")
+      logger.trace("send: start for #{target_node}")
       packed_fluent_message = create_packed_fluent_message(tag, data)
       unless connected?
-        logger.trace("send: reconnect to #{@host}:#{@port}")
+        logger.trace("send: reconnect to #{target_node}")
         connect
       end
       @socket.write(packed_fluent_message)
-      logger.trace("send: done")
+      logger.trace("send: done for #{target_node}")
     end
 
     def resume
       unless connected?
-        logger.trace("resume: reconnect to #{@host}:#{@port}")
+        logger.trace("resume: reconnect to #{target_node}")
         connect
       end
     end
@@ -73,25 +73,25 @@ module Droonga
     end
 
     def connect
-      logger.trace("connect: start")
+      logger.trace("connect: start for #{target_node}")
 
       log_write_complete = lambda do
-        logger.trace("write completed")
+        logger.trace("write completed for #{target_node}")
       end
       log_connect = lambda do
-        logger.trace("connected to #{@host}:#{@port}")
+        logger.trace("connected to #{target_node}")
       end
       log_failed = lambda do
-        logger.error("failed to connect to #{@host}:#{@port}")
+        logger.error("failed to connect to #{target_node}")
         @socket = nil
       end
       on_close = lambda do
-        logger.trace("connection to #{@host}:#{@port} is closed by someone")
+        logger.trace("connection to #{target_node} is closed by someone")
         @socket = nil
       end
 
       if @buffering
-        data_directory = Path.accidental_buffer + "#{@host}:#{@port}"
+        data_directory = Path.accidental_buffer + "#{target_node}"
         FileUtils.mkdir_p(data_directory.to_s)
         @socket = BufferedTCPSocket.connect(@host, @port, data_directory)
         @socket.resume
@@ -116,7 +116,7 @@ module Droonga
                    :host => @host,
                    :port => @port)
 
-      logger.trace("connect: done")
+      logger.trace("connect: done for #{target_node}")
     end
 
     def shutdown_socket
@@ -135,6 +135,10 @@ module Droonga
       packed_fluent_message = @packer.to_s
       @packer.clear
       packed_fluent_message
+    end
+
+    def target_node
+      "#{@host}:#{@port}"
     end
 
     def log_tag
