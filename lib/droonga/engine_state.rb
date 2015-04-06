@@ -15,8 +15,6 @@
 
 require "English"
 
-require "coolio"
-
 require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/event_loop"
