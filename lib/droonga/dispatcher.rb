@@ -172,7 +172,9 @@ module Droonga
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
-          @engine_state.register_session(id, session)
+          timeout_seconds = message["timeout_seconds"] || nil
+          @engine_state.register_session(id, session,
+                                         :timeout_seconds => timeout_seconds)
         else
           logger.error("no steps error", :id => id, :message => message)
           return
@@ -208,7 +210,13 @@ module Droonga
       id = @engine_state.generate_id
 
       destinations = []
+      timeout_seconds = nil
       steps.each do |step|
+        calculated_timeout_seconds = timeout_seconds_from_step(step)
+        if calculated_timeout_seconds
+          timeout_seconds = calculated_timeout_seconds
+        end
+
         dataset = @catalog.dataset(step["dataset"])
         if dataset
           if write_step?(step)
@@ -236,6 +244,7 @@ module Droonga
         else
           step["routes"] ||= [id]
         end
+
         destinations += step["routes"].collect do |route|
           internal_farm_path(route)
         end
@@ -244,6 +253,7 @@ module Droonga
       dispatch_message = {
         "id"    => id,
         "steps" => steps,
+        "timeout_seconds" => timeout_seconds,
       }
       destinations.uniq.each do |destination|
         dispatch(dispatch_message, destination)
@@ -291,6 +301,18 @@ module Droonga
       return false unless step_definition
 
       step_definition.write?
+    end
+
+    def timeout_seconds_from_step(step)
+      return nil unless step["dataset"]
+
+      step_runner = @step_runners[step["dataset"]]
+      return nil unless step_runner
+
+      step_definition = step_runner.find(step["command"])
+      return nil unless step_definition
+
+      step_definition.timeout_seconds_for_step(step)
     end
 
     private

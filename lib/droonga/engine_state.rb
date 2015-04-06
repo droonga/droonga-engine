@@ -124,10 +124,12 @@ module Droonga
       @sessions[id]
     end
 
-    def register_session(id, session)
+    def register_session(id, session, options={})
       @sessions[id] = session
       logger.trace("new session #{id} is registered. rest sessions=#{@sessions.size}")
-      session.set_timeout(@loop, DEFAULT_SESSION_TIMEOUT_SECONDS) do
+
+      timeout_seconds = options[:timeout_seconds] || DEFAULT_SESSION_TIMEOUT_SECONDS
+      session.set_timeout(@loop, timeout_seconds) do
         logger.trace("session #{id} is timed out!")
         unregister_session(id)
       end
