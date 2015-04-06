@@ -27,6 +27,8 @@ module Droonga
     include Loggable
     include Deferrable
 
+    DEFAULT_SESSION_TIMEOUT_SECONDS = 60
+
     attr_reader :loop
     attr_reader :name
     attr_reader :internal_name
@@ -125,6 +127,9 @@ module Droonga
     def register_session(id, session)
       @sessions[id] = session
       logger.trace("new session #{id} is registered. rest sessions=#{@sessions.size}")
+      session.set_timeout(@loop, DEFAULT_SESSION_TIMEOUT_SECONDS) do
+        unregister_session(id)
+      end
     end
 
     def unregister_session(id)

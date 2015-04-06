@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2014 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -12,6 +12,8 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+require "coolio"
 
 require "droonga/loggable"
 
@@ -87,6 +89,20 @@ module Droonga
       end
     end
 
+    def set_timeout(loop, timeout_seconds, &on_timeout)
+      @timeout_timer = Coolio::TimerWatcher.new(timeout_seconds)
+      on_timer = lambda do
+        @timeout_timer.detach
+        @timeout_timer = nil
+        report_timeout_error
+        on_timeout.call
+      end
+      @timeout_timer.on_timer do
+        on_timer.call
+      end
+      loop.attach(@timeout_timer)
+    end
+
     private
     def send_to_descendantas(descendantas, result)
       descendantas.each do |name, routes|
@@ -99,6 +115,10 @@ module Droonga
           @dispatcher.dispatch(message, route)
         end
       end
+    end
+
+    def report_timeout_error
+      #TODO: implement me!
     end
 
     def log_tag
