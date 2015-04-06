@@ -49,6 +49,11 @@ module Droonga
       end
     end
 
+    def finish
+      @timeout_timer.detach if @timeout_timer
+      @timeout_timer = nil
+    end
+
     def receive(name, value)
       tasks = @inputs[name]
       logger.trace("receive: process response",

@@ -133,6 +133,8 @@ module Droonga
     end
 
     def unregister_session(id)
+      session = @sessions[id]
+      session.finish
       @sessions.delete(id)
       unless have_session?
         @on_finish.call if @on_finish
