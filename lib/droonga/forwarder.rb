@@ -26,10 +26,15 @@ module Droonga
     class AlreadyShutdown < StandardError
     end
 
+    DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS = 60
+
     def initialize(loop, options={})
       @loop = loop
       @senders = {}
+      @auto_close_timers = {}
       @shutting_down = false
+      @auto_close_timeout_seconds = options[:auto_close_timeout_seconds] ||
+                                      DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS
     end
 
     def start
@@ -42,6 +47,9 @@ module Droonga
       @shutting_down = true
       @senders.each_value do |sender|
         sender.shutdown
+      end
+      @auto_close_timers.each_value do |timer|
+        timer.detach
       end
       logger.trace("shutdown: done")
     end
@@ -80,6 +88,7 @@ module Droonga
                      :params => params)
         return
       end
+      set_auto_close_timer(host, port, params)
       override_message = {
         "type" => command,
       }
@@ -93,11 +102,15 @@ module Droonga
       logger.trace("output: done")
     end
 
-    def find_sender(host, port, params)
+    def resolve_destination(host, port, params)
       connection_id = extract_connection_id(params)
       destination = "#{host}:#{port}"
       destination << "?#{connection_id}" if connection_id
+      destination
+    end
 
+    def find_sender(host, port, params)
+      destination = resolve_destination(host, port, params)
       @senders[destination] ||= create_sender(host, port)
     end
 
@@ -115,6 +128,25 @@ module Droonga
       sender = FluentMessageSender.new(@loop, host, port)
       sender.start
       sender
+    end
+
+    def set_auto_close_timer(host, port, params)
+      destination = resolve_destination(host, port, params)
+
+      previous_timer = @auto_close_timers[destination]
+      previous_timer.detach if previous_timer
+
+      timer = Coolio::TimerWatcher.new(@auto_close_timeout_seconds) do
+        timer.detach
+        @auto_close_timers.delete(destination)
+        sender = @senders[destination]
+        if sender
+          sender.shutdown
+          @senders.delete(destination)
+        end
+      end
+      @loop.attach(timer)
+      @auto_close_timers[destination] = timer
     end
 
     def log_tag
