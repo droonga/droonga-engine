@@ -31,6 +31,9 @@ module Droonga
       @sender_node_metadata = params[:metadata]
 
       @buffer = ForwardBuffer.new(name)
+      @buffer.on_forward = lambda do |message, destination|
+        output(message, destination)
+      end
 
       parsed_name = parse_node_name(@name)
       @sender = FluentMessageSender.new(loop,
