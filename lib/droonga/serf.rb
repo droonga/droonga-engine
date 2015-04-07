@@ -248,7 +248,7 @@ module Droonga
       end
     end
 
-    HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "have-unprocessed-messages-for-"
+    HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "buffered-for-"
 
     def have_unprocessed_messages_tag_for(node_name)
       "#{HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX}#{node_name}"
