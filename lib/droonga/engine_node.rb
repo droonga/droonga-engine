@@ -95,7 +95,7 @@ module Droonga
 
     def readable?
       forwardable? and @buffer.empty? and
-        not have_unprocessed_messages?
+        (complete_service_provider? or not service_provider?)
     end
 
     def writable?
@@ -180,6 +180,10 @@ module Droonga
 
     def absorb_destination?
       role == NodeMetadata::Role::ABSORB_DESTINATION
+    end
+
+    def complete_service_provider?
+      service_provider? and not have_unprocessed_messages?
     end
 
     def really_writable?
