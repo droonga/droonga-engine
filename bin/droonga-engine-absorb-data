@@ -202,10 +202,9 @@ class AbsorbDataCommand
     if timestamp and not timestamp.empty?
       puts "The timestamp of the last processed message in the source node: #{timestamp}"
       puts "Setting effective message timestamp for the destination node..."
-      response = run_remote_command(destination_node, "set_metadata",
+      response = run_remote_command(destination_node, "accept_messages_newer_than",
                                     "node" => destination_node,
-                                    "key" => "effective_message_timestamp",
-                                    "value" => timestamp)
+                                    "timestamp" => timestamp)
     end
   end
 

@@ -124,6 +124,14 @@ module Droonga
         end
       end
 
+      class AcceptMessagesNewerThan < Base
+        def process
+          log("old timestamp: #{@serf.accept_messages_newer_than_timestamp}")
+          @serf.accept_messages_newer_than(@params["timestamp"])
+          log("new timestamp: #{@serf.accept_messages_newer_than_timestamp}")
+        end
+      end
+
       class ReportMetadata < Base
         def process
           metadata = NodeMetadata.new

@@ -82,6 +82,8 @@ module Droonga
         case event_name
         when "change_role"
           Remote::ChangeRole
+        when "accept_messages_newer_than"
+          Remote::AcceptMessagesNewerThan
         when "report_metadata"
           Remote::ReportMetadata
         when "set_metadata"

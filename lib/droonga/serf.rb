@@ -177,6 +177,18 @@ module Droonga
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
+    def accept_messages_newer_than_timestamp
+      @node_metadata.reload
+      @node_metadata.get(:accept_messages_newer_than)
+    end
+
+    def accept_messages_newer_than(timestamp)
+      @node_metadata.reload
+      @node_metadata.set(:accept_messages_newer_than, timestamp.to_s)
+      set_tag("accept-messages-newer-than", timestamp.to_s)
+      # after that you must run update_cluster_state to update the cluster information cache
+    end
+
     def cluster_id
       loader = CatalogLoader.new(Path.catalog.to_s)
       catalog = loader.load
