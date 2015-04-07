@@ -136,7 +136,7 @@ module Droonga
         return false
       end
 
-      logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(message_timestamp)")
+      logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(#{message_timestamp})")
       return false if effective_timestamp >= message_timestamp
 
       logger.trace("deleting obsolete effective_message_timestamp: start")
