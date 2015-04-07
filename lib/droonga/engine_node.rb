@@ -47,7 +47,14 @@ module Droonga
     def start
       logger.trace("start: start")
       @sender.resume
-      @buffer.start_forward if really_writable?
+      unless @buffer.empty?
+        if really_writable?
+          logger.info("Target becomes writable. Start to forwarding.")
+          @buffer.start_forward
+        else
+          logger.info("Target is still unwritable.")
+        end
+      end
       logger.trace("start: done")
     end
 
