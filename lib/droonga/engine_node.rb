@@ -47,15 +47,7 @@ module Droonga
 
     def start
       logger.trace("start: start")
-      @sender.resume
-      unless @buffer.empty?
-        if really_writable?
-          logger.info("Target becomes writable. Start to forwarding.")
-          @buffer.start_forward
-        else
-          logger.info("Target is still unwritable.")
-        end
-      end
+      resume
       logger.trace("start: done")
     end
 
@@ -135,6 +127,14 @@ module Droonga
     def resume
       logger.trace("resume: start")
       @sender.resume
+      unless @buffer.empty?
+        if really_writable?
+          logger.info("Target becomes writable. Start to forwarding.")
+          @buffer.start_forward
+        else
+          logger.info("Target is still unwritable.")
+        end
+      end
       logger.trace("resume: done")
     end
 
