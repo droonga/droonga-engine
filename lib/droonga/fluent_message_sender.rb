@@ -39,25 +39,25 @@ module Droonga
     end
 
     def start
-      logger.trace("start: start for #{target_node}")
-      logger.trace("start: done for #{target_node}")
+      logger.trace("start: start")
+      logger.trace("start: done")
     end
 
     def shutdown
-      logger.trace("shutdown: start for #{target_node}")
+      logger.trace("shutdown: start")
       shutdown_socket
-      logger.trace("shutdown: done for #{target_node}")
+      logger.trace("shutdown: done")
     end
 
     def send(tag, data)
-      logger.trace("send: start for #{target_node}")
+      logger.trace("send: start")
       packed_fluent_message = create_packed_fluent_message(tag, data)
       unless connected?
-        logger.trace("send: reconnect to #{target_node}")
+        logger.trace("send: reconnect")
         connect
       end
       @socket.write(packed_fluent_message)
-      logger.trace("send: done for #{target_node}")
+      logger.trace("send: done")
     end
 
     def resume
@@ -73,20 +73,20 @@ module Droonga
     end
 
     def connect
-      logger.trace("connect: start for #{target_node}")
+      logger.trace("connect: start")
 
       log_write_complete = lambda do
-        logger.trace("write completed for #{target_node}")
+        logger.trace("write completed")
       end
       log_connect = lambda do
-        logger.trace("connected to #{target_node}")
+        logger.trace("connected")
       end
       log_failed = lambda do
-        logger.error("failed to connect to #{target_node}")
+        logger.error("failed to connect")
         @socket = nil
       end
       on_close = lambda do
-        logger.trace("connection to #{target_node} is closed by someone")
+        logger.trace("connection is closed by someone")
         @socket = nil
       end
 
@@ -116,7 +116,7 @@ module Droonga
                    :host => @host,
                    :port => @port)
 
-      logger.trace("connect: done for #{target_node}")
+      logger.trace("connect: done")
     end
 
     def shutdown_socket
@@ -142,7 +142,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}] fluent-message-sender"
+      "[#{Process.ppid}] fluent-message-sender: #{target_node}"
     end
   end
 end
