@@ -25,8 +25,9 @@ module Droonga
     attr_reader :name
 
     def initialize(name, state, loop, params)
-      logger.trace("initialize: start")
       @name  = name
+      logger.trace("initialize: start")
+
       @state = state
       @sender_node_metadata = params[:metadata]
 
@@ -224,7 +225,7 @@ module Droonga
     end
 
     def log_tag
-      "[#{Process.ppid}] engine-node"
+      "[#{Process.ppid}] engine-node: #{@name}"
     end
   end
 end
