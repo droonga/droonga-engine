@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "time"
+
 require "droonga/loggable"
 require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
@@ -164,6 +166,15 @@ module Droonga
 
     def have_unprocessed_messages?
       @state and @state["have_unprocessed_messages"]
+    end
+
+    def accept_messages_newer_than_timestamp
+      @accept_messages_newer_than_timestamp ||= parse_accept_messages_newer_than_timestamp
+    end
+
+    def parse_accept_messages_newer_than_timestamp
+      return nil if @state.nil? or not @state.key?("accept_messages_newer_than")
+      Time.parse(@state["accept_messages_newer_than"])
     end
 
     def dead?
