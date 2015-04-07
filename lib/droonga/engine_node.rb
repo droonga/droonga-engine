@@ -86,7 +86,8 @@ module Droonga
     end
 
     def readable?
-      forwardable? and @buffer.empty?
+      forwardable? and @buffer.empty? and
+        not have_unprocessed_messages?
     end
 
     def writable?
@@ -151,6 +152,10 @@ module Droonga
 
     def live?
       @state.nil? or @state["live"]
+    end
+
+    def have_unprocessed_messages?
+      @state and @state["have_unprocessed_messages"]
     end
 
     def dead?

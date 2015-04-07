@@ -117,15 +117,26 @@ module Droonga
 
       current_cluster_id = cluster_id
       nodes = {}
+      unprocessed_messages_existence = {}
       response["members"].each do |member|
         foreign = member["tags"]["cluster_id"] != current_cluster_id
         next if foreign
+
+        member["tags"].each do |key, value|
+          next unless key.start_with?(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX)
+          node_name = key.sub(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX, "")
+          next if unprocessed_messages_existence[node_name]
+          unprocessed_messages_existence[node_name] = value == "true"
+        end
 
         nodes[member["name"]] = {
           "type" => member["tags"]["type"],
           "role" => member["tags"]["role"],
           "live" => member["status"] == "alive",
         }
+      end
+      unprocessed_messages_existence.each do |node_name, have_messages|
+        nodes[node_name]["have_unprocessed_messages"] = have_messages
       end
       nodes
     end
@@ -237,8 +248,10 @@ module Droonga
       end
     end
 
+    HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "have-unprocessed-messages-for-"
+
     def have_unprocessed_messages_tag_for(node_name)
-      "have-unprocessed-messages-for-#{node_name}"
+      "#{HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX}#{node_name}"
     end
 
     def log_tag
