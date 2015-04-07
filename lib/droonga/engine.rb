@@ -139,6 +139,7 @@ module Droonga
       logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(#{message_timestamp})")
       return false if effective_timestamp >= message_timestamp
 
+      logger.info("New message at #{message_timestamp} (newer than #{effective_timestamp}) is detected. The effective timestamp is now cleared.")
       logger.trace("deleting obsolete effective_message_timestamp: start")
       @node_metadata.delete(:effective_message_timestamp)
       logger.trace("deleting obsolete effective_message_timestamp: done")
