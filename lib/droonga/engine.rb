@@ -15,8 +15,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "time"
 require "fileutils"
+
 require "droonga/engine/version"
 require "droonga/loggable"
 require "droonga/deferrable"
@@ -95,7 +95,6 @@ module Droonga
     end
 
     def process(message)
-      return unless effective_message?(message)
       @last_processed_message_timestamp = message["date"]
       @dispatcher.process_message(message)
     end
@@ -121,40 +120,6 @@ module Droonga
         @node_metadata.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
       end
       logger.trace("output_last_processed_message_timestamp: done")
-    end
-
-    def effective_message?(message)
-      effective_timestamp = effective_message_timestamp
-      return true if effective_timestamp.nil?
-      return true unless message["date"]
-
-      begin
-        message_timestamp = Time.parse(message["date"])
-      rescue ArgumentError
-        logger.error("failed to parse the \"date\" field of a message",
-                     :message => message)
-        return false
-      end
-
-      logger.trace("checking effective_message_timestamp (#{effective_timestamp}) vs message_timestamp(#{message_timestamp})")
-      return false if effective_timestamp >= message_timestamp
-
-      logger.info("New message at #{message_timestamp} (newer than #{effective_timestamp}) is detected. The effective timestamp is now cleared.")
-      logger.trace("deleting obsolete effective_message_timestamp: start")
-      @node_metadata.delete(:effective_message_timestamp)
-      logger.trace("deleting obsolete effective_message_timestamp: done")
-      true
-    end
-
-    def effective_message_timestamp
-      timestamp = @node_metadata.get(:effective_message_timestamp)
-      return nil unless timestamp
-
-      begin
-        Time.parse(timestamp)
-      rescue ArgumentError
-        nil
-      end
     end
 
     def log_tag
