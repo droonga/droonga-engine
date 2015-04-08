@@ -139,15 +139,6 @@ module Droonga
         end
       end
 
-      class SetMetadata < Base
-        def process
-          metadata = NodeMetadata.new
-          log("old value: #{metadata.get(@params["key"])}")
-          metadata.set(@params["key"], @params["value"])
-          log("new value: #{metadata.get(@params["key"])}")
-        end
-      end
-
       class CrossNodeCommandBase < Base
         private
         def source_node

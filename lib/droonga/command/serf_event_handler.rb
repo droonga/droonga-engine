@@ -86,8 +86,6 @@ module Droonga
           Remote::AcceptMessagesNewerThan
         when "report_metadata"
           Remote::ReportMetadata
-        when "set_metadata"
-          Remote::SetMetadata
         when "join"
           Remote::Join
         when "unjoin"
