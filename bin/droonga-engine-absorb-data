@@ -138,7 +138,7 @@ class AbsorbDataCommand
 
   def current_cluster_state(target)
     serf = Droonga::Serf.new(target, :verbose => @options.verbose)
-    serf.current_cluster_state
+    serf.current_cluster_state(:node => target)
   end
 
   def absorber

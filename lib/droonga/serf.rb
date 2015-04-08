@@ -111,11 +111,21 @@ module Droonga
       end
     end
 
-    def current_cluster_state
+    def current_cluster_state(options={})
       raw_response = run_command("members", "-format", "json")
       response = JSON.parse(raw_response)
 
-      current_cluster_id = cluster_id
+      current_cluster_id = nil
+      if options[:node]
+        response["members"].each do |member|
+          next if member["name"] != options[:node]
+          current_cluster_id = member["tags"]["cluster_id"]
+          break
+        end
+      else
+        current_cluster_id = cluster_id
+      end
+
       nodes = {}
       unprocessed_messages_existence = {}
       response["members"].each do |member|
