@@ -215,6 +215,9 @@ install_rroonga_master() {
 }
 
 install_rroonga() {
+  install_rroonga_master
+  return
+
   if exist_command grndump; then
     local current_version=$(grndump -v | cut -d " " -f 2)
     local version_matcher=$(cat $NAME.gemspec | \
@@ -227,8 +230,7 @@ install_rroonga() {
     local compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
     if [ "$compare_result" = "true" ]; then return 0; fi
   fi
-  # gem install rroonga --no-ri --no-rdoc
-  install_rroonga_master
+  gem install rroonga --no-ri --no-rdoc
 }
 
 install_from_repository() {
