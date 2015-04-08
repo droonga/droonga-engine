@@ -134,6 +134,7 @@ module Droonga
           "role" => member["tags"]["role"],
           "accept_messages_newer_than" => member["tags"]["accept-messages-newer-than"],
           "live" => member["status"] == "alive",
+          "absorbing" => member["tags"]["absorbing"] == "true",
         }
       end
       unprocessed_messages_existence.each do |node_name, have_messages|

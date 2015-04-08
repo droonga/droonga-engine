@@ -260,8 +260,7 @@ module Droonga
           log("port    = #{port}")
           log("tag     = #{tag}")
 
-          metadata = NodeMetadata.new
-          metadata.set(:absorbing, true)
+          @serf.set_tag("absorbing", true)
 
           log("start")
           DataAbsorber.absorb(:dataset          => dataset,
@@ -272,8 +271,7 @@ module Droonga
                               :messages_per_second => messages_per_second,
                               :client           => "droonga-send")
 
-          metadata.reload
-          metadata.delete(:absorbing)
+          @serf.delete_tag("absorbing")
           log("done")
         end
 

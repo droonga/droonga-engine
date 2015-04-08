@@ -141,6 +141,11 @@ class JoinCommand
     serf.send_query(command, options)
   end
 
+  def current_cluster_state(target)
+    serf = Droonga::Serf.new(target, :verbose => @options[:verbose])
+    serf.current_cluster_state
+  end
+
   def absorber
     @absorber ||= prepare_absorber
   end
@@ -224,14 +229,11 @@ class JoinCommand
     last_progress = ""
     while true
       sleep(3)
-      response = run_remote_command(joining_node, "report_metadata",
-                                    "node" => joining_node,
-                                    "key"  => "absorbing")
-      if response
-        absorbing = response["value"]
-        break unless absorbing
+      state = current_cluster_state(source_node)
+      if state[joining_node].nil? or
+           not state[joining_node]["absorbing"]
+        break
       end
-
       progress = absorber.report_progress(@start_time_in_seconds)
       if progress
         printf("%s", "#{" " * last_progress.size}\r")
