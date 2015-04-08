@@ -236,12 +236,13 @@ install_rroonga() {
 install_from_repository() {
   gem install bundler --no-ri --no-rdoc
 
+  install_rroonga
+
   cd $TEMPDIR
 
   if [ -d $NAME ]
   then
     cd $NAME
-    install_rroonga
     git reset --hard
     git pull --rebase
     git checkout $VERSION
@@ -250,7 +251,6 @@ install_from_repository() {
     git clone $REPOSITORY_URL
     cd $NAME
     git checkout $VERSION
-    install_rroonga
     bundle install --path vendor/
   fi
   rm -rf pkg
