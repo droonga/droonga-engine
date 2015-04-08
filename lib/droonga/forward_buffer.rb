@@ -101,8 +101,8 @@ module Droonga
       end
 
       if buffered_message
-      on_forward(buffered_message["message"],
-                 buffered_message["destination"])
+        on_forward(buffered_message["message"],
+                   buffered_message["destination"])
       end
 
       FileUtils.rm_f(buffered_message_path.to_s)
