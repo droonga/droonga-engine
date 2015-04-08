@@ -215,7 +215,7 @@ install_rroonga_master() {
 }
 
 install_rroonga() {
-  install_rroonga_master
+  (install_rroonga_master)
   return
 
   if exist_command grndump; then
