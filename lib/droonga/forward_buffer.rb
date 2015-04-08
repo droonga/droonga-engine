@@ -18,6 +18,7 @@
 require "fileutils"
 require "pathname"
 require "msgpack"
+require "time"
 
 require "droonga/loggable"
 require "droonga/path"
@@ -74,6 +75,10 @@ module Droonga
       @data_directory.children.empty?
     end
 
+    def process_messages_newer_than(timestamp)
+      @process_messages_newer_than_timestamp = timestamp
+    end
+
     private
     def forward(buffered_message_path)
       logger.trace("forward: start (#{buffered_message_path})")
@@ -81,8 +86,25 @@ module Droonga
       @unpacker.feed(file_contents)
       buffered_message = @unpacker.read
       @unpacker.reset
+
+      if @process_messages_newer_than_timestamp
+        message_timestamp = Time.parse(message["date"])
+        logger.trace("Checking boundary of obsolete message",
+                     :newer_than => @process_messages_newer_than_timestamp,
+                     :message_at => message_timestamp)
+        if @process_messages_newer_than_timestamp >= message_timestamp
+          buffered_message = nil
+        else
+          logger.info("New message is detected. The boundary is now cleared.")
+          @process_messages_newer_than_timestamp = nil
+        end
+      end
+
+      if buffered_message
       on_forward(buffered_message["message"],
                  buffered_message["destination"])
+      end
+
       FileUtils.rm_f(buffered_message_path.to_s)
       logger.trace("forward: done (#{buffered_message_path})")
     end

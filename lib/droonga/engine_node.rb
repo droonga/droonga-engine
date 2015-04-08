@@ -34,6 +34,8 @@ module Droonga
       @sender_node_metadata = params[:metadata]
 
       @buffer = ForwardBuffer.new(name)
+      boundary_timestamp = accept_messages_newer_than_timestamp
+      @buffer.process_messages_newer_than(boundary_timestamp)
       @buffer.on_forward = lambda do |message, destination|
         output(message, destination)
       end
