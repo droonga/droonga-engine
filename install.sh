@@ -37,6 +37,8 @@ NAME=droonga-engine
 DOWNLOAD_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
 RROONGA_REPOSITORY_URL=https://github.com/ranguba/rroonga.git
+GROONGA_COMMAND_REPOSITORY_URL=https://github.com/groonga/groonga-command.git
+GROONGA_COMMAND_PARSER_REPOSITORY_URL=https://github.com/groonga/groonga-command-parser.git
 USER=$NAME
 GROUP=droonga
 DROONGA_BASE_DIR=/home/$USER/droonga
@@ -193,69 +195,36 @@ installed_version() {
   $NAME --version | cut -d " " -f 2
 }
 
-install_rroonga_master() {
+install_gem_from_repository() {
+  GEM_NAME=$1
+  GEM_REPOSITORY_URL=$2
   cd $TEMPDIR
 
-  if [ -d rroonga ]
+  if [ -d $GEM_NAME ]
   then
-    cd rroonga
+    cd $GEM_NAME
     git reset --hard
     git pull --rebase
     git checkout master
     bundle update
   else
-    git clone $RROONGA_REPOSITORY_URL
-    cd rroonga
+    git clone $GEM_REPOSITORY_URL
+    cd $GEM_NAME
     git checkout master
     bundle install --path vendor/
   fi
   rm -rf pkg
   bundle exec rake build
   gem install "pkg/*.gem" --no-ri --no-rdoc
-}
-
-install_rroonga() {
-  (install_rroonga_master)
-  return
-
-  if exist_command grndump; then
-    local current_version=$(grndump -v | cut -d " " -f 2)
-    local version_matcher=$(cat $NAME.gemspec | \
-                            grep rroonga | \
-                            cut -d "," -f 2 | \
-                            cut -d '"' -f 2)
-    local compared_version=$(echo "$version_matcher" | \
-                             cut -d " " -f 2)
-    local operator=$(echo "$version_matcher" | cut -d " " -f 1)
-    local compare_result=$(ruby -e "puts('$current_version' $operator '$compared_version')")
-    if [ "$compare_result" = "true" ]; then return 0; fi
-  fi
-  gem install rroonga --no-ri --no-rdoc
 }
 
 install_from_repository() {
   gem install bundler --no-ri --no-rdoc
 
-  install_rroonga
-
-  cd $TEMPDIR
-
-  if [ -d $NAME ]
-  then
-    cd $NAME
-    git reset --hard
-    git pull --rebase
-    git checkout $VERSION
-    bundle update
-  else
-    git clone $REPOSITORY_URL
-    cd $NAME
-    git checkout $VERSION
-    bundle install --path vendor/
-  fi
-  rm -rf pkg
-  bundle exec rake build
-  gem install "pkg/*.gem" --no-ri --no-rdoc
+  install_gem_from_repository rroonga $RROONGA_REPOSITORY_URL
+  install_gem_from_repository groonga-command $GROONGA_COMMAND_REPOSITORY_URL
+  install_gem_from_repository groonga-command-parser $GROONGA_COMMAND_PARSER_REPOSITORY_URL
+  install_gem_from_repository $NAME $REPOSITORY_URL
 }
 
 
