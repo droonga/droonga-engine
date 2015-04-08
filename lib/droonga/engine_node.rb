@@ -175,7 +175,7 @@ module Droonga
     end
 
     def parse_accept_messages_newer_than_timestamp
-      return nil if @state.nil? or not @state.key?("accept_messages_newer_than")
+      return nil if @state.nil? or @state["accept_messages_newer_than"].nil?
       Time.parse(@state["accept_messages_newer_than"])
     end
 
