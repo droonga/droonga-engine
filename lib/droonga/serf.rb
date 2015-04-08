@@ -150,7 +150,11 @@ module Droonga
       unprocessed_messages_existence.each do |node_name, have_messages|
         nodes[node_name]["have_unprocessed_messages"] = have_messages
       end
-      nodes
+      sorted_nodes = {}
+      nodes.keys.sort.each do |key|
+        sorted_nodes[key] = nodes[key]
+      end
+      sorted_nodes
     end
 
     def set_tag(name, value)

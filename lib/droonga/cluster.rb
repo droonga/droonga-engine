@@ -134,7 +134,11 @@ module Droonga
           "status" => node.status,
         }
       end
-      nodes_status
+      sorted_nodes_status = {}
+      nodes_status.keys.sort.each do |key|
+        sorted_nodes_status[key] = nodes_status[key]
+      end
+      sorted_nodes_status
     end
 
     def forward(message, destination)
