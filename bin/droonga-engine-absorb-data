@@ -44,11 +44,7 @@ class AbsorbDataCommand
     puts ""
     puts "Absorbing..."
 
-    if @options.remote
-      absorb_on_remote
-    else
-      absorb_on_local
-    end
+    absorb
 
     puts "Done."
     exit(true)
@@ -60,7 +56,6 @@ class AbsorbDataCommand
     options.port    = Droonga::CatalogGenerator::DEFAULT_PORT
     options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
     options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
-    options.remote  = true
     options.receiver_host = Socket.gethostname
     options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
     options.verbose = false
@@ -86,11 +81,6 @@ class AbsorbDataCommand
               "Port number of the source cluster to be connected.",
               "(#{options.port})") do |port|
       options.port = port
-    end
-    parser.on("--[no-]remote",
-              "Run command in remote node or not.",
-              "(#{options.remote})") do |remote|
-      options.remote = remote
     end
 
     parser.separator("")
@@ -168,7 +158,7 @@ class AbsorbDataCommand
     Droonga::DataAbsorber.new(absorber_options)
   end
 
-  def absorb_on_remote
+  def absorb
     start_time_in_seconds = Time.new.to_i
     run_remote_command(destination_node, "absorb_data",
                        "node"    => destination_node,
@@ -208,30 +198,6 @@ class AbsorbDataCommand
       response = run_remote_command(destination_node, "accept_messages_newer_than",
                                     "node" => destination_node,
                                     "timestamp" => timestamp)
-    end
-  end
-
-  def absorb_on_local
-    last_progress = ""
-    absorber.absorb do |live_status|
-      if live_status[:progress]
-        progress = live_status[:progress]
-      else
-        progress = live_status[:output]
-      end
-      printf("%s", "#{" " * last_progress.size}\r")
-      printf("%s", "#{progress}\r")
-      last_progress = progress
-    end
-    response = run_remote_command(source_node, "report_metadata",
-                                  "node" => source_node,
-                                  "key" => "last_processed_message_timestamp")
-    timestamp = response["value"]
-    puts "The timestamp of the last processed message in the source node: #{timestamp}"
-    if timestamp and not timestamp.empty?
-      metadata = NodeMetadata.new
-      metadata.set(:effective_message_timestamp, timestamp)
-      Droonga::Restarter.restart
     end
   end
 
