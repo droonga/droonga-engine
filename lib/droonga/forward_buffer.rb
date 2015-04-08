@@ -88,6 +88,7 @@ module Droonga
       @unpacker.reset
 
       if @process_messages_newer_than_timestamp
+        message = buffered_message["message"]
         message_timestamp = Time.parse(message["date"])
         logger.trace("Checking boundary of obsolete message",
                      :newer_than => @process_messages_newer_than_timestamp,
