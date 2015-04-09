@@ -136,9 +136,11 @@ class AbsorbDataCommand
     serf.send_query(command, options)
   end
 
-  def current_cluster_state(target)
+  def current_member_state(target)
     serf = Droonga::Serf.new(target, :verbose => @options.verbose)
-    serf.current_cluster_state(:node => target)
+    serf.current_members.select do |member|
+      member["name"] == target
+    end.first
   end
 
   def absorber
@@ -170,9 +172,8 @@ class AbsorbDataCommand
     last_progress = ""
     while true
       sleep(3)
-      state = current_cluster_state(source_node)
-      if state[destination_node].nil? or
-           not state[destination_node]["absorbing"]
+      state = current_member_state(destination_node)
+      if state.nil? or state["tags"]["absorbing"] != "true"
         break
       end
 

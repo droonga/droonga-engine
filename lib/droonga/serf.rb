@@ -111,24 +111,17 @@ module Droonga
       end
     end
 
-    def current_cluster_state(options={})
+    def current_members
       raw_response = run_command("members", "-format", "json")
       response = JSON.parse(raw_response)
+      response["members"]
+    end
 
-      current_cluster_id = nil
-      if options[:node]
-        response["members"].each do |member|
-          next if member["name"] != options[:node]
-          current_cluster_id = member["tags"]["cluster_id"]
-          break
-        end
-      else
-        current_cluster_id = cluster_id
-      end
-
+    def current_cluster_state
+      current_cluster_id = cluster_id
       nodes = {}
       unprocessed_messages_existence = {}
-      response["members"].each do |member|
+      current_members.each do |member|
         foreign = member["tags"]["cluster_id"] != current_cluster_id
         next if foreign
 
@@ -144,7 +137,6 @@ module Droonga
           "role" => member["tags"]["role"],
           "accept_messages_newer_than" => member["tags"]["accept-messages-newer-than"],
           "live" => member["status"] == "alive",
-          "absorbing" => member["tags"]["absorbing"] == "true",
         }
       end
       unprocessed_messages_existence.each do |node_name, have_messages|
