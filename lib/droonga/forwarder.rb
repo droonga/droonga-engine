@@ -57,7 +57,7 @@ module Droonga
     end
 
     def forward(message, destination)
-      logger.trace("forward: start")
+      logger.trace("forward: start", :message => message)
       raise AlreadyShutdown.new if @shutting_down
       command = destination["type"]
       receiver = destination["to"]
