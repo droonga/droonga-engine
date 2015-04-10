@@ -127,7 +127,10 @@ module Droonga
             remaining_seconds -= remaining_hours * ONE_HOUR_IN_SECONDS
             remaining_minutes  = (remaining_seconds / ONE_MINUTE_IN_SECONDS).floor
             remaining_seconds -= remaining_minutes * ONE_MINUTE_IN_SECONDS
-            remaining_time     = sprintf("%02i:%02i:%02i", remaining_hours, remaining_minutes, remaining_seconds)
+            remaining_time     = sprintf("%02i:%02i:%02i",
+                                         remaining_hours,
+                                         remaining_minutes,
+                                         remaining_seconds)
 
             "#{progress_percentage}% done (maybe #{remaining_time} remaining)"
           end
