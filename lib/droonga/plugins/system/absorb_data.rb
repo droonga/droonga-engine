@@ -55,12 +55,16 @@ module Droonga
             serf = Serf.new(my_node_name)
             serf.set_tag("absorbing", true)
 
+            count = 0
             dumper_error_message = dumper.run do |message|
               @messenger.forward(message,
                                  "to"   => my_node_name,
                                  "type" => message["type"])
-              forward("#{prefix}.progress")
+              count += 1
+              report_progress(count)
             end
+
+            forward("#{prefix}.progress", "count" => count)
 
             serf.set_tag("absorbing", true)
 
@@ -82,6 +86,11 @@ module Droonga
 
               :messages_per_second => params["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND,
             }
+          end
+
+          def report_progress(count)
+            return unless (count % 100).zero?
+            forward("#{prefix}.progress", "count" => count)
           end
 
           def myself
