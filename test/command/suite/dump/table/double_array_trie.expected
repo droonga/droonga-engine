@@ -1,22 +1,26 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
   "statusCode": 200,
   "type": "dump.result",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": true
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "DoubleArrayTrie",
     "name": "Memos",
@@ -27,6 +31,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "DoubleArrayTrie",
     "name": "Memos",
@@ -37,10 +42,12 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.end"
 }
