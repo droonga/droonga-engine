@@ -43,6 +43,10 @@ module Droonga
           (@message.raw["replyTo"] || {})["to"]
         end
 
+        def request
+          @message.request
+        end
+
         def messages_per_seconds
           request = (@message.request || {})
           minimum_messages_per_seconds = 10
