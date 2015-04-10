@@ -64,9 +64,13 @@ module Droonga
           request = Request.new(message)
           if request.need_start?
             start(request)
-            true
+            {
+              "started" => true,
+            }
           else
-            false
+            {
+              "started" => false,
+            }
           end
         end
 
