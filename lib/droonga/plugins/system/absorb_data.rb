@@ -25,6 +25,8 @@ module Droonga
       class AbsorbDataHandler < Droonga::Handler
         action.synchronous = true
 
+        DEFAULT_MESSAGES_PER_SECOND = 100
+
         class MissingHostParameter < BadRequest
           def initialize
             super("\"host\" must be specified.")
@@ -63,6 +65,8 @@ module Droonga
 
             :receiver_host => myself.host,
             :receiver_port => 0,
+
+            :messages_per_second => message["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND,
           }
         end
 
