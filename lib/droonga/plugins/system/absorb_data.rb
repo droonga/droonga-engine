@@ -57,9 +57,9 @@ module Droonga
         def dumper_params(message)
           {
             :host    => message["host"],
-            :port    => message["port"]    ||= NodeName::DEFAULT_PORT,
-            :tag     => message["tag"]     ||= NodeName::DEFAULT_TAG,
-            :dataset => message["dataset"] ||= Catalog::Dataset::DEFAULT_NAME,
+            :port    => message["port"]    || NodeName::DEFAULT_PORT,
+            :tag     => message["tag"]     || NodeName::DEFAULT_TAG,
+            :dataset => message["dataset"] || Catalog::Dataset::DEFAULT_NAME,
 
             :receiver_host => myself.host,
             :receiver_port => 0,
