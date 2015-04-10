@@ -25,8 +25,6 @@ module Droonga
   module Plugins
     module System
       class AbsorbDataHandler < AsyncCommand::Handler
-        action.synchronous = true
-
         DEFAULT_MESSAGES_PER_SECOND = 100
         DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
         MIN_PROGRESS_INTERVAL_SECONDS = 1
@@ -140,7 +138,7 @@ module Droonga
           end
 
           def my_node_name
-            @messenger.engine_state.name
+            ENV["DROONGA_ENGINE_NAME"]
           end
 
           def prepare_progress_interval_seconds
