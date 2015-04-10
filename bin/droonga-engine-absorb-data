@@ -138,9 +138,9 @@ class AbsorbDataCommand
 
   def current_member_state(target)
     serf = Droonga::Serf.new(target, :verbose => @options.verbose)
-    serf.current_members.select do |member|
+    serf.current_members.find do |member|
       member["name"] == target
-    end.first
+    end
   end
 
   def absorber
