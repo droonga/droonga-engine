@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Droonga Project
+# Copyright (C) 2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,11 +18,19 @@ require "droonga/plugin"
 module Droonga
   module Plugins
     module System
-      extend Plugin
-      register("system")
+      class AbsorbDataHandler < Droonga::Handler
+        action.synchronous = true
+
+        def handle(message)
+          true
+        end
+      end
+
+      define_single_step do |step|
+        step.name = "system.absorb-data"
+        step.handler = AbsorbDataHandler
+        step.collector = Collectors::Or
+      end
     end
   end
 end
-
-require "droonga/plugins/system/status"
-require "droonga/plugins/system/absorb_data"
