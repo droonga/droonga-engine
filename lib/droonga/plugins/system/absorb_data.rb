@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "time"
+
 require "droonga/plugin"
 require "droonga/catalog/dataset"
 require "droonga/node_name"
@@ -49,6 +51,7 @@ module Droonga
           serf.set_tag("absorbing", true)
 
           error_message = dumper.run do |message|
+            message["date"] ||= new_date
             @messenger.forward(message,
                                "to"   => my_node_name,
                                "type" => message["type"])
@@ -82,6 +85,12 @@ module Droonga
 
         def my_node_name
           @messenger.engine_state.name
+        end
+
+        MICRO_SECONDS_DECIMAL_PLACE = 6
+
+        def new_date
+          Time.now.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         end
       end
 
