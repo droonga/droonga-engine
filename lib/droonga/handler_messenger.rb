@@ -13,6 +13,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "time"
+
 require "droonga/replier"
 require "droonga/forwarder"
 
@@ -106,6 +108,7 @@ module Droonga
     #
     # @see Forwarder#forward
     def forward(droonga_message, destination)
+      droonga_message["date"] ||= new_date
       @forwarder.forward(droonga_message, destination)
     end
 
@@ -116,6 +119,12 @@ module Droonga
     private
     def log_tag
       "[#{Process.ppid}] handler_messenger"
+    end
+
+    MICRO_SECONDS_DECIMAL_PLACE = 6
+
+    def new_date
+      Time.now.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
     end
   end
 end
