@@ -71,8 +71,8 @@ module Droonga
                 @messenger.forward(message,
                                    "to"   => my_node_name,
                                    "type" => message["type"])
-                elapsed_time = (Time.now - @start_time).to_i
-                if (elapsed_time % progress_interval_seconds).zero?
+                elapsed_seconds = (Time.now - @start_time).to_i
+                if (elapsed_seconds % progress_interval_seconds).zero?
                   report_progress
                 end
               end
