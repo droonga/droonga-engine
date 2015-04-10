@@ -14,8 +14,9 @@
   "inReplyTo": "request-id",
   "statusCode": 200,
   "type": "dump.result",
-  "date": "0000-00-00T00:00:00.000000Z",
-  "body": true
+  "body": {
+    "started": true
+  }
 }
 {
   "inReplyTo": "request-id",
