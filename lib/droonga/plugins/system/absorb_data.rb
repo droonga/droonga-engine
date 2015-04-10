@@ -35,7 +35,7 @@ module Droonga
           end
         end
 
-        class DataAbsorber
+        class DataAbsorber < AsyncCommand::AsyncHandler
           private
           def prefix
             "system.absorb-data"
@@ -69,7 +69,6 @@ module Droonga
             end
           end
 
-          private
           def dumper_params
             params = @request.request
             {
