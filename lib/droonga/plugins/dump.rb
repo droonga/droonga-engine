@@ -37,6 +37,7 @@ module Droonga
       register("dump")
 
       class Handler < AsyncCommand::Handler
+        private
         def start(request)
           dumper = Dumper.new(@context, loop, messenger, request)
           dumper.start_dump

@@ -63,6 +63,7 @@ module Droonga
           end
         end
 
+        private
         def start(request)
           #XXX override me!
           # handler = MyAsyncHandler.new(loop, messenger, request)
