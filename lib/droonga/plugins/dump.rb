@@ -16,6 +16,7 @@
 require "groonga"
 
 require "droonga/plugin"
+require "droonga/plugin/async_command"
 require "droonga/error_messages"
 
 module Droonga
@@ -35,136 +36,38 @@ module Droonga
       extend Plugin
       register("dump")
 
-      class Handler < Droonga::Handler
-        def handle(message)
-          request = Request.new(message)
-          if request.need_dump?
-            dumper = Dumper.new(@context, loop, messenger, request)
-            dumper.start_dump
-            true
-          else
-            false
-          end
+      class Handler < AsyncCommand::Handler
+        def start(request)
+          dumper = Dumper.new(@context, loop, messenger, request)
+          dumper.start_dump
         end
       end
 
-      class Request
-        def initialize(message)
-          @message = message
-        end
-
-        def need_dump?
-          reply_to
-        end
-
-        def id
-          @message["id"]
-        end
-
-        def dataset
-          @message.raw["dataset"]
-        end
-
-        def reply_to
-          (@message.raw["replyTo"] || {})["to"]
-        end
-
-        def messages_per_seconds
-          request = (@message.request || {})
-          minimum_messages_per_seconds = 10
-          [
-            minimum_messages_per_seconds,
-            (request["messagesPerSecond"] || 10000).to_i,
-          ].max
-        end
-      end
-
-      class Dumper
+      class Dumper < AsyncCommand::AsyncHandler
         include Loggable
 
         def initialize(context, loop, messenger, request)
           @context = context
-          @loop = loop
-          @messenger = messenger
-          @request = request
-        end
-
-        def start_dump
-          setup_forward_data
-
-          forward("dump.start")
-
-          dumper = Fiber.new do
-            dump_schema
-            dump_records
-            dump_indexes
-            forward("dump.end")
-          end
-
-          on_error = lambda do |exception|
-            message = "failed to dump"
-            logger.exception(message, $!)
-            error("DumpFailure", message)
-          end
-
-          timer = Coolio::TimerWatcher.new(0.1, true)
-          timer.on_timer do
-            begin
-              dumper.resume
-            rescue FiberError
-              timer.detach
-              logger.trace("start_dump: watcher detached on FiberError",
-                           :watcher => timer)
-            rescue
-              timer.detach
-              logger.trace("start_dump: watcher detached on unexpected exception",
-                           :watcher => timer)
-              on_error.call($!)
-            end
-          end
-
-          @loop.attach(timer)
-          logger.trace("start_dump: new watcher attached",
-                       :watcher => timer)
+          super(loop, messenger, request)
         end
 
         private
-        def setup_forward_data
-          @base_forward_message = {
-            "inReplyTo" => @request.id,
-            "dataset"   => @request.dataset,
-          }
-          @forward_to = @request.reply_to
-          @n_forwarded_messages = 0
-          @messages_per_100msec = @request.messages_per_seconds / 10
+        def prefix
+          "dump"
         end
 
-        def error(name, message)
-          message = {
-            "statusCode" => ErrorMessages::InternalServerError::STATUS_CODE,
-            "body" => {
-              "name"    => name,
-              "message" => message,
-            },
-          }
-          error_message = @base_forward_message.merge(message)
-          @messenger.forward(error_message,
-                             "to"   => @forward_to,
-                             "type" => "dump.error")
+        def error_name
+          "DumpFailure"
         end
 
-        def forward(type, body=nil)
-          forward_message = @base_forward_message
-          if body
-            forward_message = forward_message.merge("body" => body)
-          end
-          @messenger.forward(forward_message,
-                             "to"   => @forward_to,
-                             "type" => type)
+        def error_message
+          "failed to dump"
+        end
 
-          @n_forwarded_messages += 1
-          @n_forwarded_messages %= @messages_per_100msec
-          Fiber.yield if @n_forwarded_messages.zero?
+        def handle
+          dump_schema
+          dump_records
+          dump_indexes
         end
 
         def dump_schema
@@ -183,7 +86,7 @@ module Droonga
         end
 
         def dump_table(table)
-          forward("dump.table", table_body(table))
+          forward("#{prefix}.table", table_body(table))
 
           columns = table.columns.sort_by(&:name)
           columns.each do |column|
@@ -216,7 +119,7 @@ module Droonga
         end
 
         def dump_column(column)
-          forward("dump.column", column_body(column))
+          forward("#{prefix}.column", column_body(column))
         end
 
         def column_body(column)
@@ -276,7 +179,7 @@ module Droonga
                 "key"    => record.key,
                 "values" => values,
               }
-              forward("dump.record", body)
+              forward("#{prefix}.record", body)
             end
           end
         end
