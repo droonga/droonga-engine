@@ -19,6 +19,7 @@ require "slop"
 require "json"
 require "pathname"
 require "socket"
+require "coolio"
 
 require "droonga/engine/version"
 require "droonga/path"
@@ -32,6 +33,8 @@ require "droonga/node_metadata"
 
 class JoinCommand
   def run
+    @loop = Coolio::Loop.default
+
     parse_options
     trap_signals
 
@@ -47,7 +50,13 @@ class JoinCommand
       do_join
       register_to_existing_nodes
       set_source_node_role
-      copy_data unless @options["no-copy"]
+      unless @options["no-copy"]
+        successed = copy_data
+        unless successed
+          do_cancel
+          exit(false)
+        end
+      end
       set_effective_message_timestamp
       reset_source_node_role
       reset_joining_node_role
@@ -141,13 +150,6 @@ class JoinCommand
     serf.send_query(command, options)
   end
 
-  def current_member_state(target)
-    serf = Droonga::Serf.new(target, :verbose => @options[:verbose])
-    serf.current_members.find do |member|
-      member["name"] == target
-    end
-  end
-
   def absorber
     @absorber ||= prepare_absorber
   end
@@ -161,6 +163,10 @@ class JoinCommand
       :port             => @options[:port],
       :tag              => @options[:tag],
       :messages_per_second => @options["records-per-second"],
+      :client_options   => {
+        :backend => :coolio,
+        :loop    => @loop,
+      },
     }
     Droonga::DataAbsorber.new(absorber_options)
   end
@@ -218,33 +224,22 @@ class JoinCommand
   def copy_data
     puts("Copying data from the source node...")
 
-    @start_time_in_seconds = Time.new.to_i
-
-    run_remote_command(joining_node, "absorb_data",
-                       "node"    => joining_node,
-                       "source"  => source_node,
-                       "port"    => absorber.port,
-                       "tag"     => absorber.tag,
-                       "dataset" => absorber.dataset,
-                       "messages_per_second" => absorber.messages_per_second)
-
-    last_progress = ""
-    while true
-      sleep(3)
-      state = current_member_state(joining_node)
-      if state.nil? or state["tags"]["absorbing"] != "true"
-        break
+    last_progress = nil
+    absorber.run do |progress|
+      if last_progress
+        printf("%s", "#{" " * last_progress[:message].size}\r")
       end
-      progress = absorber.report_progress(@start_time_in_seconds)
-      if progress
-        printf("%s", "#{" " * last_progress.size}\r")
-        printf("%s", "#{progress}\r")
-        last_progress = progress
-      end
+      printf("%s", "#{progress[:message]}\r")
+      last_progress = progress
     end
-    printf("%s", "#{" " * last_progress.size}\r")
-    printf("%s", "#{progress}\r")
-    puts "100% done"
+    @loop.run
+
+    if absorber.error_message
+      puts(absorber.error_message)
+      do_cancel
+      return false
+    end
+
     puts ""
   end
 

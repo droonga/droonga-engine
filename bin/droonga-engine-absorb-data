@@ -17,8 +17,8 @@
 
 require "ostruct"
 require "optparse"
-require "open3"
 require "socket"
+require "coolio"
 
 require "droonga/engine/version"
 require "droonga/catalog_generator"
@@ -31,6 +31,8 @@ require "droonga/restarter"
 
 class AbsorbDataCommand
   def run
+    @loop = Coolio::Loop.default
+
     parse_options
     assert_valid_options
     trap_signals
@@ -44,10 +46,10 @@ class AbsorbDataCommand
     puts ""
     puts "Absorbing..."
 
-    absorb
+    succeeded = absorb
 
-    puts "Done."
-    exit(true)
+    puts "Done." if succeeded
+    exit(succeeded)
   end
 
   private
@@ -136,13 +138,6 @@ class AbsorbDataCommand
     serf.send_query(command, options)
   end
 
-  def current_member_state(target)
-    serf = Droonga::Serf.new(target, :verbose => @options.verbose)
-    serf.current_members.find do |member|
-      member["name"] == target
-    end
-  end
-
   def absorber
     @absorber ||= prepare_absorber
   end
@@ -156,37 +151,31 @@ class AbsorbDataCommand
       :port             => @options.port,
       :tag              => @options.tag,
       :messages_per_second => @options.messages_per_second,
+      :client_options   => {
+        :backend => :coolio,
+        :loop    => @loop,
+      },
     }
     Droonga::DataAbsorber.new(absorber_options)
   end
 
   def absorb
-    start_time_in_seconds = Time.new.to_i
-    run_remote_command(destination_node, "absorb_data",
-                       "node"    => destination_node,
-                       "source"  => source_node,
-                       "port"    => @options.port,
-                       "tag"     => @options.tag,
-                       "dataset" => @options.dataset,
-                       "messages_per_second" => @options.messages_per_second)
-    last_progress = ""
-    while true
-      sleep(3)
-      state = current_member_state(destination_node)
-      if state.nil? or state["tags"]["absorbing"] != "true"
-        break
+    last_progress = nil
+    absorber.run do |progress|
+      if last_progress
+        printf("%s", "#{" " * last_progress[:message].size}\r")
       end
-
-      progress = absorber.report_progress(start_time_in_seconds)
-      if progress
-        printf("%s", "#{" " * last_progress.size}\r")
-        printf("%s", "#{progress}\r")
-        last_progress = progress
-      end
+      printf("%s", "#{progress[:message]}\r")
+      last_progress = progress
     end
-    printf("%s", "#{" " * last_progress.size}\r")
-    printf("%s", "#{progress}\r")
-    puts "100% done"
+    @loop.run
+
+    if absorber.error_message
+      puts(absorber.error_message)
+      do_cancel
+      return false
+    end
+
     puts ""
 
     response = run_remote_command(source_node, "report_metadata",
@@ -200,6 +189,7 @@ class AbsorbDataCommand
                                     "node" => destination_node,
                                     "timestamp" => timestamp)
     end
+    true
   end
 
   def trap_signals
