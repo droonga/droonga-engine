@@ -63,16 +63,15 @@ module Droonga
 
             begin
               @total_n_source_records = count_total_n_source_records
-            @n_processed_messages = 0
-            dumper_error_message = dumper.run do |message|
-              @messenger.forward(message,
-                                 "to"   => my_node_name,
-                                 "type" => message["type"])
-              @n_processed_messages += 1
+              @n_processed_messages = 0
+              dumper_error_message = dumper.run do |message|
+                @messenger.forward(message,
+                                   "to"   => my_node_name,
+                                   "type" => message["type"])
+                @n_processed_messages += 1
+                report_progress
+              end
               report_progress
-            end
-
-            report_progress
             rescue Exception => exception
               dumper_error_message = exception.to_s
             end
