@@ -1,22 +1,26 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.start"
 }
 {
   "inReplyTo": "request-id",
   "statusCode": 200,
   "type": "dump.result",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": true
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -27,6 +31,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "Hash",
     "name": "Memos",
@@ -37,6 +42,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "PatriciaTrie",
     "name": "Tags",
@@ -47,6 +53,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "PatriciaTrie",
     "name": "Tags",
@@ -57,6 +64,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "Hash",
     "name": "Users",
@@ -67,6 +75,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "type": "Hash",
     "name": "Users",
@@ -77,6 +86,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "table": "Memos",
     "name": "tags",
@@ -91,6 +101,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "table": "Memos",
     "name": "tags",
@@ -105,6 +116,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -120,6 +132,7 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "table": "Memos",
     "key": "Groonga newbie",
@@ -135,10 +148,12 @@
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.end"
 }
 {
   "inReplyTo": "request-id",
   "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.end"
 }
