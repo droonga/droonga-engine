@@ -183,8 +183,7 @@ module Droonga
           end
 
           def source_client_options
-            params = @request.request
-            options = {
+            {
               :host    => source_host,
               :port    => source_port,
               :tag     => source_tag,
