@@ -28,6 +28,8 @@ module Droonga
         action.synchronous = true
 
         DEFAULT_MESSAGES_PER_SECOND = 100
+        DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
+        MIN_PROGRESS_INTERVAL_SECONDS = 1
 
         class MissingHostParameter < BadRequest
           def initialize
@@ -61,15 +63,18 @@ module Droonga
             serf = Serf.new(my_node_name)
             serf.set_tag("absorbing", true)
 
+            @start_time = Time.now
+
             begin
               @total_n_source_records = count_total_n_source_records
-              @n_processed_messages = 0
               dumper_error_message = dumper.run do |message|
                 @messenger.forward(message,
                                    "to"   => my_node_name,
                                    "type" => message["type"])
-                @n_processed_messages += 1
-                report_progress
+                elapsed_time = (Time.now - @start_time).to_i
+                if (elapsed_time % progress_interval_seconds).zero?
+                  report_progress
+                end
               end
               report_progress
             rescue Exception => exception
@@ -99,7 +104,6 @@ module Droonga
           end
 
           def report_progress
-            return unless (@n_processed_messages % 100).zero?
             forward("#{prefix}.progress",
                     "nProcessedMessages" => @n_processed_messages,
                     "percentage"         => progress_percentage,
@@ -133,6 +137,17 @@ module Droonga
 
           def my_node_name
             @messenger.engine_state.name
+          end
+
+          def prepare_progress_interval_seconds
+            interval_seconds = @request.request["progressIntervalSeconds"]
+                                 || DEFAULT_PROGRESS_INTERVAL_SECONDS
+            interval_seconds = interval_seconds.to_i
+            [interval_seconds, MIN_PROGRESS_INTERVAL_SECONDS].max
+          end
+
+          def progress_interval_seconds
+            @progress_interval_seconds ||= prepare_progress_interval_seconds
           end
 
           def source_host

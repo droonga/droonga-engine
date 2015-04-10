@@ -23,6 +23,7 @@ module Droonga
     include Loggable
 
     DEFAULT_MESSAGES_PER_SECOND = 100
+    DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
 
     TIME_UNKNOWN = -1
     PROGRESS_UNKNOWN = -1
@@ -42,6 +43,7 @@ module Droonga
       @params = params
 
       @messages_per_second = @params[:messages_per_second] || DEFAULT_MESSAGES_PER_SECOND
+      @progress_interval_seconds = @params[:progress_interval_seconds] || DEFAULT_PROGRESS_INTERVAL_SECONDS
 
       @dataset = @params[:dataset] || CatalogGenerator::DEFAULT_DATASET
       @port    = @params[:port]    || CatalogGenerator::DEFAULT_PORT
@@ -69,6 +71,7 @@ module Droonga
           "tag"     => @tag,
           "dataset" => @dataset,
           "messagesPerSecond" => @messages_per_second,
+          "progressIntervalSeconds" => @progress_interval_seconds,
         },
       }
       destination_client.subscribe(absorb_message) do |message|
