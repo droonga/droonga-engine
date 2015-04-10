@@ -141,8 +141,8 @@ module Droonga
           end
 
           def prepare_progress_interval_seconds
-            interval_seconds = @request.request["progressIntervalSeconds"]
-                                 || DEFAULT_PROGRESS_INTERVAL_SECONDS
+            interval_seconds = @request.request["progressIntervalSeconds"] ||
+                                 DEFAULT_PROGRESS_INTERVAL_SECONDS
             interval_seconds = interval_seconds.to_i
             [interval_seconds, MIN_PROGRESS_INTERVAL_SECONDS].max
           end
