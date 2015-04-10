@@ -25,15 +25,6 @@ module Droonga
     DEFAULT_MESSAGES_PER_SECOND = 100
     DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
 
-    TIME_UNKNOWN = -1
-    PROGRESS_UNKNOWN = -1
-
-    class << self
-      def absorb(params)
-        new(params).absorb
-      end
-    end
-
     attr_reader :params
     attr_reader :dataset, :port, :tag, :messages_per_second
     attr_reader :source_host, :destination_host
