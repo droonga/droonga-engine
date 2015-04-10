@@ -18,10 +18,24 @@ require "droonga/plugin"
 module Droonga
   module Plugins
     module System
-      extend Plugin
-      register("system")
+      class StatusHandler < Droonga::Handler
+        action.synchronous = true
+
+        def handle(message)
+          engine_state = @messenger.engine_state
+          reporter     = "#{engine_state.internal_name} @ #{engine_state.name}"
+          {
+            "nodes"    => @messenger.cluster.engine_nodes_status,
+            "reporter" => reporter,
+          }
+        end
+      end
+
+      define_single_step do |step|
+        step.name = "system.status"
+        step.handler = StatusHandler
+        step.collector = Collectors::Or
+      end
     end
   end
 end
-
-require "droonga/plugins/system/status"
