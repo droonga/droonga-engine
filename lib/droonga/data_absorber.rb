@@ -34,8 +34,10 @@ module Droonga
     def initialize(params)
       @params = params
 
-      @messages_per_second = @params[:messages_per_second] || DEFAULT_MESSAGES_PER_SECOND
-      @progress_interval_seconds = @params[:progress_interval_seconds] || DEFAULT_PROGRESS_INTERVAL_SECONDS
+      @messages_per_second = @params[:messages_per_second] ||
+                               DEFAULT_MESSAGES_PER_SECOND
+      @progress_interval_seconds = @params[:progress_interval_seconds] ||
+                                     DEFAULT_PROGRESS_INTERVAL_SECONDS
 
       @dataset = @params[:dataset] || CatalogGenerator::DEFAULT_DATASET
       @port    = @params[:port]    || CatalogGenerator::DEFAULT_PORT
