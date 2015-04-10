@@ -103,6 +103,10 @@ class JoinCommand
                 :default => Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND)
 
       option.separator("Miscellaneous:")
+      option.on("progress-interval-seconds=",
+                "Interval seconds to report progress.",
+                :as => Integer,
+                :default => Droonga::DataAbsorber::DEFAULT_PROGRESS_INTERVAL_SECONDS)
       option.on(:verbose, "Output details for internal operations.",
                 :default => false)
     end
@@ -163,6 +167,7 @@ class JoinCommand
       :port             => @options[:port],
       :tag              => @options[:tag],
       :messages_per_second => @options["records-per-second"],
+      :progress_interval_seconds => @options["progress-interval-seconds"],
       :client_options   => {
         :backend => :coolio,
         :loop    => @loop,

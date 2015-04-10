@@ -60,6 +60,7 @@ class AbsorbDataCommand
     options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
     options.receiver_host = Socket.gethostname
     options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
+    options.progress_interval_seconds = Droonga::DataAbsorber::DEFAULT_PROGRESS_INTERVAL_SECONDS
     options.verbose = false
     parser = OptionParser.new
     parser.version = Droonga::Engine::VERSION
@@ -106,6 +107,11 @@ class AbsorbDataCommand
 
     parser.separator("")
     parser.separator("Miscellaneous:")
+    parser.on("--progress-interval-seconds=N", Integer,
+              "Interval seconds to report progress.",
+              "(#{options.progress_interval_seconds})") do |n|
+      options.progress_interval_seconds = n
+    end
     parser.on("--[no-]verbose",
               "Output details for internal operations.",
               "(#{options.verbose})") do |verbose|
@@ -151,6 +157,7 @@ class AbsorbDataCommand
       :port             => @options.port,
       :tag              => @options.tag,
       :messages_per_second => @options.messages_per_second,
+      :progress_interval_seconds => @options.progress_interval_seconds,
       :client_options   => {
         :backend => :coolio,
         :loop    => @loop,
