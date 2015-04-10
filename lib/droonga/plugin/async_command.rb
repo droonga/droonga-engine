@@ -15,6 +15,7 @@
 
 require "coolio"
 
+require "droonga/loggable"
 require "droonga/handler"
 require "droonga/error_messages"
 
@@ -72,6 +73,8 @@ module Droonga
       end
 
       class AsyncHandler
+        include Loggable
+
         def initialize(loop, messenger, request)
           @loop = loop
           @messenger = messenger

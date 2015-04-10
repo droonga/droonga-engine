@@ -45,8 +45,6 @@ module Droonga
       end
 
       class Dumper < AsyncCommand::AsyncHandler
-        include Loggable
-
         def initialize(context, loop, messenger, request)
           @context = context
           super(loop, messenger, request)
