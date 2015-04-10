@@ -26,7 +26,8 @@ module Droonga
     DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
 
     attr_reader :params
-    attr_reader :dataset, :port, :tag, :messages_per_second
+    attr_reader :dataset, :port, :tag
+    attr_reader :messages_per_second, :progress_interval_seconds
     attr_reader :source_host, :destination_host
     attr_reader :error_message
 
