@@ -95,7 +95,8 @@ module Droonga
               @error_message = "#{error['name']}: #{error['message']}"
             end
           when "system.absorb-data.progress"
-            @n_prosessed_messages = message["body"]["count"]
+            body = message["body"]
+            @n_prosessed_messages = body["nProcessedMessages"]
             yield(:n_processed_messages => @n_processed_messages,
                   :percentage           => progress_percentage,
                   :message              => progress_message)
@@ -135,7 +136,7 @@ module Droonga
         :host          => @source_host,
         :port          => @port,
         :tag           => @tag,
-        :progocol      => :droonga,
+        :protocol      => :droonga,
         :receiver_host => @receiver_host,
         :receiver_port => 0,
       }
@@ -147,7 +148,7 @@ module Droonga
         :host          => @destination_host,
         :port          => @port,
         :tag           => @tag,
-        :progocol      => :droonga,
+        :protocol      => :droonga,
         :receiver_host => @receiver_host,
         :receiver_port => 0,
       }.merge(@destination_client_options)
