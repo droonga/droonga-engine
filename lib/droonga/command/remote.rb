@@ -238,54 +238,6 @@ module Droonga
         end
       end
 
-      class AbsorbData < CrossNodeCommandBase
-        def process
-          return unless valid_params?
-
-          log("start to absorb data from #{source_node}")
-
-          if dataset.nil? or port.nil? or tag.nil?
-            generator = CatalogGenerator.new
-            generator.load(catalog)
-
-            dataset_info = generator.dataset_for_host(source_host)
-            return unless dataset_info
-
-            @dataset = dataset_info.name
-            @port    = dataset_info.replicas.port
-            @tag     = dataset_info.replicas.tag
-          end
-
-          log("dataset = #{dataset}")
-          log("port    = #{port}")
-          log("tag     = #{tag}")
-
-          @serf.set_tag("absorbing", true)
-
-          log("start")
-          DataAbsorber.absorb(:dataset          => dataset,
-                              :source_host      => source_host,
-                              :destination_host => host,
-                              :port             => port,
-                              :tag              => tag,
-                              :messages_per_second => messages_per_second,
-                              :client           => "droonga-send")
-
-          @serf.delete_tag("absorbing")
-          log("done")
-        end
-
-        private
-        def messages_per_second
-          @params["messages_per_second"]
-        end
-
-        def valid_params?
-          not dataset.nil? and
-            not source_node.nil?
-        end
-      end
-
       class ModifyReplicasBase < Base
         private
         def dataset

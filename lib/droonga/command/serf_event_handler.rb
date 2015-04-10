@@ -96,8 +96,6 @@ module Droonga
           Remote::AddReplicas
         when "remove_replicas"
           Remote::RemoveReplicas
-        when "absorb_data"
-          Remote::AbsorbData
         else
           nil
         end
