@@ -40,7 +40,7 @@ module Droonga
         private
         def start(request)
           dumper = Dumper.new(@context, loop, messenger, request)
-          dumper.start_dump
+          dumper.start
         end
       end
 
