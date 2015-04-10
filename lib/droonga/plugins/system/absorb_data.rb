@@ -156,15 +156,18 @@ module Droonga
           end
 
           def source_port
-            @source_port ||= @request.request["port"] || NodeName::DEFAULT_PORT
+            @source_port ||= @request.request["port"] ||
+                               NodeName::DEFAULT_PORT
           end
 
           def source_tag
-            @source_tag ||= @request.request["tag"] || NodeName::DEFAULT_TAG
+            @source_tag ||= @request.request["tag"] ||
+                              NodeName::DEFAULT_TAG
           end
 
           def source_dataset
-            @source_dataset ||= @request.request["dataset"] || Catalog::Dataset::DEFAULT_NAME
+            @source_dataset ||= @request.request["dataset"] ||
+                                  Catalog::Dataset::DEFAULT_NAME
           end
 
           def source_tables
