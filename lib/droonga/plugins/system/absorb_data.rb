@@ -44,11 +44,17 @@ module Droonga
           raise MissingHostParameter.new unless message.include?("host")
 
           dumper = Drndump::Dumper.new(dumper_params(message))
+
+          serf = Serf.new(my_node_name)
+          serf.set_tag("absorbing", true)
+
           error_message = dumper.run do |message|
             @messenger.forward(message,
                                "to"   => my_node_name,
                                "type" => message["type"])
           end
+
+          serf.set_tag("absorbing", true)
 
           raise DumpFailed.new(error_message) if error_message
 
