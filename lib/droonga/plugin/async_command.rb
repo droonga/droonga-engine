@@ -47,12 +47,14 @@ module Droonga
           @message.request
         end
 
+        DEFAULT_MESSAGES_PER_SECOND = 10000
+
         def messages_per_seconds
           request = (@message.request || {})
           minimum_messages_per_seconds = 10
           [
             minimum_messages_per_seconds,
-            (request["messagesPerSecond"] || 10000).to_i,
+            (request["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND).to_i,
           ].max
         end
       end
