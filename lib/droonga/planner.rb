@@ -40,7 +40,11 @@ module Droonga
 
     def broadcast(message, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
-      planner.broadcast(:write => options[:write])
+      broadcast_options = {
+        :write => options[:write],
+      }
+      broadcast_options[:replica] = "all" if options[:write]
+      planner.broadcast(broadcast_options)
       planner.reduce(options[:reduce])
       planner.plan
     end

@@ -63,7 +63,7 @@ module Droonga
         "record"  => record,
         "type"    => "scatter",
         "outputs" => [],
-        "replica" => "all",
+        "replica" => options[:replica] || "all",
         "post"    => true
       }
     end
@@ -75,10 +75,9 @@ module Droonga
         "body"    => options[:body] || @source_message["body"],
         "type"    => "broadcast",
         "outputs" => [],
-        "replica" => "random"
+        "replica" => options[:replica] || "random"
       }
       if options[:write]
-        processor["replica"] = "all"
         processor["post"]    = true
       end
       @processor = processor
