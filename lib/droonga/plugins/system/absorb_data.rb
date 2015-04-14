@@ -119,6 +119,9 @@ module Droonga
           end
 
           def progress_percentage
+            if @total_n_source_records.nil? or @total_n_source_records.zero?
+              return 0
+            end
             progress = @n_processed_messages / @total_n_source_records
             [(progress * 100).to_i, 100].min
           end
