@@ -233,13 +233,15 @@ module Droonga
             }
           end
 
-          def source_client
-            @source_client ||= Droonga::Client.new(source_client_options)
+          def create_source_client
+            Droonga::Client.new(source_client_options)
           end
 
           def get_source_tables(&block)
-            source_client.request("dataset" => source_dataset,
-                                  "type"    => "table_list") do |response|
+            client = create_source_client
+            client.request("dataset" => source_dataset,
+                           "type"    => "table_list") do |response|
+              client.close
               unless response
                 raise EmptyResponse.new("table_list returns nil response")
               end
@@ -268,12 +270,14 @@ module Droonga
                   },
                 }
               end
-              source_client.request("dataset" => source_dataset,
-                                    "type"    => "search",
-                                    "body"    => {
-                                      "timeout" => 10,
-                                      "queries" => queries,
-                                    }) do |response|
+              client = create_source_client
+              client.request("dataset" => source_dataset,
+                             "type"    => "search",
+                             "body"    => {
+                               "timeout" => 10,
+                               "queries" => queries,
+                             }) do |response|
+                client.close
                 unless response
                   raise EmptyResponse.new("search returns nil response")
                 end
