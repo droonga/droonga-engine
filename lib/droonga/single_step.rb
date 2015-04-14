@@ -34,7 +34,7 @@ module Droonga
       planner = Planner.new(@dataset)
       planner.write = @definition.write?
       planner.random = @definition.random?
-      planner.collector_class = @sdefinition.collector_class
+      planner.collector_class = @definition.collector_class
 
       body = message["body"]
       fact_input = find_fact_input(@definition.inputs, @dataset.fact, body)
