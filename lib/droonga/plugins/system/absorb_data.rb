@@ -61,6 +61,7 @@ module Droonga
             @start_time = Time.now
 
             begin
+              @n_processed_messages = 0
               @total_n_source_records = nil
               get_total_n_source_records do |count|
                 @total_n_source_records = count
@@ -70,6 +71,7 @@ module Droonga
                 @messenger.forward(message,
                                    "to"   => my_node_name,
                                    "type" => message["type"])
+                @n_processed_messages += 1
                 elapsed_seconds = (Time.now - @start_time).to_i
                 if (elapsed_seconds % progress_interval_seconds).zero? and
                      not @total_n_source_records.nil?
