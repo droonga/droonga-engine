@@ -47,7 +47,7 @@ module Droonga
       test_file = Path.config
       begin
         test_file.read
-      rescue Errno::EACCES => error
+      rescue Errno::EACCES
         return false
       end
       true
@@ -58,7 +58,7 @@ module Droonga
       begin
         FileUtils.mkdir_p(Path.base)
         FileUtils.touch(test_file.to_s)
-      rescue Errno::EACCES => error
+      rescue Errno::EACCES
       end
       unless test_file.exist?
         return false
