@@ -33,8 +33,6 @@ module Droonga
 
     def plan(message, params={})
       options = {
-        :write  => write?,
-        :random => random?,
         :record => params[:record],
       }
       if @collector_class
@@ -67,10 +65,10 @@ module Droonga
     def scatter(message, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
       scatter_options = {
-        :write => options[:write],
+        :write => write?,
         :record => options[:record],
       }
-      scatter_options[:replica] = "random" if options[:random]
+      scatter_options[:replica] = "random" if random?
       planner.scatter(scatter_options)
       planner.reduce(options[:reduce])
       planner.plan
@@ -79,9 +77,9 @@ module Droonga
     def broadcast(message, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
       broadcast_options = {
-        :write => options[:write],
+        :write => write?,
       }
-      broadcast_options[:replica] = "all" if options[:write]
+      broadcast_options[:replica] = "all" if write?
       planner.broadcast(broadcast_options)
       planner.reduce(options[:reduce])
       planner.plan
