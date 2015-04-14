@@ -22,15 +22,48 @@ module Droonga
     include Loggable
     include ErrorMessages
 
+    attr_writer :write, :random, :collector_class
+
     def initialize(dataset)
       @dataset = dataset
+      @write = false
+      @ramdom = nil
+      @collector_class = nil
     end
 
-    def plan(message)
-      raise NotImplemented, "#{self.class.name}\##{__method__} must implement."
+    def plan(message, params={})
+      options = {
+        :write  => write?,
+        :random => random?,
+      }
+      if @collector_class
+        reduce_key = "result"
+        options[:reduce] = {
+          reduce_key => @collector_class.operator,
+        }
+      end
+
+      record = params[:record]
+      if record
+        scatter(message, record, options)
+      else
+        broadcast(message, options)
+      end
     end
 
     private
+    def write?
+      @write
+    end
+
+    def random?
+      unless @random.nil?
+        @random
+      else
+        not write?
+      end
+    end
+
     def scatter(message, record, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
       scatter_options = {

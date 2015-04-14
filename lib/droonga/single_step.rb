@@ -32,24 +32,17 @@ module Droonga
 
       # XXX: Re-implement me.
       planner = Planner.new(@dataset)
-      options = {}
-      options[:write] = @definition.write?
-      options[:random] = @definition.random?
-      collector_class = @definition.collector_class
-      if collector_class
-        reduce_key = "result"
-        options[:reduce] = {
-          reduce_key => collector_class.operator,
-        }
-      end
+      planner.write = @definition.write?
+      planner.random = @definition.random?
+      planner.collector_class = @sdefinition.collector_class
 
       body = message["body"]
       fact_input = find_fact_input(@definition.inputs, @dataset.fact, body)
       if fact_input
         record = body[fact_input[:filter]]
-        planner.scatter(message, record, options)
+        planner.plan(message, :record => record)
       else
-        planner.broadcast(message, options)
+        planner.plan(message)
       end
     end
 
