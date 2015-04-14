@@ -308,6 +308,7 @@ module Droonga
 
       define_single_step do |step|
         step.name = "system.absorb-data"
+        step.random = true
         step.handler = AbsorbDataHandler
         step.collector = Collectors::And
       end
