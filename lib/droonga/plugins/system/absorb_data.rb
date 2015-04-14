@@ -177,7 +177,7 @@ module Droonga
           end
 
           def source_tables
-            response = source_client.request("dataset" => @dataset,
+            response = source_client.request("dataset" => source_dataset,
                                              "type"    => "table_list")
 
             unless response
@@ -226,7 +226,7 @@ module Droonga
                 },
               }
             end
-            response = source_client.request("dataset" => @dataset,
+            response = source_client.request("dataset" => source_dataset,
                                              "type"    => "search",
                                              "body"    => {
                                                "queries" => queries,
