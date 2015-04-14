@@ -1,0 +1,59 @@
+{
+  "datasets": {
+    "Default": {
+    },
+    "Source": {
+      "schema": {
+        "Users": {
+          "type": "Hash",
+          "keyType": "ShortText"
+        }
+      },
+      "fact": "Users",
+      "nWorkers": 2,
+      "plugins": ["groonga", "crud", "search", "dump", "system", "catalog"],
+      "replicas": [
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice020",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.020"
+              }
+            },
+            {
+              "label": "slice021",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.021"
+              }
+            }
+          ]
+        },
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice030",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.030"
+              }
+            },
+            {
+              "label": "slice031",
+              "weight": 50,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.031"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

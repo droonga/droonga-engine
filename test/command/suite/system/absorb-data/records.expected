@@ -1,0 +1,43 @@
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "system.absorb-data.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "system.absorb-data.start"
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "system.absorb-data.result",
+  "body": {
+    "started": true
+  }
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "nProcessedMessages": 1,
+    "percentage":         100,
+    "message":            "100% done (maybe 00:00:00 remaining)"
+  },
+  "type": "system.absorb-data.progress"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "system.absorb-data.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "system.absorb-data.end"
+}
