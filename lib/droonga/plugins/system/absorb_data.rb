@@ -97,6 +97,11 @@ module Droonga
               :receiver_host => myself.host,
               :receiver_port => 0,
 
+              :client_options => {
+                :backend => :coolio,
+                :loop    => @loop,
+              },
+
               :messages_per_second => params["messagesPerSecond"] ||
                                         DEFAULT_MESSAGES_PER_SECOND,
             }
@@ -197,6 +202,9 @@ module Droonga
 
               :receiver_host => myself.host,
               :receiver_port => 0,
+
+              :backend => :coolio,
+              :loop    => @loop,
             }
           end
 
