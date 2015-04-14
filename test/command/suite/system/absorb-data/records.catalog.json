@@ -5,11 +5,10 @@
     "Source": {
       "schema": {
         "Users": {
-          "type": "Hash",
+          "type": "PatriciaTrie",
           "keyType": "ShortText"
         }
       },
-      "fact": "Users",
       "nWorkers": 2,
       "plugins": ["groonga", "crud", "search", "dump", "system", "catalog"],
       "replicas": [
