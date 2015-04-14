@@ -39,7 +39,7 @@ end
 
 base_dir = File.dirname(__FILE__)
 lib_dir = File.expand_path(File.join(base_dir, "..", "..", "lib"))
-log_path = File.expand_path(File.join(base_dir, "test", "command", "tmp", "droonga-engine.log"))
+log_path = File.expand_path(File.join(base_dir, "tmp", "droonga-engine.log"))
 
 drntest_options = []
 drntest_options.concat(["--base-path", base_dir])
