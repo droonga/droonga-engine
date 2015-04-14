@@ -93,36 +93,9 @@ module Droonga
         end
 
         def start
-          setup_forward_data
-
-          forward("#{prefix}.start")
-
-          runner = Fiber.new do
-            handle
-          end
-
-          timer = Coolio::TimerWatcher.new(0.1, true)
-          timer.on_timer do
-            if runner.alive?
-              begin
-                runner.resume
-              rescue
-                timer.detach
-                logger.trace("start: watcher detached on unexpected exception",
-                             :watcher => timer)
-                logger.exception(error_message, $!)
-                error(error_name, error_message)
-              end
-            else
-              timer.detach
-              logger.trace("start: watcher detached on unexpected exception",
-                           :watcher => timer)
-            end
-          end
-
-          @loop.attach(timer)
-          logger.trace("start: new watcher attached",
-                       :watcher => timer)
+          #XXX override me!!
+          on_start
+          on_finish
         end
 
         private
@@ -130,9 +103,14 @@ module Droonga
           "" #XXX override me!!
         end
 
-        def handle
+        def on_start
+          setup_forward_data
+          forward("#{prefix}.start")
+        end
+
+        def on_finish
           #XXX override me!!
-          forward("#{prefix}.end") #XXX you must forward "end" message by self!
+          forward("#{prefix}.end")
         end
 
         def setup_forward_data
@@ -141,8 +119,6 @@ module Droonga
             "dataset"   => @request.dataset,
           }
           @forward_to = @request.reply_to
-          @n_forwarded_messages = 0
-          @messages_per_100msec = @request.messages_per_seconds / 10
         end
 
         def error_name
@@ -175,10 +151,6 @@ module Droonga
           @messenger.forward(forward_message,
                              "to"   => @forward_to,
                              "type" => type)
-
-          @n_forwarded_messages += 1
-          @n_forwarded_messages %= @messages_per_100msec
-          Fiber.yield if @n_forwarded_messages.zero?
         end
 
         def log_tag

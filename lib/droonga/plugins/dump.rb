@@ -50,6 +50,40 @@ module Droonga
           super(loop, messenger, request)
         end
 
+        def start
+          on_start
+
+          runner = Fiber.new do
+            dump_schema
+            dump_records
+            dump_indexes
+            on_finish
+          end
+
+          timer = Coolio::TimerWatcher.new(0.1, true)
+          timer.on_timer do
+            if runner.alive?
+              begin
+                runner.resume
+              rescue
+                timer.detach
+                logger.trace("start: watcher detached on unexpected exception",
+                             :watcher => timer)
+                logger.exception(error_message, $!)
+                error(error_name, error_message)
+              end
+            else
+              timer.detach
+              logger.trace("start: watcher detached on unexpected exception",
+                           :watcher => timer)
+            end
+          end
+
+          @loop.attach(timer)
+          logger.trace("start: new watcher attached",
+                       :watcher => timer)
+        end
+
         private
         def prefix
           "dump"
@@ -61,13 +95,6 @@ module Droonga
 
         def error_message
           "failed to dump"
-        end
-
-        def handle
-          dump_schema
-          dump_records
-          dump_indexes
-          forward("#{prefix}.end")
         end
 
         def dump_schema
@@ -244,6 +271,19 @@ module Droonga
               yield(column) if index_column?(column)
             end
           end
+        end
+
+        def setup_forward_data
+          super
+          @n_forwarded_messages = 0
+          @messages_per_100msec = @request.messages_per_seconds / 10
+        end
+
+        def forward(type, body=nil)
+          super
+          @n_forwarded_messages += 1
+          @n_forwarded_messages %= @messages_per_100msec
+          Fiber.yield if @n_forwarded_messages.zero?
         end
 
         def log_tag

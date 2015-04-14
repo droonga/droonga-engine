@@ -42,20 +42,9 @@ module Droonga
           class EmptyBody < StandardError
           end
 
-          private
-          def prefix
-            "system.absorb-data"
-          end
+          def start
+            on_start
 
-          def error_name
-            "AbsorbFailure"
-          end
-
-          def error_message
-            "failed to absorb data"
-          end
-
-          def handle
             @dumper_error_message = nil
 
             dumper = Drndump::Dumper.new(dumper_params)
@@ -96,6 +85,19 @@ module Droonga
             on_finish if @dumper_error_message
           end
 
+          private
+          def prefix
+            "system.absorb-data"
+          end
+
+          def error_name
+            "AbsorbFailure"
+          end
+
+          def error_message
+            "failed to absorb data"
+          end
+
           def on_finish
             begin
               if @dumper_error_message
@@ -108,7 +110,7 @@ module Droonga
               @dumper_error_message = exception.to_s
               error(error_name, @dumper_error_message)
             end
-            forward("#{prefix}.end")
+            super
           end
 
           def dumper_params
