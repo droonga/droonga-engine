@@ -397,7 +397,13 @@ module Droonga
               select_range_and_replicas(partition, args, routes)
             end
           when "scatter"
-            name = get_partition(args["record"]["_key"])
+            record = args["record"]
+            if record
+              key = record["_key"]
+            else
+              key = nil
+            end
+            name = get_partition(key)
             partition = self["ring"][name]
             select_range_and_replicas(partition, args, routes)
           end
@@ -407,6 +413,7 @@ module Droonga
         def get_partition(key)
           continuum = self["continuum"]
           return self["ring"].keys[0] unless continuum
+          return continuum.sample[1] unless key
           key = key.to_s unless key.is_a?(String)
           hash = Zlib.crc32(key)
           min = 0
