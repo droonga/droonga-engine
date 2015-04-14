@@ -59,7 +59,8 @@ module Droonga
           FileUtils.chmod(0755, absolete_output_path.to_s)
         end
       rescue Archive::Zip::UnzipError => archive_error
-        logger.warn("Downloaded zip file is broken.")
+        logger.warn("Downloaded zip file is broken.",
+                    :detail => archive_error)
         if @retry_count < MAX_RETRY_COUNT
           @retry_count += 1
           sleep(RETRY_INTERVAL * @retry_count)
@@ -68,7 +69,8 @@ module Droonga
           raise DownloadFailed.new("Couldn't download serf executable. Try it later.")
         end
       rescue Faraday::ConnectionFailed => network_error
-        logger.warn("Connection failed.")
+        logger.warn("Connection failed.",
+                    :detail => network_error)
         if @retry_count < MAX_RETRY_COUNT
           @retry_count += 1
           sleep(RETRY_INTERVAL * @retry_count)
