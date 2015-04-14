@@ -180,8 +180,12 @@ module Droonga
             response = source_client.request("dataset" => @dataset,
                                              "type"    => "table_list")
 
-            raise EmptyResponse.new("table_list") unless response
-            raise EmptyBody.new("table_list") unless response["body"]
+            unless response
+              raise EmptyResponse.new("table_list returns nil response")
+            end
+            unless response["body"]
+              raise EmptyBody.new("table_list returns nil result")
+            end
 
             message_body = response["body"]
             body = message_body[1]
@@ -228,8 +232,12 @@ module Droonga
                                                "queries" => queries,
                                              })
 
-            raise EmptyResponse.new("search") unless response
-            raise EmptyBody.new("search") unless response["body"]
+            unless response
+              raise EmptyResponse.new("search returns nil response")
+            end
+            unless response["body"]
+              raise EmptyBody.new("search returns nil result")
+            end
 
             n_records = 0
             response["body"].each do |query_name, result|
@@ -244,7 +252,9 @@ module Droonga
         end
 
         def handle(message)
-          raise MissingHostParameter.new unless message.request.include?("host")
+          unless message.request.include?("host")
+            raise MissingHostParameter.new
+          end
           super
         end
 
