@@ -71,10 +71,12 @@ module Droonga
                                    "to"   => my_node_name,
                                    "type" => message["type"])
                 elapsed_seconds = (Time.now - @start_time).to_i
-                if (elapsed_seconds % progress_interval_seconds).zero?
+                if (elapsed_seconds % progress_interval_seconds).zero? and
+                     not @total_n_source_records.nil?
                   report_progress
                 end
               end
+              @total_n_source_records = @n_processed_messages
               report_progress
             rescue Exception => exception
               dumper_error_message = exception.to_s
