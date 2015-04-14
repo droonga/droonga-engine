@@ -229,6 +229,7 @@ module Droonga
             response = source_client.request("dataset" => source_dataset,
                                              "type"    => "search",
                                              "body"    => {
+                                               "timeout" => 10,
                                                "queries" => queries,
                                              })
 
