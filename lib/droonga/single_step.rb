@@ -34,6 +34,7 @@ module Droonga
       planner = Planner.new(@dataset)
       options = {}
       options[:write] = @definition.write?
+      options[:random] = @definition.random?
       collector_class = @definition.collector_class
       if collector_class
         reduce_key = "result"

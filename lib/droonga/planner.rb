@@ -36,6 +36,7 @@ module Droonga
       scatter_options = {
         :write => options[:write],
       }
+      scatter_options[:replica] = "random" if options[:random]
       planner.scatter(record, scatter_options)
       planner.reduce(options[:reduce])
       planner.plan
