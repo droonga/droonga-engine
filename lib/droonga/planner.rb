@@ -64,7 +64,7 @@ module Droonga
       end
     end
 
-    def scatter(message, record, options={})
+    def scatter(message, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
       scatter_options = {
         :write => options[:write],
