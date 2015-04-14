@@ -63,6 +63,7 @@ module Droonga
             begin
               @total_n_source_records = count_total_n_source_records
               dumper_error_message = dumper.run do |message|
+                message["dataset"] = current_dataset
                 @messenger.forward(message,
                                    "to"   => my_node_name,
                                    "type" => message["type"])
@@ -139,6 +140,10 @@ module Droonga
 
           def my_node_name
             ENV["DROONGA_ENGINE_NAME"]
+          end
+
+          def current_dataset
+            @request.dataset
           end
 
           def prepare_progress_interval_seconds
