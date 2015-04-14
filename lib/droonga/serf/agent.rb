@@ -140,8 +140,8 @@ module Droonga
             content = $POSTMATCH
             case content
             when /\A(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2}) \[(\w+)\] /
-              year, month, day = $1, $2, $3
-              hour, minute, second = $4, $5, $6
+              # year, month, day = $1, $2, $3
+              # hour, minute, second = $4, $5, $6
               level = $7
               content = $POSTMATCH
               return unless needed_log_message?(content)
