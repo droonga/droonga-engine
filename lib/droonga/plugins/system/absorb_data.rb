@@ -118,7 +118,7 @@ module Droonga
           end
 
           def progress_percentage
-            progress = @n_prosessed_messages / @total_n_source_records
+            progress = @n_processed_messages / @total_n_source_records
             [(progress * 100).to_i, 100].min
           end
 
@@ -126,7 +126,7 @@ module Droonga
           ONE_HOUR_IN_SECONDS = ONE_MINUTE_IN_SECONDS * 60
 
           def progress_message
-            n_remaining_records = [@total_n_source_records - @n_prosessed_messages, 0].max
+            n_remaining_records = [@total_n_source_records - @n_processed_messages, 0].max
 
             remaining_seconds  = n_remaining_records / @messages_per_second
             remaining_hours    = (remaining_seconds / ONE_HOUR_IN_SECONDS).floor
