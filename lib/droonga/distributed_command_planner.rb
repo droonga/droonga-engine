@@ -64,23 +64,20 @@ module Droonga
         "type"    => "scatter",
         "outputs" => [],
         "replica" => options[:replica] || "all",
-        "post"    => true
+        "post"    => options[:write] || false,
       }
     end
 
     def broadcast(options={})
-      processor = {
+      @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset.name,
         "body"    => options[:body] || @source_message["body"],
         "type"    => "broadcast",
         "outputs" => [],
         "replica" => options[:replica] || "random"
+        "post"    => options[:write] || false,
       }
-      if options[:write]
-        processor["post"] = true
-      end
-      @processor = processor
     end
 
     private

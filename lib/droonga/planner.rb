@@ -33,7 +33,10 @@ module Droonga
     private
     def scatter(message, record, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
-      planner.scatter(record)
+      scatter_options = {
+        :write => options[:write],
+      }
+      planner.scatter(record, scatter_options)
       planner.reduce(options[:reduce])
       planner.plan
     end
