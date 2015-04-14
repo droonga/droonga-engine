@@ -83,7 +83,7 @@ module Droonga
                     report_progress
                   end
                 rescue Exception => exception
-                  @dumper_error_message
+                  @dumper_error_message = exception.to_s
                   on_finish
                 end
               end
