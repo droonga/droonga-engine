@@ -78,7 +78,7 @@ module Droonga
         "replica" => options[:replica] || "random"
       }
       if options[:write]
-        processor["post"]    = true
+        processor["post"] = true
       end
       @processor = processor
     end
