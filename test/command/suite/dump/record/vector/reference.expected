@@ -150,6 +150,54 @@
   "inReplyTo": "request-id",
   "dataset": "Default",
   "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "Groonga",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "Groonga",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "column store",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "column store",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
   "type": "dump.end"
 }
 {

@@ -1,0 +1,65 @@
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "dump.result",
+  "body": {
+    "started": true
+  }
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "Hash",
+    "name": "Users",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "Hash",
+    "name": "Users",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Users",
+    "key": "Adam",
+    "values": {}
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.end"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.end"
+}

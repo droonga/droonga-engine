@@ -1,0 +1,15 @@
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "Users",
+    "key": "Adam"
+  }
+}
+#@enable-logging
+{
+  "type": "dump",
+  "dataset": "Default"
+}
