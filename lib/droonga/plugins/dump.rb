@@ -224,6 +224,7 @@ module Droonga
         end
 
         def index_only_table?(table)
+          return false if table.columns.empty?
           table.columns.all? do |column|
             index_column?(column)
           end
