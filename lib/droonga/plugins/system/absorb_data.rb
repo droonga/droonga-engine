@@ -104,8 +104,7 @@ module Droonga
                 :loop    => @loop,
               },
 
-              :messages_per_second => params["messagesPerSecond"] ||
-                                        DEFAULT_MESSAGES_PER_SECOND,
+              :messages_per_second => messages_per_second,
             }
           end
 
@@ -130,7 +129,7 @@ module Droonga
           def progress_message
             n_remaining_records = [@total_n_source_records - @n_processed_messages, 0].max
 
-            remaining_seconds  = n_remaining_records / @messages_per_second
+            remaining_seconds  = n_remaining_records / messages_per_second
             remaining_hours    = (remaining_seconds / ONE_HOUR_IN_SECONDS).floor
             remaining_seconds -= remaining_hours * ONE_HOUR_IN_SECONDS
             remaining_minutes  = (remaining_seconds / ONE_MINUTE_IN_SECONDS).floor
@@ -183,6 +182,11 @@ module Droonga
           def source_dataset
             @source_dataset ||= @request.request["dataset"] ||
                                   Catalog::Dataset::DEFAULT_NAME
+          end
+
+          def messages_per_second
+            @messages_per_second ||= @request.request["messagesPerSecond"] ||
+                                       DEFAULT_MESSAGES_PER_SECOND
           end
 
           def source_client_options
