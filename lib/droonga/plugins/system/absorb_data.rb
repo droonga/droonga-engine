@@ -244,7 +244,7 @@ module Droonga
         end
 
         def handle(message)
-          raise MissingHostParameter.new unless message.include?("host")
+          raise MissingHostParameter.new unless message.request.include?("host")
           super
         end
 
