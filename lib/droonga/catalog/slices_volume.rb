@@ -80,7 +80,12 @@ module Droonga
             routes.concat(slice.compute_routes(message, active_nodes))
           end
         when "scatter"
-          slice = choose_slice(message["record"])
+          record = message["record"]
+          if record
+            slice = choose_slice(record)
+          else
+            slice = select_slices.sample
+          end
           routes.concat(slice.compute_routes(message, active_nodes))
         end
         routes
