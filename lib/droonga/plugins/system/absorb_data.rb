@@ -61,7 +61,10 @@ module Droonga
             @start_time = Time.now
 
             begin
-              @total_n_source_records = count_total_n_source_records
+              @total_n_source_records = nil
+              get_total_n_source_records do |count|
+                @total_n_source_records = count
+              end
               dumper_error_message = dumper.run do |message|
                 message["dataset"] = current_dataset
                 @messenger.forward(message,
@@ -176,9 +179,9 @@ module Droonga
                                   Catalog::Dataset::DEFAULT_NAME
           end
 
-          def source_tables
-            response = source_client.request("dataset" => source_dataset,
-                                             "type"    => "table_list")
+          def get_source_tables(&block)
+            source_client.request("dataset" => source_dataset,
+                                  "type"    => "table_list") do |response|
 
             unless response
               raise EmptyResponse.new("table_list returns nil response")
@@ -190,8 +193,11 @@ module Droonga
             message_body = response["body"]
             body = message_body[1]
             tables = body[1..-1]
-            tables.collect do |table|
+            table_names = tables.collect do |table|
               table[1]
+            end
+            yield(table_names)
+
             end
           end
 
@@ -216,7 +222,8 @@ module Droonga
             @source_client ||= Droonga::Client.new(source_client_options)
           end
 
-          def count_total_n_source_records
+          def get_total_n_source_records(&block)
+            get_source_tables do |source_tables|
             queries = {}
             source_tables.each do |table|
               queries["n_records_of_#{table}"] = {
@@ -226,13 +233,12 @@ module Droonga
                 },
               }
             end
-            response = source_client.request("dataset" => source_dataset,
-                                             "type"    => "search",
-                                             "body"    => {
-                                               "timeout" => 10,
-                                               "queries" => queries,
-                                             })
-
+            source_client.request("dataset" => source_dataset,
+                                  "type"    => "search",
+                                  "body"    => {
+                                    "timeout" => 10,
+                                    "queries" => queries,
+                                  }) do |response|
             unless response
               raise EmptyResponse.new("search returns nil response")
             end
@@ -244,7 +250,9 @@ module Droonga
             response["body"].each do |query_name, result|
               n_records += result["count"]
             end
-            n_records
+            yield(n_records)
+            end
+            end
           end
 
           def log_tag
