@@ -63,7 +63,7 @@ module Droonga
               on_finish
             end
 
-            @start_time = Time.now
+            @previous_report_time = Time.now
 
             begin
               @n_processed_messages = 0
@@ -78,8 +78,10 @@ module Droonga
                                      "to"   => my_node_name,
                                      "type" => message["type"])
                   @n_processed_messages += 1
-                  elapsed_seconds = (Time.now - @start_time).to_i
-                  if (elapsed_seconds % progress_interval_seconds).zero?
+                  now = Time.now
+                  elapsed_seconds = (now - @previous_report_time).to_i
+                  if elapsed_seconds >= progress_interval_seconds
+                    @previous_report_time = now
                     report_progress
                   end
                 rescue Exception => exception
