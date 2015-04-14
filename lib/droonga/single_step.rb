@@ -46,9 +46,9 @@ module Droonga
       fact_input = find_fact_input(@definition.inputs, @dataset.fact, body)
       if fact_input
         record = body[fact_input[:filter]]
-        planner.send(:scatter, message, record, options)
+        planner.scatter(message, record, options)
       else
-        planner.send(:broadcast, message, options)
+        planner.broadcast(message, options)
       end
     end
 
