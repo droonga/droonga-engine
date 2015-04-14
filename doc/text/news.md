@@ -4,11 +4,17 @@
 
  * General:
    * Graceful stopping/restarting works correctly with continual inpouring messages.
+   * A new parameter `random` is introduced to single step definitions.
+     If you set it to `true`, messages for the handler will be delivered to just single volume (one of replicas and slices).
+     It is useful for commands which has to be executed only once in a cluster, like `system.status`.
    * `add` command now accepts requests with automatically-convertible mismatched type keys.
      For example, a string key `"1"` is available for a table with the key type `UInt32`.
    * `dump` command: the value of a column referring any record of another table are correctly exported as its key string, instead of object value (it's invalid value for a message of the `add` command).
      As the result, now tables with reference columns are correctly copied between multiple clusters.
+   * `dump` command: records in a table which has only one column `_key` are exported correctly.
+   * `dump` command: forwarded messages are now have their own `date` field.
    * `system.status` command: now the reporter node and its internal name is reported as a part of response body.
+   * `system.absorb-data` command is now available. It is used by command line utilities internally.
  * Command line utilities:
    * `droonga-engine-join` and `droonga-engine-absorb-data` commands work more surely.
    * A new option `--verbose` is introduced to monitor internal Serf operations, for `droonga-engine-join` and `droonga-engine-absorb-data`.
