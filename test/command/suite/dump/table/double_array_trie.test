@@ -1,4 +1,5 @@
 #@require-catalog-version 2
+#@subscribe-until 1s
 {
   "type": "dump",
   "dataset": "Default"

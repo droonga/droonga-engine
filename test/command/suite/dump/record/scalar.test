@@ -9,6 +9,7 @@
   }
 }
 #@enable-logging
+#@subscribe-until 1s
 {
   "type": "dump",
   "dataset": "Default"

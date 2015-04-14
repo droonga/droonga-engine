@@ -9,6 +9,7 @@
   }
 }
 #@enable-logging
+#@subscribe-until 60s 2messages
 {
   "type": "system.absorb-data",
   "dataset": "Default",
@@ -16,6 +17,8 @@
     "host":    "localhost",
     "port":    23003,
     "tag":     "droonga",
-    "dataset": "Source"
+    "dataset": "Source",
+    "progressIntervalSeconds": 10000,
+    "messagesPerSecond":       10000
   }
 }
