@@ -67,6 +67,7 @@ module Droonga
           dump_schema
           dump_records
           dump_indexes
+          forward("#{prefix}.end")
         end
 
         def dump_schema

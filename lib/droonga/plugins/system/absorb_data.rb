@@ -56,7 +56,12 @@ module Droonga
           end
 
           def handle
+            @dumper_error_message = nil
+
             dumper = Drndump::Dumper.new(dumper_params)
+            dumper.on_finish = lambda do
+              on_finish
+            end
 
             @start_time = Time.now
 
@@ -66,7 +71,8 @@ module Droonga
               get_total_n_source_records do |count|
                 @total_n_source_records = count
               end
-              dumper_error_message = dumper.run do |message|
+              @dumper_error_message = dumper.run do |message|
+                begin
                 message["dataset"] = current_dataset
                 @messenger.forward(message,
                                    "to"   => my_node_name,
@@ -76,16 +82,30 @@ module Droonga
                 if (elapsed_seconds % progress_interval_seconds).zero?
                   report_progress
                 end
+                rescue Exception => exception
+                  @dumper_error_message
+                  on_finish
+                end
               end
-              @total_n_source_records = @n_processed_messages
-              report_progress
             rescue Exception => exception
-              dumper_error_message = exception.to_s
+              @dumper_error_message = exception.to_s
+              on_finish
             end
+          end
 
-            if dumper_error_message
-              error(error_name, dumper_error_message)
+          def on_finish
+            begin
+              if @dumper_error_message
+                error(error_name, @dumper_error_message)
+              else
+                @total_n_source_records = @n_processed_messages
+                report_progress
+              end
+            rescue Exception => exception
+              @dumper_error_message = exception.to_s
+              error(error_name, @dumper_error_message)
             end
+            forward("#{prefix}.end")
           end
 
           def dumper_params

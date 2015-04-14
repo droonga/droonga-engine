@@ -98,7 +98,6 @@ module Droonga
 
           runner = Fiber.new do
             handle
-            forward("#{prefix}.end")
           end
 
           timer = Coolio::TimerWatcher.new(0.1, true)
@@ -130,6 +129,7 @@ module Droonga
 
         def handle
           #XXX override me!!
+          forward("#{prefix}.end") #XXX you must forward "end" message by self!
         end
 
         def setup_forward_data
