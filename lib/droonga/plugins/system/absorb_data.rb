@@ -179,26 +179,6 @@ module Droonga
                                   Catalog::Dataset::DEFAULT_NAME
           end
 
-          def get_source_tables(&block)
-            source_client.request("dataset" => source_dataset,
-                                  "type"    => "table_list") do |response|
-              unless response
-                raise EmptyResponse.new("table_list returns nil response")
-              end
-              unless response["body"]
-                raise EmptyBody.new("table_list returns nil result")
-              end
-
-              message_body = response["body"]
-              body = message_body[1]
-              tables = body[1..-1]
-              table_names = tables.collect do |table|
-                table[1]
-              end
-              yield(table_names)
-            end
-          end
-
           def source_client_options
             {
               :host    => source_host,
@@ -218,6 +198,26 @@ module Droonga
 
           def source_client
             @source_client ||= Droonga::Client.new(source_client_options)
+          end
+
+          def get_source_tables(&block)
+            source_client.request("dataset" => source_dataset,
+                                  "type"    => "table_list") do |response|
+              unless response
+                raise EmptyResponse.new("table_list returns nil response")
+              end
+              unless response["body"]
+                raise EmptyBody.new("table_list returns nil result")
+              end
+
+              message_body = response["body"]
+              body = message_body[1]
+              tables = body[1..-1]
+              table_names = tables.collect do |table|
+                table[1]
+              end
+              yield(table_names)
+            end
           end
 
           def get_total_n_source_records(&block)
