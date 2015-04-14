@@ -13,6 +13,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "fiber"
 require "coolio"
 
 require "droonga/loggable"
@@ -102,18 +103,18 @@ module Droonga
 
           timer = Coolio::TimerWatcher.new(0.1, true)
           timer.on_timer do
-            begin
-              runner.resume
-            rescue FiberError
+            if runner.alive?
+              begin
+                runner.resume
+              rescue
+                timer.detach
+                logger.trace("start: watcher detached on unexpected exception",
+                             :watcher => timer)
+                logger.exception(error_message, $!)
+                error(error_name, error_message)
+              end
+            else
               timer.detach
-              logger.trace("start: watcher detached on FiberError",
-                           :watcher => timer)
-            rescue
-              timer.detach
-              logger.trace("start: watcher detached on unexpected exception",
-                           :watcher => timer)
-              logger.exception(error_message, $!)
-              error(error_name, error_message)
             end
           end
 
