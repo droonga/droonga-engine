@@ -55,12 +55,12 @@ module Droonga
       end
     end
 
-    def scatter(record, options={})
+    def scatter(options={})
       @processor = {
         "command" => @source_message["type"],
         "dataset" => @dataset.name,
         "body"    => options[:body] || @source_message["body"],
-        "record"  => record,
+        "record"  => options[:record],
         "type"    => "scatter",
         "outputs" => [],
         "replica" => options[:replica] || "all",
