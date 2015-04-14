@@ -9,7 +9,7 @@
   }
 }
 #@enable-logging
-#@subscribe-until 60s 2messages
+#@subscribe-until 60s 4messages
 {
   "type": "system.absorb-data",
   "dataset": "Default",
