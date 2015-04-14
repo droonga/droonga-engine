@@ -109,7 +109,6 @@ module Droonga
         end
 
         def on_finish
-          #XXX override me!!
           forward("#{prefix}.end")
         end
 
