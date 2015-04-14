@@ -75,7 +75,7 @@ module Droonga
         "body"    => options[:body] || @source_message["body"],
         "type"    => "broadcast",
         "outputs" => [],
-        "replica" => options[:replica] || "random"
+        "replica" => options[:replica] || "random",
         "post"    => options[:write] || false,
       }
     end
