@@ -44,7 +44,7 @@ module Droonga
         }
       end
 
-      if options[:record]
+      if options[:record] or random?
         scatter(message, options)
       else
         broadcast(message, options)
