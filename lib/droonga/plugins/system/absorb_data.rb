@@ -73,15 +73,15 @@ module Droonga
               end
               @dumper_error_message = dumper.run do |message|
                 begin
-                message["dataset"] = current_dataset
-                @messenger.forward(message,
-                                   "to"   => my_node_name,
-                                   "type" => message["type"])
-                @n_processed_messages += 1
-                elapsed_seconds = (Time.now - @start_time).to_i
-                if (elapsed_seconds % progress_interval_seconds).zero?
-                  report_progress
-                end
+                  message["dataset"] = current_dataset
+                  @messenger.forward(message,
+                                     "to"   => my_node_name,
+                                     "type" => message["type"])
+                  @n_processed_messages += 1
+                  elapsed_seconds = (Time.now - @start_time).to_i
+                  if (elapsed_seconds % progress_interval_seconds).zero?
+                    report_progress
+                  end
                 rescue Exception => exception
                   @dumper_error_message
                   on_finish
