@@ -58,9 +58,6 @@ module Droonga
           def handle
             dumper = Drndump::Dumper.new(dumper_params)
 
-            serf = Serf.new(my_node_name)
-            serf.set_tag("absorbing", true)
-
             @start_time = Time.now
 
             begin
@@ -78,8 +75,6 @@ module Droonga
             rescue Exception => exception
               dumper_error_message = exception.to_s
             end
-
-            serf.set_tag("absorbing", true)
 
             if dumper_error_message
               error(error_name, dumper_error_message)
