@@ -89,8 +89,9 @@ module Droonga
               end
             rescue Exception => exception
               @dumper_error_message = exception.to_s
-              on_finish
             end
+
+            on_finish if @dumper_error_message
           end
 
           def on_finish
