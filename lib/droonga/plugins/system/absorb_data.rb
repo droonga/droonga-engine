@@ -110,7 +110,6 @@ module Droonga
           end
 
           def dumper_params
-            params = @request.request
             {
               :host    => source_host,
               :port    => source_port,
