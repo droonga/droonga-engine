@@ -73,8 +73,7 @@ module Droonga
                                    "type" => message["type"])
                 @n_processed_messages += 1
                 elapsed_seconds = (Time.now - @start_time).to_i
-                if (elapsed_seconds % progress_interval_seconds).zero? and
-                     not @total_n_source_records.nil?
+                if (elapsed_seconds % progress_interval_seconds).zero?
                   report_progress
                 end
               end
@@ -111,6 +110,9 @@ module Droonga
           end
 
           def report_progress
+            if @n_processed_messages.nil? or @total_n_source_records.nil?
+              return
+            end
             forward("#{prefix}.progress",
                     "nProcessedMessages" => @n_processed_messages,
                     "percentage"         => progress_percentage,
