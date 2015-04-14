@@ -182,22 +182,20 @@ module Droonga
           def get_source_tables(&block)
             source_client.request("dataset" => source_dataset,
                                   "type"    => "table_list") do |response|
+              unless response
+                raise EmptyResponse.new("table_list returns nil response")
+              end
+              unless response["body"]
+                raise EmptyBody.new("table_list returns nil result")
+              end
 
-            unless response
-              raise EmptyResponse.new("table_list returns nil response")
-            end
-            unless response["body"]
-              raise EmptyBody.new("table_list returns nil result")
-            end
-
-            message_body = response["body"]
-            body = message_body[1]
-            tables = body[1..-1]
-            table_names = tables.collect do |table|
-              table[1]
-            end
-            yield(table_names)
-
+              message_body = response["body"]
+              body = message_body[1]
+              tables = body[1..-1]
+              table_names = tables.collect do |table|
+                table[1]
+              end
+              yield(table_names)
             end
           end
 
@@ -224,34 +222,34 @@ module Droonga
 
           def get_total_n_source_records(&block)
             get_source_tables do |source_tables|
-            queries = {}
-            source_tables.each do |table|
-              queries["n_records_of_#{table}"] = {
-                "source" => table,
-                "output" => {
-                  "elements" => ["count"],
-                },
-              }
-            end
-            source_client.request("dataset" => source_dataset,
-                                  "type"    => "search",
-                                  "body"    => {
-                                    "timeout" => 10,
-                                    "queries" => queries,
-                                  }) do |response|
-            unless response
-              raise EmptyResponse.new("search returns nil response")
-            end
-            unless response["body"]
-              raise EmptyBody.new("search returns nil result")
-            end
+              queries = {}
+              source_tables.each do |table|
+                queries["n_records_of_#{table}"] = {
+                  "source" => table,
+                  "output" => {
+                    "elements" => ["count"],
+                  },
+                }
+              end
+              source_client.request("dataset" => source_dataset,
+                                    "type"    => "search",
+                                    "body"    => {
+                                      "timeout" => 10,
+                                      "queries" => queries,
+                                    }) do |response|
+                unless response
+                  raise EmptyResponse.new("search returns nil response")
+                end
+                unless response["body"]
+                  raise EmptyBody.new("search returns nil result")
+                end
 
-            n_records = 0
-            response["body"].each do |query_name, result|
-              n_records += result["count"]
-            end
-            yield(n_records)
-            end
+                n_records = 0
+                response["body"].each do |query_name, result|
+                  n_records += result["count"]
+                end
+                yield(n_records)
+              end
             end
           end
 
