@@ -34,6 +34,9 @@ require "droonga/node_metadata"
 
 module Droonga
   class JoinCommand
+    class MissingRequiredParameter < StandardError
+    end
+
     def run
       @loop = Coolio::Loop.default
 
@@ -59,20 +62,20 @@ module Droonga
           successed = copy_data
           unless successed
             do_cancel
-            exit(false)
+            return false
           end
         end
         set_effective_message_timestamp
         reset_source_node_role
         reset_joining_node_role
         puts("Done.")
+        true
       rescue Exception => exception
         puts("Unexpected exception: #{exception.message}")
         puts(exception.backtrace.join("\n"))
         do_cancel
-        exit(false)
+        false
       end
-      exit(true)
     end
 
     private
@@ -121,7 +124,7 @@ module Droonga
       @options = options
     rescue Slop::MissingOptionError => error
       $stderr.puts(error)
-      exit(false)
+      raise MissingRequiredParameter.new
     end
 
     def dataset
@@ -336,4 +339,4 @@ module Droonga
   end
 end
 
-Droonga::JoinCommand.new.run
+exit(Droonga::JoinCommand.new.run)

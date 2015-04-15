@@ -47,7 +47,7 @@ module Droonga
       succeeded = absorb
 
       puts "Done." if succeeded
-      exit(succeeded)
+      succeeded
     end
 
     private
@@ -268,4 +268,4 @@ module Droonga
   end
 end
 
-Droonga::AbsorbDataCommand.new.run
+exit(Droonga::AbsorbDataCommand.new.run)
