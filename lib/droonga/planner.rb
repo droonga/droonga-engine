@@ -22,12 +22,12 @@ module Droonga
     include Loggable
     include ErrorMessages
 
-    attr_writer :write, :collector_class
+    attr_writer :write, :single_operation, :collector_class
 
     def initialize(dataset)
       @dataset = dataset
       @write = false
-      @specified_random = nil
+      @single_operation = false
       @collector_class = nil
     end
 
@@ -42,15 +42,11 @@ module Droonga
         }
       end
 
-      if options[:record] or random?
+      if options[:record] or single_operation?
         scatter(message, options)
       else
         broadcast(message, options)
       end
-    end
-
-    def random=(value)
-      @specified_random = value
     end
 
     private
@@ -58,12 +54,9 @@ module Droonga
       @write
     end
 
-    def random?
-      if @specified_random.nil?
-        not write?
-      else
-        @specified_random
-      end
+    def single_operation?
+      return false if write?
+      @single_operation
     end
 
     def scatter(message, options={})
@@ -72,7 +65,10 @@ module Droonga
         :write => write?,
         :record => options[:record],
       }
-      scatter_options[:replica] = "random" if random?
+      if single_operation?
+        scatter_options[:slice]   = "random"
+        scatter_options[:replica] = "random"
+      end
       planner.scatter(scatter_options)
       planner.reduce(options[:reduce])
       planner.plan

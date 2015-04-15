@@ -44,7 +44,7 @@ module Droonga
 
       define_single_step do |step|
         step.name = "system.status"
-        step.random = true
+        step.single_operation = true
         step.handler = StatusHandler
         step.collector = Collectors::Or
       end

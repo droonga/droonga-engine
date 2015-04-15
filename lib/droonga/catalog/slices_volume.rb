@@ -39,8 +39,16 @@ module Droonga
         @slices ||= create_slices
       end
 
-      def select_slices(range=0..-1)
-        slices.sort_by(&:label)[range]
+      def select_slices(how=:all, range=0..-1)
+        selected = slices.sort_by(&:label)[range]
+        case how
+        when :random
+          [selected.sample]
+        when :all
+          selected
+        else
+          selected
+        end
       end
 
       def choose_slice(record)
@@ -76,13 +84,13 @@ module Droonga
         slices = []
         case message["type"]
         when "broadcast"
-          slices = select_slices
+          slices = select_slices(:all)
         when "scatter"
           record = message["record"]
           if record
             slices = [choose_slice(record)]
           else
-            slices = select_slices
+            slices = select_slices(message["slice"].to_sym)
           end
         end
         slices.each do |slice|

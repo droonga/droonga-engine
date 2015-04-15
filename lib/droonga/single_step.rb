@@ -33,7 +33,7 @@ module Droonga
       # XXX: Re-implement me.
       planner = Planner.new(@dataset)
       planner.write = @definition.write?
-      planner.random = @definition.random?
+      planner.single_operation = @definition.single_operation?
       planner.collector_class = @definition.collector_class
 
       body = message["body"]
