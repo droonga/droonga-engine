@@ -17,7 +17,7 @@ require "droonga/loggable"
 require "droonga/node_name"
 require "droonga/catalog/dataset"
 require "droonga/client"
-require "droonga/catalog_generator"
+require "droonga/catalog/generator"
 require "droonga/catalog_fetcher"
 
 module Droonga
@@ -153,7 +153,7 @@ module Droonga
     end
 
     def get_source_replica_hosts
-      generator = CatalogGenerator.new
+      generator = Catalog::Generator.new
       generator.load(source_catalog)
       dataset = generator.dataset_for_host(@source_host)
       return [] unless dataset

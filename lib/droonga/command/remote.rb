@@ -19,7 +19,7 @@ require "droonga/path"
 require "droonga/serf"
 require "droonga/node_name"
 require "droonga/node_metadata"
-require "droonga/catalog_generator"
+require "droonga/catalog/generator"
 require "droonga/catalog_modifier"
 require "droonga/catalog_fetcher"
 require "droonga/data_absorber"
@@ -208,7 +208,7 @@ module Droonga
         end
 
         def replica_hosts
-          generator = CatalogGenerator.new
+          generator = Catalog::Generator.new
           generator.load(catalog)
           dataset = generator.dataset_for_host(source_host) ||
                       generator.dataset_for_host(host)

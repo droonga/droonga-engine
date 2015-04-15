@@ -16,13 +16,13 @@
 require "json"
 
 require "droonga/path"
-require "droonga/catalog_generator"
+require "droonga/catalog/generator"
 require "droonga/safe_file_writer"
 
 module Droonga
   class CatalogModifier
     def initialize(source_catalog)
-      @generator = CatalogGenerator.new
+      @generator = Catalog::Generator.new
       @generator.load(source_catalog)
     end
 

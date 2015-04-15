@@ -19,7 +19,8 @@ require "droonga/node_name"
 require "droonga/catalog/dataset"
 
 module Droonga
-  class CatalogGenerator
+  module Catalog
+  class Generator
     DEFAULT_DATASET = Catalog::Dataset::DEFAULT_NAME
     DEFAULT_HOSTS     = [NodeName::DEFAULT_HOST]
     DEFAULT_N_WORKERS = 4
@@ -239,5 +240,6 @@ module Droonga
         @weight ||= 100 / @n_slices
       end
     end
+  end
   end
 end
