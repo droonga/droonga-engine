@@ -33,307 +33,307 @@ require "droonga/serf"
 require "droonga/node_metadata"
 
 module Droonga
-class JoinCommand
-  def run
-    @loop = Coolio::Loop.default
+  class JoinCommand
+    def run
+      @loop = Coolio::Loop.default
 
-    parse_options
-    trap_signals
+      parse_options
+      trap_signals
 
-    puts "Start to join a new node #{joining_node.host}"
-    puts "       to the cluster of #{source_node.host}"
-    puts "                     via #{@options["receiver-host"]} (this host)"
-    puts "    port    = #{joining_node.port}"
-    puts "    tag     = #{joining_node.tag}"
-    puts "    dataset = #{dataset}"
-    puts ""
-    puts "Source Cluster ID: #{source_cluster_id}"
-    puts ""
+      puts "Start to join a new node #{joining_node.host}"
+      puts "       to the cluster of #{source_node.host}"
+      puts "                     via #{@options["receiver-host"]} (this host)"
+      puts "    port    = #{joining_node.port}"
+      puts "    tag     = #{joining_node.tag}"
+      puts "    dataset = #{dataset}"
+      puts ""
+      puts "Source Cluster ID: #{source_cluster_id}"
+      puts ""
 
-    begin
-      set_joining_node_role
-      do_join
-      register_to_existing_nodes
-      set_source_node_role
-      unless @options["no-copy"]
-        successed = copy_data
-        unless successed
-          do_cancel
-          exit(false)
+      begin
+        set_joining_node_role
+        do_join
+        register_to_existing_nodes
+        set_source_node_role
+        unless @options["no-copy"]
+          successed = copy_data
+          unless successed
+            do_cancel
+            exit(false)
+          end
         end
+        set_effective_message_timestamp
+        reset_source_node_role
+        reset_joining_node_role
+        puts("Done.")
+      rescue Exception => exception
+        puts("Unexpected exception: #{exception.message}")
+        puts(exception.backtrace.join("\n"))
+        do_cancel
+        exit(false)
       end
-      set_effective_message_timestamp
-      reset_source_node_role
-      reset_joining_node_role
-      puts("Done.")
-    rescue Exception => exception
-      puts("Unexpected exception: #{exception.message}")
-      puts(exception.backtrace.join("\n"))
-      do_cancel
+      exit(true)
+    end
+
+    private
+    def parse_options
+      options = Slop.parse(:help => true) do |option|
+        option.on("no-copy", "Don't copy data from the source cluster.",
+                  :default => false)
+
+        option.separator("Target:")
+        option.on(:host=,
+                  "Host name of the new node to be joined.",
+                  :required => true)
+        option.on("replica-source-host=",
+                  "Host name of the soruce node in the cluster to be connected.",
+                  :required => true)
+
+        option.on(:port=,
+                  "Port number of the source cluster to be connected.",
+                  :as => Integer,
+                  :default => NodeName::DEFAULT_PORT)
+        option.on(:tag=,
+                  "Tag name of the soruce cluster to be connected.",
+                  :default => NodeName::DEFAULT_TAG)
+        option.on(:dataset=,
+                  "Dataset name of for the node to be joined.",
+                  :default => Catalog::Dataset::DEFAULT_NAME)
+
+        option.separator("Connections:")
+        option.on("receiver-host=",
+                  "Host name of this host.",
+                  :default => Socket.gethostname)
+
+        option.separator("Miscellaneous:")
+        option.on("records-per-second=",
+                  "Maximum number of records per second to be copied. " +
+                    "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
+                  :as => Integer,
+                  :default => DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND)
+        option.on("progress-interval-seconds=",
+                  "Interval seconds to report progress.",
+                  :as => Integer,
+                  :default => DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS)
+        option.on(:verbose, "Output details for internal operations.",
+                  :default => false)
+      end
+      @options = options
+    rescue Slop::MissingOptionError => error
+      $stderr.puts(error)
       exit(false)
     end
-    exit(true)
-  end
 
-  private
-  def parse_options
-    options = Slop.parse(:help => true) do |option|
-      option.on("no-copy", "Don't copy data from the source cluster.",
-                :default => false)
-
-      option.separator("Target:")
-      option.on(:host=,
-                "Host name of the new node to be joined.",
-                :required => true)
-      option.on("replica-source-host=",
-                "Host name of the soruce node in the cluster to be connected.",
-                :required => true)
-
-      option.on(:port=,
-                "Port number of the source cluster to be connected.",
-                :as => Integer,
-                :default => NodeName::DEFAULT_PORT)
-      option.on(:tag=,
-                "Tag name of the soruce cluster to be connected.",
-                :default => NodeName::DEFAULT_TAG)
-      option.on(:dataset=,
-                "Dataset name of for the node to be joined.",
-                :default => Catalog::Dataset::DEFAULT_NAME)
-
-      option.separator("Connections:")
-      option.on("receiver-host=",
-                "Host name of this host.",
-                :default => Socket.gethostname)
-
-      option.separator("Miscellaneous:")
-      option.on("records-per-second=",
-                "Maximum number of records per second to be copied. " +
-                  "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
-                :as => Integer,
-                :default => DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND)
-      option.on("progress-interval-seconds=",
-                "Interval seconds to report progress.",
-                :as => Integer,
-                :default => DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS)
-      option.on(:verbose, "Output details for internal operations.",
-                :default => false)
+    def dataset
+      @options[:dataset]
     end
-    @options = options
-  rescue Slop::MissingOptionError => error
-    $stderr.puts(error)
-    exit(false)
-  end
 
-  def dataset
-    @options[:dataset]
-  end
-
-  def joining_node
-    @joining_node ||= NodeName.new(:host => @options[:host],
-                                   :port => @options[:port],
-                                   :tag  => @options[:tag])
-  end
-
-  def source_node
-    @source_node ||= NodeName.new(:host => @options["replica-source-host"],
-                                  :port => @options[:port],
-                                  :tag  => @options[:tag])
-  end
-
-  def source_cluster_id
-    source_catalog.cluster_id
-  end
-
-  def source_catalog
-    @source_catalog ||= parse_source_catalog
-  end
-
-  def parse_source_catalog
-    loader = Catalog::Loader.new
-    loader.parse(raw_source_catalog)
-  end
-
-  def raw_source_catalog
-    @raw_source_catalog ||= fetch_source_catalog
-  end
-
-  def fetch_source_catalog
-    fetcher = Catalog::Fetcher.new(:host          => source_node.host,
-                                            :port          => source_node.port,
-                                            :tag           => source_node.tag,
-                                            :receiver_host => @options["receiver-host"])
-    fetcher.fetch(:dataset => dataset)
-  end
-
-  def run_remote_command(target, command, options)
-    serf = Serf.new(target, :verbose => @options[:verbose])
-    serf.send_query(command, options)
-  end
-
-  def absorber
-    @absorber ||= prepare_absorber
-  end
-
-  def prepare_absorber
-    absorber_options = {
-      :host    => joining_node.host,
-      :port    => joining_node.port,
-      :tag     => joining_node.tag,
-      :dataset => dataset,
-
-      :source_host    => source_node.host,
-      :source_port    => source_node.port,
-      :source_tag     => source_node.tag,
-      :source_dataset => dataset,
-
-      :receiver_host    => @options["receiver-host"],
-
-      :messages_per_second => @options["records-per-second"],
-      :progress_interval_seconds => @options["progress-interval-seconds"],
-
-      :client_options   => {
-        :backend => :coolio,
-        :loop    => @loop,
-      },
-    }
-    DataAbsorberClient.new(absorber_options)
-  end
-
-  def set_source_node_role
-    if absorber.source_node_suspendable?
-      puts("Changing role of the source node...")
-      run_remote_command(source_node.to_s, "change_role",
-                         "node" => source_node.to_s,
-                         "role" => NodeMetadata::Role::ABSORB_SOURCE)
-      wait_until_restarted(source_node)
+    def joining_node
+      @joining_node ||= NodeName.new(:host => @options[:host],
+                                     :port => @options[:port],
+                                     :tag  => @options[:tag])
     end
-    @source_node_role_changed = true
-  end
 
-  def set_joining_node_role
-    puts("Changing role of the joining node...")
-    run_remote_command(joining_node.to_s, "change_role",
-                       "node" => joining_node.to_s,
-                       "role" => NodeMetadata::Role::ABSORB_DESTINATION)
-    wait_until_restarted(joining_node)
-    @joining_node_role_changed = true
-  end
-
-  def reset_source_node_role
-    if absorber.source_node_suspendable?
-      puts("Restoring role of the source node...")
-      run_remote_command(source_node.to_s, "change_role",
-                         "node" => source_node.to_s,
-                         "role" => NodeMetadata::Role::SERVICE_PROVIDER)
-      wait_until_restarted(source_node.to_s)
+    def source_node
+      @source_node ||= NodeName.new(:host => @options["replica-source-host"],
+                                    :port => @options[:port],
+                                    :tag  => @options[:tag])
     end
-    @source_node_role_changed = false
-  end
 
-  def reset_joining_node_role
-    puts("Restoring role of the joining node...")
-    run_remote_command(joining_node.to_s, "change_role",
-                       "node" => joining_node.to_s,
-                       "role" => NodeMetadata::Role::SERVICE_PROVIDER)
-    wait_until_restarted(joining_node.to_s)
-    @joining_node_role_changed = false
-  end
+    def source_cluster_id
+      source_catalog.cluster_id
+    end
 
-  def do_join
-    puts("Joining new replica to the cluster...")
-    run_remote_command(joining_node.to_s, "join",
-                       "node"    => joining_node.to_s,
-                       "type"    => "replica",
-                       "source"  => source_node.to_s,
-                       "dataset" => dataset)
-    wait_until_restarted(joining_node)
-  end
+    def source_catalog
+      @source_catalog ||= parse_source_catalog
+    end
 
-  def copy_data
-    puts("Copying data from the source node...")
+    def parse_source_catalog
+      loader = Catalog::Loader.new
+      loader.parse(raw_source_catalog)
+    end
 
-    last_progress = nil
-    absorber.run do |progress|
-      if last_progress
-        printf("%s", "#{" " * last_progress[:message].size}\r")
+    def raw_source_catalog
+      @raw_source_catalog ||= fetch_source_catalog
+    end
+
+    def fetch_source_catalog
+      fetcher = Catalog::Fetcher.new(:host          => source_node.host,
+                                     :port          => source_node.port,
+                                     :tag           => source_node.tag,
+                                     :receiver_host => @options["receiver-host"])
+      fetcher.fetch(:dataset => dataset)
+    end
+
+    def run_remote_command(target, command, options)
+      serf = Serf.new(target, :verbose => @options[:verbose])
+      serf.send_query(command, options)
+    end
+
+    def absorber
+      @absorber ||= prepare_absorber
+    end
+
+    def prepare_absorber
+      absorber_options = {
+        :host    => joining_node.host,
+        :port    => joining_node.port,
+        :tag     => joining_node.tag,
+        :dataset => dataset,
+
+        :source_host    => source_node.host,
+        :source_port    => source_node.port,
+        :source_tag     => source_node.tag,
+        :source_dataset => dataset,
+
+        :receiver_host    => @options["receiver-host"],
+
+        :messages_per_second => @options["records-per-second"],
+        :progress_interval_seconds => @options["progress-interval-seconds"],
+
+        :client_options   => {
+          :backend => :coolio,
+          :loop    => @loop,
+        },
+      }
+      DataAbsorberClient.new(absorber_options)
+    end
+
+    def set_source_node_role
+      if absorber.source_node_suspendable?
+        puts("Changing role of the source node...")
+        run_remote_command(source_node.to_s, "change_role",
+                           "node" => source_node.to_s,
+                           "role" => NodeMetadata::Role::ABSORB_SOURCE)
+        wait_until_restarted(source_node)
       end
-      printf("%s", "#{progress[:message]}\r")
-      last_progress = progress
-    end
-    @loop.run
-
-    if absorber.error_message
-      puts(absorber.error_message)
-      do_cancel
-      return false
+      @source_node_role_changed = true
     end
 
-    puts ""
-  end
-
-  def set_effective_message_timestamp
-    response = run_remote_command(source_node.to_s, "report_metadata",
-                                  "node" => source_node.to_s,
-                                  "key" => "last_processed_message_timestamp")
-    timestamp = response["value"]
-    if timestamp and not timestamp.empty?
-      puts "The timestamp of the last processed message in the source node: #{timestamp}"
-      puts "Setting effective message timestamp for the destination node..."
-      response = run_remote_command(joining_node.to_s, "accept_messages_newer_than",
-                                    "node" => joining_node.to_s,
-                                    "timestamp" => timestamp)
-    end
-  end
-
-  def register_to_existing_nodes
-    puts("Register new node to existing hosts in the cluster...")
-    run_remote_command(source_node.to_s, "add_replicas",
-                       "cluster_id" => source_cluster_id,
-                       "dataset" => dataset,
-                       "hosts"   => [joining_node.host])
-    wait_until_restarted(source_node)
-    @node_registered = true
-  end
-
-  def unregister_from_existing_nodes
-    puts("Unregister new node from existing hosts in the cluster...")
-    run_remote_command(source_node, "remove_replicas",
-                       "cluster_id" => source_cluster_id,
-                       "dataset" => dataset,
-                       "hosts"   => [joining_node.host])
-    wait_until_restarted(source_node)
-    @node_registered = false
-  end
-
-  def trap_signals
-    trap(:TERM) do
-      trap(:TERM, "DEFAULT")
-      do_cancel
+    def set_joining_node_role
+      puts("Changing role of the joining node...")
+      run_remote_command(joining_node.to_s, "change_role",
+                         "node" => joining_node.to_s,
+                         "role" => NodeMetadata::Role::ABSORB_DESTINATION)
+      wait_until_restarted(joining_node)
+      @joining_node_role_changed = true
     end
 
-    trap(:INT) do
-      trap(:INT, "DEFAULT")
-      do_cancel
+    def reset_source_node_role
+      if absorber.source_node_suspendable?
+        puts("Restoring role of the source node...")
+        run_remote_command(source_node.to_s, "change_role",
+                           "node" => source_node.to_s,
+                           "role" => NodeMetadata::Role::SERVICE_PROVIDER)
+        wait_until_restarted(source_node.to_s)
+      end
+      @source_node_role_changed = false
     end
 
-    trap(:QUIT) do
-      trap(:QUIT, "DEFAULT")
-      do_cancel
+    def reset_joining_node_role
+      puts("Restoring role of the joining node...")
+      run_remote_command(joining_node.to_s, "change_role",
+                         "node" => joining_node.to_s,
+                         "role" => NodeMetadata::Role::SERVICE_PROVIDER)
+      wait_until_restarted(joining_node.to_s)
+      @joining_node_role_changed = false
+    end
+
+    def do_join
+      puts("Joining new replica to the cluster...")
+      run_remote_command(joining_node.to_s, "join",
+                         "node"    => joining_node.to_s,
+                         "type"    => "replica",
+                         "source"  => source_node.to_s,
+                         "dataset" => dataset)
+      wait_until_restarted(joining_node)
+    end
+
+    def copy_data
+      puts("Copying data from the source node...")
+
+      last_progress = nil
+      absorber.run do |progress|
+        if last_progress
+          printf("%s", "#{" " * last_progress[:message].size}\r")
+        end
+        printf("%s", "#{progress[:message]}\r")
+        last_progress = progress
+      end
+      @loop.run
+
+      if absorber.error_message
+        puts(absorber.error_message)
+        do_cancel
+        return false
+      end
+
+      puts ""
+    end
+
+    def set_effective_message_timestamp
+      response = run_remote_command(source_node.to_s, "report_metadata",
+                                    "node" => source_node.to_s,
+                                    "key" => "last_processed_message_timestamp")
+      timestamp = response["value"]
+      if timestamp and not timestamp.empty?
+        puts "The timestamp of the last processed message in the source node: #{timestamp}"
+        puts "Setting effective message timestamp for the destination node..."
+        response = run_remote_command(joining_node.to_s, "accept_messages_newer_than",
+                                      "node" => joining_node.to_s,
+                                      "timestamp" => timestamp)
+      end
+    end
+
+    def register_to_existing_nodes
+      puts("Register new node to existing hosts in the cluster...")
+      run_remote_command(source_node.to_s, "add_replicas",
+                         "cluster_id" => source_cluster_id,
+                         "dataset" => dataset,
+                         "hosts"   => [joining_node.host])
+      wait_until_restarted(source_node)
+      @node_registered = true
+    end
+
+    def unregister_from_existing_nodes
+      puts("Unregister new node from existing hosts in the cluster...")
+      run_remote_command(source_node, "remove_replicas",
+                         "cluster_id" => source_cluster_id,
+                         "dataset" => dataset,
+                         "hosts"   => [joining_node.host])
+      wait_until_restarted(source_node)
+      @node_registered = false
+    end
+
+    def trap_signals
+      trap(:TERM) do
+        trap(:TERM, "DEFAULT")
+        do_cancel
+      end
+
+      trap(:INT) do
+        trap(:INT, "DEFAULT")
+        do_cancel
+      end
+
+      trap(:QUIT) do
+        trap(:QUIT, "DEFAULT")
+        do_cancel
+      end
+    end
+
+    def do_cancel
+      #XXX we have to write more codes to cancel remote processes!
+      unregister_from_existing_nodes if @node_registered
+      reset_joining_node_role if @joining_node_role_changed
+      reset_source_node_role if @source_node_role_changed
+    end
+
+    def wait_until_restarted(*nodes)
+      #TODO: wait for restarting of the given nodes. this should be done more safely.
+      sleep(30)
     end
   end
-
-  def do_cancel
-    #XXX we have to write more codes to cancel remote processes!
-    unregister_from_existing_nodes if @node_registered
-    reset_joining_node_role if @joining_node_role_changed
-    reset_source_node_role if @source_node_role_changed
-  end
-
-  def wait_until_restarted(*nodes)
-    #TODO: wait for restarting of the given nodes. this should be done more safely.
-    sleep(30)
-  end
-end
 end
 
 Droonga::JoinCommand.new.run

@@ -28,130 +28,130 @@ require "droonga/catalog/loader"
 require "droonga/serf"
 
 module Droonga
-class UnjoinCommand
-  def run
-    parse_options
+  class UnjoinCommand
+    def run
+      parse_options
 
-    puts "Start to unjoin a node #{@options[:host]}"
-    puts "                    by #{@options["receiver-host"]} (this host)"
-    puts ""
+      puts "Start to unjoin a node #{@options[:host]}"
+      puts "                    by #{@options["receiver-host"]} (this host)"
+      puts ""
 
-    do_unjoin
+      do_unjoin
 
-    puts("Done.")
-    exit(true)
-  end
-
-  private
-  def parse_options
-    options = Slop.parse(:help => true) do |option|
-      option.on(:host=,
-                "Host name of the replica removed from cluster.",
-                :required => true)
-      option.on("receiver-host=",
-                "Host name of this host.",
-                :default => Socket.gethostname)
-      option.on(:dataset=,
-                "Dataset name of for the node to be unjoined.",
-                :default => NodeName::DEFAULT_DATASET)
-      option.on(:port=,
-                "Port number of the source cluster to be connected.",
-                :as => Integer,
-                :default => NodeName::DEFAULT_PORT)
-      option.on(:tag=,
-                "Tag name of the soruce cluster to be connected.",
-                :default => NodeName::DEFAULT_TAG)
-
-      option.separator("Miscellaneous:")
-      option.on(:verbose, "Output details for internal operations.",
-                :default => false)
-    end
-    @options = options
-  rescue Slop::MissingOptionError => error
-    $stderr.puts(error)
-    exit(false)
-  end
-
-  def replica_remove_host
-    @options[:host]
-  end
-
-  def tag
-    @options[:tag]
-  end
-
-  def port
-    @options[:port]
-  end
-
-  def dataset_name
-    @options[:dataset]
-  end
-
-  def replica_remove_node
-    "#{replica_remove_host}:#{port}/#{tag}"
-  end
-
-  def cluster_id
-    catalog.cluster_id
-  end
-
-  def catalog
-    @catalog ||= parse_catalog
-  end
-
-  def parse_catalog
-    loader = Catalog::Loader.new
-    loader.parse(raw_catalog)
-  end
-
-  def raw_catalog
-    @raw_catalog ||= fetch_catalog
-  end
-
-  def fetch_catalog
-    fetcher = Catalog::Fetcher.new(:host          => replica_remove_host,
-                                            :port          => port,
-                                            :tag           => tag,
-                                            :receiver_host => @options["receiver-host"])
-    fetcher.fetch(:dataset => dataset_name)
-  end
-
-  def remaining_node
-    @remaining_node ||= detect_remaining_node
-  end
-
-  def detect_remaining_node
-    generator = Catalog::Generator.new
-    generator.load(raw_catalog)
-
-    dataset = generator.dataset_for_host(replica_remove_host)
-    unless dataset
-      raise "Specified host #{replica_remove_host} is not a member of "+
-              "the cluster. You must specify correct host via --replica-remove-host " +
-              "option."
+      puts("Done.")
+      exit(true)
     end
 
-    other_hosts = dataset.replicas.hosts
+    private
+    def parse_options
+      options = Slop.parse(:help => true) do |option|
+        option.on(:host=,
+                  "Host name of the replica removed from cluster.",
+                  :required => true)
+        option.on("receiver-host=",
+                  "Host name of this host.",
+                  :default => Socket.gethostname)
+        option.on(:dataset=,
+                  "Dataset name of for the node to be unjoined.",
+                  :default => NodeName::DEFAULT_DATASET)
+        option.on(:port=,
+                  "Port number of the source cluster to be connected.",
+                  :as => Integer,
+                  :default => NodeName::DEFAULT_PORT)
+        option.on(:tag=,
+                  "Tag name of the soruce cluster to be connected.",
+                  :default => NodeName::DEFAULT_TAG)
 
-    remaining_host = other_hosts.first || replica_remove_host
-    "#{remaining_host}:#{port}/#{tag}"
+        option.separator("Miscellaneous:")
+        option.on(:verbose, "Output details for internal operations.",
+                  :default => false)
+      end
+      @options = options
+    rescue Slop::MissingOptionError => error
+      $stderr.puts(error)
+      exit(false)
+    end
+
+    def replica_remove_host
+      @options[:host]
+    end
+
+    def tag
+      @options[:tag]
+    end
+
+    def port
+      @options[:port]
+    end
+
+    def dataset_name
+      @options[:dataset]
+    end
+
+    def replica_remove_node
+      "#{replica_remove_host}:#{port}/#{tag}"
+    end
+
+    def cluster_id
+      catalog.cluster_id
+    end
+
+    def catalog
+      @catalog ||= parse_catalog
+    end
+
+    def parse_catalog
+      loader = Catalog::Loader.new
+      loader.parse(raw_catalog)
+    end
+
+    def raw_catalog
+      @raw_catalog ||= fetch_catalog
+    end
+
+    def fetch_catalog
+      fetcher = Catalog::Fetcher.new(:host          => replica_remove_host,
+                                     :port          => port,
+                                     :tag           => tag,
+                                     :receiver_host => @options["receiver-host"])
+      fetcher.fetch(:dataset => dataset_name)
+    end
+
+    def remaining_node
+      @remaining_node ||= detect_remaining_node
+    end
+
+    def detect_remaining_node
+      generator = Catalog::Generator.new
+      generator.load(raw_catalog)
+
+      dataset = generator.dataset_for_host(replica_remove_host)
+      unless dataset
+        raise "Specified host #{replica_remove_host} is not a member of "+
+                "the cluster. You must specify correct host via --replica-remove-host " +
+                "option."
+      end
+
+      other_hosts = dataset.replicas.hosts
+
+      remaining_host = other_hosts.first || replica_remove_host
+      "#{remaining_host}:#{port}/#{tag}"
+    end
+
+    def run_remote_command(target, command, options)
+      serf = Serf.new(target, :verbose => @options[:verbose])
+      serf.send_query(command, options)
+    end
+
+    def do_unjoin
+      puts "Unjoining replica from the cluster..."
+
+      run_remote_command(remaining_node, "unjoin",
+                         "cluster_id" => cluster_id,
+                         "dataset" => dataset_name,
+                         "hosts"   => [replica_remove_host])
+    end
   end
-
-  def run_remote_command(target, command, options)
-    serf = Serf.new(target, :verbose => @options[:verbose])
-    serf.send_query(command, options)
-  end
-
-  def do_unjoin
-    puts "Unjoining replica from the cluster..."
-
-    run_remote_command(remaining_node, "unjoin",
-                       "cluster_id" => cluster_id,
-                       "dataset" => dataset_name,
-                       "hosts"   => [replica_remove_host])
-  end
-end
 end
 
 Droonga::UnjoinCommand.new.run

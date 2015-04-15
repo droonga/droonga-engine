@@ -23,65 +23,65 @@ require "droonga/node_name"
 require "droonga/serf"
 
 module Droonga
-class SetRoleCommand
-  def run
-    parse_options
-    puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
-    set_node_role
-    puts("Done.")
-    exit(true)
-  end
-
-  private
-  def parse_options
-    options = Slop.parse(:help => true) do |option|
-      option.on(:role=,
-                "New role for the target node.",
-                :required => true)
-
-      option.separator("Connections:")
-      option.on(:host=,
-                "Host name of the target node.",
-                :required => true)
-      option.on("receiver-host=",
-                "Host name of this host.",
-                :default => Socket.gethostname)
-      option.on(:dataset=,
-                "Dataset name of for the target node.",
-                :default => NodeName::DEFAULT_DATASET)
-      option.on(:port=,
-                "Port number of the source cluster to be connected.",
-                :as => Integer,
-                :default => NodeName::DEFAULT_PORT)
-      option.on(:tag=,
-                "Tag name of the soruce cluster to be connected.",
-                :default => NodeName::DEFAULT_TAG)
-
-      option.separator("Miscellaneous:")
-      option.on(:verbose, "Output details for internal operations.",
-                :default => false)
+  class SetRoleCommand
+    def run
+      parse_options
+      puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
+      set_node_role
+      puts("Done.")
+      exit(true)
     end
-    @options = options
-  rescue Slop::MissingOptionError => error
-    $stderr.puts(error)
-    exit(false)
-  end
 
-  def target_node
-    "#{@options[:host]}:#{@options[:port]}/#{@options[:tag]}"
-  end
+    private
+    def parse_options
+      options = Slop.parse(:help => true) do |option|
+        option.on(:role=,
+                  "New role for the target node.",
+                  :required => true)
 
-  def run_remote_command(target, command, options)
-    serf = Serf.new(target, :verbose => @options[:verbose])
-    serf.send_query(command, options)
-  end
+        option.separator("Connections:")
+        option.on(:host=,
+                  "Host name of the target node.",
+                  :required => true)
+        option.on("receiver-host=",
+                  "Host name of this host.",
+                  :default => Socket.gethostname)
+        option.on(:dataset=,
+                  "Dataset name of for the target node.",
+                  :default => NodeName::DEFAULT_DATASET)
+        option.on(:port=,
+                  "Port number of the source cluster to be connected.",
+                  :as => Integer,
+                  :default => NodeName::DEFAULT_PORT)
+        option.on(:tag=,
+                  "Tag name of the soruce cluster to be connected.",
+                  :default => NodeName::DEFAULT_TAG)
 
-  def set_node_role
-    run_remote_command(target_node, "change_role",
-                       "node" => target_node,
-                       "role" => @options[:role])
+        option.separator("Miscellaneous:")
+        option.on(:verbose, "Output details for internal operations.",
+                  :default => false)
+      end
+      @options = options
+    rescue Slop::MissingOptionError => error
+      $stderr.puts(error)
+      exit(false)
+    end
+
+    def target_node
+      "#{@options[:host]}:#{@options[:port]}/#{@options[:tag]}"
+    end
+
+    def run_remote_command(target, command, options)
+      serf = Serf.new(target, :verbose => @options[:verbose])
+      serf.send_query(command, options)
+    end
+
+    def set_node_role
+      run_remote_command(target_node, "change_role",
+                         "node" => target_node,
+                         "role" => @options[:role])
+    end
   end
-end
 end
 
 Droonga::SetRoleCommand.new.run
