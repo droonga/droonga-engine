@@ -64,6 +64,7 @@ module Droonga
         "type"    => "scatter",
         "outputs" => [],
         "replica" => options[:replica] || "all",
+        "slice"   => options[:slice] || "all",
         "post"    => options[:write] || false,
       }
     end
@@ -76,6 +77,7 @@ module Droonga
         "type"    => "broadcast",
         "outputs" => [],
         "replica" => options[:replica] || "random",
+        "slice"   => options[:slice] || "all",
         "post"    => options[:write] || false,
       }
     end

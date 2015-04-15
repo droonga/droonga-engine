@@ -84,14 +84,13 @@ module Droonga
         slices = []
         case message["type"]
         when "broadcast"
-          slices = select_slices
+          slices = select_slices(message["slice"].to_sym)
         when "scatter"
           record = message["record"]
           if record
             slices = [choose_slice(record)]
           else
-            slice_option = message["slice"] || "all"
-            slices = select_slices(slice_option.to_sym)
+            slices = select_slices(message["slice"].to_sym)
           end
         end
         slices.each do |slice|

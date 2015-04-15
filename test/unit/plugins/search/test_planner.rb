@@ -174,6 +174,7 @@ class SearchPlannerTest < Test::Unit::TestCase
         "query2",
       ],
       "replica" => "random",
+      "slice" => "all",
       "post" => false,
     }
     message << searcher

@@ -79,7 +79,12 @@ module Droonga
       broadcast_options = {
         :write => write?,
       }
-      broadcast_options[:replica] = "all" if write?
+      if write?
+        broadcast_options[:replica] = "all"
+      elsif single_operation?
+        broadcast_options[:slice]   = "random"
+        broadcast_options[:replica] = "random"
+      end
       planner.broadcast(broadcast_options)
       planner.reduce(options[:reduce])
       planner.plan
