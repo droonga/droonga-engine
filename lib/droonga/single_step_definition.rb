@@ -18,7 +18,7 @@ module Droonga
     attr_accessor :name
     attr_accessor :handler
     attr_accessor :collector
-    attr_writer :write, :random
+    attr_writer :write
     attr_writer :timeout_seconds_calculator
     attr_accessor :inputs
     attr_accessor :output
@@ -28,7 +28,7 @@ module Droonga
       @handler = nil
       @collector = nil
       @write = false
-      @random = false
+      @user_defined_random = nil
       @timeout_seconds_calculator = lambda do |step|
         if step["timeout"]
           return step["timeout"]
@@ -47,11 +47,15 @@ module Droonga
       @write
     end
 
+    def random=(value)
+      @user_defined_random = value
+    end
+
     def random?
-      unless @random.nil?
-        @random
-      else
+      if @user_defined_random.nil?
         not write?
+      else
+        @user_defined_random
       end
     end
 
