@@ -69,7 +69,7 @@ module Droonga
               @total_n_source_records = nil
               get_total_n_source_records do |count|
                 @total_n_source_records = count
-               logger.info("#{count} records to be absorbed")
+                logger.info("#{count} records to be absorbed")
               end
               logger.info("starting to absorb the source dataset")
               @dumper_error_message = dumper.run(dump_options) do |message|
