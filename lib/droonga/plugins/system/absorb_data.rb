@@ -19,7 +19,7 @@ require "droonga/catalog/dataset"
 require "droonga/serf"
 require "droonga/node_name"
 
-require "drndump/dumper"
+require "drndump/dump_client"
 
 module Droonga
   module Plugins
@@ -47,7 +47,7 @@ module Droonga
 
             @dumper_error_message = nil
 
-            dumper = Drndump::Dumper.new(dumper_params)
+            dumper = Drndump::DumpClient.new(dumper_params)
             dumper.on_finish = lambda do
               on_finish
             end
