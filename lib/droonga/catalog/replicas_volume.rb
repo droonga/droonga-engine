@@ -89,6 +89,7 @@ module Droonga
             routes.concat(volume.compute_routes(message, active_nodes))
           end
         when "scatter"
+          #TODO: we should choose suitable replica from differently sliced replicas.
           replicas = select(message["replica"].to_sym, active_nodes)
           replicas.each do |volume|
             routes.concat(volume.compute_routes(message, active_nodes))
