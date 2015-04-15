@@ -19,7 +19,7 @@ require "droonga/catalog_generator"
 require "droonga/catalog_fetcher"
 
 module Droonga
-  class DataAbsorber
+  class DataAbsorberClient
     include Loggable
 
     DEFAULT_MESSAGES_PER_SECOND = 100

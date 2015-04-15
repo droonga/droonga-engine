@@ -23,7 +23,7 @@ require "coolio"
 require "droonga/engine/version"
 require "droonga/catalog_generator"
 require "droonga/path"
-require "droonga/data_absorber"
+require "droonga/data_absorber_client"
 require "droonga/serf"
 require "droonga/client"
 require "droonga/node_metadata"
@@ -59,8 +59,8 @@ class AbsorbDataCommand
     options.tag     = Droonga::CatalogGenerator::DEFAULT_TAG
     options.dataset = Droonga::CatalogGenerator::DEFAULT_DATASET
     options.receiver_host = Socket.gethostname
-    options.messages_per_second = Droonga::DataAbsorber::DEFAULT_MESSAGES_PER_SECOND
-    options.progress_interval_seconds = Droonga::DataAbsorber::DEFAULT_PROGRESS_INTERVAL_SECONDS
+    options.messages_per_second = Droonga::DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND
+    options.progress_interval_seconds = Droonga::DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS
     options.verbose = false
     parser = OptionParser.new
     parser.version = Droonga::Engine::VERSION
@@ -163,7 +163,7 @@ class AbsorbDataCommand
         :loop    => @loop,
       },
     }
-    Droonga::DataAbsorber.new(absorber_options)
+    Droonga::DataAbsorberClient.new(absorber_options)
   end
 
   def absorb
