@@ -87,10 +87,11 @@ module Droonga
           "progressIntervalSeconds" => @progress_interval_seconds,
         },
       }
-      destination_client.subscribe(absorb_message) do |message|
+      client = create_destination_client
+      client.subscribe(absorb_message) do |message|
         case message
         when Droonga::Client::Error
-          destination_client.close
+          client.close
           @error_message = message.to_s
         else
           case message["type"]
@@ -115,7 +116,7 @@ module Droonga
       end
     end
 
-    def destination_client
+    def create_destination_client
       options = {
         :host          => @host,
         :port          => @port,
@@ -124,7 +125,7 @@ module Droonga
         :receiver_host => @receiver_host,
         :receiver_port => @receiver_port,
       }.merge(@client_options)
-      @destination_client ||= Droonga::Client.new(options)
+      Droonga::Client.new(options)
     end
 
     def source_node_suspendable?
