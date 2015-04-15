@@ -48,7 +48,7 @@ module Droonga
     end
 
     def random?
-      if @random
+      unless @random.nil?
         @random
       else
         not write?
