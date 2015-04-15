@@ -53,6 +53,9 @@ module Droonga
               on_finish
               logger.trace("start: finish")
             end
+            dumper.on_error = lambda do |error|
+              logger.error(error)
+            end
 
             @previous_report_time = Time.now
 
