@@ -24,6 +24,12 @@ module Droonga
   class DataAbsorberClient
     include Loggable
 
+    class DestinationEqualsToSource < StandardError
+      def initialize(params)
+        super("The source and the destination are same", params)
+      end
+    end
+
     DEFAULT_MESSAGES_PER_SECOND = 100
     DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
 
@@ -57,6 +63,8 @@ module Droonga
       @client_options = @params[:client_options] || {}
 
       @error_message = nil
+
+      validate_params
     end
 
     def run
@@ -119,6 +127,22 @@ module Droonga
     end
 
     private
+    def validate_params
+      source_node_name = NodeName.new(:host => @source_host,
+                                      :port => @source_port,
+                                      :tag  => @source_tag)
+      destination_node_name = NodeName.new(:host => @host,
+                                           :port => @port,
+                                           :tag  => @tag)
+      if source_node_name == destination_node_name and
+           @source_dataset == @dataset
+        raise DestinationEqualsToSource.new(:host    => @host,
+                                            :port    => @port,
+                                            :tag     => @tag,
+                                            :dataset => @dataset)
+      end
+    end
+
     def source_replica_hosts
       @source_replica_hosts ||= get_source_replica_hosts
     end
