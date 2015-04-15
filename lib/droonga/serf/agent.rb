@@ -62,11 +62,11 @@ module Droonga
         return if @pid.nil?
         Process.waitpid(@pid)
         @output_io.close
-        logger.trace("stop: output_io watcher detached",
-                     :watcher => @output_io)
+        # logger.trace("stop: output_io watcher detached",
+        #              :watcher => @output_io)
         @error_io.close
-        logger.trace("stop: error_io watcher detached",
-                     :watcher => @error_io)
+        # logger.trace("stop: error_io watcher detached",
+        #              :watcher => @error_io)
         @pid = nil
       end
 
@@ -111,8 +111,8 @@ module Droonga
           on_read_output.call(data)
         end
         @loop.attach(@output_io)
-        logger.trace("capture_output: new output_io watcher attached",
-                     :watcher => @output_io)
+        # logger.trace("capture_output: new output_io watcher attached",
+        #              :watcher => @output_io)
 
         error_line_buffer = LineBuffer.new
         on_read_error = lambda do |data|
@@ -123,8 +123,8 @@ module Droonga
           on_read_error.call(data)
         end
         @loop.attach(@error_io)
-        logger.trace("capture_output: new error_io watcher attached",
-                     :watcher => @error_io)
+        # logger.trace("capture_output: new error_io watcher attached",
+        #              :watcher => @error_io)
 
         result
       end

@@ -91,10 +91,10 @@ module Droonga
         @clients << client
       end
       @loop.attach(@server)
-      logger.trace("start_server: new server watcher attached",
-                   :watcher => @server,
-                   :listen_fd => @listen_fd,
-                   :heartbeat_fd => @heartbeat_fd)
+      # logger.trace("start_server: new server watcher attached",
+      #              :watcher => @server,
+      #              :listen_fd => @listen_fd,
+      #              :heartbeat_fd => @heartbeat_fd)
 
       logger.trace("start_server: done")
     end
@@ -106,8 +106,8 @@ module Droonga
     def shutdown_server
       logger.trace("shutdown_server: start")
       @server.close
-      logger.trace("shutdown_server: server watcher detached",
-                   :watcher => @server)
+      # logger.trace("shutdown_server: server watcher detached",
+      #              :watcher => @server)
       logger.trace("shutdown_server: done")
     end
 
@@ -134,17 +134,17 @@ module Droonga
           on_readable.call
         end
         @loop.attach(@watcher)
-        logger.trace("start: new heartbeat watcher attached",
-                     :watcher => @watcher,
-                     :fd => @fd)
+        # logger.trace("start: new heartbeat watcher attached",
+        #              :watcher => @watcher,
+        #              :fd => @fd)
       end
 
       def shutdown
         @socket.close
         @watcher.detach
-        logger.trace("shutdown: heartbeat watcher detached",
-                     :watcher => @watcher,
-                     :fd => @fd)
+        # logger.trace("shutdown: heartbeat watcher detached",
+        #              :watcher => @watcher,
+        #              :fd => @fd)
       end
 
       private
