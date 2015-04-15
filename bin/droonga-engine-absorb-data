@@ -39,7 +39,7 @@ module Droonga
       trap_signals
 
       puts "Start to absorb data from #{@options.soruce_dataset} at #{source_node.to_s}"
-      puts "                       to #{@options.dataset} at #{destination_host.to_s}"
+      puts "                       to #{@options.dataset} at #{destination_node.to_s}"
       puts "                      via #{@options.receiver_host} (this host)"
       puts ""
       puts "Absorbing..."
