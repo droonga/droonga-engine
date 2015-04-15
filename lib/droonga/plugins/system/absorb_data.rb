@@ -72,7 +72,7 @@ module Droonga
                logger.info("#{count} records to be absorbed")
               end
               logger.info("starting to absorb the source dataset")
-              @dumper_error_message = dumper.run do |message|
+              @dumper_error_message = dumper.run(dump_options) do |message|
                 begin
                   message["dataset"] = current_dataset
                   @messenger.forward(message,
@@ -135,12 +135,13 @@ module Droonga
 
               :receiver_host => myself.host,
               :receiver_port => 0,
+            }
+          end
 
-              :client_options => {
-                :backend => :coolio,
-                :loop    => @loop,
-              },
-
+          def dump_options
+            {
+              :backend => :coolio,
+              :loop    => @loop,
               :messages_per_second => messages_per_second,
             }
           end
