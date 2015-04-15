@@ -32,6 +32,7 @@ require "droonga/data_absorber_client"
 require "droonga/serf"
 require "droonga/node_metadata"
 
+module Droonga
 class JoinCommand
   def run
     @loop = Coolio::Loop.default
@@ -91,13 +92,13 @@ class JoinCommand
       option.on(:port=,
                 "Port number of the source cluster to be connected.",
                 :as => Integer,
-                :default => Droonga::NodeName::DEFAULT_PORT)
+                :default => NodeName::DEFAULT_PORT)
       option.on(:tag=,
                 "Tag name of the soruce cluster to be connected.",
-                :default => Droonga::NodeName::DEFAULT_TAG)
+                :default => NodeName::DEFAULT_TAG)
       option.on(:dataset=,
                 "Dataset name of for the node to be joined.",
-                :default => Droonga::Catalog::Dataset::DEFAULT_NAME)
+                :default => Catalog::Dataset::DEFAULT_NAME)
 
       option.separator("Connections:")
       option.on("receiver-host=",
@@ -107,13 +108,13 @@ class JoinCommand
       option.separator("Miscellaneous:")
       option.on("records-per-second=",
                 "Maximum number of records per second to be copied. " +
-                  "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
+                  "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
                 :as => Integer,
-                :default => Droonga::DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND)
+                :default => DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND)
       option.on("progress-interval-seconds=",
                 "Interval seconds to report progress.",
                 :as => Integer,
-                :default => Droonga::DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS)
+                :default => DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS)
       option.on(:verbose, "Output details for internal operations.",
                 :default => false)
     end
@@ -148,7 +149,7 @@ class JoinCommand
   end
 
   def parse_source_catalog
-    loader = Droonga::Catalog::Loader.new
+    loader = Catalog::Loader.new
     loader.parse(raw_source_catalog)
   end
 
@@ -157,7 +158,7 @@ class JoinCommand
   end
 
   def fetch_source_catalog
-    fetcher = Droonga::Catalog::Fetcher.new(:host          => source_node.host,
+    fetcher = Catalog::Fetcher.new(:host          => source_node.host,
                                             :port          => source_node.port,
                                             :tag           => source_node.tag,
                                             :receiver_host => @options["receiver-host"])
@@ -165,7 +166,7 @@ class JoinCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(target, :verbose => @options[:verbose])
+    serf = Serf.new(target, :verbose => @options[:verbose])
     serf.send_query(command, options)
   end
 
@@ -195,7 +196,7 @@ class JoinCommand
         :loop    => @loop,
       },
     }
-    Droonga::DataAbsorberClient.new(absorber_options)
+    DataAbsorberClient.new(absorber_options)
   end
 
   def set_source_node_role
@@ -203,7 +204,7 @@ class JoinCommand
       puts("Changing role of the source node...")
       run_remote_command(source_node.to_s, "change_role",
                          "node" => source_node.to_s,
-                         "role" => Droonga::NodeMetadata::Role::ABSORB_SOURCE)
+                         "role" => NodeMetadata::Role::ABSORB_SOURCE)
       wait_until_restarted(source_node)
     end
     @source_node_role_changed = true
@@ -213,7 +214,7 @@ class JoinCommand
     puts("Changing role of the joining node...")
     run_remote_command(joining_node.to_s, "change_role",
                        "node" => joining_node.to_s,
-                       "role" => Droonga::NodeMetadata::Role::ABSORB_DESTINATION)
+                       "role" => NodeMetadata::Role::ABSORB_DESTINATION)
     wait_until_restarted(joining_node)
     @joining_node_role_changed = true
   end
@@ -223,7 +224,7 @@ class JoinCommand
       puts("Restoring role of the source node...")
       run_remote_command(source_node.to_s, "change_role",
                          "node" => source_node.to_s,
-                         "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
+                         "role" => NodeMetadata::Role::SERVICE_PROVIDER)
       wait_until_restarted(source_node.to_s)
     end
     @source_node_role_changed = false
@@ -233,7 +234,7 @@ class JoinCommand
     puts("Restoring role of the joining node...")
     run_remote_command(joining_node.to_s, "change_role",
                        "node" => joining_node.to_s,
-                       "role" => Droonga::NodeMetadata::Role::SERVICE_PROVIDER)
+                       "role" => NodeMetadata::Role::SERVICE_PROVIDER)
     wait_until_restarted(joining_node.to_s)
     @joining_node_role_changed = false
   end
@@ -333,5 +334,6 @@ class JoinCommand
     sleep(30)
   end
 end
+end
 
-JoinCommand.new.run
+Droonga::JoinCommand.new.run

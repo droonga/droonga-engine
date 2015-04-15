@@ -29,6 +29,7 @@ require "droonga/client"
 require "droonga/node_metadata"
 require "droonga/restarter"
 
+module Droonga
 class AbsorbDataCommand
   def run
     @loop = Coolio::Loop.default
@@ -54,24 +55,24 @@ class AbsorbDataCommand
     options = OpenStruct.new
 
     options.host    = Socket.gethostname
-    options.port    = Droonga::DataAbsorberClient::DEFAULT_PORT
-    options.tag     = Droonga::DataAbsorberClient::DEFAULT_TAG
-    options.dataset = Droonga::DataAbsorberClient::DEFAULT_DATASET
+    options.port    = DataAbsorberClient::DEFAULT_PORT
+    options.tag     = DataAbsorberClient::DEFAULT_TAG
+    options.dataset = DataAbsorberClient::DEFAULT_DATASET
 
-    options.source_host    = Droonga::DataAbsorberClient::DEFAULT_HOST
-    options.source_port    = Droonga::DataAbsorberClient::DEFAULT_PORT
-    options.source_tag     = Droonga::DataAbsorberClient::DEFAULT_TAG
-    options.source_dataset = Droonga::DataAbsorberClient::DEFAULT_DATASET
+    options.source_host    = DataAbsorberClient::DEFAULT_HOST
+    options.source_port    = DataAbsorberClient::DEFAULT_PORT
+    options.source_tag     = DataAbsorberClient::DEFAULT_TAG
+    options.source_dataset = DataAbsorberClient::DEFAULT_DATASET
 
     options.receiver_host = Socket.gethostname
 
-    options.messages_per_second       = Droonga::DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND
-    options.progress_interval_seconds = Droonga::DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS
+    options.messages_per_second       = DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND
+    options.progress_interval_seconds = DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS
 
     options.verbose = false
 
     parser = OptionParser.new
-    parser.version = Droonga::Engine::VERSION
+    parser.version = Engine::VERSION
 
     parser.separator("")
     parser.separator("Destination node:")
@@ -130,7 +131,7 @@ class AbsorbDataCommand
     parser.separator("Miscellaneous:")
     parser.on("--records-per-second=N", Integer,
               "Maximum number of records per second to be absorbed.",
-              "'#{Droonga::Client::RateLimiter::NO_LIMIT}' means no limit.",
+              "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
               "(#{options.messages_per_second})") do |n|
       options.messages_per_second = n
     end
@@ -178,7 +179,7 @@ class AbsorbDataCommand
   end
 
   def run_remote_command(target, command, options)
-    serf = Droonga::Serf.new(target, :verbose => @options.verbose)
+    serf = Serf.new(target, :verbose => @options.verbose)
     serf.send_query(command, options)
   end
 
@@ -208,7 +209,7 @@ class AbsorbDataCommand
         :loop    => @loop,
       },
     }
-    Droonga::DataAbsorberClient.new(absorber_options)
+    DataAbsorberClient.new(absorber_options)
   end
 
   def absorb
@@ -265,5 +266,6 @@ class AbsorbDataCommand
     #XXX we have to write more codes to cancel remote processes!
   end
 end
+end
 
-AbsorbDataCommand.new.run
+Droonga::AbsorbDataCommand.new.run
