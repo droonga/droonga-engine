@@ -20,7 +20,8 @@ require "droonga/catalog/generator"
 require "droonga/safe_file_writer"
 
 module Droonga
-  class CatalogModifier
+  module Catalog
+  class Modifier
     def initialize(source_catalog)
       @generator = Catalog::Generator.new
       @generator.load(source_catalog)
@@ -32,5 +33,6 @@ module Droonga
         output.puts(JSON.pretty_generate(@generator.generate))
       end
     end
+  end
   end
 end

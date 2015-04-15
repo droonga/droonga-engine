@@ -18,7 +18,7 @@ require "droonga/node_name"
 require "droonga/catalog/dataset"
 require "droonga/client"
 require "droonga/catalog/generator"
-require "droonga/catalog_fetcher"
+require "droonga/catalog/fetcher"
 
 module Droonga
   class DataAbsorberClient
@@ -165,10 +165,10 @@ module Droonga
     end
 
     def fetch_source_catalog
-      fetcher = CatalogFetcher.new(:host          => @source_host,
-                                   :port          => @source_port,
-                                   :tag           => @source_tag,
-                                   :receiver_host => @receiver_host)
+      fetcher = Catalog::Fetcher.new(:host          => @source_host,
+                                     :port          => @source_port,
+                                     :tag           => @source_tag,
+                                     :receiver_host => @receiver_host)
       fetcher.fetch(:dataset => @source_dataset)
     end
 

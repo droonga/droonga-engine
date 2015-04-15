@@ -21,7 +21,8 @@ require "droonga/node_name"
 require "droonga/catalog/dataset"
 
 module Droonga
-  class CatalogFetcher
+  module Catalog
+  class Fetcher
     class EmptyResponse < StandardError
     end
 
@@ -58,5 +59,6 @@ module Droonga
         :receiver_port => 0,
       }
     end
+  end
   end
 end
