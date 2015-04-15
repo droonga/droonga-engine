@@ -194,8 +194,8 @@ module Droonga
         on_connect = lambda do
           on_ready
           checker.close
-          logger.trace("start_ready_check: checker watcher detached",
-                       :watcher => checker)
+          # logger.trace("start_ready_check: checker watcher detached",
+          #              :watcher => checker)
         end
         checker.on_connect do
           on_connect.call
@@ -209,15 +209,15 @@ module Droonga
             on_timer = lambda do
               start_ready_check
               timer.detach
-              logger.trace("start_ready_check: timer watcher detached",
-                           :watcher => timer)
+              # logger.trace("start_ready_check: timer watcher detached",
+              #              :watcher => timer)
             end
             timer.on_timer do
               on_timer.call
             end
             @loop.attach(timer)
-            logger.trace("start_ready_check: new timer watcher attached",
-                         :watcher => timer)
+            # logger.trace("start_ready_check: new timer watcher attached",
+            #              :watcher => timer)
           end
         end
         checker.on_connect_failed do
@@ -225,8 +225,8 @@ module Droonga
         end
 
         @loop.attach(checker)
-        logger.trace("start_ready_check: new checker watcher attached",
-                     :watcher => checker)
+        # logger.trace("start_ready_check: new checker watcher attached",
+        #              :watcher => checker)
       end
 
       def log_tag
