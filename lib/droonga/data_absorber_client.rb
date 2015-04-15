@@ -33,6 +33,11 @@ module Droonga
     DEFAULT_MESSAGES_PER_SECOND = 100
     DEFAULT_PROGRESS_INTERVAL_SECONDS = 3
 
+    DEFAULT_HOST    = NodeName::DEFAULT_HOST
+    DEFAULT_PORT    = NodeName::DEFAULT_PORT
+    DEFAULT_TAG     = NodeName::DEFAULT_TAG
+    DEFAULT_DATASET = Catalog::Dataset::DEFAULT_NAME
+
     attr_reader :params
     attr_reader :host, :port, :tag, :dataset
     attr_reader :messages_per_second, :progress_interval_seconds
@@ -47,15 +52,15 @@ module Droonga
       @progress_interval_seconds = @params[:progress_interval_seconds] ||
                                      DEFAULT_PROGRESS_INTERVAL_SECONDS
 
-      @host    = @params[:host]    || NodeName::DEFAULT_HOST
-      @port    = @params[:port]    || NodeName::DEFAULT_PORT
-      @tag     = @params[:tag]     || NodeName::DEFAULT_TAG
-      @dataset = @params[:dataset] || Catalog::Dataset::DEFAULT_NAME
+      @host    = @params[:host]    || DEFAULT_HOST
+      @port    = @params[:port]    || DEFAULT_PORT
+      @tag     = @params[:tag]     || DEFAULT_TAG
+      @dataset = @params[:dataset] || DEFAULT_DATASET
 
-      @source_host    = @params[:source_host]    || @host
-      @source_port    = @params[:source_port]    || @port    || NodeName::DEFAULT_PORT
-      @source_tag     = @params[:source_tag]     || @tag     || NodeName::DEFAULT_TAG
-      @source_dataset = @params[:source_dataset] || @dataset || Catalog::Dataset::DEFAULT_NAME
+      @source_host    = @params[:source_host]    || @host    || DEFAULT_HOST
+      @source_port    = @params[:source_port]    || @port    || DEFAULT_PORT
+      @source_tag     = @params[:source_tag]     || @tag     || DEFAULT_TAG
+      @source_dataset = @params[:source_dataset] || @dataset || DEFAULT_DATASET
 
       @receiver_host = @params[:receiver_host] || @host
       @receiver_port = @params[:receiver_port] || 0
