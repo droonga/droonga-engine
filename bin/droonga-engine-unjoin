@@ -21,9 +21,10 @@ require "pathname"
 
 require "droonga/engine/version"
 require "droonga/path"
-require "droonga/catalog_fetcher"
-require "droonga/catalog_generator"
-require "droonga/catalog_loader"
+require "droonga/node_name"
+require "droonga/catalog/fetcher"
+require "droonga/catalog/generator"
+require "droonga/catalog/loader"
 require "droonga/serf"
 
 class UnjoinCommand
@@ -51,14 +52,14 @@ class UnjoinCommand
                 :default => Socket.gethostname)
       option.on(:dataset=,
                 "Dataset name of for the node to be unjoined.",
-                :default => Droonga::CatalogGenerator::DEFAULT_DATASET)
+                :default => Droonga::NodeName::DEFAULT_DATASET)
       option.on(:port=,
                 "Port number of the source cluster to be connected.",
                 :as => Integer,
-                :default => Droonga::CatalogGenerator::DEFAULT_PORT)
+                :default => Droonga::NodeName::DEFAULT_PORT)
       option.on(:tag=,
                 "Tag name of the soruce cluster to be connected.",
-                :default => Droonga::CatalogGenerator::DEFAULT_TAG)
+                :default => Droonga::NodeName::DEFAULT_TAG)
 
       option.separator("Miscellaneous:")
       option.on(:verbose, "Output details for internal operations.",
@@ -99,7 +100,7 @@ class UnjoinCommand
   end
 
   def parse_catalog
-    loader = Droonga::CatalogLoader.new
+    loader = Droonga::Catalog::Loader.new
     loader.parse(raw_catalog)
   end
 
@@ -108,10 +109,10 @@ class UnjoinCommand
   end
 
   def fetch_catalog
-    fetcher = Droonga::CatalogFetcher.new(:host          => replica_remove_host,
-                                          :port          => port,
-                                          :tag           => tag,
-                                          :receiver_host => @options["receiver-host"])
+    fetcher = Droonga::Catalog::Fetcher.new(:host          => replica_remove_host,
+                                            :port          => port,
+                                            :tag           => tag,
+                                            :receiver_host => @options["receiver-host"])
     fetcher.fetch(:dataset => dataset_name)
   end
 
@@ -120,7 +121,7 @@ class UnjoinCommand
   end
 
   def detect_remaining_node
-    generator = Droonga::CatalogGenerator.new
+    generator = Droonga::Catalog::Generator.new
     generator.load(raw_catalog)
 
     dataset = generator.dataset_for_host(replica_remove_host)

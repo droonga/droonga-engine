@@ -21,17 +21,17 @@ require "json"
 require "pathname"
 
 require "droonga/engine/version"
-require "droonga/catalog_generator"
+require "droonga/catalog/generator"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
 
 service_installation = Droonga::ServiceInstallation.new
 service_installation.ensure_using_service_base_directory
 
-generator = Droonga::CatalogGenerator.new
+generator = Droonga::Catalog::Generator.new
 current_dataset = {}
 datasets = {
-  Droonga::CatalogGenerator::DEFAULT_DATASET => current_dataset
+  Droonga::Catalog::Generator::DEFAULT_DATASET => current_dataset
 }
 
 options = OpenStruct.new
@@ -65,7 +65,7 @@ end
 parser.on("--dataset=NAME",
           "Add a dataset its name is NAME.",
           "And set the NAME to the current dataset.",
-          "(#{Droonga::CatalogGenerator::DEFAULT_DATASET})") do |name|
+          "(#{Droonga::Catalog::Generator::DEFAULT_DATASET})") do |name|
   current_dataset = datasets[name] = {}
 end
 parser.on("--replica-hosts=NAME1,NAME2,...", Array,

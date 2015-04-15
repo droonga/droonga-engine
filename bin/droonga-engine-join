@@ -25,8 +25,8 @@ require "droonga/engine/version"
 require "droonga/path"
 require "droonga/node_name"
 require "droonga/catalog/dataset"
-require "droonga/catalog_fetcher"
-require "droonga/catalog_loader"
+require "droonga/catalog/fetcher"
+require "droonga/catalog/loader"
 require "droonga/safe_file_writer"
 require "droonga/data_absorber_client"
 require "droonga/serf"
@@ -148,7 +148,7 @@ class JoinCommand
   end
 
   def parse_source_catalog
-    loader = Droonga::CatalogLoader.new
+    loader = Droonga::Catalog::Loader.new
     loader.parse(raw_source_catalog)
   end
 
@@ -157,10 +157,10 @@ class JoinCommand
   end
 
   def fetch_source_catalog
-    fetcher = Droonga::CatalogFetcher.new(:host          => source_node.host,
-                                          :port          => source_node.port,
-                                          :tag           => source_node.tag,
-                                          :receiver_host => @options["receiver-host"])
+    fetcher = Droonga::Catalog::Fetcher.new(:host          => source_node.host,
+                                            :port          => source_node.port,
+                                            :tag           => source_node.tag,
+                                            :receiver_host => @options["receiver-host"])
     fetcher.fetch(:dataset => dataset)
   end
 
