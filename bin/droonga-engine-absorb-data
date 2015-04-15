@@ -113,7 +113,7 @@ module Droonga
                 "(#{options.source_tag})") do |tag|
         options.source_tag = tag
       end
-      parser.on("--dataset=DATASET",
+      parser.on("--source-dataset=DATASET",
                 "Name of the source dataset.",
                 "(#{options.source_dataset})") do |dataset|
         options.source_dataset = dataset
