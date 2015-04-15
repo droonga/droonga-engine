@@ -36,6 +36,8 @@
 NAME=droonga-engine
 DOWNLOAD_URL_BASE=https://raw.githubusercontent.com/droonga/$NAME
 REPOSITORY_URL=https://github.com/droonga/$NAME.git
+DROONGA_CLIENT_RUBY_REPOSITORY_URL=https://github.com/droonga/droonga-client-ruby.git
+DRNDUMP_REPOSITORY_URL=https://github.com/droonga/drndump.git
 RROONGA_REPOSITORY_URL=https://github.com/ranguba/rroonga.git
 GROONGA_COMMAND_REPOSITORY_URL=https://github.com/groonga/groonga-command.git
 GROONGA_COMMAND_PARSER_REPOSITORY_URL=https://github.com/groonga/groonga-command-parser.git
@@ -224,6 +226,8 @@ install_from_repository() {
   install_gem_from_repository rroonga $RROONGA_REPOSITORY_URL
   install_gem_from_repository groonga-command $GROONGA_COMMAND_REPOSITORY_URL
   install_gem_from_repository groonga-command-parser $GROONGA_COMMAND_PARSER_REPOSITORY_URL
+  install_gem_from_repository droonga-client-ruby $DROONGA_CLIENT_RUBY_REPOSITORY_URL
+  install_gem_from_repository drndump $DRNDUMP_REPOSITORY_URL
   install_gem_from_repository $NAME $REPOSITORY_URL
 }
 
