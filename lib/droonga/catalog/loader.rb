@@ -19,7 +19,8 @@ require "droonga/catalog/version1"
 require "droonga/catalog/version2"
 
 module Droonga
-  class CatalogLoader
+  module Catalog
+  class Loader
     def initialize(path=nil)
       @path = path
     end
@@ -60,5 +61,6 @@ module Droonga
         raise Error.new("Unsupported catalog version <#{version}> is specified in #{@path}")
       end
     end
+  end
   end
 end

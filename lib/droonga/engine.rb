@@ -22,7 +22,7 @@ require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/engine_state"
 require "droonga/cluster"
-require "droonga/catalog_loader"
+require "droonga/catalog/loader"
 require "droonga/dispatcher"
 require "droonga/node_metadata"
 
@@ -102,7 +102,7 @@ module Droonga
     private
     def load_catalog
       catalog_path = Path.catalog
-      loader = CatalogLoader.new(catalog_path.to_s)
+      loader = Catalog::Loader.new(catalog_path.to_s)
       catalog = loader.load
       logger.info("catalog loaded",
                   :path  => catalog_path.to_s,

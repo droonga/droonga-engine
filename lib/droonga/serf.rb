@@ -17,7 +17,7 @@ require "json"
 
 require "droonga/path"
 require "droonga/loggable"
-require "droonga/catalog_loader"
+require "droonga/catalog/loader"
 require "droonga/node_metadata"
 require "droonga/serf/downloader"
 require "droonga/serf/agent"
@@ -198,7 +198,7 @@ module Droonga
     end
 
     def cluster_id
-      loader = CatalogLoader.new(Path.catalog.to_s)
+      loader = Catalog::Loader.new(Path.catalog.to_s)
       catalog = loader.load
       catalog.cluster_id
     end
@@ -258,7 +258,7 @@ module Droonga
     end
 
     def detect_other_hosts
-      loader = CatalogLoader.new(Path.catalog.to_s)
+      loader = Catalog::Loader.new(Path.catalog.to_s)
       catalog = loader.load
       other_nodes = catalog.all_nodes.reject do |node|
         node == @name
