@@ -43,6 +43,7 @@ module Droonga
           end
 
           def start
+            logger.trace("start: start")
             on_start
 
             @dumper_error_message = nil
@@ -50,6 +51,7 @@ module Droonga
             dumper = Drndump::DumpClient.new(dumper_params)
             dumper.on_finish = lambda do
               on_finish
+              logger.trace("start: finish")
             end
 
             @previous_report_time = Time.now
@@ -59,7 +61,9 @@ module Droonga
               @total_n_source_records = nil
               get_total_n_source_records do |count|
                 @total_n_source_records = count
+               logger.info("#{count} records to be absorbed")
               end
+              logger.info("starting to absorb the source dataset")
               @dumper_error_message = dumper.run do |message|
                 begin
                   message["dataset"] = current_dataset
@@ -83,6 +87,7 @@ module Droonga
             end
 
             on_finish if @dumper_error_message
+            logger.trace("start: done")
           end
 
           private
