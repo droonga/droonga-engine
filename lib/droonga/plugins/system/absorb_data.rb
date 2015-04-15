@@ -53,8 +53,13 @@ module Droonga
               on_finish
               logger.trace("start: finish")
             end
+            dumper.on_progress = lambda do |message|
+              logger.trace("dump progress",
+                           :message => message)
+            end
             dumper.on_error = lambda do |error|
-              logger.error(error)
+              logger.error("unexpected error while dump",
+                           :error => error)
             end
 
             @previous_report_time = Time.now
