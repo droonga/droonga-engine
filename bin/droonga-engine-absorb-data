@@ -38,7 +38,7 @@ module Droonga
       assert_valid_options
       trap_signals
 
-      puts "Start to absorb data from #{@options.soruce_dataset} at #{source_node.to_s}"
+      puts "Start to absorb data from #{@options.source_dataset} at #{source_node.to_s}"
       puts "                       to #{@options.dataset} at #{destination_node.to_s}"
       puts "                      via #{@options.receiver_host} (this host)"
       puts ""
