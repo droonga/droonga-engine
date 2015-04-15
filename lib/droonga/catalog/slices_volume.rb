@@ -73,19 +73,19 @@ module Droonga
 
       def compute_routes(message, active_nodes)
         routes = []
+        slices = []
         case message["type"]
         when "broadcast"
           slices = select_slices
-          slices.each do |slice|
-            routes.concat(slice.compute_routes(message, active_nodes))
-          end
         when "scatter"
           record = message["record"]
           if record
-            slice = choose_slice(record)
+            slices = [choose_slice(record)]
           else
-            slice = select_slices.sample
+            slices = select_slices
           end
+        end
+        slices.each do |slice|
           routes.concat(slice.compute_routes(message, active_nodes))
         end
         routes
