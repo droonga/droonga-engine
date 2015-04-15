@@ -41,7 +41,7 @@ module Droonga
     attr_reader :params
     attr_reader :host, :port, :tag, :dataset
     attr_reader :messages_per_second, :progress_interval_seconds
-    attr_reader :source_host, :source_port, :source_tag, :source_dataset,
+    attr_reader :source_host, :source_port, :source_tag, :source_dataset
     attr_reader :error_message
 
     def initialize(params)
