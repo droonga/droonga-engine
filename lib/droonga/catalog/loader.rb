@@ -20,47 +20,47 @@ require "droonga/catalog/version2"
 
 module Droonga
   module Catalog
-  class Loader
-    def initialize(path=nil)
-      @path = path
-    end
-
-    def load
-      unless @path
-        raise Error.new("nothing specified")
+    class Loader
+      def initialize(path=nil)
+        @path = path
       end
 
-      data = nil
-      begin
-        data = File.open(@path) do |file|
-          JSON.parse(file.read)
+      def load
+        unless @path
+          raise Error.new("nothing specified")
         end
-      rescue Errno::ENOENT => error
-        raise Error.new("Missing catalog file #{@path}")
-      rescue JSON::ParserError => error
-        raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
-      end
-      parse(data)
-    end
 
-    def parse(data)
-      unless data.is_a?(Hash)
-        raise Error.new("Root element of catalog must be an object in #{@path}: " +
-                          "#{JSON.generate(data)}")
+        data = nil
+        begin
+          data = File.open(@path) do |file|
+            JSON.parse(file.read)
+          end
+        rescue Errno::ENOENT => error
+          raise Error.new("Missing catalog file #{@path}")
+        rescue JSON::ParserError => error
+          raise Error.new("Syntax error in #{@path}:\n#{error.to_s}")
+        end
+        parse(data)
       end
 
-      version = data["version"]
-      case version
-      when 1
-        Catalog::Version1.new(data, @path)
-      when 2
-        Catalog::Version2.new(data, @path)
-      when nil
-        raise Error.new("Catalog version must be specified in #{@path}")
-      else
-        raise Error.new("Unsupported catalog version <#{version}> is specified in #{@path}")
+      def parse(data)
+        unless data.is_a?(Hash)
+          raise Error.new("Root element of catalog must be an object in #{@path}: " +
+                            "#{JSON.generate(data)}")
+        end
+
+        version = data["version"]
+        case version
+        when 1
+          Catalog::Version1.new(data, @path)
+        when 2
+          Catalog::Version2.new(data, @path)
+        when nil
+          raise Error.new("Catalog version must be specified in #{@path}")
+        else
+          raise Error.new("Unsupported catalog version <#{version}> is specified in #{@path}")
+        end
       end
     end
-  end
   end
 end

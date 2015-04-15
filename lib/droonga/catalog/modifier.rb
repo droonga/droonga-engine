@@ -21,18 +21,18 @@ require "droonga/safe_file_writer"
 
 module Droonga
   module Catalog
-  class Modifier
-    def initialize(source_catalog)
-      @generator = Catalog::Generator.new
-      @generator.load(source_catalog)
-    end
+    class Modifier
+      def initialize(source_catalog)
+        @generator = Catalog::Generator.new
+        @generator.load(source_catalog)
+      end
 
-    def modify
-      SafeFileWriter.write(Path.catalog) do |output, file|
-        yield(@generator, file)
-        output.puts(JSON.pretty_generate(@generator.generate))
+      def modify
+        SafeFileWriter.write(Path.catalog) do |output, file|
+          yield(@generator, file)
+          output.puts(JSON.pretty_generate(@generator.generate))
+        end
       end
     end
-  end
   end
 end

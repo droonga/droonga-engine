@@ -22,43 +22,43 @@ require "droonga/catalog/dataset"
 
 module Droonga
   module Catalog
-  class Fetcher
-    class EmptyResponse < StandardError
-    end
-
-    class EmptyCatalog < StandardError
-    end
-
-    def initialize(client_options)
-      @client_options = default_options.merge(client_options)
-    end
-
-    def fetch(options={})
-      message = {
-        "dataset" => options[:dataset] || Catalog::Dataset::DEFAULT_NAME,
-        "type"    => "catalog.fetch"
-      }
-      response = nil
-      Droonga::Client.open(@client_options) do |client|
-        response = client.request(message)
+    class Fetcher
+      class EmptyResponse < StandardError
       end
-      raise EmptyResponse.new unless response
-      raise EmptyCatalog.new unless response["body"]
-      response["body"]
-    end
 
-    private
-    def default_options
-      {
-        :host          => "127.0.0.1",
-        :port          => NodeName::DEFAULT_PORT,
-        :tag           => NodeName::DEFAULT_TAG,
-        :protocol      => :droonga,
-        :timeout       => 1,
-        :receiver_host => Socket.gethostname,
-        :receiver_port => 0,
-      }
+      class EmptyCatalog < StandardError
+      end
+
+      def initialize(client_options)
+        @client_options = default_options.merge(client_options)
+      end
+
+      def fetch(options={})
+        message = {
+          "dataset" => options[:dataset] || Catalog::Dataset::DEFAULT_NAME,
+          "type"    => "catalog.fetch"
+        }
+        response = nil
+        Droonga::Client.open(@client_options) do |client|
+          response = client.request(message)
+        end
+        raise EmptyResponse.new unless response
+        raise EmptyCatalog.new unless response["body"]
+        response["body"]
+      end
+
+      private
+      def default_options
+        {
+          :host          => "127.0.0.1",
+          :port          => NodeName::DEFAULT_PORT,
+          :tag           => NodeName::DEFAULT_TAG,
+          :protocol      => :droonga,
+          :timeout       => 1,
+          :receiver_host => Socket.gethostname,
+          :receiver_port => 0,
+        }
+      end
     end
-  end
   end
 end
