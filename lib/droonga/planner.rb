@@ -22,12 +22,12 @@ module Droonga
     include Loggable
     include ErrorMessages
 
-    attr_writer :write, :random, :collector_class
+    attr_writer :write, :collector_class
 
     def initialize(dataset)
       @dataset = dataset
       @write = false
-      @ramdom = nil
+      @specified_random = nil
       @collector_class = nil
     end
 
@@ -49,16 +49,20 @@ module Droonga
       end
     end
 
+    def random=(value)
+      @specified_random = value
+    end
+
     private
     def write?
       @write
     end
 
     def random?
-      unless @random.nil?
-        @random
-      else
+      if @specified_random.nil?
         not write?
+      else
+        @specified_random
       end
     end
 
