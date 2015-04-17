@@ -160,7 +160,7 @@ module Droonga
             if @total_n_source_records.nil? or @total_n_source_records.zero?
               return 0
             end
-            progress = @n_processed_messages / @total_n_source_records
+            progress = @n_processed_messages.to_f / @total_n_source_records
             [(progress * 100).to_i, 100].min
           end
 
