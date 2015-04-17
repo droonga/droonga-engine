@@ -35,6 +35,12 @@ module Droonga
       @n_dones == @tasks.size
     end
 
+    def need_result?
+      @tasks.any? do |task|
+        @collector_runner.collectable?("task" => task)
+      end
+    end
+
     def start
       tasks = @inputs[nil] || []
       logger.trace("start: no task!") if tasks.empty?

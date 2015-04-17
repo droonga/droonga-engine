@@ -44,6 +44,10 @@ module Droonga
       logger.trace("collector: done")
     end
 
+    def collectable?(message)
+      not find_collector_class(message).nil?
+    end
+
     private
     def find_collector_class(message)
       @collector_classes.find do |collector_class|

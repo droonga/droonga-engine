@@ -172,17 +172,25 @@ module Droonga
           dataset = message["dataset"] || @message["dataset"]
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
+          if session.need_result?
           timeout_seconds = message["timeout_seconds"] || nil
           @engine_state.register_session(id, session,
                                          :timeout_seconds => timeout_seconds)
+          session.start
+            logger.trace("process_internal_message: waiting for results")
+          else
+            session.start
+            session.finish
+            session = nil
+            logger.trace("process_internal_message: no need to wait for results")
+          end
         else
           logger.error("no steps error", :id => id, :message => message)
           return
           #todo: take cases receiving result before its query into account
         end
-        session.start
       end
-      @engine_state.unregister_session(id) if session.done?
+      @engine_state.unregister_session(id) if session and session.done?
       logger.trace("process_internal_message: done")
     end
 
