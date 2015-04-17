@@ -173,10 +173,10 @@ module Droonga
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
           if session.need_result?
-          timeout_seconds = message["timeout_seconds"] || nil
-          @engine_state.register_session(id, session,
-                                         :timeout_seconds => timeout_seconds)
-          session.start
+            timeout_seconds = message["timeout_seconds"] || nil
+            @engine_state.register_session(id, session,
+                                           :timeout_seconds => timeout_seconds)
+            session.start
             logger.trace("process_internal_message: waiting for results")
           else
             session.start
