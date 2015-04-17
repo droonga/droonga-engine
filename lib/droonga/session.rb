@@ -35,6 +35,21 @@ module Droonga
       @n_dones == @tasks.size
     end
 
+    #TODO: We don't have to wait results if no collection step is
+    #      in the list of tasks, because:
+    #
+    #       * Currently the "super step" mecahnism is not
+    #         implemented yet.
+    #       * So, results won't be used by other handlers directly.
+    #         Results will be used only for the "response" for the
+    #         sender.
+    #       * So, if there is no collection step, no-one requires
+    #         results and there is no need to wait results.
+    #
+    #      However, in the future after the "super step" mechanism
+    #      is introduced, results can be used by other handlers
+    #      even if there is no collection step.
+    #      Then we must update this logic.
     def need_result?
       @tasks.any? do |task|
         @collector_runner.collectable?("task" => task)
