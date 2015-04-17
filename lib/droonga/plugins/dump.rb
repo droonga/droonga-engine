@@ -36,8 +36,25 @@ module Droonga
       extend Plugin
       register("dump")
 
+      class Request < AsyncCommand::Request
+        DEFAULT_MESSAGES_PER_SECOND = 10000
+
+        def messages_per_seconds
+          request = (@message.request || {})
+          minimum_messages_per_seconds = 10
+          [
+            minimum_messages_per_seconds,
+            (request["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND).to_i,
+          ].max
+        end
+      end
+
       class Handler < AsyncCommand::Handler
         private
+        def request_class
+          Request
+        end
+
         def start(request)
           dumper = Dumper.new(@context, loop, messenger, request)
           dumper.start

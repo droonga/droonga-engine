@@ -47,17 +47,6 @@ module Droonga
         def request
           @message.request
         end
-
-        DEFAULT_MESSAGES_PER_SECOND = 10000
-
-        def messages_per_seconds
-          request = (@message.request || {})
-          minimum_messages_per_seconds = 10
-          [
-            minimum_messages_per_seconds,
-            (request["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND).to_i,
-          ].max
-        end
       end
 
       class Handler < Droonga::Handler
@@ -76,6 +65,11 @@ module Droonga
         end
 
         private
+        def request_class
+          #XXX override me!
+          Request
+        end
+
         def start(request)
           #XXX override me!
           # handler = MyAsyncHandler.new(loop, messenger, request)
