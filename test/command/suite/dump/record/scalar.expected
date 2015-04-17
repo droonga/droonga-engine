@@ -23,6 +23,24 @@
   "dataset": "Default",
   "date": "0000-00-00T00:00:00.000000Z",
   "body": {
+    "nMessages": 1
+  },
+  "type": "dump.forecast"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "nMessages": 2
+  },
+  "type": "dump.forecast"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
     "type": "Hash",
     "name": "Users",
     "keyType": "ShortText"
@@ -47,7 +65,8 @@
   "body": {
     "table": "Users",
     "key": "Adam",
-    "values": {}
+    "values": {
+    }
   },
   "type": "dump.record"
 }
