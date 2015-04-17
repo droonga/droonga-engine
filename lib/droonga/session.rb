@@ -44,7 +44,7 @@ module Droonga
     #         Results will be used only for the "response" for the
     #         sender.
     #       * So, if there is no collection step, no-one requires
-    #         results and there is no need to wait results.
+    #         results and there is no need to wait for results.
     #
     #      However, in the future after the "super step" mechanism
     #      is introduced, results can be used by other handlers
