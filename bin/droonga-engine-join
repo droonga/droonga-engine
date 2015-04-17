@@ -58,7 +58,7 @@ module Droonga
         do_join
         register_to_existing_nodes
         set_source_node_role
-        unless @options["no-copy"]
+        if should_copy?
           successed = copy_data
           unless successed
             do_cancel
@@ -129,6 +129,10 @@ module Droonga
 
     def dataset
       @options[:dataset]
+    end
+
+    def should_copy?
+      not @options["no-copy"]
     end
 
     def joining_node
