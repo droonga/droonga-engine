@@ -46,7 +46,11 @@ module Droonga
 
       succeeded = absorb
 
-      puts "Done." if succeeded
+      if succeeded
+        puts "Done."
+      else
+        do_cancel
+      end
       succeeded
     end
 
@@ -225,7 +229,6 @@ module Droonga
 
       if absorber.error_message
         puts(absorber.error_message)
-        do_cancel
         return false
       end
 
