@@ -18,6 +18,8 @@ module Droonga
   class NodeName
     class << self
       def parse(string)
+        return string if string.is_a?(self)
+
         if /\A(.+):(\d+)\/([^.]+)\z/ =~ string
           components = {
             :host => $1,
@@ -52,6 +54,15 @@ module Droonga
     attr_reader :tag
 
     def initialize(components={})
+      if components.is_a?(self.class)
+        node_name = components
+        components = {
+          :host => node_name.host,
+          :port => node_name.port,
+          :tag  => node_name.tag,
+        }
+      end
+
       @host = components[:host] || DEFAULT_HOST
       @port = components[:port] || DEFAULT_PORT
       @tag  = components[:tag]  || DEFAULT_TAG
@@ -70,6 +81,9 @@ module Droonga
     end
 
     def ==(other)
+      if other.is_a?(String)
+        return to_s == other
+      end
       other.is_a?(self.class) and to_a == other.to_a
     end
   end
