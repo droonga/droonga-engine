@@ -54,6 +54,7 @@ module Droonga
           on_start
 
           runner = Fiber.new do
+            forecast
             dump_schema
             dump_records
             dump_indexes
@@ -95,6 +96,21 @@ module Droonga
 
         def error_message
           "failed to dump"
+        end
+
+        def forecast
+          n_tables  = 0
+          n_columns = 0
+          n_records = 0
+          each_table do |table|
+            n_tables += 1
+            n_columns += table.columns.size
+            unless index_only_table?(table)
+              n_records += table.size
+            end
+          end
+          n_dump_messages = n_tables + n_columns + n_records
+          forward("#{prefix}.forecast", "nMessages" => n_dump_messages)
         end
 
         def dump_schema
