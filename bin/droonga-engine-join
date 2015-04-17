@@ -50,14 +50,15 @@ module Droonga
       puts "    tag     = #{joining_node.tag}"
       puts "    dataset = #{dataset}"
       puts ""
-      puts "Source Cluster ID: #{source_cluster_id}"
-      puts ""
 
       if should_copy? and not absorber.empty_destination?
         $stderr.puts("Error: The joining node's dataset #{dataset} is not empty.")
         $stderr.puts("       You must clear all data of the node before joining.")
         return false
       end
+
+      puts "Source Cluster ID: #{source_cluster_id}"
+      puts ""
 
       begin
         set_joining_node_role
