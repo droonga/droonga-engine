@@ -51,7 +51,7 @@ module Droonga
 
       class Handler < Droonga::Handler
         def handle(message)
-          request = Request.new(message)
+          request = request_class.new(message)
           if request.need_start?
             start(request)
             {
