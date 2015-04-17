@@ -282,6 +282,7 @@ module Droonga
       end
 
       puts ""
+      true
     end
 
     def set_effective_message_timestamp
