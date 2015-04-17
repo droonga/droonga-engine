@@ -39,11 +39,11 @@ module Droonga
       class Request < AsyncCommand::Request
         DEFAULT_MESSAGES_PER_SECOND = 10000
 
-        def messages_per_seconds
+        def messages_per_second
           request = (@message.request || {})
-          minimum_messages_per_seconds = 10
+          minimum_messages_per_second = 10
           [
-            minimum_messages_per_seconds,
+            minimum_messages_per_second,
             (request["messagesPerSecond"] || DEFAULT_MESSAGES_PER_SECOND).to_i,
           ].max
         end
@@ -309,7 +309,7 @@ module Droonga
         def setup_forward_data
           super
           @n_forwarded_messages = 0
-          @messages_per_100msec = @request.messages_per_seconds / 10
+          @messages_per_100msec = @request.messages_per_second / 10
         end
 
         def forward(type, body=nil)
