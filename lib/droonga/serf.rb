@@ -18,6 +18,7 @@ require "json"
 require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog/loader"
+require "droonga/node_name"
 require "droonga/node_metadata"
 require "droonga/serf/downloader"
 require "droonga/serf/agent"
@@ -39,7 +40,7 @@ module Droonga
 
     def initialize(name, options={})
       @serf = nil
-      @name = NodeName.new(name)
+      @name = NodeName.parse(name)
       @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
       @node_metadata = NodeMetadata.new
@@ -264,7 +265,7 @@ module Droonga
         node == @name.to_s
       end
       other_nodes.collect do |node|
-        NodeName.new(node).host
+        NodeName.parse(node).host
       end
     end
 
