@@ -278,7 +278,6 @@ module Droonga
 
       if absorber.error_message
         puts(absorber.error_message)
-        do_cancel
         return false
       end
 
