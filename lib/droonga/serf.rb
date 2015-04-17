@@ -39,7 +39,7 @@ module Droonga
 
     def initialize(name, options={})
       @serf = nil
-      @name = name
+      @name = NodeName.new(name)
       @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
       @node_metadata = NodeMetadata.new
@@ -54,8 +54,8 @@ module Droonga
         retry_joins.push("-retry-join", other_host)
       end
       agent = Agent.new(loop, @serf,
-                        extract_host(@name), agent_port, rpc_port,
-                        "-node", @name,
+                        @name.host, agent_port, rpc_port,
+                        "-node", @name.to_s,
                         "-event-handler", "droonga-engine-serf-event-handler",
                         "-tag", "type=engine",
                         "-tag", "role=#{role}",
@@ -242,11 +242,11 @@ module Droonga
     end
 
     def extract_host(node_name)
-      node_name.split(":").first
+      node_name.to_s.split(":").first
     end
 
     def rpc_address
-      "#{extract_host(@name)}:#{rpc_port}"
+      "#{@name.host}:#{rpc_port}"
     end
 
     def rpc_port
@@ -261,10 +261,10 @@ module Droonga
       loader = Catalog::Loader.new(Path.catalog.to_s)
       catalog = loader.load
       other_nodes = catalog.all_nodes.reject do |node|
-        node == @name
+        node == @name.to_s
       end
       other_nodes.collect do |node|
-        extract_host(node)
+        NodeName.new(node).host
       end
     end
 
