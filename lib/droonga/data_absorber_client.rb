@@ -127,7 +127,7 @@ module Droonga
     end
 
     def empty_destination?
-      source_table_names.empty?
+      table_names_in_destination_node.empty?
     end
 
     private
@@ -158,32 +158,17 @@ module Droonga
       }.merge(@client_options)
     end
 
-    def create_destination_client
-      Droonga::Client.new(destination_client_options)
+    def create_destination_client(options={})
+      Droonga::Client.new(destination_client_options.merge(options))
     end
 
-    def source_client_options
-      {
-        :host          => @source_host,
-        :port          => @source_port,
-        :tag           => @source_tag,
-        :dataset       => @source_dataset,
-        :protocol      => :droonga,
-        :receiver_host => @receiver_host,
-        :receiver_port => @receiver_port,
-      }
+    def table_names_in_destination_node
+      @table_names_in_destination_node ||= get_table_names_in_destination_node
     end
 
-    def create_source_client
-      Droonga::Client.new(source_client_options)
-    end
-
-    def source_table_names
-      @source_table_names ||= get_source_table_names
-    end
-
-    def get_source_table_names
-      client = create_source_client
+    def get_table_names_in_destination_node
+      client = create_destination_client(:backend => :thread,
+                                         :loop => nil)
       response = client.request("dataset" => @source_dataset,
                                 "type"    => "table_list")
 
