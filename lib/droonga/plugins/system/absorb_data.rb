@@ -80,11 +80,17 @@ module Droonga
                   end
                 rescue Exception => exception
                   @dumper_error_message = exception.to_s
+                  logger.error("failed to process progress",
+                               :error     => exception,
+                               :backtrace => exception.backtrace)
                   on_finish
                 end
               end
             rescue Exception => exception
               @dumper_error_message = exception.to_s
+              logger.error("failed to start dump",
+                           :error     => exception,
+                           :backtrace => exception.backtrace)
             end
 
             on_finish if @dumper_error_message
@@ -113,6 +119,9 @@ module Droonga
               end
             rescue Exception => exception
               @dumper_error_message = exception.to_s
+              logger.error("failed to finish dump",
+                           :error     => exception,
+                           :backtrace => exception.backtrace)
               error(error_name, @dumper_error_message)
             end
             super
