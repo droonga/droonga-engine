@@ -116,18 +116,6 @@ module Droonga
       end
     end
 
-    def create_destination_client
-      options = {
-        :host          => @host,
-        :port          => @port,
-        :tag           => @tag,
-        :protocol      => :droonga,
-        :receiver_host => @receiver_host,
-        :receiver_port => @receiver_port,
-      }.merge(@client_options)
-      Droonga::Client.new(options)
-    end
-
     def source_node_suspendable?
       (source_replica_hosts - [@source_host]).size >= 1
     end
@@ -147,6 +135,21 @@ module Droonga
                                             :tag     => @tag,
                                             :dataset => @dataset)
       end
+    end
+
+    def destination_client_options
+      {
+        :host          => @host,
+        :port          => @port,
+        :tag           => @tag,
+        :protocol      => :droonga,
+        :receiver_host => @receiver_host,
+        :receiver_port => @receiver_port,
+      }.merge(@client_options)
+    end
+
+    def create_destination_client
+      Droonga::Client.new(destination_client_options)
     end
 
     def source_replica_hosts
