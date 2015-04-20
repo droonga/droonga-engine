@@ -470,6 +470,9 @@ module Droonga
 
         def stop_gracefully
           logger.trace("stop_gracefully: start")
+          logger.trace("stop_gracefully: stopping serf agent")
+          stop_serf do
+          logger.trace("stop_gracefully: stopping command runner")
           @command_runner.stop
           logger.trace("stop_gracefully: stopping cluster_state_observer")
           @cluster_state_observer.stop
@@ -477,18 +480,20 @@ module Droonga
           @catalog_observer.stop
           logger.trace("stop_gracefully: stopping restart_observer")
           @restart_observer.stop
-          stop_serf
           @service_runner.stop_gracefully
+          logger.trace("stop_gracefully: completely done")
+          end
           logger.trace("stop_gracefully: done")
         end
 
         def stop_immediately
+          stop_serf do
           @command_runner.stop
           @cluster_state_observer.stop
           @catalog_observer.stop
           @restart_observer.stop
-          stop_serf
           @service_runner.stop_immediately
+          end
         end
 
         def restart_graceful
@@ -547,14 +552,17 @@ module Droonga
           @serf_agent = @serf.run_agent(@loop)
         end
 
-        def stop_serf
+        def stop_serf(&block)
           logger.trace("stop_serf: start")
           begin
             @serf.leave
           rescue Droonga::Serf::Command::Failure
             logger.error("Failed to leave from Serf cluster: #{$!.message}")
           end
-          @serf_agent.stop
+          @serf_agent.stop do
+            logger.trace("stop_serf: serf agent stopped")
+            yield
+          end
           logger.trace("stop_serf: done")
         end
 
