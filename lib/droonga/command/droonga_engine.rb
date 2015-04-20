@@ -472,27 +472,27 @@ module Droonga
           logger.trace("stop_gracefully: start")
           logger.trace("stop_gracefully: stopping serf agent")
           stop_serf do
-          logger.trace("stop_gracefully: stopping command runner")
-          @command_runner.stop
-          logger.trace("stop_gracefully: stopping cluster_state_observer")
-          @cluster_state_observer.stop
-          logger.trace("stop_gracefully: stopping catalog_observer")
-          @catalog_observer.stop
-          logger.trace("stop_gracefully: stopping restart_observer")
-          @restart_observer.stop
-          @service_runner.stop_gracefully
-          logger.trace("stop_gracefully: completely done")
+            logger.trace("stop_gracefully: stopping command runner")
+            @command_runner.stop
+            logger.trace("stop_gracefully: stopping cluster_state_observer")
+            @cluster_state_observer.stop
+            logger.trace("stop_gracefully: stopping catalog_observer")
+            @catalog_observer.stop
+            logger.trace("stop_gracefully: stopping restart_observer")
+            @restart_observer.stop
+            @service_runner.stop_gracefully
+            logger.trace("stop_gracefully: completely done")
           end
           logger.trace("stop_gracefully: done")
         end
 
         def stop_immediately
           stop_serf do
-          @command_runner.stop
-          @cluster_state_observer.stop
-          @catalog_observer.stop
-          @restart_observer.stop
-          @service_runner.stop_immediately
+            @command_runner.stop
+            @cluster_state_observer.stop
+            @catalog_observer.stop
+            @restart_observer.stop
+            @service_runner.stop_immediately
           end
         end
 
