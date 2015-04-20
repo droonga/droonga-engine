@@ -22,6 +22,7 @@ require "pathname"
 require "droonga/engine/version"
 require "droonga/path"
 require "droonga/node_name"
+require "droonga/catalog/dataset"
 require "droonga/catalog/fetcher"
 require "droonga/catalog/generator"
 require "droonga/catalog/loader"
@@ -53,7 +54,7 @@ module Droonga
                   :default => Socket.gethostname)
         option.on(:dataset=,
                   "Dataset name of for the node to be unjoined.",
-                  :default => NodeName::DEFAULT_DATASET)
+                  :default => Catalog::Dataset::DEFAULT_NAME)
         option.on(:port=,
                   "Port number of the source cluster to be connected.",
                   :as => Integer,
