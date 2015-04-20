@@ -19,7 +19,7 @@ module Droonga
     attr_accessor :handler
     attr_accessor :collector
     attr_writer :write, :single_operation
-    attr_writer :timeout_seconds_calculator
+    attr_writer :timeout_calculator
     attr_accessor :inputs
     attr_accessor :output
     def initialize(plugin_module)
@@ -29,7 +29,7 @@ module Droonga
       @collector = nil
       @write = false
       @single_operation = false
-      @timeout_seconds_calculator = lambda do |step|
+      @timeout_calculator = lambda do |step|
         if step["timeout"]
           return step["timeout"]
         elsif step["body"]
@@ -52,9 +52,9 @@ module Droonga
       @single_operation
     end
 
-    def timeout_seconds_for_step(step)
-      if @timeout_seconds_calculator
-        @timeout_seconds_calculator.call(step)
+    def timeout_for_step(step)
+      if @timeout_calculator
+        @timeout_calculator.call(step)
       else
         nil
       end

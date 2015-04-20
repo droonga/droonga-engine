@@ -115,8 +115,8 @@ module Droonga
       end
     end
 
-    def set_timeout(loop, timeout_seconds, &on_timeout)
-      @timeout_timer = Coolio::TimerWatcher.new(timeout_seconds)
+    def set_timeout(loop, timeout, &on_timeout)
+      @timeout_timer = Coolio::TimerWatcher.new(timeout)
       on_timer = lambda do
         @timeout_timer.detach
         @timeout_timer = nil

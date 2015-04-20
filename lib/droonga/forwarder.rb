@@ -35,8 +35,8 @@ module Droonga
       @senders = {}
       @auto_close_timers = {}
       @shutting_down = false
-      @auto_close_timeout_seconds = options[:auto_close_timeout_seconds] ||
-                                      DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS
+      @auto_close_timeout = options[:auto_close_timeout] ||
+                              DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS
     end
 
     def start
@@ -138,7 +138,7 @@ module Droonga
       previous_timer = @auto_close_timers[destination]
       previous_timer.detach if previous_timer
 
-      timer = Coolio::TimerWatcher.new(@auto_close_timeout_seconds)
+      timer = Coolio::TimerWatcher.new(@auto_close_timeout)
       on_timeout = lambda do
         timer.detach
         @auto_close_timers.delete(destination)
