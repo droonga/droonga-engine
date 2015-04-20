@@ -58,8 +58,11 @@ module Droonga
         start_ready_check
       end
 
-      def stop
-        return if @pid.nil?
+      def stop(&block)
+        if @pid.nil?
+          yield if block_given?
+          return
+        end
         Process.waitpid(@pid)
         @output_io.close
         # logger.trace("stop: output_io watcher detached",
@@ -68,6 +71,7 @@ module Droonga
         # logger.trace("stop: error_io watcher detached",
         #              :watcher => @error_io)
         @pid = nil
+        yield if block_given?
       end
 
       def running?
