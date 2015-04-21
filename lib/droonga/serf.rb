@@ -47,7 +47,7 @@ module Droonga
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
-      tags_file = Droonga::Path.serf_tags_file
+      tags_file = Path.serf_tags_file
       FileUtils.mkdir_p(tags_file.dirname)
       agent = Agent.new(loop, @serf_command,
                         @name.host, agent_port, rpc_port,
@@ -223,7 +223,7 @@ module Droonga
       @serf_command ||= find_system_serf
       return if @serf_command
 
-      serf_path = Droonga::Path.serf_command
+      serf_path = Path.serf_command
       @serf_command = serf_path.to_s
       return if serf_path.executable?
       downloader = Downloader.new(serf_path)
