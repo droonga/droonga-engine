@@ -61,7 +61,7 @@ module Droonga
                         @name.host, agent_port, rpc_port,
                         "-node", @name.to_s,
                         "-event-handler", "droonga-engine-serf-event-handler",
-                        "-tags-file", self.class.tags_file,
+                        "-tags-file", self.class.tags_file.to_s,
                         *retry_joins)
       agent.on_ready = lambda do
         set_tag("type", "engine")
