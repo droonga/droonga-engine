@@ -64,8 +64,13 @@ module Droonga
 
     def start_forward
       logger.trace("start_forward: start")
+      fowarded = false
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
-        forward(buffered_message_path)
+        fowarded = forward(buffered_message_path) || fowarded
+      end
+      if @process_messages_newer_than_timestamp and fowarded
+        logger.info("New message is detected and forwarded. The boundary is now cleared.")
+        @process_messages_newer_than_timestamp = nil
       end
       @serf.reset_have_unprocessed_messages_for(@target)
       logger.trace("start_forward: done")
@@ -90,6 +95,8 @@ module Droonga
       message     = buffered_message["message"]
       destination = buffered_message["destination"]
 
+      forwarded = false
+
       if @process_messages_newer_than_timestamp
         message_timestamp = Time.parse(message["date"])
         logger.trace("Checking boundary of obsolete message",
@@ -98,8 +105,9 @@ module Droonga
         if @process_messages_newer_than_timestamp >= message_timestamp
           buffered_message = nil
         else
-          logger.info("New message is detected. The boundary is now cleared.")
-          @process_messages_newer_than_timestamp = nil
+          logger.info("New message is detected.")
+          # Don't clear the boundary for now, because older messages
+          # forwarded by the dispatcher can be still buffered.
         end
       end
 
@@ -109,10 +117,13 @@ module Droonga
                      :destination => destination)
         message["xSender"] = "forward-buffer"
         on_forward(message, destination)
+        forwarded = true
       end
 
       FileUtils.rm_f(buffered_message_path.to_s)
       logger.trace("forward: done (#{buffered_message_path})")
+
+      forwarded
     end
 
     def file_path(time_stamp=Time.now)
