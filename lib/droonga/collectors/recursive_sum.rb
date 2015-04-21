@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2015 Droonga Project
+# Copyright (C) 2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,7 +13,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/collectors/and"
-require "droonga/collectors/or"
-require "droonga/collectors/sum"
-require "droonga/collectors/recursive_sum"
+module Droonga
+  module Collectors
+    class RecursiveSum
+      class << self
+        def operator
+          "recursive-sum"
+        end
+      end
+    end
+  end
+end

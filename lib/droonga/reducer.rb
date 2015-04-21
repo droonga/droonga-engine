@@ -58,6 +58,10 @@ module Droonga
         reduced_value = sum(left_value, right_value)
         reduced_value = self.class.apply_range(reduced_value,
                                                "limit" => @deal["limit"])
+      when "recursive-sum"
+        reduced_value = recursive_sum(left_value, right_value)
+        reduced_value = self.class.apply_range(reduced_value,
+                                               "limit" => @deal["limit"])
       when "average"
         reduced_value = (left_value.to_f + right_value.to_f) / 2
       when "sort"
@@ -74,6 +78,16 @@ module Droonga
 
     private
     def sum(x, y)
+      return x || y if x.nil? or y.nil?
+
+      if x.is_a?(Hash) and y.is_a?(Hash)
+        x.merge(y)
+      else
+        x + y
+      end
+    end
+
+    def recursive_sum(x, y)
       return x || y if x.nil? or y.nil?
 
       if x.is_a?(Hash) and y.is_a?(Hash)

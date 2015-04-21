@@ -46,7 +46,7 @@ module Droonga
       define_single_step do |step|
         step.name = "system.object-count"
         step.handler = ObjectCountHandler
-        step.collector = Collectors::Sum
+        step.collector = Collectors::RecursiveSum
       end
     end
   end
