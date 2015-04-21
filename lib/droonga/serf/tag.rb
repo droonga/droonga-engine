@@ -17,43 +17,43 @@ module Droonga
   class Serf
     module Tag
       module_function
-        def node_type
-          "type"
-        end
+      def node_type
+        "type"
+      end
 
-        def node_role
-          "role"
-        end
+      def node_role
+        "role"
+      end
 
-        def internal_node_name
-          "internal-name"
-        end
+      def internal_node_name
+        "internal-name"
+      end
 
-        def cluster_id
-          "cluster_id"
-        end
+      def cluster_id
+        "cluster_id"
+      end
 
-        def accept_messages_newer_than
-          "accept-newer-than"
-        end
+      def accept_messages_newer_than
+        "accept-newer-than"
+      end
 
-        def last_processed_message_timestamp
-          "last-timestamp"
-        end
+      def last_processed_message_timestamp
+        "last-timestamp"
+      end
 
-        HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "buffered-for-"
+      HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "buffered-for-"
 
-        def have_unprocessed_messages_tag_for(node_name)
-         "#{HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX}#{node_name}"
-        end
+      def have_unprocessed_messages_tag_for(node_name)
+       "#{HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX}#{node_name}"
+      end
 
-        def have_unprocessed_messages_tag?(tag)
-          tag.start_with?(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX)
-        end
+      def have_unprocessed_messages_tag?(tag)
+        tag.start_with?(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX)
+      end
 
-        def extract_node_name_from_have_unprocessed_messages_tag(tag)
-          tag.sub(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX, "")
-        end
+      def extract_node_name_from_have_unprocessed_messages_tag(tag)
+        tag.sub(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX, "")
+      end
     end
   end
 end
