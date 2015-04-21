@@ -58,8 +58,13 @@ module Droonga
                            :message => message)
             end
             @dumper.on_error = lambda do |error|
+              if error.is_a?(Exception)
+                logger.exception("unexpected exception while dump",
+                                 error)
+              else
               logger.error("unexpected error while dump",
                            :error => error)
+              end
             end
 
             @previous_report_time = Time.now
