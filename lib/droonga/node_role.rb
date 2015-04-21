@@ -26,10 +26,6 @@ module Droonga
     ]
 
     class << self
-      def valid?(role)
-        ROLES.include?(role)
-      end
-
       def mine
         if @mine
           @mine.to_s
@@ -53,8 +49,12 @@ module Droonga
     end
 
     private
+    def valid?(role)
+      ROLES.include?(role)
+    end
+
     def normalize(role)
-      role = SERVICE_PROVIDER unless self.class.valid?(role)
+      role = SERVICE_PROVIDER unless valid?(role)
       role
     end
   end
