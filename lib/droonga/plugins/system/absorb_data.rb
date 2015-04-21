@@ -62,8 +62,8 @@ module Droonga
                 logger.exception("unexpected exception while dump",
                                  error)
               else
-              logger.error("unexpected error while dump",
-                           :error => error)
+                logger.error("unexpected error while dump",
+                             :error => error)
               end
             end
 
