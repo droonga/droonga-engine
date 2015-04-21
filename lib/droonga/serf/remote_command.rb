@@ -26,7 +26,7 @@ require "droonga/service_installation"
 require "droonga/restarter"
 
 module Droonga
-  module Serf
+  class Serf
     module RemoteCommand
       class Base
         attr_reader :response
