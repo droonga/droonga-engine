@@ -16,7 +16,7 @@
 require "json"
 require "fileutils"
 
-require "droonga/command/remote"
+require "droonga/serf/remote_command"
 
 module Droonga
   module Command
@@ -72,7 +72,7 @@ module Droonga
           @payload = JSON.parse($stdin.gets)
           detect_command_class_from_custom_event(ENV["SERF_QUERY_NAME"])
         when "member-join", "member-leave", "member-update", "member-reap"
-          Remote::UpdateClusterState
+          Serf::RemtoeCommand::UpdateClusterState
         else
           nil
         end
@@ -81,19 +81,19 @@ module Droonga
       def detect_command_class_from_custom_event(event_name)
         case event_name
         when "change_role"
-          Remote::ChangeRole
+          Serf::RemtoeCommand::ChangeRole
         when "accept_messages_newer_than"
-          Remote::AcceptMessagesNewerThan
+          Serf::RemtoeCommand::AcceptMessagesNewerThan
         when "join"
-          Remote::Join
+          Serf::RemtoeCommand::Join
         when "unjoin"
-          Remote::Unjoin
+          Serf::RemtoeCommand::Unjoin
         when "set_replicas"
-          Remote::SetReplicas
+          Serf::RemtoeCommand::SetReplicas
         when "add_replicas"
-          Remote::AddReplicas
+          Serf::RemtoeCommand::AddReplicas
         when "remove_replicas"
-          Remote::RemoveReplicas
+          Serf::RemtoeCommand::RemoveReplicas
         else
           nil
         end
