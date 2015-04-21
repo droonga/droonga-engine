@@ -1,0 +1,12 @@
+{
+  "type": "system.object-count",
+  "dataset": "Default",
+  "body": {
+    "output": [
+      "tables",
+      "columns",
+      "records",
+      "total"
+    ]
+  }
+}

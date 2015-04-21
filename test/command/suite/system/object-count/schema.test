@@ -1,0 +1,13 @@
+#@require-catalog-version 2
+{
+  "type": "system.object-count",
+  "dataset": "Default",
+  "body": {
+    "output": [
+      "tables",
+      "columns",
+      "records",
+      "total"
+    ]
+  }
+}
