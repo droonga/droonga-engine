@@ -2,7 +2,7 @@
 #@disable-logging
 {
   "type": "add",
-  "dataset": "Source",
+  "dataset": "Default",
   "body": {
     "table": "Users",
     "key": "Adam"
