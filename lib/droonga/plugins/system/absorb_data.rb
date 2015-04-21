@@ -123,7 +123,7 @@ module Droonga
               yield
             end
 
-            timer = Coolio::TimerWatcher.new(3, true)
+            timer = Coolio::TimerWatcher.new(DEFAULT_PROGRESS_INTERVAL_SECONDS, true)
             timer.on_timer do
               if runner.alive?
                 begin
