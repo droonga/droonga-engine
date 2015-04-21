@@ -57,11 +57,13 @@ module Droonga
       detect_other_hosts.each do |other_host|
         retry_joins.push("-retry-join", other_host)
       end
+      tags_file = self.class.tags_file
+      FileUtils.mkdir_p(tags_file.dirname)
       agent = Agent.new(loop, @serf,
                         @name.host, agent_port, rpc_port,
                         "-node", @name.to_s,
                         "-event-handler", "droonga-engine-serf-event-handler",
-                        "-tags-file", self.class.tags_file.to_s,
+                        "-tags-file", tags_file.to_s,
                         *retry_joins)
       agent.on_ready = lambda do
         set_tag("type", "engine")
