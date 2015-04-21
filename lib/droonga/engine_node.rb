@@ -95,11 +95,11 @@ module Droonga
 
     def writable?
       case NodeRole.my_role
-      when NodeMetadata::Role::SERVICE_PROVIDER
+      when NodeRole::SERVICE_PROVIDER
         true
-      when NodeMetadata::Role::ABSORB_SOURCE
+      when NodeRole::ABSORB_SOURCE
         absorb_source?
-      when NodeMetadata::Role::ABSORB_DESTINATION
+      when NodeRole::ABSORB_DESTINATION
         absorb_destination?
       else
         false
@@ -157,7 +157,7 @@ module Droonga
       if @state
         @state["role"]
       else
-        NodeMetadata::Role::SERVICE_PROVIDER
+        NodeRole::SERVICE_PROVIDER
       end
     end
 
@@ -183,15 +183,15 @@ module Droonga
     end
 
     def service_provider?
-      role == NodeMetadata::Role::SERVICE_PROVIDER
+      role == NodeRole::SERVICE_PROVIDER
     end
 
     def absorb_source?
-      role == NodeMetadata::Role::ABSORB_SOURCE
+      role == NodeRole::ABSORB_SOURCE
     end
 
     def absorb_destination?
-      role == NodeMetadata::Role::ABSORB_DESTINATION
+      role == NodeRole::ABSORB_DESTINATION
     end
 
     def complete_service_provider?
@@ -201,9 +201,9 @@ module Droonga
     def really_writable?
       return false unless writable?
       case NodeRole.my_role
-      when NodeMetadata::Role::SERVICE_PROVIDER
+      when NodeRole::SERVICE_PROVIDER
         service_provider?
-      when NodeMetadata::Role::ABSORB_SOURCE
+      when NodeRole::ABSORB_SOURCE
         not absorb_destination?
       else
         true
