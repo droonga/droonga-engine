@@ -74,6 +74,14 @@ module Droonga
         state + "buffer" + "intentional"
       end
 
+      def serf_command
+        base + "serf"
+      end
+
+      def serf_tags_file
+        state + "serf-tags.json"
+      end
+
       def serf_event_handler_errors
         state + "serf-event-handler-errors"
       end
