@@ -15,7 +15,7 @@
 
 module Droonga
   module Deferrable
-    attr_writer :on_ready, :on_failure
+    attr_writer :on_failure
 
     def wait_until_ready(target)
       target.on_ready = lambda do
@@ -23,9 +23,23 @@ module Droonga
       end
     end
 
+    def on_ready=(callback)
+      @on_ready_callbacks ||= []
+      if callback
+        @on_ready_callbacks << callback
+      else
+        @on_ready_callbacks.clear
+      end
+      callback
+    end
+
     private
     def on_ready
-      @on_ready.call if @on_ready
+      if @on_ready_callbacks
+        @on_ready_callbacks.each do |callback|
+          callback.call
+        end
+      end
     end
 
     def on_failure
