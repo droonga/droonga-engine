@@ -20,6 +20,7 @@ require "droonga/loggable"
 require "droonga/catalog/loader"
 require "droonga/node_name"
 require "droonga/node_role"
+require "droonga/serf/tag"
 require "droonga/serf/downloader"
 require "droonga/serf/agent"
 require "droonga/serf/command"
@@ -61,9 +62,9 @@ module Droonga
     end
 
     def initialize_tags
-      set_tag("type", "engine")
-      set_tag("cluster_id", cluster_id)
-      set_tag("role", role)
+      set_tag(Tag.node_type, "engine")
+      set_tag(Tag.node_role, role)
+      set_tag(Tag.cluster_id, cluster_id)
     end
 
     def leave
@@ -122,20 +123,20 @@ module Droonga
       nodes = {}
       unprocessed_messages_existence = {}
       current_members.each do |member|
-        foreign = member["tags"]["cluster_id"] != current_cluster_id
+        foreign = member["tags"][Tag.cluster_id] != current_cluster_id
         next if foreign
 
         member["tags"].each do |key, value|
-          next unless key.start_with?(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX)
-          node_name = key.sub(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX, "")
+          next unless Tag.have_unprocessed_messages_tag?(key)
+          node_name = Tag.extract_node_name_from_have_unprocessed_messages_tag(key)
           next if unprocessed_messages_existence[node_name]
           unprocessed_messages_existence[node_name] = value == "true"
         end
 
         nodes[member["name"]] = {
-          "type" => member["tags"]["type"],
-          "role" => member["tags"]["role"],
-          "accept_messages_newer_than" => member["tags"]["accept-newer-than"],
+          "type" => member["tags"][Tag.node_type],
+          "role" => member["tags"][Tag.node_role],
+          "accept_messages_newer_than" => member["tags"][Tag.accept_messages_newer_than],
           "live" => member["status"] == "alive",
         }
       end
@@ -171,44 +172,44 @@ module Droonga
     end
 
     def update_cluster_id
-      set_tag("cluster_id", cluster_id)
+      set_tag(Tag.cluster_id, cluster_id)
     end
 
     def set_have_unprocessed_messages_for(node_name)
-      tag = have_unprocessed_messages_tag_for(node_name)
+      tag = Tag.have_unprocessed_messages_tag_for(node_name)
       set_tag(tag, true) unless @tags_cache.key?(tag)
     end
 
     def reset_have_unprocessed_messages_for(node_name)
-      delete_tag(have_unprocessed_messages_tag_for(node_name))
+      delete_tag(Tag.have_unprocessed_messages_tag_for(node_name))
     end
 
     def role
-      NodeRole.normalize(get_tag("role"))
+      NodeRole.normalize(get_tag(Tag.node_role))
     end
 
     def role=(new_role)
       role = NodeRole.normalize(new_role)
-      set_tag("role", role)
+      set_tag(Tag.node_role, role)
       # after that you must run update_cluster_state to update the cluster information cache
       role
     end
 
     def last_processed_message_timestamp
-      get_tag("last-timestamp")
+      get_tag(Tag.last_processed_message_timestamp)
     end
 
     def last_processed_message_timestamp=(timestamp)
-      set_tag("last-timestamp", timestamp.to_s)
+      set_tag(Tag.last_processed_message_timestamp, timestamp.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
     def accept_messages_newer_than_timestamp
-      get_tag("accept-newer-than")
+      get_tag(Tag.accept_messages_newer_than)
     end
 
     def accept_messages_newer_than(timestamp)
-      set_tag("accept-newer-than", timestamp.to_s)
+      set_tag(Tag.accept_messages_newer_than, timestamp.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
@@ -223,13 +224,13 @@ module Droonga
 
     def ensure_restarted(&block)
       start_time = Time.now
-      previous_internal_name = get_tag("internal-name")
+      previous_internal_name = get_tag(Tag.internal_node_name)
       restarted = false
 
       yield # the given operation must restart the service.
 
       while Time.now - start_time < CHECK_RESTARTED_TIMEOUT
-        restarted = get_tag("internal-name") == previous_internal_name
+        restarted = get_tag(Tag.internal_node_name) == previous_internal_name
         break if restarted
         sleep(CHECK_RESTARTED_INTERVAL)
       end
@@ -300,12 +301,6 @@ module Droonga
       other_nodes.collect do |node|
         NodeName.parse(node).host
       end
-    end
-
-    HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "buffered-for-"
-
-    def have_unprocessed_messages_tag_for(node_name)
-      "#{HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX}#{node_name}"
     end
 
     def log_tag
