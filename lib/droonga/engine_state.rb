@@ -20,7 +20,6 @@ require "droonga/deferrable"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
-require "droonga/node_metadata"
 
 module Droonga
   class EngineState
@@ -47,7 +46,6 @@ module Droonga
       @replier = Replier.new(@forwarder)
       @on_finish = nil
       @catalog = params[:catalog]
-      @node_metadata = params[:metadata]
     end
 
     def start
@@ -150,7 +148,7 @@ module Droonga
     end
 
     def role
-      @node_metadata.role
+      NodeRole.my_role
     end
 
     private
