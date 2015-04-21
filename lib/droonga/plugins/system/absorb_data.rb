@@ -59,8 +59,8 @@ module Droonga
             @dumper = Drndump::DumpClient.new(dumper_params)
             @dumper.on_finish = lambda do
               ensure_completely_restored do
-              on_finish
-              logger.trace("start: finish")
+                on_finish
+                logger.trace("start: finish")
               end
             end
             @dumper.on_progress = lambda do |message|
