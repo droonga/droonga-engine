@@ -18,7 +18,7 @@ require "time"
 require "droonga/loggable"
 require "droonga/forward_buffer"
 require "droonga/fluent_message_sender"
-require "droonga/node_metadata"
+require "droonga/node_role"
 
 module Droonga
   class EngineNode
@@ -31,7 +31,6 @@ module Droonga
       logger.trace("initialize: start")
 
       @state = state
-      @sender_node_metadata = params[:metadata]
 
       @buffer = ForwardBuffer.new(name)
       boundary_timestamp = accept_messages_newer_than_timestamp
@@ -86,7 +85,7 @@ module Droonga
 
     def forwardable?
       return false unless live?
-      role == sender_role
+      role == NodeRole.my_role
     end
 
     def readable?
@@ -95,7 +94,7 @@ module Droonga
     end
 
     def writable?
-      case sender_role
+      case NodeRole.my_role
       when NodeMetadata::Role::SERVICE_PROVIDER
         true
       when NodeMetadata::Role::ABSORB_SOURCE
@@ -201,7 +200,7 @@ module Droonga
 
     def really_writable?
       return false unless writable?
-      case sender_role
+      case NodeRole.my_role
       when NodeMetadata::Role::SERVICE_PROVIDER
         service_provider?
       when NodeMetadata::Role::ABSORB_SOURCE
@@ -209,10 +208,6 @@ module Droonga
       else
         true
       end
-    end
-
-    def sender_role
-      @sender_node_metadata.role
     end
 
     def read_message?(message)
