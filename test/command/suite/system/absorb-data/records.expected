@@ -18,6 +18,7 @@
   "date": "0000-00-00T00:00:00.000000Z",
   "body": {
     "nProcessedMessages": 3,
+    "nRestoredObjects":   3,
     "percentage":         100,
     "message":            "100% done (maybe 00:00:00 remaining)"
   },
