@@ -109,12 +109,12 @@ module Droonga
       else
         old_state = nil
       end
-      clear_cache
       @state = self.class.load_state_file
       if @state == old_state
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed", :state => @state)
+        clear_cache
         engine_nodes.each(&:resume)
         on_change
       end
