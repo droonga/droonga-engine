@@ -32,6 +32,7 @@ module Droonga
 
       define_single_step do |step|
         step.name = "catalog.fetch"
+        step.single_operation = true
         step.handler = FetchHandler
         step.collector = Collectors::Or
       end
