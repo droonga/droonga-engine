@@ -110,12 +110,12 @@ module Droonga
     end
 
     def save_last_processed_message_timestamp
-      logger.trace("output_last_processed_message_timestamp: start")
+      logger.trace("save_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
         serf = Serf.new(@name)
         serf.last_processed_message_timestamp = @last_processed_message_timestamp
       end
-      logger.trace("output_last_processed_message_timestamp: done")
+      logger.trace("save_last_processed_message_timestamp: done")
     end
 
     def log_tag
