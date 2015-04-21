@@ -222,9 +222,9 @@ module Droonga
       if absorber.source_node_suspendable?
         puts("Changing role of the source node...")
         source_node_serf.do_and_wait_restart do
-        source_node_serf.send_query("change_role",
-                                    "node" => source_node.to_s,
-                                    "role" => NodeRole::ABSORB_SOURCE)
+          source_node_serf.send_query("change_role",
+                                      "node" => source_node.to_s,
+                                      "role" => NodeRole::ABSORB_SOURCE)
         end
       end
       @source_node_role_changed = true
@@ -233,9 +233,9 @@ module Droonga
     def set_joining_node_role
       puts("Changing role of the joining node...")
       joining_node_serf.do_and_wait_restart do
-      joining_node_serf.send_query("change_role",
-                                   "node" => joining_node.to_s,
-                                   "role" => NodeRole::ABSORB_DESTINATION)
+        joining_node_serf.send_query("change_role",
+                                     "node" => joining_node.to_s,
+                                     "role" => NodeRole::ABSORB_DESTINATION)
       end
       @joining_node_role_changed = true
     end
@@ -244,9 +244,9 @@ module Droonga
       if absorber.source_node_suspendable?
         puts("Restoring role of the source node...")
         source_node_serf.do_and_wait_restart do
-        source_node_serf.send_query("change_role",
-                                    "node" => source_node.to_s,
-                                    "role" => NodeRole::SERVICE_PROVIDER)
+          source_node_serf.send_query("change_role",
+                                      "node" => source_node.to_s,
+                                      "role" => NodeRole::SERVICE_PROVIDER)
         end
       end
       @source_node_role_changed = false
@@ -255,9 +255,9 @@ module Droonga
     def reset_joining_node_role
       puts("Restoring role of the joining node...")
       joining_node_serf.do_and_wait_restart do
-      joining_node_serf.send_query("change_role",
-                                   "node" => joining_node.to_s,
-                                   "role" => NodeRole::SERVICE_PROVIDER)
+        joining_node_serf.send_query("change_role",
+                                     "node" => joining_node.to_s,
+                                     "role" => NodeRole::SERVICE_PROVIDER)
       end
       @joining_node_role_changed = false
     end
@@ -265,11 +265,11 @@ module Droonga
     def do_join
       puts("Joining new replica to the cluster...")
       joining_node_serf.do_and_wait_restart do
-      joining_node_serf.send_query("join",
-                                   "node"    => joining_node.to_s,
-                                   "type"    => "replica",
-                                   "source"  => source_node.to_s,
-                                   "dataset" => dataset)
+        joining_node_serf.send_query("join",
+                                     "node"    => joining_node.to_s,
+                                     "type"    => "replica",
+                                     "source"  => source_node.to_s,
+                                     "dataset" => dataset)
       end
     end
 
@@ -314,10 +314,10 @@ module Droonga
     def register_to_existing_nodes
       puts("Register new node to existing hosts in the cluster...")
       source_node_serf.do_and_wait_restart do
-      source_node_serf.send_query("add_replicas",
-                                  "cluster_id" => source_cluster_id,
-                                  "dataset"    => dataset,
-                                  "hosts"      => [joining_node.host])
+        source_node_serf.send_query("add_replicas",
+                                    "cluster_id" => source_cluster_id,
+                                    "dataset"    => dataset,
+                                    "hosts"      => [joining_node.host])
       end
       @node_registered = true
     end
@@ -325,10 +325,10 @@ module Droonga
     def unregister_from_existing_nodes
       puts("Unregister new node from existing hosts in the cluster...")
       source_node_serf.do_and_wait_restart do
-      source_node_serf.send_query("remove_replicas",
-                                  "cluster_id" => source_cluster_id,
-                                  "dataset"    => dataset,
-                                  "hosts"      => [joining_node.host])
+        source_node_serf.send_query("remove_replicas",
+                                    "cluster_id" => source_cluster_id,
+                                    "dataset"    => dataset,
+                                    "hosts"      => [joining_node.host])
       end
       @node_registered = false
     end
