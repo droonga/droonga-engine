@@ -34,6 +34,10 @@ module Droonga
       def path
         Droonga::Path.base + "serf"
       end
+
+      def tags_file
+        Droonga::Path.state + "serf-tags"
+      end
     end
 
     include Loggable
@@ -58,10 +62,13 @@ module Droonga
                         @name.host, agent_port, rpc_port,
                         "-node", @name.to_s,
                         "-event-handler", "droonga-engine-serf-event-handler",
-                        "-tag", "type=engine",
-                        "-tag", "role=#{role}",
-                        "-tag", "cluster_id=#{cluster_id}",
+                        "-tags-file", self.class.tags_file,
                         *retry_joins)
+      agent.on_ready = lambda do
+        set_tag("type", "engine")
+        set_tag("role", role)
+        set_tag("cluster_id", cluster_id)
+      end
       agent.start
       logger.trace("run_agent: done")
       agent
