@@ -36,7 +36,7 @@ module Droonga
       end
 
       def tags_file
-        Droonga::Path.state + "serf-tags"
+        Droonga::Path.state + "serf-tags.json"
       end
     end
 
