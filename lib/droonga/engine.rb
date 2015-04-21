@@ -25,6 +25,7 @@ require "droonga/cluster"
 require "droonga/catalog/loader"
 require "droonga/dispatcher"
 require "droonga/serf"
+require "droonga/serf/tag"
 
 module Droonga
   class Engine
@@ -50,7 +51,7 @@ module Droonga
       @state.on_ready = lambda do
         on_ready
         serf = Serf.new(@name.to_s)
-        serf.set_tag("internal-name", @internal_name)
+        serf.set_tag(Serf::Tag.internal_node_name, @internal_name)
       end
       @state.on_failure = lambda do
         on_failure
