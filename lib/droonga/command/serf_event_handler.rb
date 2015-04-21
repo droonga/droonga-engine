@@ -84,8 +84,6 @@ module Droonga
           Remote::ChangeRole
         when "accept_messages_newer_than"
           Remote::AcceptMessagesNewerThan
-        when "report_metadata"
-          Remote::ReportMetadata
         when "join"
           Remote::Join
         when "unjoin"

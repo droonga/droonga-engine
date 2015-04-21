@@ -131,13 +131,6 @@ module Droonga
         end
       end
 
-      class ReportMetadata < Base
-        def process
-          metadata = NodeMetadata.new
-          @response["value"] = metadata.get(@params["key"])
-        end
-      end
-
       class CrossNodeCommandBase < Base
         private
         def source_node
