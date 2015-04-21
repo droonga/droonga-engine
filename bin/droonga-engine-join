@@ -241,6 +241,7 @@ module Droonga
     end
 
     def set_source_node_role
+      return if source_node_serf.role == NodeRole::ABSORB_SOURCE
       if absorber.source_node_suspendable?
         puts("Changing role of the source node...")
         source_node_serf.ensure_restarted do
@@ -249,20 +250,20 @@ module Droonga
                                       "role" => NodeRole::ABSORB_SOURCE)
         end
       end
-      @source_node_role_changed = true
     end
 
     def set_joining_node_role
+      return if joining_node_serf.role == NodeRole::ABSORB_DESTINATION
       puts("Changing role of the joining node...")
       joining_node_serf.ensure_restarted do
         joining_node_serf.send_query("change_role",
                                      "node" => joining_node.to_s,
                                      "role" => NodeRole::ABSORB_DESTINATION)
       end
-      @joining_node_role_changed = true
     end
 
     def reset_source_node_role
+      return if source_node_serf.role == NodeRole::SERVICE_PROVIDER
       if absorber.source_node_suspendable?
         puts("Restoring role of the source node...")
         source_node_serf.ensure_restarted do
@@ -271,17 +272,16 @@ module Droonga
                                       "role" => NodeRole::SERVICE_PROVIDER)
         end
       end
-      @source_node_role_changed = false
     end
 
     def reset_joining_node_role
+      return if joining_node_serf.role == NodeRole::SERVICE_PROVIDER
       puts("Restoring role of the joining node...")
       joining_node_serf.ensure_restarted do
         joining_node_serf.send_query("change_role",
                                      "node" => joining_node.to_s,
                                      "role" => NodeRole::SERVICE_PROVIDER)
       end
-      @joining_node_role_changed = false
     end
 
     def do_join
@@ -375,8 +375,8 @@ module Droonga
     def do_cancel
       #XXX we have to write more codes to cancel remote processes!
       unregister_from_existing_nodes if @node_registered
-      reset_joining_node_role if @joining_node_role_changed
-      reset_source_node_role if @source_node_role_changed
+      reset_joining_node_role
+      reset_source_node_role
     end
     end
   end
