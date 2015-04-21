@@ -44,10 +44,6 @@ module Droonga
         base + "state"
       end
 
-      def node_metadata
-        state + "metadata.json"
-      end
-
       def cluster_state
         state + "cluster-state.json"
       end
