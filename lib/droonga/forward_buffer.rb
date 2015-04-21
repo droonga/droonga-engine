@@ -107,6 +107,7 @@ module Droonga
         logger.trace("forward: Forwarding buffered message",
                      :message     => message,
                      :destination => destination)
+        message["xSender"] = "forward-buffer"
         on_forward(message, destination)
       end
 

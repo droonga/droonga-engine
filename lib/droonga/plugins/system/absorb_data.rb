@@ -69,6 +69,7 @@ module Droonga
               @dumper_error_message = @dumper.run(dump_options) do |message|
                 begin
                   message["dataset"] = current_dataset
+                  message["xSender"] = "system.absorb-data"
                   @messenger.forward(message,
                                      "to"   => my_node_name,
                                      "type" => message["type"])
