@@ -15,75 +15,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "slop"
 require "socket"
 
-require "droonga/engine/version"
-require "droonga/node_name"
-require "droonga/serf"
+require "droonga/command/remote_command_base"
 
 module Droonga
-  class SetRoleCommand
+  module Command
+    class SetRole << RemoteCommandBase
     def run
-      parse_options
-      puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
-      set_node_role
-      puts("Done.")
-      exit(true)
-    end
-
-    private
-    def parse_options
-      options = Slop.parse(:help => true) do |option|
+      parse_options do |option|
         option.on(:role=,
                   "New role for the target node.",
                   :required => true)
-
-        option.separator("Connections:")
-        option.on(:host=,
-                  "Host name of the target node.",
-                  :required => true)
-        option.on("receiver-host=",
-                  "Host name of this host.",
-                  :default => Socket.gethostname)
-        option.on(:dataset=,
-                  "Dataset name of for the target node.",
-                  :default => NodeName::DEFAULT_DATASET)
-        option.on(:port=,
-                  "Port number of the source cluster to be connected.",
-                  :as => Integer,
-                  :default => NodeName::DEFAULT_PORT)
-        option.on(:tag=,
-                  "Tag name of the soruce cluster to be connected.",
-                  :default => NodeName::DEFAULT_TAG)
-
-        option.separator("Miscellaneous:")
-        option.on(:verbose, "Output details for internal operations.",
-                  :default => false)
       end
-      @options = options
-    rescue Slop::MissingOptionError => error
-      $stderr.puts(error)
-      exit(false)
+
+      puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
+      succeeded = set_node_role
+
+      puts("Done.") if succeeded
+      succeeded
     end
 
-    def target_node
-      "#{@options[:host]}:#{@options[:port]}/#{@options[:tag]}"
-    end
-
-    def target_node_serf
-      @target_node_serf ||= Serf.new(target_node,
-                                     :verbose => @options[:verbose])
-    end
-
+    private
     def set_node_role
-      target_node_serf.ensure_restarted do
-        target_node_serf.send_query("change_role",
-                                    "node" => target_node,
+      serf.ensure_restarted do
+        serf.send_query("change_role",
+                                    "node" => node.to_s,
                                     "role" => @options[:role])
       end
     end
   end
 end
 
-Droonga::SetRoleCommand.new.run
+exit(Droonga::Command::SetRole.new.run)
