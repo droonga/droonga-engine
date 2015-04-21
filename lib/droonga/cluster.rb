@@ -86,9 +86,7 @@ module Droonga
 
     def start
       logger.trace("start: start")
-      engine_nodes.each do |node|
-        node.start
-      end
+      engine_nodes.each(&:start)
       start_observe
       logger.trace("start: done")
     end
@@ -96,9 +94,7 @@ module Droonga
     def shutdown
       logger.trace("shutdown: start")
       stop_observe
-      engine_nodes.each do |node|
-        node.shutdown
-      end
+      engine_nodes.each(&:shutdown)
       logger.trace("shutdown: done")
     end
 
