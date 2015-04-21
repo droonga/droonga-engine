@@ -63,9 +63,7 @@ module Droonga
     def initialize_tags
       set_tag("type", "engine")
       set_tag("cluster_id", cluster_id)
-      current_role = role
-      set_tag("role", current_role)
-      NodeRole.mine = current_role
+      set_tag("role", role)
     end
 
     def leave

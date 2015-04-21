@@ -13,6 +13,10 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "json"
+
+require "droonga/path"
+
 module Droonga
   class NodeRole
     SERVICE_PROVIDER   = "service-provider"
@@ -31,16 +35,14 @@ module Droonga
       end
 
       def mine
-        if @mine
-          @mine.to_s
-        else
-          SERVICE_PROVIDER
+        if Path.serf_tags_file.exist?
+          tags = Path.serf_tags_file.read
+          tags = JSON.parse(tags)
+          return tags["role"] if tags["role"]
         end
-      end
-
-      def mine=(new_role)
-        @mine = new(new_role)
-        @mine.to_s
+        SERVICE_PROVIDER
+      rescue Errno::ENOENT, JSON::ParserError
+        SERVICE_PROVIDER
       end
     end
 
