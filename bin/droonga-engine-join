@@ -290,7 +290,7 @@ module Droonga
                                     "node" => source_node.to_s,
                                     "key" => "last_processed_message_timestamp")
       unless response
-        $stderr.puts("Could't get the time stamp of " +
+        $stderr.puts("Couldn't get the time stamp of " +
                        "the last processed message from the source node.")
         return false
       end
