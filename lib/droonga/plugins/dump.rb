@@ -18,6 +18,7 @@ require "groonga"
 require "droonga/plugin"
 require "droonga/plugin/async_command"
 require "droonga/error_messages"
+require "droonga/database_scanner"
 
 module Droonga
   module Plugins
@@ -62,6 +63,8 @@ module Droonga
       end
 
       class Dumper < AsyncCommand::AsyncHandler
+        include DatabaseScanner
+
         def initialize(context, loop, messenger, request)
           @context = context
           super(loop, messenger, request)
@@ -116,31 +119,12 @@ module Droonga
         end
 
         def forecast
-          n_tables  = 0
-          n_columns = 0
-          n_records = 0
-          each_table do |table|
-            n_tables += 1
-            n_columns += table.columns.size
-            unless index_only_table?(table)
-              n_records += table.size
-            end
-          end
-          n_dump_messages = n_tables + n_columns + n_records
-          forward("#{prefix}.forecast", "nMessages" => n_dump_messages)
+          forward("#{prefix}.forecast", "nMessages" => n_all_objects)
         end
 
         def dump_schema
           reference_tables = []
           each_table do |table|
-            if reference_table?(table)
-              reference_tables << table
-              next
-            end
-            dump_table(table)
-          end
-
-          reference_tables.each do |table|
             dump_table(table)
           end
         end
@@ -265,44 +249,6 @@ module Droonga
         def dump_indexes
           each_index_columns do |column|
             dump_column(column)
-          end
-        end
-
-        def each_table
-          options = {
-            :ignore_missing_object => true,
-            :order_by => :key,
-          }
-          @context.database.each(options) do |object|
-            next unless table?(object)
-            yield(object)
-          end
-        end
-
-        def table?(object)
-          object.is_a?(::Groonga::Table)
-        end
-
-        def index_only_table?(table)
-          return false if table.columns.empty?
-          table.columns.all? do |column|
-            index_column?(column)
-          end
-        end
-
-        def reference_table?(table)
-          table.support_key? and table?(table.domain)
-        end
-
-        def index_column?(column)
-          column.is_a?(::Groonga::IndexColumn)
-        end
-
-        def each_index_columns
-          each_table do |table|
-            table.columns.each do |column|
-              yield(column) if index_column?(column)
-            end
           end
         end
 
