@@ -187,6 +187,13 @@ module Droonga
       serf.send_query(command, options)
     end
 
+    def current_member_state(target)
+      serf = Serf.new(target, :verbose => @options[:verbose])
+      serf.current_members.find do |member|
+        member["name"] == target
+      end
+    end
+
     def absorber
       @absorber ||= prepare_absorber
     end
@@ -234,15 +241,16 @@ module Droonga
 
       puts ""
 
-      response = run_remote_command(source_node.to_s, "report_metadata",
-                                    "node" => source_node.to_s,
-                                    "key" => "last_processed_message_timestamp")
-      unless response
+      timestamp = nil
+      source_state = current_member_state(source_node.to_s)
+      if source_state
+        timestamp = source_state["tags"]["last-processed-message-timestamp"]
+      end
+      unless timestamp
         $stderr.puts("Couldn't get the time stamp of " +
                        "the last processed message from the source node.")
         return false
       end
-      timestamp = response["value"]
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
