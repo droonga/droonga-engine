@@ -310,7 +310,7 @@ module Droonga
             return 0 if @dumper.n_forecasted_messages.zero?
             processed = @dumper.n_received_messages + @n_restored_objects
             expected  = @dumper.n_forecasted_messages * 2
-            progress  = processed / expected
+            progress  = processed.to_f / expected
             [(progress * 100).to_i, 100].min
           end
 
