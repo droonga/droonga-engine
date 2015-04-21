@@ -221,51 +221,56 @@ module Droonga
     def set_source_node_role
       if absorber.source_node_suspendable?
         puts("Changing role of the source node...")
+        source_node_serf.do_and_wait_restart do
         source_node_serf.send_query("change_role",
                                     "node" => source_node.to_s,
                                     "role" => NodeRole::ABSORB_SOURCE)
-        wait_until_restarted(source_node)
+        end
       end
       @source_node_role_changed = true
     end
 
     def set_joining_node_role
       puts("Changing role of the joining node...")
+      joining_node_serf.do_and_wait_restart do
       joining_node_serf.send_query("change_role",
                                    "node" => joining_node.to_s,
                                    "role" => NodeRole::ABSORB_DESTINATION)
-      wait_until_restarted(joining_node)
+      end
       @joining_node_role_changed = true
     end
 
     def reset_source_node_role
       if absorber.source_node_suspendable?
         puts("Restoring role of the source node...")
+        source_node_serf.do_and_wait_restart do
         source_node_serf.send_query("change_role",
                                     "node" => source_node.to_s,
                                     "role" => NodeRole::SERVICE_PROVIDER)
-        wait_until_restarted(source_node.to_s)
+        end
       end
       @source_node_role_changed = false
     end
 
     def reset_joining_node_role
       puts("Restoring role of the joining node...")
+      joining_node_serf.do_and_wait_restart do
       joining_node_serf.send_query("change_role",
                                    "node" => joining_node.to_s,
                                    "role" => NodeRole::SERVICE_PROVIDER)
-      wait_until_restarted(joining_node.to_s)
+      end
       @joining_node_role_changed = false
     end
 
     def do_join
       puts("Joining new replica to the cluster...")
+      joining_node_serf.do_and_wait_restart do
       joining_node_serf.send_query("join",
                                    "node"    => joining_node.to_s,
                                    "type"    => "replica",
                                    "source"  => source_node.to_s,
                                    "dataset" => dataset)
-      wait_until_restarted(joining_node)
+      end
     end
 
     def copy_data
@@ -308,21 +313,23 @@ module Droonga
 
     def register_to_existing_nodes
       puts("Register new node to existing hosts in the cluster...")
+      source_node_serf.do_and_wait_restart do
       source_node_serf.send_query("add_replicas",
                                   "cluster_id" => source_cluster_id,
                                   "dataset"    => dataset,
                                   "hosts"      => [joining_node.host])
-      wait_until_restarted(source_node)
+      end
       @node_registered = true
     end
 
     def unregister_from_existing_nodes
       puts("Unregister new node from existing hosts in the cluster...")
+      source_node_serf.do_and_wait_restart do
       source_node_serf.send_query("remove_replicas",
                                   "cluster_id" => source_cluster_id,
                                   "dataset"    => dataset,
                                   "hosts"      => [joining_node.host])
-      wait_until_restarted(source_node)
+      end
       @node_registered = false
     end
 
@@ -348,11 +355,6 @@ module Droonga
       unregister_from_existing_nodes if @node_registered
       reset_joining_node_role if @joining_node_role_changed
       reset_source_node_role if @source_node_role_changed
-    end
-
-    def wait_until_restarted(*nodes)
-      #TODO: wait for restarting of the given nodes. this should be done more safely.
-      sleep(30)
     end
   end
 end
