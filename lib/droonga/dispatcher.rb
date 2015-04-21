@@ -23,6 +23,7 @@ require "droonga/farm"
 require "droonga/session"
 require "droonga/error_messages"
 require "droonga/distributor"
+require "droonga/node_role"
 
 module Droonga
   class Dispatcher
@@ -232,7 +233,7 @@ module Droonga
             target_nodes = @cluster.writable_nodes
             if target_nodes.empty?
               logger.error("there is no node to dispath a write step!",
-                           :my_role   => @engine_state.role,
+                           :my_role   => NodeRole.my_role,
                            :all_nodes => @cluster.engine_nodes.collect(&:to_json),
                            :step      => step)
             end
@@ -240,7 +241,7 @@ module Droonga
             target_nodes = @cluster.readable_nodes
             if target_nodes.empty?
               logger.error("there is no node to dispath a read step!",
-                           :my_role   => @engine_state.role,
+                           :my_role   => NodeRole.my_role,
                            :all_nodes => @cluster.engine_nodes.collect(&:to_json),
                            :step      => step)
             end

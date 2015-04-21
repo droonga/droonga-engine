@@ -147,10 +147,6 @@ module Droonga
       not @sessions.empty?
     end
 
-    def role
-      NodeRole.my_role
-    end
-
     private
     def log_tag
       "engine_state"
