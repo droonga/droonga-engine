@@ -18,6 +18,7 @@ require "droonga/plugin/async_command"
 require "droonga/catalog/dataset"
 require "droonga/serf"
 require "droonga/node_name"
+require "droonga/database_scanner"
 
 require "drndump/dump_client"
 
@@ -36,10 +37,17 @@ module Droonga
         end
 
         class DataAbsorber < AsyncCommand::AsyncHandler
+          include DatabaseScanner
+
           class EmptyResponse < StandardError
           end
 
           class EmptyBody < StandardError
+          end
+
+          def initialize(context, loop, messenger, request)
+            @context = context
+            super(loop, messenger, request)
           end
 
           def start
@@ -50,8 +58,10 @@ module Droonga
 
             @dumper = Drndump::DumpClient.new(dumper_params)
             @dumper.on_finish = lambda do
+              ensure_completely_restored do
               on_finish
               logger.trace("start: finish")
+              end
             end
             @dumper.on_progress = lambda do |message|
               logger.trace("dump progress",
@@ -112,6 +122,10 @@ module Droonga
 
           def error_message
             "failed to absorb data"
+          end
+
+          def ensure_completely_restored(&block)
+            yield
           end
 
           def on_finish
@@ -220,7 +234,7 @@ module Droonga
 
         private
         def start(request)
-          absorber = DataAbsorber.new(loop, messenger, request)
+          absorber = DataAbsorber.new(@context, loop, messenger, request)
           absorber.start
         end
       end
