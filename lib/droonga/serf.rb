@@ -196,15 +196,14 @@ module Droonga
     end
 
     def role
-      role = NodeRole.new(get_tag("role"))
-      role.to_s
+      NodeRole.normalize(get_tag("role"))
     end
 
     def role=(new_role)
-      role = NodeRole.new(new_role)
-      set_tag("role", role.to_s)
+      role = NodeRole.normalize(new_role)
+      set_tag("role", role)
       # after that you must run update_cluster_state to update the cluster information cache
-      role.to_s
+      role
     end
 
     def last_processed_message_timestamp

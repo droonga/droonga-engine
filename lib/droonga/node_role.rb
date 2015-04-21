@@ -26,6 +26,10 @@ module Droonga
     ]
 
     class << self
+      def normalize(role)
+        new(role).to_s
+      end
+
       def mine
         if @mine
           @mine.to_s
