@@ -243,7 +243,7 @@ module Droonga
         step.name = "system.absorb-data"
         step.single_operation = true
         step.handler = AbsorbDataHandler
-        step.collector = Collectors::And
+        step.collector = Collectors::Or
       end
     end
   end
