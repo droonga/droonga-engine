@@ -161,12 +161,12 @@ module Droonga
 
     def source_node_serf
       @source_node_serf ||= Serf.new(source_node.to_s,
-                                     :verbose => @options.verbose)
+                                     :verbose => @options[:verbose])
     end
 
     def joining_node_serf
       @joining_node_serf ||= Serf.new(joining_node.to_s,
-                                      :verbose => @options.verbose)
+                                      :verbose => @options[:verbose])
     end
 
     def source_cluster_id
