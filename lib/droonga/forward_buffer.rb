@@ -87,8 +87,10 @@ module Droonga
       buffered_message = @unpacker.read
       @unpacker.reset
 
+      message     = buffered_message["message"]
+      destination = buffered_message["destination"]
+
       if @process_messages_newer_than_timestamp
-        message = buffered_message["message"]
         message_timestamp = Time.parse(message["date"])
         logger.trace("Checking boundary of obsolete message",
                      :newer_than => @process_messages_newer_than_timestamp,
@@ -103,10 +105,9 @@ module Droonga
 
       if buffered_message
         logger.trace("forward: Forwarding buffered message",
-                     :message     => buffered_message["message"],
-                     :destination => buffered_message["destination"])
-        on_forward(buffered_message["message"],
-                   buffered_message["destination"])
+                     :message     => message,
+                     :destination => destination)
+        on_forward(message, destination)
       end
 
       FileUtils.rm_f(buffered_message_path.to_s)
