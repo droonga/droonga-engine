@@ -169,6 +169,27 @@ module Droonga
       source_catalog.cluster_id
     end
 
+    def all_nodes
+      existing_nodes + [joining_node]
+    end
+
+    def existing_nodes
+      @existing_nodes ||= prepare_existing_nodes
+    end
+
+    def prepare_existing_nodes
+      generator = Catalog::Generator.new
+      generator.load(raw_source_catalog)
+
+      dataset = generator.dataset_for_host(source_node.host)
+      other_hosts = dataset.replicas.hosts
+      other_hosts.collect do |host|
+        NodeName.new(:host => host,
+                     :port => source_node.port,
+                     :tag  => source_node.tag)
+      end
+    end
+
     def source_catalog
       @source_catalog ||= parse_source_catalog
     end
@@ -314,7 +335,7 @@ module Droonga
 
     def register_to_existing_nodes
       puts("Register new node to existing hosts in the cluster...")
-      source_node_serf.ensure_restarted do
+      source_node_serf.ensure_restarted(*existing_nodes) do
         source_node_serf.send_query("add_replicas",
                                     "cluster_id" => source_cluster_id,
                                     "dataset"    => dataset,
@@ -325,7 +346,7 @@ module Droonga
 
     def unregister_from_existing_nodes
       puts("Unregister new node from existing hosts in the cluster...")
-      source_node_serf.ensure_restarted do
+      source_node_serf.ensure_restarted(*existing_nodes) do
         source_node_serf.send_query("remove_replicas",
                                     "cluster_id" => source_cluster_id,
                                     "dataset"    => dataset,

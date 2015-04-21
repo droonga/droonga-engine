@@ -222,20 +222,31 @@ module Droonga
     CHECK_RESTARTED_INTERVAL = 3
     CHECK_RESTARTED_TIMEOUT = 60 * 5
 
-    def ensure_restarted(&block)
+    def ensure_restarted(*nodes, &block)
+      nodes << @name.to_s if nodes.empty?
+
+      targets = nodes.collect do |node|
+        serf = self.class.new(node)
+        {
+          :serf          => serf,
+          :previous_name => serf.get_tag(Tag.internal_node_name),
+        }
+      end
+
       start_time = Time.now
-      previous_internal_name = get_tag(Tag.internal_node_name)
-      restarted = false
 
       yield # the given operation must restart the service.
 
       while Time.now - start_time < CHECK_RESTARTED_TIMEOUT
-        restarted = get_tag(Tag.internal_node_name) == previous_internal_name
-        break if restarted
+        targets.reject! do |target|
+          name = target[:serf].get_tag(Tag.internal_node_name)
+          name != target[:previous_name]
+        end
+        break if targets.empty?
         sleep(CHECK_RESTARTED_INTERVAL)
       end
 
-      restarted
+      targets.empty?
     end
 
     private
