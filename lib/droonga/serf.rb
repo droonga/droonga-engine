@@ -218,6 +218,19 @@ module Droonga
       catalog.cluster_id
     end
 
+    CHECK_RESTARTED_INTERVAL = 3
+    CHECK_RESTARTED_TIMEOUT = 60 * 5
+
+    def do_and_wait_restart(&block)
+      start_time = Time.now
+      previous_internal_name = get_tag("internal-name")
+      yield # the given operation must restart the service.
+      while Time.now - start_time < CHECK_RESTARTED_TIMEOUT and
+              get_tag("internal-name") == previous_internal_name
+        sleep(CHECK_RESTARTED_INTERVAL)
+      end
+    end
+
     private
     def ensure_serf
       @serf_command ||= find_system_serf
