@@ -78,9 +78,9 @@ module Droonga
 
     def set_node_role
       target_node_serf.ensure_restarted do
-      target_node_serf.send_query("change_role",
-                         "node" => target_node,
-                         "role" => @options[:role])
+        target_node_serf.send_query("change_role",
+                                    "node" => target_node,
+                                    "role" => @options[:role])
       end
     end
   end

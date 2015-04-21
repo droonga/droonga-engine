@@ -148,10 +148,10 @@ module Droonga
       puts "Unjoining replica from the cluster..."
 
       remaining_node_serf.ensure_restarted do
-      remaining_node_serf.send_query("unjoin",
-                         "cluster_id" => cluster_id,
-                         "dataset" => dataset_name,
-                         "hosts"   => [replica_remove_host])
+        remaining_node_serf.send_query("unjoin",
+                                       "cluster_id" => cluster_id,
+                                       "dataset" => dataset_name,
+                                       "hosts"   => [replica_remove_host])
       end
     end
   end
