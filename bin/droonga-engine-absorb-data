@@ -29,7 +29,8 @@ require "droonga/client"
 require "droonga/restarter"
 
 module Droonga
-  class AbsorbDataCommand
+  module Command
+    class AbsorbData
     def run
       @loop = Coolio::Loop.default
 
@@ -274,7 +275,8 @@ module Droonga
     def do_cancel
       #XXX we have to write more codes to cancel remote processes!
     end
+    end
   end
 end
 
-exit(Droonga::AbsorbDataCommand.new.run)
+exit(Droonga::Command::AbsorbData.new.run)

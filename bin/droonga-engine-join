@@ -33,7 +33,8 @@ require "droonga/data_absorber_client"
 require "droonga/serf"
 
 module Droonga
-  class JoinCommand
+  module Command
+    class Join
     class MissingRequiredParameter < StandardError
     end
 
@@ -356,7 +357,8 @@ module Droonga
       reset_joining_node_role if @joining_node_role_changed
       reset_source_node_role if @source_node_role_changed
     end
+    end
   end
 end
 
-exit(Droonga::JoinCommand.new.run)
+exit(Droonga::Command::Join.new.run)
