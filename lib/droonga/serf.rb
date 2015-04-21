@@ -157,6 +157,17 @@ module Droonga
       sorted_nodes
     end
 
+    def get_tag(name)
+      myself = current_members.find do |member|
+        member["name"] == @name.to_s
+      end
+      if myself
+        myself["tags"]["name"]
+      else
+        nil
+      end
+    end
+
     def set_tag(name, value)
       run_command("tags", "-set", "#{name}=#{value}")
       @tags_cache[name] = value

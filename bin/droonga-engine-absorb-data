@@ -187,11 +187,9 @@ module Droonga
       serf.send_query(command, options)
     end
 
-    def current_member_state(target)
+    def tag_value(target, tag)
       serf = Serf.new(target, :verbose => @options[:verbose])
-      serf.current_members.find do |member|
-        member["name"] == target
-      end
+      serf.get_tag(tag)
     end
 
     def absorber
@@ -241,11 +239,7 @@ module Droonga
 
       puts ""
 
-      timestamp = nil
-      source_state = current_member_state(source_node.to_s)
-      if source_state
-        timestamp = source_state["tags"]["last-processed-message-timestamp"]
-      end
+      timestamp = tag_value(source_node.to_s, "last-processed-message-timestamp")
       unless timestamp
         $stderr.puts("Couldn't get the time stamp of " +
                        "the last processed message from the source node.")
