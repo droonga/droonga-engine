@@ -22,28 +22,28 @@ require "droonga/command/remote_command_base"
 module Droonga
   module Command
     class SetRole << RemoteCommandBase
-    def run
-      parse_options do |option|
-        option.on(:role=,
-                  "New role for the target node.",
-                  :required => true)
+      def run
+        parse_options do |option|
+          option.on(:role=,
+                    "New role for the target node.",
+                    :required => true)
+        end
+
+        puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
+        succeeded = set_node_role
+
+        puts("Done.") if succeeded
+        succeeded
       end
 
-      puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
-      succeeded = set_node_role
-
-      puts("Done.") if succeeded
-      succeeded
-    end
-
-    private
-    def set_node_role
-      serf.ensure_restarted do
-        serf.send_query("change_role",
-                                    "node" => node.to_s,
-                                    "role" => @options[:role])
+      private
+      def set_node_role
+        serf.ensure_restarted do
+          serf.send_query("change_role",
+                          "node" => node.to_s,
+                          "role" => @options[:role])
+        end
       end
-    end
   end
 end
 
