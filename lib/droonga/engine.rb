@@ -24,7 +24,6 @@ require "droonga/engine_state"
 require "droonga/cluster"
 require "droonga/catalog/loader"
 require "droonga/dispatcher"
-require "droonga/node_metadata"
 
 module Droonga
   class Engine
@@ -35,21 +34,17 @@ module Droonga
       @name = name
       @loop = loop
       @catalog = load_catalog
-      @node_metadata = NodeMetadata.new
       @state = EngineState.new(loop, name,
                                internal_name,
-                               :catalog  => @catalog,
-                               :metadata => @node_metadata)
+                               :catalog  => @catalog)
       @cluster = Cluster.new(loop,
-                             :catalog  => @catalog,
-                             :metadata => @node_metadata)
+                             :catalog  => @catalog)
 
       @dispatcher = create_dispatcher
     end
 
     def start
       logger.trace("start: start")
-      @node_metadata.start_observe(@loop)
       @state.on_ready = lambda do
         on_ready
       end
@@ -64,7 +59,6 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
-      @node_metadata.stop_observe
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
