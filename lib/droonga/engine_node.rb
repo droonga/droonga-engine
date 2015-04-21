@@ -26,7 +26,7 @@ module Droonga
 
     attr_reader :name
 
-    def initialize(name, state, loop, params)
+    def initialize(name, state, loop)
       @name  = name
       logger.trace("initialize: start")
 
