@@ -44,6 +44,12 @@ module Droonga
       puts ""
       puts "Absorbing..."
 
+      succeeded = update_accept_messages_newer_than_timestamp
+      unless succeeded
+        do_cancel
+        return false
+      end
+
       succeeded = absorb
 
       if succeeded
@@ -238,7 +244,10 @@ module Droonga
       end
 
       puts ""
+      true
+    end
 
+    def update_accept_messages_newer_than_timestamp
       timestamp = source_node_serf.last_processed_message_timestamp
       unless timestamp
         $stderr.puts("Couldn't get the time stamp of " +
@@ -248,9 +257,11 @@ module Droonga
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
-        response = destination_node_serf.send_query("accept_messages_newer_than",
+        destination_node_serf.ensure_restarted do
+          destination_node_serf.send_query("accept_messages_newer_than",
                                                     "node"      => destination_node.to_s,
                                                     "timestamp" => timestamp)
+        end
       end
       true
     end

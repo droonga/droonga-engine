@@ -66,6 +66,7 @@ module Droonga
         do_join
         register_to_existing_nodes
         set_source_node_role
+        update_accept_messages_newer_than_timestamp
         if should_copy?
           successed = copy_data
           unless successed
@@ -73,7 +74,6 @@ module Droonga
             return false
           end
         end
-        set_effective_message_timestamp
         reset_source_node_role
         reset_joining_node_role
         puts("Done.")
@@ -317,7 +317,7 @@ module Droonga
       true
     end
 
-    def set_effective_message_timestamp
+    def update_accept_messages_newer_than_timestamp
       timestamp = source_node_serf.last_processed_message_timestamp
       unless timestamp
         $stderr.puts("Couldn't get the time stamp of " +
@@ -327,10 +327,13 @@ module Droonga
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
-        response = joining_node_serf.send_query("accept_messages_newer_than",
+        joining_node_serf.ensure_restarted do
+          joining_node_serf.send_query("accept_messages_newer_than",
                                                 "node"      => joining_node.to_s,
                                                 "timestamp" => timestamp)
+        end
       end
+      true
     end
 
     def register_to_existing_nodes
