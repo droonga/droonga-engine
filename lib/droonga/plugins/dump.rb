@@ -119,11 +119,10 @@ module Droonga
         end
 
         def forecast
-          forward("#{prefix}.forecast", "nMessages" => n_all_objects)
+          forward("#{prefix}.forecast", "nMessages" => total_n_objects)
         end
 
         def dump_schema
-          reference_tables = []
           each_table do |table|
             dump_table(table)
           end

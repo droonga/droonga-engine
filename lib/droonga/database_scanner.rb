@@ -17,7 +17,33 @@ require "groonga"
 
 module Droonga
   module DatabaseScanner
-    def n_all_objects
+    def n_tables
+      n_tables  = 0
+      each_table do |table|
+        n_tables += 1
+      end
+      n_tables
+    end
+
+    def n_columns
+      n_columns = 0
+      each_table do |table|
+        n_columns += table.columns.size
+      end
+      n_columns
+    end
+
+    def n_records
+      n_records = 0
+      each_table do |table|
+        unless index_only_table?(table)
+          n_records += table.size
+        end
+      end
+      n_records
+    end
+
+    def total_n_objects
       n_tables  = 0
       n_columns = 0
       n_records = 0
