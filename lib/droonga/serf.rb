@@ -238,9 +238,13 @@ module Droonga
       yield # the given operation must restart the service.
 
       while Time.now - start_time < CHECK_RESTARTED_TIMEOUT
+        puts "Checking nodes are restarted or not:" if @verbose
         targets.reject! do |target|
           name = target[:serf].get_tag(Tag.internal_node_name)
-          name != target[:previous_name]
+          restarted = name != target[:previous_name]
+          puts "  #{name} vs #{target[:previous_name]} => " +
+                 "#{restarted ? "restarted" : "not yet"}" if @verbose
+          restarted
         end
         break if targets.empty?
         sleep(CHECK_RESTARTED_INTERVAL)
