@@ -66,7 +66,11 @@ module Droonga
         do_join
         register_to_existing_nodes
         set_source_node_role
-        update_accept_messages_newer_than_timestamp
+        successed = update_accept_messages_newer_than_timestamp
+        unless successed
+          do_cancel
+          return false
+        end
         if should_copy?
           successed = copy_data
           unless successed
