@@ -186,6 +186,18 @@ module Droonga
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
+    def last_processed_message_timestamp
+      @node_metadata.reload
+      @node_metadata.get(:last_processed_message_timestamp)
+    end
+
+    def last_processed_message_timestamp=(timestamp)
+      @node_metadata.reload
+      @node_metadata.set(:last_processed_message_timestamp, timestamp.to_s)
+      set_tag("last-processed-message-timestamp", timestamp.to_s)
+      # after that you must run update_cluster_state to update the cluster information cache
+    end
+
     def accept_messages_newer_than_timestamp
       @node_metadata.reload
       @node_metadata.get(:accept_messages_newer_than)

@@ -32,6 +32,7 @@ module Droonga
     include Deferrable
 
     def initialize(loop, name, internal_name)
+      @name = name
       @loop = loop
       @catalog = load_catalog
       @node_metadata = NodeMetadata.new
@@ -117,7 +118,8 @@ module Droonga
     def save_last_processed_message_timestamp
       logger.trace("output_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
-        @node_metadata.set(:last_processed_message_timestamp, @last_processed_message_timestamp.to_s)
+        serf = Serf.new(@name)
+        serf.last_processed_message_timestamp = @last_processed_message_timestamp
       end
       logger.trace("output_last_processed_message_timestamp: done")
     end
