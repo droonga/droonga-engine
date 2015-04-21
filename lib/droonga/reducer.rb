@@ -96,6 +96,8 @@ module Droonga
         else
           x.merge(y)
         end
+      elsif numeric_array?(x) and numeric_array?(y)
+        sum_numeric_array(x, y)
       else
         x + y
       end
@@ -184,30 +186,51 @@ module Droonga
       end
     end
 
-    def numeric_hash?(hash)
-      return false unless hash.is_a?(Hash)
-      hash.values.all? do |value|
+    def numeric_array?(array)
+      return false unless array.is_a?(Array)
+      array.all? do |value|
         case value
         when Numeric
           true
         when Hash
           numeric_hash?(value)
+        when Array
+          numeric_array?(value)
         else
           false
         end
       end
     end
 
+    def numeric_hash?(hash)
+      return false unless hash.is_a?(Hash)
+      numeric_array?(hash.values)
+    end
+
+    def sum_numeric_values(x, y)
+      if x.nil? or y.nil?
+        x || y
+      elsif numeric_array?(x) and numeric_array?(y)
+        sum_numeric_arrays(x, y)
+      elsif numeric_hash?(x) and numeric_hash?(y)
+        sum_numeric_hashes(x, y)
+      else
+        x + y
+      end
+    end
+
+    def sum_numeric_arrays(x, y)
+      sum = []
+      [x.size, y.size].max.times do |index|
+        sum << sum_numeric_values(x[index], y[index])
+      end
+      sum
+    end
+
     def sum_numeric_hashes(x, y)
       sum = {}
-      (x.keys + y.keys).each do |key|
-        x_value = x[key]
-        y_value = y[key]
-        if numeric_hash?(x_value) and numeric_hash?(y_value)
-          sum[key] = sum_numeric_hashes(x_value, y_value)
-        else
-          sum[key] = (x_value || 0) + (y_value || 0)
-        end
+      (x.keys + y.keys).uniq.each do |key|
+        sum[key] = sum_numeric_values(x[key], y[key])
       end
       sum
     end
