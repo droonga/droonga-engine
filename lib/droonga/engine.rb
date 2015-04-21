@@ -24,6 +24,7 @@ require "droonga/engine_state"
 require "droonga/cluster"
 require "droonga/catalog/loader"
 require "droonga/dispatcher"
+require "droonga/serf"
 
 module Droonga
   class Engine
@@ -32,6 +33,7 @@ module Droonga
 
     def initialize(loop, name, internal_name)
       @name = name
+      @internal_name = internal_name
       @loop = loop
       @catalog = load_catalog
       @state = EngineState.new(loop, name,
@@ -47,6 +49,8 @@ module Droonga
       logger.trace("start: start")
       @state.on_ready = lambda do
         on_ready
+        serf = Serf.new(@name.to_s)
+        serf.set_tag("internal-name", @internal_name)
       end
       @state.on_failure = lambda do
         on_failure
