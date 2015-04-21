@@ -221,7 +221,7 @@ module Droonga
     CHECK_RESTARTED_INTERVAL = 3
     CHECK_RESTARTED_TIMEOUT = 60 * 5
 
-    def do_and_wait_restart(&block)
+    def ensure_restarted(&block)
       start_time = Time.now
       previous_internal_name = get_tag("internal-name")
       yield # the given operation must restart the service.
