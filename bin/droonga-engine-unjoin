@@ -27,7 +27,7 @@ require "droonga/serf"
 
 module Droonga
   module Command
-    class Unjoin << RemoteCommandBase
+    class Unjoin < RemoteCommandBase
       def run
         parse_options do |option|
           option.on("receiver-host=",

@@ -19,7 +19,7 @@ require "droonga/command/remote_command_base"
 
 module Droonga
   module Command
-    class SetRole << RemoteCommandBase
+    class SetRole < RemoteCommandBase
       def run
         parse_options do |option|
           option.on(:role=,
