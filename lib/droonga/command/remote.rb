@@ -18,7 +18,7 @@ require "json"
 require "droonga/path"
 require "droonga/serf"
 require "droonga/node_name"
-require "droonga/node_metadata"
+require "droonga/node_role"
 require "droonga/catalog/generator"
 require "droonga/catalog/modifier"
 require "droonga/catalog/fetcher"
@@ -119,6 +119,7 @@ module Droonga
         def process
           log("old role: #{@serf.role}")
           @serf.role = @params["role"]
+          NodeRole.my_role = @serf.role
           log("new role: #{@serf.role}")
         end
       end

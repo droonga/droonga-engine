@@ -67,6 +67,7 @@ module Droonga
         set_tag("type", "engine")
         set_tag("role", role)
         set_tag("cluster_id", cluster_id)
+        NodeRole.my_role = role
       end
       agent.start
       logger.trace("run_agent: done")
@@ -199,6 +200,7 @@ module Droonga
       role = NodeRole.new(new_role)
       set_tag("role", role.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
+      role.to_s
     end
 
     def last_processed_message_timestamp
