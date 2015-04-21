@@ -51,13 +51,31 @@ module Droonga
             count_total_n_objects do |n_objects|
               @n_initial_objects = n_objects
               logger.info("initially #{n_objects} objects exist in the dataset")
-              do_absorb
+              do_absorb do
+                ensure_completely_restored do
+                  on_finish
+                  logger.trace("start: finish")
+                end
+              end
             end
 
             logger.trace("start: done")
           end
 
-          def do_absorb
+          private
+          def prefix
+            "system.absorb-data"
+          end
+
+          def error_name
+            "AbsorbFailure"
+          end
+
+          def error_message
+            "failed to absorb data"
+          end
+
+          def do_absorb(&block)
             logger.trace("do_absorb: start")
             @dumper_error_message = nil
 
@@ -68,6 +86,9 @@ module Droonga
             @previous_report_time = Time.now
 
             @dumper = create_dumper
+            @dumper.on_finish = lambda do
+              yield
+            end
             begin
               logger.info("starting to absorb the source dataset")
               @dumper_error_message = @dumper.run(dump_options) do |message|
@@ -95,17 +116,42 @@ module Droonga
             logger.trace("do_absorb: done")
           end
 
-          private
-          def prefix
-            "system.absorb-data"
+          def create_dumper
+            dumper = Drndump::DumpClient.new(dumper_params)
+            dumper.on_progress = lambda do |message|
+              logger.trace("dump progress",
+                           :message => message)
+            end
+            dumper.on_error = lambda do |error|
+              if error.is_a?(Exception)
+                logger.exception("unexpected exception while dump",
+                                 error)
+              else
+                logger.error("unexpected error while dump",
+                             :error => error)
+              end
+            end
+            dumper
           end
 
-          def error_name
-            "AbsorbFailure"
+          def dumper_params
+            {
+              :host    => source_host,
+              :port    => source_port,
+              :tag     => source_tag,
+              :dataset => source_dataset,
+
+              :receiver_host => myself.host,
+              :receiver_port => 0,
+            }
           end
 
-          def error_message
-            "failed to absorb data"
+          def dump_options
+            {
+              :backend => :coolio,
+              :loop    => @loop,
+              :messages_per_second => messages_per_second,
+            }
           end
 
           def ensure_completely_restored(&block)
@@ -145,6 +191,22 @@ module Droonga
             @loop.attach(timer)
           end
 
+          def on_finish
+            begin
+              if @dumper_error_message
+                error(error_name, @dumper_error_message)
+              else
+                report_progress
+              end
+            rescue Exception => exception
+              @dumper_error_message = exception.to_s
+              logger.exception("failed to finish dump",
+                               exception)
+              error(error_name, @dumper_error_message)
+            end
+            super
+          end
+
           def count_total_n_objects(&block)
             count_message = {
               "type"    => "system.object-count",
@@ -170,66 +232,6 @@ module Droonga
               :protocol => :droonga,
               :backend  => :coolio,
               :loop     => @loop,
-            }
-          end
-
-          def on_finish
-            begin
-              if @dumper_error_message
-                error(error_name, @dumper_error_message)
-              else
-                report_progress
-              end
-            rescue Exception => exception
-              @dumper_error_message = exception.to_s
-              logger.exception("failed to finish dump",
-                               exception)
-              error(error_name, @dumper_error_message)
-            end
-            super
-          end
-
-          def create_dumper
-            dumper = Drndump::DumpClient.new(dumper_params)
-            dumper.on_finish = lambda do
-              ensure_completely_restored do
-                on_finish
-                logger.trace("start: finish")
-              end
-            end
-            dumper.on_progress = lambda do |message|
-              logger.trace("dump progress",
-                           :message => message)
-            end
-            dumper.on_error = lambda do |error|
-              if error.is_a?(Exception)
-                logger.exception("unexpected exception while dump",
-                                 error)
-              else
-                logger.error("unexpected error while dump",
-                             :error => error)
-              end
-            end
-            dumper
-          end
-
-          def dumper_params
-            {
-              :host    => source_host,
-              :port    => source_port,
-              :tag     => source_tag,
-              :dataset => source_dataset,
-
-              :receiver_host => myself.host,
-              :receiver_port => 0,
-            }
-          end
-
-          def dump_options
-            {
-              :backend => :coolio,
-              :loop    => @loop,
-              :messages_per_second => messages_per_second,
             }
           end
 
