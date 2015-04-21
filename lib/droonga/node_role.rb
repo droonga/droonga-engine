@@ -43,7 +43,7 @@ module Droonga
 
     private
     def normalize(role)
-      role = Role::SERVICE_PROVIDER unless self.class.valid?(role)
+      role = SERVICE_PROVIDER unless self.class.valid?(role)
       role
     end
   end
