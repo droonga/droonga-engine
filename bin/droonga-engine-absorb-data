@@ -259,8 +259,8 @@ module Droonga
         puts "Setting effective message timestamp for the destination node..."
         destination_node_serf.ensure_restarted do
           destination_node_serf.send_query("accept_messages_newer_than",
-                                                    "node"      => destination_node.to_s,
-                                                    "timestamp" => timestamp)
+                                           "node"      => destination_node.to_s,
+                                           "timestamp" => timestamp)
         end
       end
       true
