@@ -75,7 +75,7 @@ module Droonga
       set_tag("cluster_id", cluster_id)
       current_role = role
       set_tag("role", current_role)
-      NodeRole.my_role = current_role
+      NodeRole.mine = current_role
     end
 
     def leave

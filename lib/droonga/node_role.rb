@@ -30,17 +30,17 @@ module Droonga
         ROLES.include?(role)
       end
 
-      def my_role
-        if @my_role
-          @my_role.to_s
+      def mine
+        if @mine
+          @mine.to_s
         else
           SERVICE_PROVIDER
         end
       end
 
-      def my_role=(new_role)
-        @my_role = new(new_role)
-        @my_role.to_s
+      def mine=(new_role)
+        @mine = new(new_role)
+        @mine.to_s
       end
     end
 

@@ -119,7 +119,7 @@ module Droonga
         def process
           log("old role: #{@serf.role}")
           @serf.role = @params["role"]
-          NodeRole.my_role = @serf.role
+          NodeRole.mine = @serf.role
           log("new role: #{@serf.role}")
         end
       end

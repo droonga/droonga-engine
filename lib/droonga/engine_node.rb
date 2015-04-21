@@ -85,7 +85,7 @@ module Droonga
 
     def forwardable?
       return false unless live?
-      role == NodeRole.my_role
+      role == NodeRole.mine
     end
 
     def readable?
@@ -94,7 +94,7 @@ module Droonga
     end
 
     def writable?
-      case NodeRole.my_role
+      case NodeRole.mine
       when NodeRole::SERVICE_PROVIDER
         true
       when NodeRole::ABSORB_SOURCE
@@ -200,7 +200,7 @@ module Droonga
 
     def really_writable?
       return false unless writable?
-      case NodeRole.my_role
+      case NodeRole.mine
       when NodeRole::SERVICE_PROVIDER
         service_provider?
       when NodeRole::ABSORB_SOURCE
