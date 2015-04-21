@@ -50,6 +50,7 @@ module Droonga
 
             count_total_n_objects do |n_objects|
               @n_initial_objects = n_objects
+              logger.info("initially #{n_objects} objects exist in the dataset")
               do_absorb
             end
 
