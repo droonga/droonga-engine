@@ -241,7 +241,7 @@ module Droonga
                 count_total_n_objects do |count|
                   @previous_report_time = Time.now
                   @n_restored_objects = count - @n_initial_objects
-                  try_report_progress
+                  report_progress
                 end
               else
                 @previous_report_time = now
