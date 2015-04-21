@@ -154,7 +154,7 @@ module Droonga
         member["name"] == @name.to_s
       end
       if myself
-        myself["tags"]["name"]
+        myself["tags"][name]
       else
         nil
       end
