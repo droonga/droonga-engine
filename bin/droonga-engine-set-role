@@ -71,15 +71,17 @@ module Droonga
       "#{@options[:host]}:#{@options[:port]}/#{@options[:tag]}"
     end
 
-    def run_remote_command(target, command, options)
-      serf = Serf.new(target, :verbose => @options[:verbose])
-      serf.send_query(command, options)
+    def target_node_serf
+      @target_node_serf ||= Serf.new(target_node,
+                                     :verbose => @options[:verbose])
     end
 
     def set_node_role
-      run_remote_command(target_node, "change_role",
+      target_node_serf.ensure_restarted do
+      target_node_serf.send_query("change_role",
                          "node" => target_node,
                          "role" => @options[:role])
+      end
     end
   end
 end
