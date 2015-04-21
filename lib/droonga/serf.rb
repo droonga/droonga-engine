@@ -19,7 +19,7 @@ require "droonga/path"
 require "droonga/loggable"
 require "droonga/catalog/loader"
 require "droonga/node_name"
-require "droonga/node_metadata"
+require "droonga/node_role"
 require "droonga/serf/downloader"
 require "droonga/serf/agent"
 require "droonga/serf/command"
@@ -47,7 +47,6 @@ module Droonga
       @name = NodeName.parse(name)
       @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
-      @node_metadata = NodeMetadata.new
       @tags_cache = {}
     end
 
@@ -192,38 +191,30 @@ module Droonga
     end
 
     def role
-      @node_metadata.reload
-      @node_metadata.role
+      role = NodeRole.new(get_tag("role"))
+      role.to_s
     end
 
     def role=(new_role)
-      new_role ||= NodeMetadata::Role::SERVICE_PROVIDER
-      @node_metadata.reload
-      @node_metadata.role = new_role
-      set_tag("role", new_role)
+      role = NodeRole.new(new_role)
+      set_tag("role", role.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
     def last_processed_message_timestamp
-      @node_metadata.reload
-      @node_metadata.get(:last_processed_message_timestamp)
+      get_tag("last-processed-message-timestamp")
     end
 
     def last_processed_message_timestamp=(timestamp)
-      @node_metadata.reload
-      @node_metadata.set(:last_processed_message_timestamp, timestamp.to_s)
       set_tag("last-processed-message-timestamp", timestamp.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
     def accept_messages_newer_than_timestamp
-      @node_metadata.reload
-      @node_metadata.get(:accept_messages_newer_than)
+      get_tag("accept-messages-newer-than")
     end
 
     def accept_messages_newer_than(timestamp)
-      @node_metadata.reload
-      @node_metadata.set(:accept_messages_newer_than, timestamp.to_s)
       set_tag("accept-messages-newer-than", timestamp.to_s)
       # after that you must run update_cluster_state to update the cluster information cache
     end
