@@ -43,7 +43,7 @@ module Droonga
     include Loggable
 
     def initialize(name, options={})
-      @serf = nil
+      @serf_command = nil
       @name = NodeName.parse(name)
       @verbose = options[:verbose] || false
       @service_installation = ServiceInstallation.new
@@ -59,7 +59,7 @@ module Droonga
       end
       tags_file = self.class.tags_file
       FileUtils.mkdir_p(tags_file.dirname)
-      agent = Agent.new(loop, @serf,
+      agent = Agent.new(loop, @serf_command,
                         @name.host, agent_port, rpc_port,
                         "-node", @name.to_s,
                         "-event-handler", "droonga-engine-serf-event-handler",
@@ -232,11 +232,11 @@ module Droonga
 
     private
     def ensure_serf
-      @serf ||= find_system_serf
-      return if @serf
+      @serf_command ||= find_system_serf
+      return if @serf_command
 
       serf_path = self.class.path
-      @serf = serf_path.to_s
+      @serf_command = serf_path.to_s
       return if serf_path.executable?
       downloader = Downloader.new(serf_path)
       downloader.download
@@ -253,7 +253,7 @@ module Droonga
 
     def run_command(command, *options)
       ensure_serf
-      command = Command.new(@serf, command,
+      command = Command.new(@serf_command, command,
                             "-rpc-addr", rpc_address,
                             *options)
       command.verbose = @verbose
