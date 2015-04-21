@@ -102,6 +102,9 @@ module Droonga
       end
 
       if buffered_message
+        logger.trace("forward: Forwarding buffered message",
+                     :message     => buffered_message["message"],
+                     :destination => buffered_message["destination"])
         on_forward(buffered_message["message"],
                    buffered_message["destination"])
       end
