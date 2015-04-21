@@ -413,6 +413,7 @@ module Droonga
           start_serf
           @serf_agent.on_ready = lambda do
             logger.trace("run_internal: serf agent is ready")
+            @serf.initialize_tags
             @serf.update_cluster_state
             @service_runner = run_service
             setup_initial_on_ready

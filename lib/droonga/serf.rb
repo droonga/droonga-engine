@@ -65,16 +65,17 @@ module Droonga
                         "-event-handler", "droonga-engine-serf-event-handler",
                         "-tags-file", tags_file.to_s,
                         *retry_joins)
-      agent.on_ready = lambda do
-        set_tag("type", "engine")
-        set_tag("cluster_id", cluster_id)
-        current_role = role
-        set_tag("role", current_role)
-        NodeRole.my_role = current_role
-      end
       agent.start
       logger.trace("run_agent: done")
       agent
+    end
+
+    def initialize_tags
+      set_tag("type", "engine")
+      set_tag("cluster_id", cluster_id)
+      current_role = role
+      set_tag("role", current_role)
+      NodeRole.my_role = current_role
     end
 
     def leave

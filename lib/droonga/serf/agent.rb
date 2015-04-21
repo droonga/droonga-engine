@@ -196,6 +196,7 @@ module Droonga
         checker = Coolio::TCPSocket.connect(@host, @bind_port)
 
         on_connect = lambda do
+          @serf.initialize_tags
           on_ready
           checker.close
           # logger.trace("start_ready_check: checker watcher detached",
