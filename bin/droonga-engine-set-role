@@ -44,6 +44,7 @@ module Droonga
                           "role" => @options[:role])
         end
       end
+    end
   end
 end
 
