@@ -26,7 +26,6 @@ require "droonga/node_name"
 require "droonga/data_absorber_client"
 require "droonga/serf"
 require "droonga/client"
-require "droonga/node_metadata"
 require "droonga/restarter"
 
 module Droonga
