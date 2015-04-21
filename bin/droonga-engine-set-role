@@ -27,7 +27,7 @@ module Droonga
                     :required => true)
         end
 
-        puts "Setting role of #{@options[:host]} to #{@options[:role]}..."
+        puts "Setting role of #{node.to_s} to #{@options[:role]}..."
         succeeded = set_node_role
 
         puts("Done.") if succeeded
