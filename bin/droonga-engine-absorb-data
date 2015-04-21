@@ -182,14 +182,14 @@ module Droonga
                                          :tag  => @options.tag)
     end
 
-    def run_remote_command(target, command, options)
-      serf = Serf.new(target, :verbose => @options.verbose)
-      serf.send_query(command, options)
+    def source_node_serf
+      @source_node_serf ||= Serf.new(source_node.to_s,
+                                     :verbose => @options.verbose)
     end
 
-    def tag_value(target, tag)
-      serf = Serf.new(target, :verbose => @options[:verbose])
-      serf.get_tag(tag)
+    def destination_node_serf
+      @destination_node_serf ||= Serf.new(destination_node.to_s,
+                                          :verbose => @options.verbose)
     end
 
     def absorber
@@ -239,7 +239,7 @@ module Droonga
 
       puts ""
 
-      timestamp = tag_value(source_node.to_s, "last-processed-message-timestamp")
+      timestamp = source_node_serf.last_processed_message_timestamp
       unless timestamp
         $stderr.puts("Couldn't get the time stamp of " +
                        "the last processed message from the source node.")
@@ -248,9 +248,9 @@ module Droonga
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
-        response = run_remote_command(destination_node.to_s, "accept_messages_newer_than",
-                                      "node" => destination_node.to_s,
-                                      "timestamp" => timestamp)
+        response = destination_node_serf.send_query("accept_messages_newer_than",
+                                                    "node"      => destination_node.to_s,
+                                                    "timestamp" => timestamp)
       end
       true
     end
