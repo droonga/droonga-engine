@@ -18,7 +18,6 @@ require "droonga/changable"
 require "droonga/path"
 require "droonga/file_observer"
 require "droonga/engine_node"
-require "droonga/node_metadata"
 
 module Droonga
   class Cluster
@@ -62,7 +61,6 @@ module Droonga
 
       @catalog = params[:catalog]
       @state = nil
-      @node_metadata = params[:metadata]
 
       reload
     end
@@ -189,8 +187,7 @@ module Droonga
         node_state = @state[name] || {}
         EngineNode.new(name,
                        node_state,
-                       @loop,
-                       :metadata => @node_metadata)
+                       @loop)
       end
     end
 
