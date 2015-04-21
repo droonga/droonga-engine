@@ -29,6 +29,19 @@ module Droonga
       def valid?(role)
         ROLES.include?(role)
       end
+
+      def my_role
+        if @my_role
+          @my_role.to_s
+        else
+          SERVICE_PROVIDER
+        end
+      end
+
+      def my_role=(new_role)
+        @my_role = new(new_role)
+        @my_role.to_s
+      end
     end
 
     def initialize(role)
