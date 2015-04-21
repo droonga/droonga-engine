@@ -16,6 +16,7 @@
 require "json"
 
 require "droonga/path"
+require "droonga/serf/tag"
 
 module Droonga
   class NodeRole
@@ -38,7 +39,7 @@ module Droonga
         if Path.serf_tags_file.exist?
           tags = Path.serf_tags_file.read
           tags = JSON.parse(tags)
-          return tags["role"] if tags["role"]
+          return tags[Serf::Tag.node_role] if tags[Serf::Tag.node_role]
         end
         SERVICE_PROVIDER
       rescue Errno::ENOENT, JSON::ParserError
