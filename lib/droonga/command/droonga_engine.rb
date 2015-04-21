@@ -29,7 +29,6 @@ require "droonga/path"
 require "droonga/node_name"
 require "droonga/serf"
 require "droonga/cluster"
-require "droonga/node_metadata"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
 
