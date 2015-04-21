@@ -91,8 +91,8 @@ module Droonga
       return x || y if x.nil? or y.nil?
 
       if x.is_a?(Hash) and y.is_a?(Hash)
-        if number_hash?(x) and number_hash?(y)
-          sum_number_hashes(x, y)
+        if numeric_hash?(x) and numeric_hash?(y)
+          sum_numeric_hashes(x, y)
         else
           x.merge(y)
         end
@@ -184,27 +184,27 @@ module Droonga
       end
     end
 
-    def number_hash?(hash)
+    def numeric_hash?(hash)
       return false unless hash.is_a?(Hash)
       hash.values.all? do |value|
         case value
         when Numeric
           true
         when Hash
-          number_hash?(value)
+          numeric_hash?(value)
         else
           false
         end
       end
     end
 
-    def sum_number_hashes(x, y)
+    def sum_numeric_hashes(x, y)
       sum = {}
       (x.keys + y.keys).each do |key|
         x_value = x[key]
         y_value = y[key]
-        if number_hash?(x_value) and number_hash?(y_value)
-          sum[key] = sum_number_hashes(x_value, y_value)
+        if numeric_hash?(x_value) and numeric_hash?(y_value)
+          sum[key] = sum_numeric_hashes(x_value, y_value)
         else
           sum[key] = (x_value || 0) + (y_value || 0)
         end
