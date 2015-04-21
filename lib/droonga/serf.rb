@@ -224,11 +224,17 @@ module Droonga
     def ensure_restarted(&block)
       start_time = Time.now
       previous_internal_name = get_tag("internal-name")
+      restarted = false
+
       yield # the given operation must restart the service.
-      while Time.now - start_time < CHECK_RESTARTED_TIMEOUT and
-              get_tag("internal-name") == previous_internal_name
+
+      while Time.now - start_time < CHECK_RESTARTED_TIMEOUT
+        restarted = get_tag("internal-name") == previous_internal_name
+        break if restarted
         sleep(CHECK_RESTARTED_INTERVAL)
       end
+
+      restarted
     end
 
     private
