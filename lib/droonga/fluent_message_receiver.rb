@@ -141,11 +141,8 @@ module Droonga
         @socket = UDPSocket.for_fd(@fd)
 
         @watcher = Coolio::IOWatcher.new(@socket, "r")
-        on_readable = lambda do
-          receive_heartbeat
-        end
         @watcher.on_readable do
-          on_readable.call
+          receive_heartbeat
         end
         @loop.attach(@watcher)
         # logger.trace("start: new heartbeat watcher attached",
@@ -199,19 +196,13 @@ module Droonga
         @on_close = nil
         @unpacker = MessagePack::Unpacker.new
 
-        on_read = lambda do |data|
+        @io.on_read do |data|
           feed(data)
         end
-        @io.on_read do |data|
-          on_read.call(data)
-        end
 
-        on_close = lambda do
+        @io.on_close do
           @io = nil
           @on_close.call if @on_close
-        end
-        @io.on_close do
-          on_close.call
         end
       end
 
