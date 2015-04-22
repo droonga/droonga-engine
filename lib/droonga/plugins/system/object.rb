@@ -19,11 +19,7 @@ require "droonga/database_scanner"
 module Droonga
   module Plugins
     module System
-      module Object
-        extend Plugin
-        register("system.object")
-
-        class CountHandler < Droonga::Handler
+      class ObjectCountHandler < Droonga::Handler
         include DatabaseScanner
 
         def handle(message)
@@ -49,9 +45,8 @@ module Droonga
 
       define_single_step do |step|
         step.name = "system.object.count"
-        step.handler = CountHandler
+        step.handler = ObjectCountHandler
         step.collector = Collectors::RecursiveSum
-      end
       end
     end
   end
