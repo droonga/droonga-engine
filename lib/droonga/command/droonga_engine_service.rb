@@ -214,13 +214,13 @@ module Droonga
         logger.trace("stop_gracefully: start")
         @stopping = true
         @receiver.stop_gracefully do
-        @engine.stop_gracefully do
-          shutdown_worker_process_agent
-          shutdown_internal_message_receiver
-          logger.trace("stop_gracefully: done",
-                       :n_rest_watchers => @loop.watchers.size,
-                       :rest_watchers   => @loop.watchers)
-        end
+          @engine.stop_gracefully do
+            shutdown_worker_process_agent
+            shutdown_internal_message_receiver
+            logger.trace("stop_gracefully: done",
+                         :n_rest_watchers => @loop.watchers.size,
+                         :rest_watchers   => @loop.watchers)
+          end
         end
       end
 
