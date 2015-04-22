@@ -112,7 +112,7 @@ module Droonga
           "--database-path", @config.database_path.to_s,
           "--plugins", @config.plugins.join(","),
           "--internal-connection-lifetime",
-            @config.internal_connection_lifetime,
+            @config.internal_connection_lifetime.to_s,
         ]
         options = {
           control_write_in => control_write_in,

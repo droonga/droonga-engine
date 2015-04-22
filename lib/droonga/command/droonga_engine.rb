@@ -163,7 +163,7 @@ module Droonga
             "--port", port.to_s,
             "--tag", tag,
             "--internal-connection-lifetime",
-              internal_connection_lifetime,
+              internal_connection_lifetime.to_s,
             "--log-level", log_level,
           ]
           if log_file_path
@@ -184,7 +184,7 @@ module Droonga
           command_line_options = [
             "--engine-name", engine_name,
             "--internal-connection-lifetime",
-              internal_connection_lifetime,
+              internal_connection_lifetime.to_s,
           ]
           command_line_options
         end
