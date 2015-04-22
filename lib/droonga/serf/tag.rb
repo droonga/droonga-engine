@@ -16,7 +16,7 @@
 module Droonga
   class Serf
     module Tag
-      module_function
+      class << self
         def node_type
           "type"
         end
@@ -54,6 +54,7 @@ module Droonga
         def extract_node_name_from_have_unprocessed_messages_tag(tag)
           tag.sub(HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX, "")
         end
+      end
     end
   end
 end
