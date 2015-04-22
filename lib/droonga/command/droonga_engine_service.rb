@@ -171,6 +171,9 @@ module Droonga
         @worker_process_agent.on_stop_immediately = lambda do
           stop_immediately
         end
+        @worker_process_agent.on_refresh_self_reference = lambda do
+          @engine.refresh_self_reference
+        end
         @worker_process_agent.start
       end
 
@@ -221,10 +224,11 @@ module Droonga
         @stopping = true
         @receiver.stop_gracefully
         #XXX To disconnect all clients to myself (old service),
-        #    we must refresh all connections via EngineNode.
-        @engine.cluster.refresh_connection_for(@engine_name)
-        #XXX However, internal connections via Forwarder can be
-        #    still there. Then we have to wait for their timeout.
+        #    we must refresh the connection via EngineNode
+        #    and Forwarder.
+        #    However, connections from workers can be still
+        #    there. Then we have to wait for their timeout.
+        @engine.refresh_self_reference
         @receiver.ensure_no_client do
           logger.trace("stop_gracefully: ready to stop service")
           @engine.stop_gracefully do

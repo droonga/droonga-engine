@@ -73,6 +73,10 @@ module Droonga
       @on_stop_immediately = callback
     end
 
+    def on_refresh_self_reference=(callback)
+      @on_refresh_self_reference = callback
+    end
+
     private
     def create_input(raw_input)
       @input = Coolio::IO.new(raw_input)
@@ -85,6 +89,8 @@ module Droonga
             on_stop_gracefully
           when Messages::STOP_IMMEDIATELY
             on_stop_immediately
+          when Messages::REFRESH_SELF_REFERENCE
+            on_refresh_self_reference
           end
         end
       end
@@ -121,6 +127,10 @@ module Droonga
 
     def on_stop_immediately
       @on_stop_immediately.call if @on_stop_immediately
+    end
+
+    def on_refresh_self_reference
+      @on_refresh_self_reference.call if @on_refresh_self_reference
     end
 
     def log_tag

@@ -64,6 +64,12 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    def refresh_self_reference
+      logger.trace("refresh_self_reference: start")
+      @output.write(Messages::REFRESH_SELF_REFERENCE)
+      logger.trace("refresh_self_reference: done")
+    end
+
     private
     def create_input(raw_input)
       input = Coolio::IO.new(raw_input)

@@ -100,6 +100,11 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    def refresh_self_reference
+      @cluster.refresh_connection_for(@name)
+      @state.forwarder.refresh_connection_for(@name)
+    end
+
     def process(message)
       @last_processed_message_timestamp = message["date"]
       @dispatcher.process_message(message)

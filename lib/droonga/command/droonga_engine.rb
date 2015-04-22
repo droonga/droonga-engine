@@ -528,6 +528,7 @@ module Droonga
           @service_runner.on_ready = lambda do
             logger.info("restart_graceful: new service runner is ready")
             @service_runner.on_failure = nil
+            @service_runner.refresh_self_reference
             old_service_runner.stop_gracefully
             @restarting = false
             logger.trace("restart_graceful: done")
@@ -718,6 +719,10 @@ module Droonga
 
         def success?
           @success
+        end
+
+        def refresh_self_reference
+          @supervisor.refresh_self_reference
         end
 
         private

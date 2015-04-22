@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2014-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@ module Droonga
     module Messages
       STOP_GRACEFUL    = "stop-graceful\n"
       STOP_IMMEDIATELY = "stop-immediately\n"
+      REFRESH_SELF_REFERENCE = "refresh-self-reference\n"
 
       READY  = "ready\n"
       FINISH = "finish\n"

@@ -66,6 +66,14 @@ module Droonga
       logger.trace("forward: done")
     end
 
+    def refresh_connection_for(name)
+      sender = @senders[name]
+      if sender
+        sender.shutdown
+        @senders.delete(name)
+      end
+    end
+
     private
     def output(receiver, message, command, arguments, options={})
       logger.trace("output: start")
