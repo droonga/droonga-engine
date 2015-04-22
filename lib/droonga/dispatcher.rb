@@ -176,7 +176,8 @@ module Droonga
           collector_runner = @collector_runners[dataset]
           session = session_planner.create_session(id, self, collector_runner)
           if session.need_result?
-            timeout = message["timeout"] || nil
+            timeout = message["timeout"] ||
+                        @engine_state.internal_connection_lifetime
             @engine_state.register_session(id, session,
                                            :timeout => timeout)
             session.start
