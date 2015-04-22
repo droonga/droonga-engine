@@ -101,7 +101,7 @@ module Droonga
 
     def refresh_connection_for(name)
       engine_nodes.each do |node|
-        if node.name == receiver_node_name
+        if node.name == name
           node.refresh_connection
         end
       end
