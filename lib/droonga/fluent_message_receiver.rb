@@ -63,13 +63,13 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    private
     def force_shutdown_clients
       @clients.dup.each do |client|
         client.close
       end
     end
 
-    private
     def start_heartbeat_receiver
       logger.trace("start_heartbeat_receiver: start")
       @heartbeat_receiver = HeartbeatReceiver.new(@loop, @heartbeat_fd)
