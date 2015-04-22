@@ -65,6 +65,12 @@ module Droonga
       end
     end
 
+    def refresh_node_reference
+      @worker_runners.each do |worker_runner|
+        worker_runner.refresh_node_reference
+      end
+    end
+
     private
     def log_tag
       "supervisor"
@@ -137,6 +143,10 @@ module Droonga
 
       def stop_immediately
         @supervisor.stop_immediately
+      end
+
+      def refresh_node_reference
+        @supervisor.refresh_node_reference
       end
 
       def success?
