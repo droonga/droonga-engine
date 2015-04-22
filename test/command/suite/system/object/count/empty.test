@@ -1,5 +1,5 @@
 {
-  "type": "system.object-count",
+  "type": "system.object.count",
   "dataset": "Default",
   "body": {
     "output": [
