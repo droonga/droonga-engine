@@ -136,6 +136,7 @@ module Droonga
         nodes[member["name"]] = {
           "type" => member["tags"][Tag.node_type],
           "role" => member["tags"][Tag.node_role],
+          "internal_name" => member["tags"][Tag.internal_node_name],
           "accept_messages_newer_than" => member["tags"][Tag.accept_messages_newer_than],
           "live" => member["status"] == "alive",
         }
