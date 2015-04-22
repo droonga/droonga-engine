@@ -214,7 +214,9 @@ module Droonga
         logger.trace("stop_gracefully: start")
         @stopping = true
         @receiver.stop_gracefully do
+          logger.trace("stop_gracefully: ready to stop service")
           @engine.stop_gracefully do
+            logger.trace("stop_gracefully: ready to stop workers")
             shutdown_worker_process_agent
             shutdown_internal_message_receiver
             logger.trace("stop_gracefully: done",
