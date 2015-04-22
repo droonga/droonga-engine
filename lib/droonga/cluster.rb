@@ -98,6 +98,11 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
+    def refresh_connections
+      clear_cache
+      engine_nodes.each(&:resume)
+    end
+
     def reload
       logger.trace("reload: start")
       if @state
@@ -110,8 +115,7 @@ module Droonga
         logger.info("cluster state not changed")
       else
         logger.info("cluster state changed", :state => @state)
-        clear_cache
-        engine_nodes.each(&:resume)
+        refresh_connections
         on_change
       end
       logger.trace("reload: done")
