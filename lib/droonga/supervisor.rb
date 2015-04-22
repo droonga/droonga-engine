@@ -76,12 +76,14 @@ module Droonga
       attr_accessor :database_path
       attr_accessor :plugins
       attr_accessor :job_pusher
+      attr_accessor :internal_connection_lifetime
       def initialize
         @name = nil
         @dataset = nil
         @database_path = nil
         @plugins = []
         @job_pusher = nil
+        @internal_connection_lifetime = nil
       end
     end
 
