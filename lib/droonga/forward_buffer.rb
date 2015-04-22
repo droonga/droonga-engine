@@ -65,7 +65,7 @@ module Droonga
     def start_forward
       logger.trace("start_forward: start")
       n_forwarded_messages = 0
-      Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
+      buffered_messages.collect do |buffered_message_path|
         forwarded = forward(buffered_message_path)
         n_forwarded_messages += 1 if forwarded
       end
@@ -77,6 +77,10 @@ module Droonga
       end
       @serf.reset_have_unprocessed_messages_for(@target)
       logger.trace("start_forward: done")
+    end
+
+    def buffered_messages
+      Pathname.glob("#{@data_directory}/*#{SUFFIX}")
     end
 
     def empty?
