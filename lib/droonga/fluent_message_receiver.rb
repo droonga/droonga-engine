@@ -103,8 +103,12 @@ module Droonga
         end
         client.on_close = lambda do
           @clients.delete(client)
-          if @on_shutdown_ready and @clients.empty?
-            @on_shutdown_ready.call
+          if @on_shutdown_ready
+            logger.trace("Client: a client is disconnected. still waiting for #{@clients.size} clients.",
+                         :clients => @clients)
+            if @clients.empty?
+              @on_shutdown_ready.call
+            end
           end
         end
         @clients << client
