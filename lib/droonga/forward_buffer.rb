@@ -98,6 +98,13 @@ module Droonga
     private
     def forward(buffered_message_path)
       logger.trace("forward: start (#{buffered_message_path})")
+
+      unless buffered_message_path.exist?
+        logger.warn("forward: no buffer file (maybe sent by other process)",
+                    :path => buffered_message_path)
+        return false
+      end
+
       file_contents = buffered_message_path.read
       @unpacker.feed(file_contents)
       buffered_message = @unpacker.read
