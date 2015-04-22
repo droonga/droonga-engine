@@ -50,6 +50,9 @@ module Droonga
                                options[:internal_connection_lifetime])
 
       @dispatcher = create_dispatcher
+      @cluster.on_change = lambda do
+        @dispatcher.refresh_node_reference
+      end
     end
 
     def start

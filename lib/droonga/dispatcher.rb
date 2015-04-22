@@ -96,6 +96,10 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    def refresh_node_reference
+      @farm.refresh_node_reference
+    end
+
     def process_message(message)
       logger.trace("process_message: start", :message => message)
       @message = message

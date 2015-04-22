@@ -50,9 +50,11 @@ module Droonga
       @senders.each_value do |sender|
         sender.shutdown
       end
+      @senders = {}
       @auto_close_timers.each_value do |timer|
         timer.detach
       end
+      @auto_close_timers = {}
       logger.trace("shutdown: done")
     end
 
@@ -72,6 +74,16 @@ module Droonga
         sender.shutdown
         @senders.delete(name)
       end
+      timer = @auto_close_timers[name]
+      if timer
+        timer.detach
+        @auto_close_timers.delete(name)
+      end
+    end
+
+    def refresh_all_connections
+      shutdown
+      start
     end
 
     private

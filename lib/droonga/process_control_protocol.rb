@@ -19,6 +19,7 @@ module Droonga
       STOP_GRACEFUL    = "stop-graceful\n"
       STOP_IMMEDIATELY = "stop-immediately\n"
       REFRESH_SELF_REFERENCE = "refresh-self-reference\n"
+      REFRESH_NODE_REFERENCE = "refresh-node-reference\n"
 
       READY  = "ready\n"
       FINISH = "finish\n"

@@ -164,6 +164,10 @@ module Droonga
         @loop.stop
       end
 
+      def refresh_node_reference
+        @forwarder.refresh_all_connections
+      end
+
       def start_forwarder
         @forwarder = Forwarder.new(@loop,
                                    :auto_close_timeout =>
@@ -222,6 +226,9 @@ module Droonga
         end
         @worker_process_agent.on_stop_immediately = lambda do
           stop_immediately
+        end
+        @worker_process_agent.on_refresh_node_reference = lambda do
+          refresh_node_reference
         end
         @worker_process_agent.start
         @worker_process_agent.ready

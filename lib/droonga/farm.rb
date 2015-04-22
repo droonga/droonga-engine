@@ -88,6 +88,12 @@ module Droonga
       end
     end
 
+    def refresh_node_reference
+      @slices.each_value do |slice|
+        slice.refresh_node_reference
+      end
+    end
+
     def process(slice_name, message)
       unless @slices.key?(slice_name)
         raise NoSlice.new(slice_name, :message => message, :slices => @slices.keys)

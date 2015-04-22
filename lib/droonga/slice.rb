@@ -69,6 +69,12 @@ module Droonga
       logger.trace("stop_immediately: done")
     end
 
+    def refresh_node_reference
+      logger.trace("refresh_node_reference: start")
+      @supervisor.refresh_node_reference if @supervisor
+      logger.trace("refresh_node_reference: done")
+    end
+
     def process(message)
       logger.trace("process: start")
       @processor.process(message)
