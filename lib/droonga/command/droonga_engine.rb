@@ -615,10 +615,15 @@ module Droonga
           cluster_state_observer.on_change = lambda do
             my_name   = @configuration.engine_name
             new_state = Cluster.load_state_file
-            if new_state and previous_state and
-                 new_state[my_name] != previous_state[my_name]
+            if new_state and previous_state
+              my_new_state = new_state[my_name].dup
+              my_new_state.delete("internal_name")
+              my_previous_state = previous_state[my_name].dup
+              my_previous_state.delete("internal_name")
+              if my_new_state != my_previous_state
               logger.info("restart by updated cluster-state.json")
               restart_graceful
+              end
             end
             previous_state = new_state
           end
