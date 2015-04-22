@@ -27,6 +27,11 @@ module Droonga
                     :required => true)
         end
 
+        if serf.role == @options[:role]
+          puts "Role of #{node.to_s} is #{@options[:role]}. Nothing to do."
+          return true
+        end
+
         puts "Setting role of #{node.to_s} to #{@options[:role]}..."
         succeeded = set_node_role
 
