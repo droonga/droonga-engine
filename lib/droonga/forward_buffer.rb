@@ -64,11 +64,11 @@ module Droonga
 
     def start_forward
       logger.trace("start_forward: start")
-      fowarded = false
+      forwarded = false
       Pathname.glob("#{@data_directory}/*#{SUFFIX}").collect do |buffered_message_path|
-        fowarded = forward(buffered_message_path) || fowarded
+        forwarded = forward(buffered_message_path) || forwarded
       end
-      if @process_messages_newer_than_timestamp and fowarded
+      if @process_messages_newer_than_timestamp and forwarded
         logger.info("New message is detected and forwarded. The boundary is now cleared.")
         @process_messages_newer_than_timestamp = nil
       end
