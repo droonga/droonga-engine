@@ -31,6 +31,7 @@ module Droonga
       @server = nil
       @clients = []
       @on_message = on_message
+      @on_shutdown_ready = nil
     end
 
     def start
@@ -40,11 +41,18 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def stop_gracefully
+    def stop_gracefully(&block)
       logger.trace("stop_gracefully: start")
       shutdown_heartbeat_receiver
       logger.trace("stop_gracefully: middle")
       shutdown_server
+      if @clients.empty?
+        yield
+      elsif block_given?
+        @on_shutdown_ready = lambda do
+          yield
+        end
+      end
       logger.trace("stop_gracefully: done")
     end
 
@@ -87,6 +95,9 @@ module Droonga
         end
         client.on_close = lambda do
           @clients.delete(client)
+          if @on_shutdown_ready and @clients.empty?
+            @on_shutdown_ready.call
+          end
         end
         @clients << client
       end
