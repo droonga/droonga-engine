@@ -621,8 +621,8 @@ module Droonga
               my_previous_state = previous_state[my_name].dup
               my_previous_state.delete("internal_name")
               if my_new_state != my_previous_state
-              logger.info("restart by updated cluster-state.json")
-              restart_graceful
+                logger.info("restart by updated cluster-state.json")
+                restart_graceful
               end
             end
             previous_state = new_state
