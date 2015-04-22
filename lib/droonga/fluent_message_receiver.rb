@@ -91,6 +91,7 @@ module Droonga
 
       @clients = []
       @server = create_server do |connection|
+        logger.trace("Client: new connection", :connection => connection)
         client = Client.new(connection) do |tag, time, record|
           logger.trace("Client: on_message: start")
           @on_message.call(tag, time, record)
