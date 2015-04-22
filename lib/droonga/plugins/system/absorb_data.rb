@@ -246,6 +246,7 @@ module Droonga
             elapsed_seconds = (now - @previous_report_time).to_i
             if elapsed_seconds >= progress_interval_seconds
               if options[:count_restored_objects]
+                @previous_report_time = now
                 count_total_n_objects do |count|
                   @previous_report_time = Time.now
                   @n_restored_objects = count - @n_initial_objects
