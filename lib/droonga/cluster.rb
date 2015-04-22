@@ -59,6 +59,7 @@ module Droonga
     def initialize(loop, params)
       @loop = loop
 
+      @params = params
       @catalog = params[:catalog]
       @state = nil
 
@@ -185,9 +186,11 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(name,
+        EngineNode.new(@loop,
+                       name,
                        node_state,
-                       @loop)
+                       :auto_close_timeout =>
+                         @params[:internal_connection_lifetime])
       end
     end
 
