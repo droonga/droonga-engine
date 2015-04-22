@@ -37,6 +37,7 @@ module Droonga
 
       def initialize
         @engine_name = nil
+        @internal_connection_lifetime = nil
         @listen_fd = nil
         @heartbeat_fd = nil
         @contrtol_read_fd = nil
@@ -84,6 +85,10 @@ module Droonga
         parser.on("--engine-name=NAME",
                   "Use NAME as the name of the engine") do |name|
           @engine_name = name
+        end
+        parser.on("--internal-connection-lifetime=SECONDS", Float,
+                  "The time to expire internal connections, in seconds") do |seconds|
+          @internal_connection_lifetime = seconds
         end
         parser.on("--listen-fd=FD", Integer,
                   "Use FD as the listen file descriptor") do |fd|
@@ -141,7 +146,8 @@ module Droonga
       end
 
       def run_engine
-        @engine = Engine.new(@loop, @engine_name, @internal_engine_name)
+        @engine = Engine.new(@loop, @engine_name, @internal_engine_name,
+                             :internal_connection_lifetime => @internal_connection_lifetime)
         @engine.on_ready = lambda do
           @worker_process_agent.ready
         end

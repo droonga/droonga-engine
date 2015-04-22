@@ -43,6 +43,7 @@ module Droonga
         @dataset = nil
         @database_path = nil
         @plugins = []
+        @internal_connection_lifetime = nil
         @worker_process_agent = nil
       end
 
@@ -102,6 +103,10 @@ module Droonga
                   "Use PLUGINs") do |plugins|
           @plugins = plugins
         end
+        parser.on("--internal-connection-lifetime=SECONDS", Float,
+                  "The time to expire internal connections, in seconds") do |seconds|
+          @internal_connection_lifetime = seconds
+        end
       end
 
       def write_pid_file
@@ -160,7 +165,9 @@ module Droonga
       end
 
       def start_forwarder
-        @forwarder = Forwarder.new(@loop)
+        @forwarder = Forwarder.new(@loop,
+                                   :auto_close_timeout =>
+                                     @internal_connection_lifetime)
         @forwarder.start
       end
 

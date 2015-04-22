@@ -27,6 +27,7 @@ require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/path"
 require "droonga/node_name"
+require "droonga/forwarder"
 require "droonga/serf"
 require "droonga/cluster"
 require "droonga/file_observer"
@@ -97,6 +98,8 @@ module Droonga
           @port = nil
           @tag  = nil
 
+          @internal_connection_lifetime = nil
+
           @log_level       = nil
           @log_file        = nil
           @daemon          = nil
@@ -129,6 +132,12 @@ module Droonga
           @tag || config["tag"] || default_tag
         end
 
+        def internal_connection_lifetime
+          @internal_connection_lifetime ||
+            config["internal_connection_lifetime"] ||
+            default_internal_connection_lifetime
+        end
+
         def log_level
           @log_level || config["log_level"] || default_log_level
         end
@@ -153,6 +162,8 @@ module Droonga
             "--host", host,
             "--port", port.to_s,
             "--tag", tag,
+            "--internal-connection-lifetime",
+              internal_connection_lifetime,
             "--log-level", log_level,
           ]
           if log_file_path
@@ -172,6 +183,8 @@ module Droonga
         def to_service_command_line
           command_line_options = [
             "--engine-name", engine_name,
+            "--internal-connection-lifetime",
+              internal_connection_lifetime,
           ]
           command_line_options
         end
@@ -208,6 +221,10 @@ module Droonga
 
         def default_tag
           NodeName::DEFAULT_TAG
+        end
+
+        def default_internal_connection_lifetime
+          Forwarder::DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS
         end
 
         def default_log_level
@@ -270,6 +287,11 @@ module Droonga
                     "The tag of the Droonga engine",
                     "(#{default_tag})") do |tag|
             @tag = tag
+          end
+          parser.on("--internal-connection-lifetime=SECONDS", Float,
+                    "The time to expire internal connections, in seconds",
+                    "(#{default_internal_connection_lifetime})") do |seconds|
+            @internal_connection_lifetime = seconds
           end
         end
 

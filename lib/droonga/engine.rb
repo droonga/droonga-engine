@@ -34,14 +34,16 @@ module Droonga
 
     attr_reader :cluster
 
-    def initialize(loop, name, internal_name)
+    def initialize(loop, name, internal_name, options={})
       @name = name
       @internal_name = internal_name
       @loop = loop
       @catalog = load_catalog
       @state = EngineState.new(loop, name,
                                internal_name,
-                               :catalog  => @catalog)
+                               :catalog  => @catalog,
+                               :internal_connection_lifetime =>
+                                 options[:internal_connection_lifetime])
       @cluster = Cluster.new(loop,
                              :catalog  => @catalog)
 

@@ -60,7 +60,9 @@ module Droonga
                        :engine_state => @engine_state,
                        :cluster => @cluster,
                        :dispatcher => self,
-                       :forwarder  => @forwarder)
+                       :forwarder  => @forwarder,
+                       :internal_connection_lifetime =>
+                         @engine_state.internal_connection_lifetime)
       @engine_state.wait_until_ready(@farm)
       @collector_runners = create_collector_runners
       @step_runners = create_step_runners

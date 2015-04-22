@@ -116,6 +116,7 @@ module Droonga
       config.database_path = @database_path
       config.plugins = @options[:plugins]
       config.job_pusher = @job_pusher
+      config.internal_connection_lifetime = @options[:internal_connection_lifetime]
       @supervisor = Supervisor.new(@loop, @n_workers, config)
       @supervisor.on_ready = lambda do
         on_ready

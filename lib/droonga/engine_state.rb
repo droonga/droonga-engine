@@ -31,6 +31,7 @@ module Droonga
     attr_reader :loop
     attr_reader :name
     attr_reader :internal_name
+    attr_reader :internal_connection_lifetime
     attr_reader :forwarder
     attr_reader :replier
     attr_accessor :catalog
@@ -40,9 +41,12 @@ module Droonga
       @loop = loop
       @name = name
       @internal_name = internal_name
+      @internal_connection_lifetime = params[:internal_connection_lifetime]
       @sessions = {}
       @current_id = 0
-      @forwarder = Forwarder.new(@loop)
+      @forwarder = Forwarder.new(@loop,
+                                 :auto_close_timeout =>
+                                   @internal_connection_lifetime)
       @replier = Replier.new(@forwarder)
       @on_finish = nil
       @catalog = params[:catalog]
