@@ -65,7 +65,7 @@ module Droonga
     def start_forward
       logger.trace("start_forward: start")
       n_forwarded_messages = 0
-      buffered_messages.collect do |buffered_message_path|
+      buffered_messages.each do |buffered_message_path|
         forwarded = forward(buffered_message_path)
         n_forwarded_messages += 1 if forwarded
       end
