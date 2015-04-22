@@ -47,9 +47,12 @@ module Droonga
       logger.trace("stop_gracefully: middle")
       shutdown_server
       if @clients.empty?
+        logger.trace("stop_gracefully: no connecting client")
         yield
       elsif block_given?
+        logger.trace("stop_gracefully: waiting for #{@clients.size} clients to be disconnected")
         @on_shutdown_ready = lambda do
+          logger.trace("stop_gracefully: all clients are disconnected")
           yield
         end
       end
