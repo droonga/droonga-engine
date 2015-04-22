@@ -213,7 +213,13 @@ module Droonga
         return if @stopping
         logger.trace("stop_gracefully: start")
         @stopping = true
-        @receiver.stop_gracefully do
+        @receiver.stop_gracefully
+        #XXX To disconnect all clients to myself (old service),
+        #    we must refresh all connections via EngineNode.
+        @engine.cluster.refresh_connections
+        #XXX However, internal connections via Forwarder can be
+        #    still there. Then we have to wait for their timeout.
+        @receiver.ensure_no_client do
           logger.trace("stop_gracefully: ready to stop service")
           @engine.stop_gracefully do
             logger.trace("stop_gracefully: ready to stop workers")

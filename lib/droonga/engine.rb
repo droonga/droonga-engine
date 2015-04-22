@@ -32,6 +32,8 @@ module Droonga
     include Loggable
     include Deferrable
 
+    attr_reader :cluster
+
     def initialize(loop, name, internal_name)
       @name = name
       @internal_name = internal_name

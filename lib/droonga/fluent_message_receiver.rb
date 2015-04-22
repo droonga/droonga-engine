@@ -41,22 +41,26 @@ module Droonga
       logger.trace("start: done")
     end
 
-    def stop_gracefully(&block)
+    def stop_gracefully
       logger.trace("stop_gracefully: start")
       shutdown_heartbeat_receiver
       logger.trace("stop_gracefully: middle")
       shutdown_server
+      logger.trace("stop_gracefully: done")
+    end
+
+    def ensure_no_client(&block)
       if @clients.empty?
-        logger.trace("stop_gracefully: no connecting client")
+        logger.trace("ensure_no_client: no client")
         yield
       elsif block_given?
-        logger.trace("stop_gracefully: waiting for #{@clients.size} clients to be disconnected")
+        logger.trace("ensure_no_client: waiting for #{@clients.size} clients to be disconnected",
+                     :clients => @clients)
         @on_shutdown_ready = lambda do
-          logger.trace("stop_gracefully: all clients are disconnected")
+          logger.trace("ensure_no_client: all clients are disconnected")
           yield
         end
       end
-      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
