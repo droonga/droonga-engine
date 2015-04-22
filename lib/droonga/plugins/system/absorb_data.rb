@@ -207,6 +207,12 @@ module Droonga
             super
           end
 
+          #TODO: Currently we are counting/comparing the number of
+          #      physical objects, but it will be different from
+          #      the source dataset if the destination is differently
+          #      sliced dataset. So, we should count/compare the
+          #      number of logical objects in the future after
+          #      supporting management of sliced datasets.
           def count_total_n_objects(&block)
             count_message = {
               "type"    => "system.statistics.object.count",
