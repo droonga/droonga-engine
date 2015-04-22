@@ -1,11 +1,11 @@
 {
   "inReplyTo": "request-id",
   "statusCode": 200,
-  "type": "system.object.count.result",
+  "type": "system.statistics.object.count.result",
   "body": {
-    "tables":  0,
+    "tables":  2,
     "columns": 0,
     "records": 0,
-    "total":   0
+    "total":   2
   }
 }

@@ -25,5 +25,5 @@ module Droonga
 end
 
 require "droonga/plugins/system/status"
-require "droonga/plugins/system/object"
+require "droonga/plugins/system/statistics"
 require "droonga/plugins/system/absorb_data"

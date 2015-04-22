@@ -209,7 +209,7 @@ module Droonga
 
           def count_total_n_objects(&block)
             count_message = {
-              "type"    => "system.object.count",
+              "type"    => "system.statistics.object.count",
               "dataset" => current_dataset,
               "body"    => {
                 "output" => ["total"],

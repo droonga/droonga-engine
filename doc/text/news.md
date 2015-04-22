@@ -15,7 +15,7 @@
    * `dump` command: forwarded messages are now have their own `date` field.
    * `Collectors::RecursiveSum` is introduced.
    * `system.status` command: now the reporter node and its internal name is reported as a part of response body.
-   * `system.object.count` command is now available. It is used by command line utilities internally.
+   * `system.statistics.object.count` command is now available. It is used by command line utilities internally.
    * `system.absorb-data` command is now available. It is used by command line utilities internally.
  * Command line utilities:
    * `droonga-engine-join` and `droonga-engine-absorb-data` commands work more surely.

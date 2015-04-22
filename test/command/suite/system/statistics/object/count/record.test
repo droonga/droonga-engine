@@ -10,7 +10,7 @@
 }
 #@enable-logging
 {
-  "type": "system.object.count",
+  "type": "system.statistics.object.count",
   "dataset": "Default",
   "body": {
     "output": [
