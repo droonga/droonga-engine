@@ -43,7 +43,9 @@ log_path = File.expand_path(File.join(base_dir, "tmp", "droonga-engine.log"))
 
 drntest_options = []
 drntest_options.concat(["--base-path", base_dir])
-drntest_options.concat(["--droonga-engine-options", "--log-file=#{log_path}"])
+drntest_options.concat(["--droonga-engine-options",
+                        ["--log-file=#{log_path}",
+                         "--internal-connection-lifetime=5"].join(" ")])
 drntest_options.concat(ARGV)
 
 run("bundle", "exec", "drntest", *drntest_options)
