@@ -59,11 +59,11 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       stop_gracefully
-      shutdown_clients
+      force_shutdown_clients
       logger.trace("stop_immediately: done")
     end
 
-    def shutdown_clients
+    def force_shutdown_clients
       @clients.dup.each do |client|
         client.close
       end
