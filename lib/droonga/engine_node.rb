@@ -65,6 +65,11 @@ module Droonga
       logger.trace("shutdown: done")
     end
 
+    def refresh_connection
+      shutdown
+      sender # instantiate new sender
+    end
+
     def forward(message, destination)
       if read_message?(message)
         # A node can receive read messages for other nodes,

@@ -222,7 +222,7 @@ module Droonga
         @receiver.stop_gracefully
         #XXX To disconnect all clients to myself (old service),
         #    we must refresh all connections via EngineNode.
-        @engine.cluster.refresh_connections
+        @engine.cluster.refresh_connection_for(@engine_name)
         #XXX However, internal connections via Forwarder can be
         #    still there. Then we have to wait for their timeout.
         @receiver.ensure_no_client do
