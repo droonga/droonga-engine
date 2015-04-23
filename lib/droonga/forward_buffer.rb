@@ -55,11 +55,12 @@ module Droonga
         "destination" => destination,
       }
       @packer.pack(buffered_message)
+      file_path = create_buffered_message_path
       SafeFileWriter.write(file_path) do |output, file|
         output.puts(@packer.to_s)
       end
       @packer.clear
-      logger.trace("add: done")
+      logger.trace("add: done", :path => file_path)
     end
 
     def start_forward
@@ -140,8 +141,15 @@ module Droonga
       forwarded
     end
 
-    def file_path(time_stamp=Time.now)
-      @data_directory + "#{time_stamp.iso8601(6)}#{SUFFIX}"
+    def create_buffered_message_path(time_stamp=Time.now)
+      timestamp_part = time_stamp.iso8601(6)
+      sametime_count = 0
+      path = nil
+      begin
+        path = @data_directory + "#{timestamp_part}.#{sametime_count}#{SUFFIX}"
+        sametime_count += 1
+      end while path.exist?
+      path
     end
 
     def on_forward(message, destination)
