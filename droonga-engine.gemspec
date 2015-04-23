@@ -36,7 +36,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_dependency "archive-zip"
-  gem.add_dependency "cool.io"
+  gem.add_dependency "cool.io", ">= 1.3.0"
   gem.add_dependency "drndump", ">= 1.0.1"
   gem.add_dependency "droonga-client", ">= 0.1.9"
   gem.add_dependency "droonga-message-pack-packer", ">= 1.0.2"
