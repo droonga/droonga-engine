@@ -61,11 +61,6 @@ module Droonga
         Pathname.new(base_file_name).expand_path(base)
       end
 
-      # TODO: Re-consider this approach
-      def restart
-        base + "restart.txt"
-      end
-
       def accidental_buffer
         state + "buffer" + "accidental"
       end
