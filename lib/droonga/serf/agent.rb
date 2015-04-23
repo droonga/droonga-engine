@@ -199,7 +199,7 @@ module Droonga
           on_ready
           checker.close
           logger.trace("start_ready_check: socket detached",
-                       :watcher => scoket)
+                       :watcher => checker)
         end
 
         checker.on_connect_failed do
