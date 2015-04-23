@@ -80,7 +80,7 @@ module Droonga
     def create_input(raw_input)
       input = Coolio::IO.new(raw_input)
       line_buffer = LineBuffer.new
-      on_read = lambda do |data|
+      input.on_read do |data|
         line_buffer.feed(data) do |line|
           case line
           when Messages::READY
@@ -89,9 +89,6 @@ module Droonga
             on_finish
           end
         end
-      end
-      input.on_read do |data|
-        on_read.call(data)
       end
       input
     end

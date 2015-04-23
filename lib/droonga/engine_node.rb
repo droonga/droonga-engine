@@ -274,7 +274,7 @@ module Droonga
       previous_timer.detach if previous_timer
 
       @auto_close_timer = Coolio::TimerWatcher.new(@auto_close_timeout)
-      on_timeout = lambda do
+      @auto_close_timer.on_timer do
         @auto_close_timer.detach
         @auto_close_timer = nil
         if @sender
@@ -282,9 +282,6 @@ module Droonga
           @sender.shutdown
           @sender = nil
         end
-      end
-      @auto_close_timer.on_timer do
-        on_timeout.call
       end
       @loop.attach(@auto_close_timer)
     end

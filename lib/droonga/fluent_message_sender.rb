@@ -75,21 +75,6 @@ module Droonga
     def connect
       logger.trace("connect: start")
 
-      log_write_complete = lambda do
-        logger.trace("write completed")
-      end
-      log_connect = lambda do
-        logger.trace("connected")
-      end
-      log_failed = lambda do
-        logger.error("failed to connect")
-        @socket = nil
-      end
-      on_close = lambda do
-        logger.trace("connection is closed by someone")
-        @socket = nil
-      end
-
       if @buffering
         data_directory = Path.accidental_buffer + "#{target_node}"
         FileUtils.mkdir_p(data_directory.to_s)
@@ -99,16 +84,18 @@ module Droonga
         @socket = Coolio::TCPSocket.connect(@host, @port)
       end
       @socket.on_write_complete do
-        log_write_complete.call
+        logger.trace("write completed")
       end
       @socket.on_connect do
-        log_connect.call
+        logger.trace("connected")
       end
       @socket.on_connect_failed do
-        log_failed.call
+        logger.error("failed to connect")
+        @socket = nil
       end
       @socket.on_close do
-        on_close.call
+        logger.trace("connection is closed by someone")
+        @socket = nil
       end
       @loop.attach(@socket)
       # logger.trace("connect: new socket watcher attached",

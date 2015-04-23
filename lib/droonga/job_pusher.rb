@@ -184,12 +184,9 @@ module Droonga
 
       private
       def setup_connection
-        on_read = lambda do |data|
+        @connection.on_read do |data|
           @ready = (data == JobProtocol::READY_SIGNAL)
           @on_ready.call(self) if @on_ready
-        end
-        @connection.on_read do |data|
-          on_read.call(data)
         end
       end
     end

@@ -107,24 +107,18 @@ module Droonga
         end
 
         output_line_buffer = LineBuffer.new
-        on_read_output = lambda do |data|
-          on_standard_output(output_line_buffer, data)
-        end
         @output_io = Coolio::IO.new(output_read)
         @output_io.on_read do |data|
-          on_read_output.call(data)
+          on_standard_output(output_line_buffer, data)
         end
         @loop.attach(@output_io)
         # logger.trace("capture_output: new output_io watcher attached",
         #              :watcher => @output_io)
 
         error_line_buffer = LineBuffer.new
-        on_read_error = lambda do |data|
-          on_error_output(error_line_buffer, data)
-        end
         @error_io = Coolio::IO.new(error_read)
         @error_io.on_read do |data|
-          on_read_error.call(data)
+          on_error_output(error_line_buffer, data)
         end
         @loop.attach(@error_io)
         # logger.trace("capture_output: new error_io watcher attached",

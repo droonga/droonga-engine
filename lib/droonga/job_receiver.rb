@@ -50,16 +50,13 @@ module Droonga
     private
     def setup_receive_handler(connection)
       unpacker = MessagePack::Unpacker.new
-      on_read = lambda do |data|
+      connection.on_read do |data|
         logger.trace("on_read: start")
         unpacker.feed_each(data) do |message|
           @callback.call(message)
         end
         logger.trace("on_read: done")
         send_ready(connection)
-      end
-      connection.on_read do |data|
-        on_read.call(data)
       end
       send_ready(connection)
     end
