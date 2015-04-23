@@ -82,8 +82,8 @@ module Droonga
         case event_name
         when "change_role"
           Serf::RemoteCommand::ChangeRole
-        when "export_last_processed_message_timestamp"
-          Serf::RemoteCommand::ExportLastProcessedMessageTimestamp
+        when "export_last_message_timestamp"
+          Serf::RemoteCommand::ExportLastMessageTimestamp
         when "accept_messages_newer_than"
           Serf::RemoteCommand::AcceptMessagesNewerThan
         when "join"

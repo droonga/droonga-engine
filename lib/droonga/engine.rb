@@ -71,7 +71,7 @@ module Droonga
       @state.start
       @cluster.start
       @dispatcher.start
-      @last_processed_message_timestamp_observer = run_last_processed_message_timestamp_observer
+      @last_message_timestamp_observer = run_last_message_timestamp_observer
       logger.trace("start: done")
     end
 
@@ -80,14 +80,14 @@ module Droonga
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully: middle")
-        @last_processed_message_timestamp_observer.stop
+        @last_message_timestamp_observer.stop
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
           #XXX We must save last processed message timstamp
           #    based on forwarded/dispatched messages while
           #    "graceful stop" operations.
-          export_last_processed_message_timestamp_to_file
+          export_last_message_timestamp_to_file
           logger.trace("stop_gracefully: done")
         end
       end
@@ -103,11 +103,11 @@ module Droonga
     # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
-      @last_processed_message_timestamp_observer.stop
+      @last_message_timestamp_observer.stop
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
-      export_last_processed_message_timestamp_to_file
+      export_last_message_timestamp_to_file
       logger.trace("stop_immediately: done")
     end
 
@@ -119,9 +119,9 @@ module Droonga
     def process(message)
       if message.include?("date")
         date = Time.parse(message["date"])
-        if @last_processed_message_timestamp.nil? or
-             @last_processed_message_timestamp < date
-          @last_processed_message_timestamp = date
+        if @last_message_timestamp.nil? or
+             @last_message_timestamp < date
+          @last_message_timestamp = date
         end
       end
       @dispatcher.process_message(message)
@@ -144,56 +144,56 @@ module Droonga
 
     MICRO_SECONDS_DECIMAL_PLACE = 6
 
-    def export_last_processed_message_timestamp_to_cluster
-      logger.trace("export_last_processed_message_timestamp_to_cluster: start")
-      if @last_processed_message_timestamp
-        timestamp = @last_processed_message_timestamp
+    def export_last_message_timestamp_to_cluster
+      logger.trace("export_last_message_timestamp_to_cluster: start")
+      if @last_message_timestamp
+        timestamp = @last_message_timestamp
         serf = Serf.new(@name)
-        old_timestamp = serf.last_processed_message_timestamp
+        old_timestamp = serf.last_message_timestamp
         old_timestamp = Time.parse(old_timestamp) if old_timestamp
         if old_timestamp.nil? or timestamp > old_timestamp
           timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
-          serf.last_processed_message_timestamp = timestamp
+          serf.last_message_timestamp = timestamp
           logger.info("exported last processed message timestamp",
                       :timestamp => timestamp)
         end
       end
-      logger.trace("export_last_processed_message_timestamp_to_cluster: done")
+      logger.trace("export_last_message_timestamp_to_cluster: done")
     end
 
-    def export_last_processed_message_timestamp_to_file
-      old_timestamp = read_last_processed_message_timestamp
+    def export_last_message_timestamp_to_file
+      old_timestamp = read_last_message_timestamp
       if old_timestamp and
-           old_timestamp > @last_processed_message_timestamp
+           old_timestamp > @last_message_timestamp
         return
       end
-      path = Path.last_processed_message_timestamp
+      path = Path.last_message_timestamp
       SafeFileWriter.write(path) do |output, file|
-        timestamp = @last_processed_message_timestamp
+        timestamp = @last_message_timestamp
         timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         output.puts(timestamp)
       end
     end
 
-    def run_last_processed_message_timestamp_observer
-      path = Path.last_processed_message_timestamp
+    def run_last_message_timestamp_observer
+      path = Path.last_message_timestamp
       observer = FileObserver.new(@loop, path)
       observer.on_change = lambda do
-        timestamp = read_last_processed_message_timestamp
+        timestamp = read_last_message_timestamp
         if timestamp
-          if @last_processed_message_timestamp.nil? or
-               timestamp > @last_processed_message_timestamp
-            @last_processed_message_timestamp = timestamp
+          if @last_message_timestamp.nil? or
+               timestamp > @last_message_timestamp
+            @last_message_timestamp = timestamp
           end
         end
-        export_last_processed_message_timestamp_to_cluster
+        export_last_message_timestamp_to_cluster
       end
       observer.start
       observer
     end
 
-    def read_last_processed_message_timestamp
-      file = Path.last_processed_message_timestamp
+    def read_last_message_timestamp
+      file = Path.last_message_timestamp
       return nil unless file.exist?
       timestamp = file.read
       return nil if timestamp.nil? or timestamp.empty?

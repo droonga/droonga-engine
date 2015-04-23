@@ -121,9 +121,9 @@ module Droonga
         end
       end
 
-      class ExportLastProcessedMessageTimestamp < Base
+      class ExportLastMessageTimestamp < Base
         def process
-          FileUtils.touch(Path.last_processed_message_timestamp.to_s)
+          FileUtils.touch(Path.last_message_timestamp.to_s)
         end
       end
 

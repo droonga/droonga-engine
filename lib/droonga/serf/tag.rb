@@ -37,7 +37,7 @@ module Droonga
           "accept-newer-than"
         end
 
-        def last_processed_message_timestamp
+        def last_message_timestamp
           "last-timestamp"
         end
 

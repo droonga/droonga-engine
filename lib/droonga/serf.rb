@@ -195,18 +195,18 @@ module Droonga
       role
     end
 
-    def last_processed_message_timestamp
-      get_tag(Tag.last_processed_message_timestamp)
+    def last_message_timestamp
+      get_tag(Tag.last_message_timestamp)
     end
 
-    def latest_last_processed_message_timestamp
-      send_query("export_last_processed_message_timestamp",
+    def latest_last_message_timestamp
+      send_query("export_last_message_timestamp",
                  "node" => @name.to_s)
-      last_processed_message_timestamp
+      last_message_timestamp
     end
 
-    def last_processed_message_timestamp=(timestamp)
-      set_tag(Tag.last_processed_message_timestamp, timestamp)
+    def last_message_timestamp=(timestamp)
+      set_tag(Tag.last_message_timestamp, timestamp)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
