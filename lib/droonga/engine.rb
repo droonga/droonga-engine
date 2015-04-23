@@ -147,10 +147,11 @@ module Droonga
       logger.trace("export_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
         timestamp = @last_processed_message_timestamp
-        timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         serf = Serf.new(@name)
         old_timestamp = serf.last_processed_message_timestamp
-        if timestamp > old_timestamp
+        old_timestamp = Time.parse(old_timestamp) if old_timestamp
+        if old_timestamp.nil? or timestamp > old_timestamp
+          timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
           serf.last_processed_message_timestamp = timestamp
           logger.info("exported last processed message timestamp",
                       :timestamp => timestamp)
