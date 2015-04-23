@@ -201,7 +201,7 @@ module Droonga
 
     def latest_last_processed_message_timestamp
       send_query("export_last_processed_message_timestamp",
-            "node" => @name)
+                 "node" => @name)
       last_processed_message_timestamp
     end
 
