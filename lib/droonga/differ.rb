@@ -19,21 +19,9 @@ module Droonga
       def diff(a, b)
         case a
         when Hash
-          difference = {}
-          (a.keys + b.keys).uniq.each do |key|
-            unless a[key] == b[key]
-              difference[key] = diff(a[key], b[key])
-            end
-          end
-          difference
+          diff_hashes(a, b)
         when Array
-          difference = {}
-          [a.size, b.size].max.times do |index|
-            unless a[index] == b[index]
-              difference[index] = diff(a[index], b[index])
-            end
-          end
-          difference
+          diff_arrays(a, b)
         else
           if a == b
             nil
@@ -41,6 +29,26 @@ module Droonga
             "#{a.inspect} <=> #{b.inspect}"
           end
         end
+      end
+
+      def diff_hashes(a, b)
+        difference = {}
+        (a.keys + b.keys).uniq.each do |key|
+          unless a[key] == b[key]
+            difference[key] = diff(a[key], b[key])
+          end
+        end
+        difference
+      end
+
+      def diff_arrays(a, b)
+        difference = {}
+        [a.size, b.size].max.times do |index|
+          unless a[index] == b[index]
+            difference[index] = diff(a[index], b[index])
+          end
+        end
+        difference
       end
     end
   end
