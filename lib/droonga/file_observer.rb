@@ -39,28 +39,25 @@ module Droonga
     end
 
     def start
-      @watcher = Coolio::TimerWatcher.new(CHECK_INTERVAL, true)
-      on_timer = lambda do
+      @timer = Coolio::TimerWatcher.new(CHECK_INTERVAL, true)
+      @timer.on_timer do
         if updated?
           @mtime = @path.mtime
           on_change
         end
       end
-      @watcher.on_timer do
-        on_timer.call
-      end
-      @loop.attach(@watcher)
+      @loop.attach(@timer)
       # logger.trace("start: new file watcher attached",
-      #              :watcher => @watcher,
+      #              :watcher => @timer,
       #              :path => @path)
     end
 
     def stop
-      @watcher.detach
+      @timer.detach if @timer
       # logger.trace("stop: file watcher detached",
-      #              :watcher => @watcher,
+      #              :watcher => @timer,
       #              :path => @path)
-      @watcher = nil
+      @timer = nil
     end
 
     private
