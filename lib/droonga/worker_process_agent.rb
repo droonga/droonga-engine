@@ -48,15 +48,15 @@ module Droonga
         output.write(Messages::FINISH)
         output.on_write_complete do
           output.close
-          # logger.trace("stop: output watcher detached",
-          #              :watcher => output)
+          logger.trace("stop: output detached",
+                       :watcher => output)
         end
       end
       if @input
         @input, input = nil, @input
         input.close
-        # logger.trace("stop: input watcher detached",
-        #              :watcher => input)
+        logger.trace("stop: input detached",
+                     :watcher => input)
       end
       logger.trace("stop: done")
     end
@@ -84,7 +84,7 @@ module Droonga
     private
     def create_input(raw_input)
       @input = Coolio::IO.new(raw_input)
-      on_read = lambda do |data|
+      @input.on_read do |data|
         line_buffer = LineBuffer.new
         line_buffer.feed(data) do |line|
           logger.trace("line buffer feeded", :line => line);
@@ -100,30 +100,21 @@ module Droonga
           end
         end
       end
-      @input.on_read do |data|
-        on_read.call(data)
-      end
-      on_close = lambda do
+      @input.on_close do
         if @input
           @input = nil
           on_stop_immediately
         end
       end
-      @input.on_close do
-        on_close.call
-      end
     end
 
     def create_output(raw_output)
       @output = Coolio::IO.new(raw_output)
-      on_close = lambda do
+      @output.on_close do
         if @output
           @output = nil
           on_stop_immediately
         end
-      end
-      @output.on_close do
-        on_close.call
       end
     end
 

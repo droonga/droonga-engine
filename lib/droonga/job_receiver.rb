@@ -33,17 +33,17 @@ module Droonga
       @receiver = Coolio::UNIXSocket.connect(@socket_path)
       setup_receive_handler(@receiver)
       @loop.attach(@receiver)
-      # logger.trace("start: new receiver watcher attached",
-      #              :watcher => @receiver,
-      #              :socket_path => @socket_path)
+      logger.trace("start: socket watcher attached",
+                   :watcher     => @receiver,
+                   :socket_path => @socket_path)
       logger.trace("start: done")
     end
 
     def shutdown
       logger.trace("shutdown: start")
       @receiver.close
-      # logger.trace("shutdown: receiver watcher attached",
-      #              :watcher => @receiver)
+      logger.trace("shutdown: socket watcher attached",
+                   :watcher => @receiver)
       logger.trace("shutdown: done")
     end
 

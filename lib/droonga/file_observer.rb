@@ -47,16 +47,16 @@ module Droonga
         end
       end
       @loop.attach(@timer)
-      # logger.trace("start: new file watcher attached",
-      #              :watcher => @timer,
-      #              :path => @path)
+      logger.trace("start: timer attached",
+                   :watcher => @timer,
+                   :path    => @path)
     end
 
     def stop
       @timer.detach if @timer
-      # logger.trace("stop: file watcher detached",
-      #              :watcher => @timer,
-      #              :path => @path)
+      logger.trace("stop: timer detached",
+                   :watcher => @timer,
+                   :path    => @path)
       @timer = nil
     end
 

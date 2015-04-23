@@ -195,42 +195,33 @@ module Droonga
 
         checker = Coolio::TCPSocket.connect(@host, @bind_port)
 
-        on_connect = lambda do
+        checker.on_connect do
           on_ready
           checker.close
-          # logger.trace("start_ready_check: checker watcher detached",
-          #              :watcher => checker)
-        end
-        checker.on_connect do
-          on_connect.call
+          logger.trace("start_ready_check: socket detached",
+                       :watcher => scoket)
         end
 
-        on_connect_failed = lambda do
+        checker.on_connect_failed do
           if @n_ready_checks >= MAX_N_READ_CHECKS
             on_failure
           else
             timer = Coolio::TimerWatcher.new(1)
-            on_timer = lambda do
+            timer.on_timer do
               start_ready_check
               timer.detach
-              # logger.trace("start_ready_check: timer watcher detached",
-              #              :watcher => timer)
-            end
-            timer.on_timer do
-              on_timer.call
+              logger.trace("start_ready_check: timer detached",
+                           :watcher => timer)
             end
             @loop.attach(timer)
-            # logger.trace("start_ready_check: new timer watcher attached",
-            #              :watcher => timer)
+            logger.trace("start_ready_check: timer attached",
+                         :watcher => timer)
           end
-        end
-        checker.on_connect_failed do
-          on_connect_failed.call
         end
 
         @loop.attach(checker)
-        # logger.trace("start_ready_check: new checker watcher attached",
-        #              :watcher => checker)
+        logger.trace("start_ready_check: socket attached",
+                     :watcher => checker)
       end
 
       def log_tag

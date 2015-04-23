@@ -177,15 +177,16 @@ module Droonga
                   runner.resume
                 rescue
                   timer.detach
-                  # logger.trace("start: watcher detached on unexpected exception",
-                  #              :watcher => timer)
+                  logger.trace("start: timer detached on unexpected exception",
+                               :watcher => timer)
                   logger.exception(error_message, $!)
                   error(error_name, error_message)
                 end
               else
                 timer.detach
-                # logger.trace("start: watcher detached on unexpected exception",
-                #              :watcher => timer)
+                logger.trace("start: timer detached on unexpected exception",
+                             :watcher => timer)
+                logger.exception(error_message, $!)
               end
             end
             @loop.attach(timer)
