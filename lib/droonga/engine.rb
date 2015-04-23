@@ -83,7 +83,7 @@ module Droonga
         logger.trace("stop_gracefully/on_finish: start")
         @dispatcher.stop_gracefully do
           @state.shutdown
-          @export_last_processed_message_timestamp_observer.shutdown
+          @export_last_processed_message_timestamp_observer.stop
           export_last_processed_message_timestamp
           yield
         end
