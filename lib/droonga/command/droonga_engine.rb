@@ -32,6 +32,7 @@ require "droonga/serf"
 require "droonga/cluster"
 require "droonga/file_observer"
 require "droonga/process_supervisor"
+require "droonga/differ"
 
 module Droonga
   module Command
@@ -621,7 +622,10 @@ module Droonga
               my_previous_state = previous_state[my_name].dup
               my_previous_state.delete("internal_name")
               if my_new_state != my_previous_state
-                logger.info("restart by updated cluster-state.json")
+                logger.info("restart by updated cluster-state.json",
+                            :previous => my_previous_state,
+                            :new      => my_new_state,
+                            :diff     => Differ.diff(my_previous_state, my_new_state))
                 restart_graceful
               end
             end

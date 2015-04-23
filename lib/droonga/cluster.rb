@@ -18,6 +18,7 @@ require "droonga/changable"
 require "droonga/path"
 require "droonga/file_observer"
 require "droonga/engine_node"
+require "droonga/differ"
 
 module Droonga
   class Cluster
@@ -122,7 +123,8 @@ module Droonga
       else
         logger.info("cluster state changed",
                     :before => old_state,
-                    :after  => @state)
+                    :after  => @state,
+                    :diff   => Differ.diff(old_state, @state))
         clear_cache
         engine_nodes.each(&:resume)
         on_change
