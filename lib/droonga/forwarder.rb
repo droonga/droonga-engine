@@ -62,6 +62,7 @@ module Droonga
     end
 
     def refresh_connection_for(name)
+      logger.trace("refresh_connection_for(#{name}): start")
       sender = @senders[name]
       if sender
         sender.shutdown
@@ -72,10 +73,13 @@ module Droonga
         timer.detach
         @auto_close_timers.delete(name)
       end
+      logger.trace("refresh_connection_for(#{name}): done")
     end
 
     def refresh_all_connections
+      logger.trace("refresh_all_connections: start")
       clear_senders
+      logger.trace("refresh_all_connections: done")
     end
 
     private

@@ -66,8 +66,10 @@ module Droonga
     end
 
     def refresh_connection
+      logger.trace("refresh_connection: start")
       shutdown
       sender # instantiate new sender
+      logger.trace("refresh_connection: done")
     end
 
     def forward(message, destination)
