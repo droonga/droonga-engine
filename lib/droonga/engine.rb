@@ -109,7 +109,13 @@ module Droonga
     end
 
     def process(message)
-      @last_processed_message_timestamp = message["date"]
+      if message.include?("date")
+        date = Time.parse(message["date"])
+        if @last_processed_message_timestamp.nil? or
+             @last_processed_message_timestamp < date
+          @last_processed_message_timestamp = date
+        end
+      end
       @dispatcher.process_message(message)
     end
 
@@ -128,11 +134,17 @@ module Droonga
       Dispatcher.new(@state, @cluster, @catalog)
     end
 
+    MICRO_SECONDS_DECIMAL_PLACE = 6
+
     def save_last_processed_message_timestamp
       logger.trace("save_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
+        timestamp = @last_processed_message_timestamp
+        timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         serf = Serf.new(@name)
-        serf.last_processed_message_timestamp = @last_processed_message_timestamp
+        serf.last_processed_message_timestamp = timestamp
+        logger.info("saved last processed message timestamp",
+                    :timestamp => timestamp)
       end
       logger.trace("save_last_processed_message_timestamp: done")
     end
