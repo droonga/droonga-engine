@@ -273,22 +273,20 @@ module Droonga
       previous_timer = @auto_close_timer
       previous_timer.detach if previous_timer
 
-      timer = Coolio::TimerWatcher.new(@auto_close_timeout)
+      @auto_close_timer = Coolio::TimerWatcher.new(@auto_close_timeout)
       on_timeout = lambda do
-        timer.detach
+        @auto_close_timer.detach
         @auto_close_timer = nil
-        sender = @sender
-        if sender
+        if @sender
           logger.info("sender for #{name} is automatically closed by timeout.")
-          sender.shutdown
+          @sender.shutdown
           @sender = nil
         end
       end
-      timer.on_timer do
+      @auto_close_timer.on_timer do
         on_timeout.call
       end
-      @loop.attach(timer)
-      @auto_close_timer = timer
+      @loop.attach(@auto_close_timer)
     end
 
     def log_tag
