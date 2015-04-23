@@ -61,8 +61,8 @@ module Droonga
         Pathname.new(base_file_name).expand_path(base)
       end
 
-      def export_last_processed_message_timestamp
-        base + "export-last-processed-message-timestamp.txt"
+      def last_processed_message_timestamp
+        base + "last-processed-message-timestamp.txt"
       end
 
       def accidental_buffer

@@ -28,6 +28,7 @@ require "droonga/dispatcher"
 require "droonga/serf"
 require "droonga/serf/tag"
 require "droonga/file_observer"
+require "droonga/safe_file_writer"
 
 module Droonga
   class Engine
@@ -70,7 +71,7 @@ module Droonga
       @state.start
       @cluster.start
       @dispatcher.start
-      @export_last_processed_message_timestamp_observer = run_export_last_processed_message_timestamp_observer
+      @last_processed_message_timestamp_observer = run_last_processed_message_timestamp_observer
       logger.trace("start: done")
     end
 
@@ -79,14 +80,14 @@ module Droonga
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully: middle")
-        @export_last_processed_message_timestamp_observer.stop
+        @last_processed_message_timestamp_observer.stop
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
           #XXX We must save last processed message timstamp
           #    based on forwarded/dispatched messages while
           #    "graceful stop" operations.
-          export_last_processed_message_timestamp
+          export_last_processed_message_timestamp_to_file
           logger.trace("stop_gracefully: done")
         end
       end
@@ -102,11 +103,11 @@ module Droonga
     # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
-      @export_last_processed_message_timestamp_observer.stop
+      @last_processed_message_timestamp_observer.stop
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
-      export_last_processed_message_timestamp
+      export_last_processed_message_timestamp_to_file
       logger.trace("stop_immediately: done")
     end
 
@@ -143,8 +144,8 @@ module Droonga
 
     MICRO_SECONDS_DECIMAL_PLACE = 6
 
-    def export_last_processed_message_timestamp
-      logger.trace("export_last_processed_message_timestamp: start")
+    def export_last_processed_message_timestamp_to_cluster
+      logger.trace("export_last_processed_message_timestamp_to_cluster: start")
       if @last_processed_message_timestamp
         timestamp = @last_processed_message_timestamp
         serf = Serf.new(@name)
@@ -157,16 +158,46 @@ module Droonga
                       :timestamp => timestamp)
         end
       end
-      logger.trace("export_last_processed_message_timestamp: done")
+      logger.trace("export_last_processed_message_timestamp_to_cluster: done")
     end
 
-    def run_export_last_processed_message_timestamp_observer
-      observer = FileObserver.new(@loop, Path.export_last_processed_message_timestamp)
+    def export_last_processed_message_timestamp_to_file
+      old_timestamp = read_last_processed_message_timestamp
+      if old_timestamp and
+           old_timestamp > @last_processed_message_timestamp
+        return
+      end
+      path = Path.last_processed_message_timestamp
+      SafeFileWriter.write(path) do |output, file|
+        timestamp = @last_processed_message_timestamp
+        timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+        output.puts(timestamp)
+      end
+    end
+
+    def run_last_processed_message_timestamp_observer
+      path = Path.last_processed_message_timestamp
+      observer = FileObserver.new(@loop, path)
       observer.on_change = lambda do
-        export_last_processed_message_timestamp
+        timestamp = read_last_processed_message_timestamp
+        if timestamp
+          if @last_processed_message_timestamp.nil? or
+               timestamp > @last_processed_message_timestamp
+            @last_processed_message_timestamp = timestamp
+          end
+        end
+        export_last_processed_message_timestamp_to_cluster
       end
       observer.start
       observer
+    end
+
+    def read_last_processed_message_timestamp
+      file = Path.last_processed_message_timestamp
+      return nil unless file.exist?
+      timestamp = file.read
+      return nil if timestamp.nil? or timestamp.empty?
+      Time.parse(timestamp)
     end
 
     def log_tag
