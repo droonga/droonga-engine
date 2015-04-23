@@ -599,6 +599,7 @@ module Droonga
 
         RESTART_TRIGGER_KEYS = [
           "role",
+          "accept_messages_newer_than",
         ]
 
         def run_cluster_state_observer
