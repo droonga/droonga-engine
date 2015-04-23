@@ -440,7 +440,6 @@ module Droonga
             @serf.update_cluster_state
             @service_runner = run_service
             setup_initial_on_ready
-            @restart_observer = run_restart_observer
             @catalog_observer = run_catalog_observer
             @cluster_state_observer = run_cluster_state_observer
             @command_runner = run_command_runner
@@ -501,8 +500,6 @@ module Droonga
             @cluster_state_observer.stop
             logger.trace("stop_gracefully: stopping catalog_observer")
             @catalog_observer.stop
-            logger.trace("stop_gracefully: stopping restart_observer")
-            @restart_observer.stop
             @service_runner.stop_gracefully
             logger.trace("stop_gracefully: completely done")
           end
@@ -514,7 +511,6 @@ module Droonga
             @command_runner.stop
             @cluster_state_observer.stop
             @catalog_observer.stop
-            @restart_observer.stop
             @service_runner.stop_immediately
           end
         end
@@ -588,15 +584,6 @@ module Droonga
             yield
           end
           logger.trace("stop_serf: done")
-        end
-
-        def run_restart_observer
-          restart_observer = FileObserver.new(@loop, Path.restart)
-          restart_observer.on_change = lambda do
-            restart_self
-          end
-          restart_observer.start
-          restart_observer
         end
 
         def run_catalog_observer
