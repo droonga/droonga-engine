@@ -55,8 +55,6 @@ module Droonga
       @cluster.on_change = lambda do
         @dispatcher.refresh_node_reference
       end
-
-      @export_last_processed_message_timestamp_observer = run_export_last_processed_message_timestamp_observer
     end
 
     def start
@@ -72,7 +70,7 @@ module Droonga
       @state.start
       @cluster.start
       @dispatcher.start
-      @export_last_processed_message_timestamp_observer.start
+      @export_last_processed_message_timestamp_observer = run_export_last_processed_message_timestamp_observer
       logger.trace("start: done")
     end
 
