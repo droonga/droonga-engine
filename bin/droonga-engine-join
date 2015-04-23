@@ -285,7 +285,7 @@ module Droonga
     end
 
     def do_join
-      puts("Joining new replica to the cluster...")
+      puts("Configuring the joining node as a new replica for the cluster...")
       joining_node_serf.ensure_restarted do
         joining_node_serf.send_query("join",
                                      "node"    => joining_node.to_s,
@@ -320,8 +320,8 @@ module Droonga
     def update_accept_messages_newer_than_timestamp
       timestamp = source_node_serf.latest_last_processed_message_timestamp
       if timestamp and not timestamp.empty?
-        puts "The timestamp of the last processed message in the source node: #{timestamp}"
-        puts "Setting effective message timestamp for the destination node..."
+        puts "The timestamp of the last processed message at the source node: #{timestamp}"
+        puts "Setting new node to ignore messages older than the timestamp..."
         joining_node_serf.ensure_restarted do
           joining_node_serf.send_query("accept_messages_newer_than",
                                        "node"      => joining_node.to_s,
@@ -335,7 +335,7 @@ module Droonga
     end
 
     def register_to_existing_nodes
-      puts("Register new node to existing hosts in the cluster...")
+      puts("Registering new node to existing nodes...")
       source_node_serf.ensure_restarted(*existing_nodes) do
         source_node_serf.send_query("add_replicas",
                                     "cluster_id" => source_cluster_id,
@@ -346,7 +346,7 @@ module Droonga
     end
 
     def unregister_from_existing_nodes
-      puts("Unregister new node from existing hosts in the cluster...")
+      puts("Unregistering new node from existing nodes...")
       source_node_serf.ensure_restarted(*existing_nodes) do
         source_node_serf.send_query("remove_replicas",
                                     "cluster_id" => source_cluster_id,

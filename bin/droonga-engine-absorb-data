@@ -245,7 +245,7 @@ module Droonga
       timestamp = source_node_serf.latest_last_processed_message_timestamp
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
-        puts "Setting effective message timestamp for the destination node..."
+        puts "Setting the destination node to ignore messages older than the timestamp..."
         destination_node_serf.ensure_restarted do
           destination_node_serf.send_query("accept_messages_newer_than",
                                            "node"      => destination_node.to_s,
@@ -254,7 +254,7 @@ module Droonga
       else
         $stderr.puts("WARNING: Couldn't get the time stamp of " +
                        "the last processed message from the source node. " +
-                       "Any message will be forwarded to the joining node.")
+                       "Any message will be forwarded to the destination node.")
       end
     end
 
