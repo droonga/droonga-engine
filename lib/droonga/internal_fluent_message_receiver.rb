@@ -84,7 +84,8 @@ module Droonga
 
     def shutdown_heartbeat_socket
       logger.trace("shutdown_heartbeat_socket: start")
-      @heartbeat_socket.close
+      #XXX don't close the heartbeat socket here, because it is used by the generic receiver.
+      # @heartbeat_socket.close
       logger.trace("shutdown_heartbeat_socket: done")
     end
 
