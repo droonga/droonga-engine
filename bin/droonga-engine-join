@@ -66,17 +66,13 @@ module Droonga
         do_join
         register_to_existing_nodes
         set_source_node_role
-        successed = update_accept_messages_newer_than_timestamp
-        unless successed
-          do_cancel
-          return false
-        end
         if should_copy?
           successed = copy_data
           unless successed
             do_cancel
             return false
           end
+          update_accept_messages_newer_than_timestamp
         end
         reset_source_node_role
         reset_joining_node_role
@@ -322,7 +318,7 @@ module Droonga
     end
 
     def update_accept_messages_newer_than_timestamp
-      timestamp = source_node_serf.last_processed_message_timestamp
+      timestamp = source_node_serf.latest_last_processed_message_timestamp
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
@@ -336,7 +332,6 @@ module Droonga
                        "the last processed message from the source node. " +
                        "Any message will be forwarded to the joining node.")
       end
-      true
     end
 
     def register_to_existing_nodes

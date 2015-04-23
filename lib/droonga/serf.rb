@@ -199,6 +199,12 @@ module Droonga
       get_tag(Tag.last_processed_message_timestamp)
     end
 
+    def latest_last_processed_message_timestamp
+      query("export_last_processed_message_timestamp",
+            "node" => @name)
+      last_processed_message_timestamp
+    end
+
     def last_processed_message_timestamp=(timestamp)
       set_tag(Tag.last_processed_message_timestamp, timestamp)
       # after that you must run update_cluster_state to update the cluster information cache
