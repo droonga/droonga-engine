@@ -61,7 +61,14 @@ module Droonga
 
     def shutdown
       logger.trace("shutdown: start")
-      @sender.shutdown if @sender
+      if @sender
+        @sender.shutdown
+        @sender = nil
+      end
+      if @auto_close_timer
+        @auto_close_timer.detach
+        @auto_close_timer = nil
+      end
       logger.trace("shutdown: done")
     end
 
