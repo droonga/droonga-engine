@@ -201,7 +201,7 @@ module Droonga
     end
 
     def last_processed_message_timestamp=(timestamp)
-      set_tag(Tag.last_processed_message_timestamp, timestamp.to_s)
+      set_tag(Tag.last_processed_message_timestamp, timestamp)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
@@ -210,7 +210,7 @@ module Droonga
     end
 
     def accept_messages_newer_than(timestamp)
-      set_tag(Tag.accept_messages_newer_than, timestamp.to_s)
+      set_tag(Tag.accept_messages_newer_than, timestamp)
       # after that you must run update_cluster_state to update the cluster information cache
     end
 
