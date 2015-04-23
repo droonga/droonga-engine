@@ -158,19 +158,18 @@ module Droonga
       }.merge(@client_options)
     end
 
-    def create_destination_client(options={})
-      Droonga::Client.new(destination_client_options.merge(options))
-    end
-
     def table_names_in_destination_node
       @table_names_in_destination_node ||= get_table_names_in_destination_node
     end
 
     def get_table_names_in_destination_node
-      client = create_destination_client(:backend => :thread,
-                                         :loop => nil)
-      response = client.request("dataset" => @source_dataset,
-                                "type"    => "table_list")
+      response = nil
+      client_options = destination_client_options.merge(:backend => :thread,
+                                                        :loop => nil)
+      Droonga::Client.open(client_options) do |client|
+        response = client.request("dataset" => @source_dataset,
+                                  "type"    => "table_list")
+      end
 
       unless response
         raise EmptyResponse.new("table_list returns nil response")
