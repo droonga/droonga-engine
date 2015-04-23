@@ -84,8 +84,8 @@ module Droonga
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
+          logger.trace("stop_gracefully/on_finish: done")
         end
-        logger.trace("stop_gracefully/on_finish: done")
       end
       if @state.have_session?
         logger.trace("stop_gracefully/having sessions")

@@ -15,11 +15,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/loggable"
 require "droonga/deferrable"
 require "droonga/slice"
 
 module Droonga
   class Farm
+    include Loggable
     include Deferrable
 
     class NoSlice < StandardError
@@ -65,9 +67,11 @@ module Droonga
     end
 
     def stop_gracefully
+      logger.trace("stop_gracefully: start")
       n_slices = @slices.size
       if n_slices.zero?
         yield if block_given?
+        logger.trace("stop_gracefully: done")
         return
       end
 
@@ -77,6 +81,7 @@ module Droonga
           n_done_slices += 1
           if n_done_slices == n_slices
             yield if block_given?
+            logger.trace("stop_gracefully: done")
           end
         end
       end
@@ -99,6 +104,11 @@ module Droonga
         raise NoSlice.new(slice_name, :message => message, :slices => @slices.keys)
       end
       @slices[slice_name].process(message)
+    end
+
+    private
+    def log_tag
+      "farm"
     end
   end
 end

@@ -72,7 +72,7 @@ module Droonga
       @farm.start
     end
 
-    def stop_gracefully(&on_stop)
+    def stop_gracefully(&block)
       logger.trace("stop_gracefully: start")
       @collector_runners.each_value do |collector_runner|
         collector_runner.shutdown
@@ -80,8 +80,10 @@ module Droonga
       @adapter_runners.each_value do |adapter_runner|
         adapter_runner.shutdown
       end
-      @farm.stop_gracefully(&on_stop)
-      logger.trace("stop_gracefully: done")
+      @farm.stop_gracefully do
+        yield
+        logger.trace("stop_gracefully: done")
+      end
     end
 
     def stop_immediately

@@ -50,6 +50,7 @@ module Droonga
         @job_pusher.shutdown
         @processor.shutdown
         yield if block_given?
+        logger.trace("stop_gracefully: done")
       end
       if @supervisor
         @supervisor.stop_gracefully do
@@ -58,7 +59,6 @@ module Droonga
       else
         on_stop.call
       end
-      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
