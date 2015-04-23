@@ -53,10 +53,10 @@ module Droonga
           n_done_worker_runners += 1
           if n_done_worker_runners == n_worker_runners
             yield if block_given?
+            logger.trace("stop_gracefully: done")
           end
         end
       end
-      logger.trace("stop_gracefully: done")
     end
 
     def stop_immediately
@@ -137,8 +137,10 @@ module Droonga
       def stop_gracefully(&block)
         logger.trace("stop_gracefully: start")
         @supervisor.stop_gracefully
-        @stop_gracefully_callback = block
-        logger.trace("stop_gracefully: done")
+        @stop_gracefully_callback = lambda do
+          yield if block_given?
+          logger.trace("stop_gracefully: done")
+        end
       end
 
       def stop_immediately
