@@ -597,6 +597,10 @@ module Droonga
           catalog_observer
         end
 
+        RESTART_TRIGGER_KEYS = [
+          "role",
+        ]
+
         def run_cluster_state_observer
           previous_state = nil
           cluster_state_observer = FileObserver.new(@loop, Path.cluster_state)
@@ -604,12 +608,14 @@ module Droonga
             my_name   = @configuration.engine_name
             new_state = Cluster.load_state_file
             if new_state and previous_state
-              my_new_state = new_state[my_name].dup
-              my_new_state.delete("internal_name")
-              my_previous_state = previous_state[my_name].dup
-              my_previous_state.delete("internal_name")
+              my_new_state = new_state[my_name].select do |key, _value|
+                RESTART_TRIGGER_KEYS.include?(key)
+              end
+              my_previous_state = previous_state[my_name].select do |key, _value|
+                RESTART_TRIGGER_KEYS.include?(key)
+              end
               if my_new_state != my_previous_state
-                logger.info("restart by updated cluster-state.json",
+                logger.info("restart by changes of myself in cluster-state.json",
                             :previous => my_previous_state,
                             :new      => my_new_state,
                             :diff     => Differ.diff(my_previous_state, my_new_state))
