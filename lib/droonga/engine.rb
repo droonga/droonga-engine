@@ -105,7 +105,7 @@ module Droonga
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
-      @export_last_processed_message_timestamp_observer.shutdown
+      @export_last_processed_message_timestamp_observer.stop
       export_last_processed_message_timestamp
       logger.trace("stop_immediately: done")
     end
