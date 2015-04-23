@@ -98,7 +98,6 @@ module Droonga
               timer.detach
               logger.trace("start: timer detached by unexpected exception",
                            :watcher => timer)
-              logger.exception(error_message, $!)
             end
           end
 
