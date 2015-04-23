@@ -76,9 +76,9 @@ module Droonga
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully/on_finish: start")
-        save_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
           @state.shutdown
+          save_last_processed_message_timestamp
           yield
         end
         logger.trace("stop_gracefully/on_finish: done")
@@ -96,10 +96,10 @@ module Droonga
     # It may be called after stop_gracefully.
     def stop_immediately
       logger.trace("stop_immediately: start")
-      save_last_processed_message_timestamp
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
+      save_last_processed_message_timestamp
       logger.trace("stop_immediately: done")
     end
 
