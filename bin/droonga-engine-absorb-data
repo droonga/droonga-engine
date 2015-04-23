@@ -43,10 +43,11 @@ module Droonga
       puts ""
       puts "Absorbing..."
 
+      update_accept_messages_newer_than_timestamp
+
       succeeded = absorb
 
       if succeeded
-        update_accept_messages_newer_than_timestamp
         puts "Done."
       else
         do_cancel
