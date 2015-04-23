@@ -78,23 +78,22 @@ module Droonga
       logger.trace("stop_gracefully: start")
       @cluster.shutdown
       on_finish = lambda do
-        logger.trace("stop_gracefully/on_finish: start")
+        logger.trace("stop_gracefully: middle")
         @export_last_processed_message_timestamp_observer.stop
         export_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
-          logger.trace("stop_gracefully/on_finish: done")
+          logger.trace("stop_gracefully: done")
         end
       end
       if @state.have_session?
-        logger.trace("stop_gracefully/having sessions")
+        logger.trace("stop_gracefully: having sessions")
         @state.on_finish = on_finish
       else
-        logger.trace("stop_gracefully/no session")
+        logger.trace("stop_gracefully: no session")
         on_finish.call
       end
-      logger.trace("stop_gracefully: done")
     end
 
     # It may be called after stop_gracefully.
