@@ -27,7 +27,6 @@ require "droonga/serf/command"
 require "droonga/line_buffer"
 require "droonga/safe_file_writer"
 require "droonga/service_installation"
-require "droonga/restarter"
 
 module Droonga
   class Serf
