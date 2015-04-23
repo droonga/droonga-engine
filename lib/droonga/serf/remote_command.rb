@@ -121,6 +121,12 @@ module Droonga
         end
       end
 
+      class ExportLastProcessedMessageTimestamp < Base
+        def process
+          FileUtils.touch(Path.export_last_processed_message_timestamp.to_s)
+        end
+      end
+
       class AcceptMessagesNewerThan < Base
         def process
           log("old timestamp: #{@serf.accept_messages_newer_than_timestamp}")

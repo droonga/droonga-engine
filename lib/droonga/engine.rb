@@ -27,6 +27,7 @@ require "droonga/catalog/loader"
 require "droonga/dispatcher"
 require "droonga/serf"
 require "droonga/serf/tag"
+require "droonga/file_observer"
 
 module Droonga
   class Engine
@@ -54,6 +55,8 @@ module Droonga
       @cluster.on_change = lambda do
         @dispatcher.refresh_node_reference
       end
+
+      @export_last_processed_message_timestamp_observer = run_export_last_processed_message_timestamp_observer
     end
 
     def start
@@ -69,6 +72,7 @@ module Droonga
       @state.start
       @cluster.start
       @dispatcher.start
+      @export_last_processed_message_timestamp_observer.start
       logger.trace("start: done")
     end
 
@@ -79,7 +83,7 @@ module Droonga
         logger.trace("stop_gracefully/on_finish: start")
         @dispatcher.stop_gracefully do
           @state.shutdown
-          save_last_processed_message_timestamp
+          @export_last_processed_message_timestamp_observer.shutdown
           yield
         end
         logger.trace("stop_gracefully/on_finish: done")
@@ -100,7 +104,7 @@ module Droonga
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
-      save_last_processed_message_timestamp
+      @export_last_processed_message_timestamp_observer.shutdown
       logger.trace("stop_immediately: done")
     end
 
@@ -137,17 +141,29 @@ module Droonga
 
     MICRO_SECONDS_DECIMAL_PLACE = 6
 
-    def save_last_processed_message_timestamp
-      logger.trace("save_last_processed_message_timestamp: start")
+    def export_last_processed_message_timestamp
+      logger.trace("export_last_processed_message_timestamp: start")
       if @last_processed_message_timestamp
         timestamp = @last_processed_message_timestamp
         timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         serf = Serf.new(@name)
-        serf.last_processed_message_timestamp = timestamp
-        logger.info("saved last processed message timestamp",
-                    :timestamp => timestamp)
+        old_timestamp = serf.last_processed_message_timestamp
+        if timestamp > old_timestamp
+          serf.last_processed_message_timestamp = timestamp
+          logger.info("exported last processed message timestamp",
+                      :timestamp => timestamp)
+        end
       end
-      logger.trace("save_last_processed_message_timestamp: done")
+      logger.trace("export_last_processed_message_timestamp: done")
+    end
+
+    def run_export_last_processed_message_timestamp_observer
+      observer = FileObserver.new(@loop, Path.export_last_processed_message_timestamp)
+      observer.on_change = lambda do
+        export_last_processed_message_timestamp
+      end
+      observer.start
+      observer
     end
 
     def log_tag
