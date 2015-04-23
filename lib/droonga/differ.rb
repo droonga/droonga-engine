@@ -17,6 +17,9 @@ module Droonga
   module Differ
     class << self
       def diff(a, b)
+        unless a.class == b.class
+          return "#{a.inspect} <=> #{b.inspect}"
+        end
         case a
         when Hash
           diff_hashes(a, b)
