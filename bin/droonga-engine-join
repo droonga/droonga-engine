@@ -323,11 +323,6 @@ module Droonga
 
     def update_accept_messages_newer_than_timestamp
       timestamp = source_node_serf.last_processed_message_timestamp
-      unless timestamp
-        $stderr.puts("Couldn't get the time stamp of " +
-                       "the last processed message from the source node.")
-        return false
-      end
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting effective message timestamp for the destination node..."
@@ -336,6 +331,10 @@ module Droonga
                                        "node"      => joining_node.to_s,
                                        "timestamp" => timestamp)
         end
+      else
+        $stderr.puts("WARNING: Couldn't get the time stamp of " +
+                       "the last processed message from the source node. " +
+                       "Any message will be forwarded to the joining node.")
       end
       true
     end
