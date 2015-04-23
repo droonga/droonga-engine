@@ -80,10 +80,13 @@ module Droonga
       on_finish = lambda do
         logger.trace("stop_gracefully: middle")
         @export_last_processed_message_timestamp_observer.stop
-        export_last_processed_message_timestamp
         @dispatcher.stop_gracefully do
           @state.shutdown
           yield
+          #XXX We must save last processed message timstamp
+          #    based on forwarded/dispatched messages while
+          #    "graceful stop" operations.
+          export_last_processed_message_timestamp
           logger.trace("stop_gracefully: done")
         end
       end
@@ -100,10 +103,10 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       @export_last_processed_message_timestamp_observer.stop
-      export_last_processed_message_timestamp
       @dispatcher.stop_immediately
       @cluster.shutdown
       @state.shutdown
+      export_last_processed_message_timestamp
       logger.trace("stop_immediately: done")
     end
 
