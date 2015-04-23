@@ -42,7 +42,7 @@ module Droonga
       logger.trace("shutdown_gracefully: start")
       shutdown_heartbeat_socket
       shutdown_listen_socket
-      shutdown_message_receiver do
+      shutdown_message_receiver_gracefully do
         yield
         logger.trace("shutdown_gracefully: done")
       end
