@@ -39,6 +39,7 @@ module Droonga
     end
 
     def start
+      return if @timer
       @timer = Coolio::TimerWatcher.new(CHECK_INTERVAL, true)
       @timer.on_timer do
         if updated?
