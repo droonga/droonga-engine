@@ -93,7 +93,7 @@ module Droonga
           "progressIntervalSeconds" => @progress_interval_seconds,
         },
       }
-      client = create_destination_client
+      client = Droonga::Client.new(destination_client_options)
       client.subscribe(absorb_message) do |message|
         case message
         when Droonga::Client::Error
@@ -158,15 +158,18 @@ module Droonga
       }.merge(@client_options)
     end
 
+    def synchronous_destination_client_options
+      destination_client_options.merge(:backend => :thread,
+                                       :loop => nil)
+    end
+
     def table_names_in_destination_node
       @table_names_in_destination_node ||= get_table_names_in_destination_node
     end
 
     def get_table_names_in_destination_node
       response = nil
-      client_options = destination_client_options.merge(:backend => :thread,
-                                                        :loop => nil)
-      Droonga::Client.open(client_options) do |client|
+      Droonga::Client.open(synchronous_destination_client_options) do |client|
         response = client.request("dataset" => @source_dataset,
                                   "type"    => "table_list")
       end
