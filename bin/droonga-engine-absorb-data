@@ -43,6 +43,9 @@ module Droonga
       puts ""
       puts "Absorbing..."
 
+      #XXX If any command is received by the source node after changing of its role,
+      #    the timestamp of last processed mesasge is unexpectedly updated by them.
+      #    Be careful to not send any command to the source node on this timing!!
       update_accept_messages_newer_than_timestamp
 
       succeeded = absorb
