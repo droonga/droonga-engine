@@ -84,6 +84,7 @@ module Droonga
         @dispatcher.stop_gracefully do
           @state.shutdown
           @export_last_processed_message_timestamp_observer.shutdown
+          export_last_processed_message_timestamp
           yield
         end
         logger.trace("stop_gracefully/on_finish: done")
@@ -105,6 +106,7 @@ module Droonga
       @cluster.shutdown
       @state.shutdown
       @export_last_processed_message_timestamp_observer.shutdown
+      export_last_processed_message_timestamp
       logger.trace("stop_immediately: done")
     end
 
