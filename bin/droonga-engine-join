@@ -321,7 +321,7 @@ module Droonga
     end
 
     def update_accept_messages_newer_than_timestamp
-      timestamp = source_node_serf.latest_last_processed_message_timestamp
+      timestamp = source_node_serf.latest_last_message_timestamp
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message at the source node: #{timestamp}"
         puts "Setting new node to ignore messages older than the timestamp..."
