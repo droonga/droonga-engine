@@ -38,12 +38,22 @@ module Droonga
       [@host, @port]
     end
 
-    def shutdown
-      logger.trace("shutdown: start")
-      shutdown_message_receiver
+    def shutdown_gracefully
+      logger.trace("shutdown_gracefully: start")
       shutdown_heartbeat_socket
       shutdown_listen_socket
-      logger.trace("shutdown: done")
+      shutdown_message_receiver do
+        yield
+        logger.trace("shutdown_gracefully: done")
+      end
+    end
+
+    def shutdown_immediately
+      logger.trace("shutdown_immediately: start")
+      shutdown_heartbeat_socket
+      shutdown_listen_socket
+      shutdown_message_receiver_immediately
+      logger.trace("shutdown_immediately: done")
     end
 
     private
@@ -56,6 +66,7 @@ module Droonga
 
     def shutdown_listen_socket
       logger.trace("shutdown_listen_socket: start")
+      @listen_socket.close
       logger.trace("shutdown_listen_socket: done")
     end
 
@@ -73,6 +84,7 @@ module Droonga
 
     def shutdown_heartbeat_socket
       logger.trace("shutdown_heartbeat_socket: start")
+      @heartbeat_socket.close
       logger.trace("shutdown_heartbeat_socket: done")
     end
 
@@ -87,11 +99,18 @@ module Droonga
       logger.trace("start_heartbeat_socket: done")
     end
 
-    # TODO: Use stop_gracefully/stop_immediately interface
-    def shutdown_message_receiver
-      logger.trace("shutdown_message_receiver: start")
+    def shutdown_message_receiver_gracefully
+      logger.trace("shutdown_message_receiver_gracefully: start")
+      @message_receiver.stop_gracefully do
+        yield
+        logger.trace("shutdown_message_receiver_gracefully: done")
+      end
+    end
+
+    def shutdown_message_receiver_immediately
+      logger.trace("shutdown_message_receiver_immediately: start")
       @message_receiver.stop_immediately
-      logger.trace("shutdown_message_receiver: done")
+      logger.trace("shutdown_message_receiver_immediately: done")
     end
 
     def log_tag

@@ -139,10 +139,21 @@ module Droonga
         end
       end
 
-      def shutdown_internal_message_receiver
+      def shutdown_internal_message_receiver_gracefully
+        if @internal_message_receiver.nil?
+          yield
+          return
+        end
+        @internal_message_receiver, receiver = nil, @internal_message_receiver
+        receiver.shutdown_gracefully do
+          yield
+        end
+      end
+
+      def shutdown_internal_message_receiver_immediately
         return if @internal_message_receiver.nil?
         @internal_message_receiver, receiver = nil, @internal_message_receiver
-        receiver.shutdown
+        receiver.shutdown_immediately
       end
 
       def run_engine
@@ -234,10 +245,11 @@ module Droonga
           @engine.stop_gracefully do
             logger.trace("stop_gracefully: ready to stop workers")
             shutdown_worker_process_agent
-            shutdown_internal_message_receiver
-            logger.trace("stop_gracefully: done",
-                         :n_rest_watchers => @loop.watchers.size,
-                         :rest_watchers   => @loop.watchers)
+            shutdown_internal_message_receiver_gracefully do
+              logger.trace("stop_gracefully: done",
+                           :n_rest_watchers => @loop.watchers.size,
+                           :rest_watchers   => @loop.watchers)
+            end
           end
         end
       end
@@ -246,7 +258,7 @@ module Droonga
       def stop_immediately
         shutdown_worker_process_agent
         @receiver.stop_immediately
-        shutdown_internal_message_receiver
+        shutdown_internal_message_receiver_immediately
         @engine.stop_immediately
         @loop.stop
       end
