@@ -47,11 +47,16 @@ module Droonga
       until @_write_buffer.empty?
         chunk = @_write_buffer.shift
         begin
+          logger.trace("Sending...", :data => chunk.data)
           written_size = @_io.write_nonblock(chunk.data)
           if written_size == chunk.data.bytesize
             chunk.written
+            logger.trace("Completely sent.")
           else
             chunk.written_partial(written_size)
+            logger.trace("Partially sent. Retry later.",
+                         :written => written_size,
+                         :rest    => chunk.data.bytesize)
             @_write_buffer.unshift(chunk)
             break
           end
