@@ -245,8 +245,24 @@ module Droonga
       true
     end
 
-    def update_accept_messages_newer_than_timestamp
+    GETTING_LAST_MESSAGE_TIMESTAMP_MAX_RETRY_COUNT = 10
+    GETTING_LAST_MESSAGE_TIMESTAMP_RETRY_INTERVAL_SECONDS = 10
+
+    def try_get_last_message_timestamp(retry_count=0)
+      puts "Getting the timestamp of the last processed message in the source node..."
       timestamp = source_node_serf.latest_last_message_timestamp
+      unless timestamp
+        if retry_count < GETTING_LAST_MESSAGE_TIMESTAMP_MAX_RETRY_COUNT
+          puts "Failed. Retrying..."
+          sleep(GETTING_LAST_MESSAGE_TIMESTAMP_RETRY_INTERVAL_SECONDS)
+          timestamp = try_get_last_message_timestamp(retry_count + 1)
+        end
+      end
+      timestamp
+    end
+
+    def update_accept_messages_newer_than_timestamp
+      timestamp = try_get_last_message_timestamp
       if timestamp and not timestamp.empty?
         puts "The timestamp of the last processed message in the source node: #{timestamp}"
         puts "Setting the destination node to ignore messages older than the timestamp..."
