@@ -86,7 +86,9 @@ module Droonga
     end
 
     def buffered_messages
-      Pathname.glob("#{@data_directory}/*#{SUFFIX}")
+      Pathname.glob("#{@data_directory}/*#{SUFFIX}").sort_by do |path|
+        path
+      end
     end
 
     def empty?
