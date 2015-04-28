@@ -57,6 +57,7 @@ module Droonga
                                DEFAULT_MESSAGES_PER_SECOND
       @progress_interval_seconds = @params[:progress_interval_seconds] ||
                                      DEFAULT_PROGRESS_INTERVAL_SECONDS
+      @target_role = @params[:target_role]
 
       @host    = @params[:host]    || DEFAULT_HOST
       @port    = @params[:port]    || DEFAULT_PORT
@@ -91,6 +92,7 @@ module Droonga
           "dataset" => @source_dataset,
           "messagesPerSecond" => @messages_per_second,
           "progressIntervalSeconds" => @progress_interval_seconds,
+          "targetRole" => @target_role,
         },
       }
       client = Droonga::Client.new(destination_client_options)

@@ -94,6 +94,7 @@ module Droonga
               @dumper_error_message = @dumper.run(dump_options) do |message|
                 begin
                   message["dataset"] = current_dataset
+                  message["targetRole"] = target_role if target_role
                   message["xSender"] = "system.absorb-data"
                   @messenger.forward(message,
                                      "to"   => my_node_name,
@@ -333,6 +334,10 @@ module Droonga
 
           def current_dataset
             @request.dataset
+          end
+
+          def target_role
+            @request.request["targetRole"]
           end
 
           def prepare_progress_interval_seconds

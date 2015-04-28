@@ -234,6 +234,7 @@ module Droonga
 
         :messages_per_second => @options["records-per-second"],
         :progress_interval_seconds => @options["progress-interval-seconds"],
+        :target_role => NodeRole::ABSORB_DESTINATION,
 
         :client_options   => {
           :backend => :coolio,
