@@ -146,6 +146,9 @@ module Droonga
 
     def export_last_message_timestamp_to_cluster
       logger.trace("export_last_message_timestamp_to_cluster: start")
+      unless @last_message_timestamp
+        @last_message_timestamp = read_last_message_timestamp
+      end
       if @last_message_timestamp
         timestamp = @last_message_timestamp
         serf = Serf.new(@name)
