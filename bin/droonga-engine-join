@@ -325,7 +325,7 @@ module Droonga
 
     def try_get_last_message_timestamp(retry_count=0)
       puts "Getting the timestamp of the last processed message in the source node..."
-      timestamp = source_node_serf.latest_last_message_timestamp
+      timestamp = source_node_serf.last_message_timestamp
       unless timestamp
         if retry_count < GETTING_LAST_MESSAGE_TIMESTAMP_MAX_RETRY_COUNT
           puts "Failed. Retrying..."

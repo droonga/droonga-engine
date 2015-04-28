@@ -22,6 +22,7 @@ require "droonga/catalog/generator"
 require "droonga/catalog/modifier"
 require "droonga/catalog/fetcher"
 require "droonga/safe_file_writer"
+require "droonga/timestamp"
 require "droonga/service_installation"
 
 module Droonga
@@ -121,9 +122,14 @@ module Droonga
         end
       end
 
-      class ExportLastMessageTimestamp < Base
+      class ReportLastMessageTimestamp < Base
         def process
-          FileUtils.touch(Path.last_message_timestamp.to_s)
+          timestamp = Timestamp.last_message_timestamp
+          if timestamp
+            @response["timestamp"] = Timestamp.stringify(timestamp)
+          else
+            @response["timestamp"] = nil
+          end
         end
       end
 

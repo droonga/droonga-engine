@@ -27,8 +27,7 @@ require "droonga/catalog/loader"
 require "droonga/dispatcher"
 require "droonga/serf"
 require "droonga/serf/tag"
-require "droonga/file_observer"
-require "droonga/safe_file_writer"
+require "droonga/timestamp"
 
 module Droonga
   class Engine
@@ -62,6 +61,7 @@ module Droonga
       logger.trace("start: start")
       @state.on_ready = lambda do
         on_ready
+        serf = Serf.new(@name.to_s)
         serf.set_tag(Serf::Tag.internal_node_name, @internal_name)
       end
       @state.on_failure = lambda do
@@ -76,15 +76,16 @@ module Droonga
 
     def stop_gracefully
       logger.trace("stop_gracefully: start")
+      @last_message_timestamp_observer.stop
+      Timestamp.last_message_timestamp = nil # to avoid old timestamp is used
       @cluster.shutdown
       on_finish = lambda do
         logger.trace("stop_gracefully: middle")
-        @last_message_timestamp_observer.stop
         @dispatcher.stop_gracefully do
           #XXX We must save last processed message timstamp
           #    based on forwarded/dispatched messages while
           #    "graceful stop" operations.
-          export_last_message_timestamp_to_file
+          save_last_message_timestamp
           @state.shutdown
           yield
           logger.trace("stop_gracefully: done")
@@ -103,8 +104,9 @@ module Droonga
     def stop_immediately
       logger.trace("stop_immediately: start")
       @last_message_timestamp_observer.stop
+      Timestamp.last_message_timestamp = nil # to avoid old timestamp is used
       @dispatcher.stop_immediately
-      export_last_message_timestamp_to_file
+      save_last_message_timestamp
       @cluster.shutdown
       @state.shutdown
       logger.trace("stop_immediately: done")
@@ -141,52 +143,14 @@ module Droonga
       Dispatcher.new(@state, @cluster, @catalog)
     end
 
-    MICRO_SECONDS_DECIMAL_PLACE = 6
-
-    def export_last_message_timestamp_to_cluster
-      logger.trace("export_last_message_timestamp_to_cluster: start")
-      @last_message_timestamp ||= read_last_message_timestamp_file
-      if @last_message_timestamp
-        timestamp = @last_message_timestamp
-        old_timestamp = read_last_message_timestamp_tag
-        logger.trace("export_last_message_timestamp_to_cluster: check",
-                     :old     => old_timestamp,
-                     :current => @last_message_timestamp)
-        if old_timestamp.nil? or timestamp > old_timestamp
-          timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
-          serf.last_message_timestamp = timestamp
-          logger.info("exported last processed message timestamp",
-                      :timestamp => timestamp)
-        end
-      end
-      logger.trace("export_last_message_timestamp_to_cluster: done")
-    end
-
-    def export_last_message_timestamp_to_file
-      logger.trace("export_last_message_timestamp_to_file: start")
-      old_timestamp = read_last_message_timestamp_file
-      logger.trace("export_last_message_timestamp_to_file: check",
-                   :loaded  => old_timestamp,
-                   :current => @last_message_timestamp)
-      if old_timestamp and
-           old_timestamp > @last_message_timestamp
-        logger.trace("export_last_message_timestamp_to_file: skipped")
-        return
-      end
-      path = Path.last_message_timestamp
-      SafeFileWriter.write(path) do |output, file|
-        timestamp = @last_message_timestamp
-        timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
-        output.puts(timestamp)
-      end
-      logger.trace("export_last_message_timestamp_to_file: done")
+    def save_last_message_timestamp
+      logger.trace("save_last_message_timestamp: start")
+      Timestamp.last_message_timestamp = @last_message_timestamp
+      logger.trace("save_last_message_timestamp: done")
     end
 
     def run_last_message_timestamp_observer
-      path = Path.last_message_timestamp
-      observer = FileObserver.new(@loop, path)
-      observer.on_change = lambda do
-        timestamp = read_last_message_timestamp_file
+      Timestamp.run_last_message_timestamp_observer(@loop) do |timestamp|
         logger.trace("last message stamp file is modified",
                      :loaded  => timestamp,
                      :current => @last_message_timestamp)
@@ -196,28 +160,7 @@ module Droonga
             @last_message_timestamp = timestamp
           end
         end
-        export_last_message_timestamp_to_cluster
       end
-      observer.start
-      observer
-    end
-
-    def read_last_message_timestamp_file
-      file = Path.last_message_timestamp
-      return nil unless file.exist?
-      timestamp = file.read
-      return nil if timestamp.nil? or timestamp.empty?
-      Time.parse(timestamp)
-    end
-
-    def read_last_message_timestamp_tag
-      old_timestamp = serf.last_message_timestamp
-      old_timestamp = Time.parse(old_timestamp) if old_timestamp
-      old_timestamp
-    end
-
-    def serf
-      @serf ||= Serf.new(@name.to_s)
     end
 
     def log_tag

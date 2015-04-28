@@ -37,10 +37,6 @@ module Droonga
           "accept-newer-than"
         end
 
-        def last_message_timestamp
-          "last-timestamp"
-        end
-
         HAVE_UNPROCESSED_MESSAGES_TAG_PREFIX = "buffered-for-"
 
         def have_unprocessed_messages_tag_for(node_name)
