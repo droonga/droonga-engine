@@ -30,6 +30,7 @@ module Droonga
 
       def last_message_timestamp=(timestamp)
         if timestamp.is_a?(String)
+          timestamp = timestamp.strip
           if timestamp.empty?
             timestamp = nil
           else
@@ -49,7 +50,7 @@ module Droonga
       def last_message_timestamp
         file = Path.last_message_timestamp
         return nil unless file.exist?
-        timestamp = file.read
+        timestamp = file.read.strip
         return nil if timestamp.nil? or timestamp.empty?
         Time.parse(timestamp)
       end
