@@ -141,15 +141,11 @@ module Droonga
       forwarded
     end
 
+    MICRO_SECONDS_DECIMAL_PLACE = 6
+
     def create_buffered_message_path(time_stamp=Time.now)
-      timestamp_part = time_stamp.iso8601(6)
-      sametime_count = 0
-      path = nil
-      begin
-        path = @data_directory + "#{timestamp_part}.#{sametime_count}#{SUFFIX}"
-        sametime_count += 1
-      end while path.exist?
-      path
+      basename = time_stamp.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+      Path.unique_file_path(@data_directory, basename, SUFFIX)
     end
 
     def on_forward(message, destination)

@@ -92,6 +92,19 @@ module Droonga
                        now.hour, now.min, now.sec, now.nsec)
         serf_event_handler_errors + name
       end
+
+      def unique_file_path(directory, basename, suffix)
+        directory = Pathname(directory)
+        basename = basename.sub(/\.\z/, "")
+        suffix   = suffix.sub(/\A\./, "")
+        uniqueness_count = 0
+        path = nil
+        begin
+          path = directory + "#{basename}.#{uniqueness_count}.#{suffix}"
+          uniqueness_count += 1
+        end while path.exist?
+        path
+      end
     end
   end
 end
