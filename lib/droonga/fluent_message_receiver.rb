@@ -236,6 +236,7 @@ module Droonga
 
       private
       def feed(data)
+        logger.trace("Client: feed: start", :data => data)
         @unpacker.feed_each(data) do |object|
           logger.trace("Client: feed_each: start", :object => object)
           begin
@@ -245,6 +246,7 @@ module Droonga
           end
           logger.trace("Client: feed_each: done")
         end
+        logger.trace("Client: feed: done")
       end
 
       def handle_feeded_object(object)
