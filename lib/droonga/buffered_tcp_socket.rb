@@ -136,7 +136,6 @@ module Droonga
         @data_directory = params[:directory]
         @data = params[:data]
         @time_stamp = params[:time_stamp] || Time.now
-        @time_stamp = @time_stamp.utc
         @uniqueness = params[:uniqueness]
         @revision = params[:revision] || 0
       end
@@ -166,7 +165,7 @@ module Droonga
       end
 
       def create_chunk_file_path
-        basename = @time_stamp.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+        basename = @time_stamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         if @uniqueness
           @data_directory + "#{basename}.#{@uniqueness}.#{@revision}#{SUFFIX}"
         else
