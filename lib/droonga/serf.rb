@@ -204,7 +204,7 @@ module Droonga
                  "node" => @name.to_s)
       # Wait until the query is completely processed by the node
       # and and the timestamp is correctly exported to its tag.
-      sleep(10)
+      sleep(30)
       last_message_timestamp
     end
 
