@@ -24,6 +24,7 @@ require "droonga/loggable"
 require "droonga/path"
 require "droonga/safe_file_writer"
 require "droonga/serf"
+require "droonga/timestamp"
 
 module Droonga
   class ForwardBuffer
@@ -141,10 +142,8 @@ module Droonga
       forwarded
     end
 
-    MICRO_SECONDS_DECIMAL_PLACE = 6
-
     def create_buffered_message_path(time_stamp=Time.now)
-      basename = time_stamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+      basename = Timestamp.stringify(time_stamp)
       Path.unique_file_path(@data_directory, basename, SUFFIX)
     end
 

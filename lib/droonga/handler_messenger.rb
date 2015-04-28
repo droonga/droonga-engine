@@ -17,6 +17,7 @@ require "time"
 
 require "droonga/replier"
 require "droonga/forwarder"
+require "droonga/timestamp"
 
 module Droonga
   class HandlerMessenger
@@ -121,10 +122,8 @@ module Droonga
       "[#{Process.ppid}] handler_messenger"
     end
 
-    MICRO_SECONDS_DECIMAL_PLACE = 6
-
     def new_date
-      Time.now.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+      Timestamp.stringify(Time.now)
     end
   end
 end

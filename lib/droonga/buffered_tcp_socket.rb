@@ -18,6 +18,7 @@
 require "coolio"
 
 require "droonga/loggable"
+require "droonga/timestamp"
 
 module Droonga
   class BufferedTCPSocket < Coolio::TCPSocket
@@ -158,14 +159,12 @@ module Droonga
       end
 
       private
-      MICRO_SECONDS_DECIMAL_PLACE = 6
-
       def path
         @path ||= create_chunk_file_path
       end
 
       def create_chunk_file_path
-        basename = @time_stamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+        basename = Timestamp.stringify(@time_stamp)
         if @uniqueness
           @data_directory + "#{basename}.#{@uniqueness}.#{@revision}#{SUFFIX}"
         else
