@@ -151,7 +151,7 @@ module Droonga
 
     def run_last_message_timestamp_observer
       Timestamp.run_last_message_timestamp_observer(@loop) do |timestamp|
-        logger.trace("last message stamp file is modified",
+        logger.trace("last message timestamp file is modified",
                      :loaded  => timestamp,
                      :current => @last_message_timestamp)
         if timestamp
