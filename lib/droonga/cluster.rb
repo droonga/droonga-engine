@@ -153,7 +153,7 @@ module Droonga
     def forward(message, destination)
       receiver = destination["to"]
       receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
-      raise NotStartedYet unless @engine_nodes
+      raise NotStartedYet.new unless @engine_nodes
       @engine_nodes.each do |node|
         if node.name == receiver_node_name
           node.forward(message, destination)
