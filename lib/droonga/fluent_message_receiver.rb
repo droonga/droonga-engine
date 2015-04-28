@@ -24,6 +24,13 @@ module Droonga
   class FluentMessageReceiver
     include Loggable
 
+    class InvalidObject < StandardError
+      def initialize(object)
+        message = "no valid tag information"
+        super(message, :object => obejct)
+      end
+    end
+
     def initialize(loop, options={}, &on_message)
       @loop = loop
       @listen_fd = options[:listen_fd]
@@ -223,20 +230,31 @@ module Droonga
       def feed(data)
         @unpacker.feed_each(data) do |object|
           logger.trace("Client: feed_each: start", :object => object)
+          begin
+          raise InvalidObject.new(object) unless object.is_a?(Array)
           tag = object[0]
+          raise InvalidObject.new(object) unless tag.is_a?(String)
           case object[1]
           when String # PackedForward message
+            raise InvalidObject.new(object) unless object.size == 2
             entries = MessagePack.unpack(object[1])
           when Array # Forward message
+            raise InvalidObject.new(object) unless object.size == 2
             entries = object[1]
           when Integer, Float # Message message
+            raise InvalidObject.new(object) unless object.size == 3
             entries = [[object[1], object[2]]]
           else
-            logger.error("unknown message", :message => object)
+            logger.error("unknown type message: couldn't detect entries",
+                         :message => object)
             next
           end
+          raise InvalidObject.new(object) unless entries.is_a?(Array)
           entries.each do |time, record|
             @on_message.call(tag, time || Time.now.to_i, record)
+          end
+          rescue InvalidObject => error
+            logger.error("invalid object received", :object => object)
           end
           logger.trace("Client: feed_each: done")
         end
