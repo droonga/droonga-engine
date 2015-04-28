@@ -24,6 +24,9 @@ module Droonga
   class BufferedTCPSocket < Coolio::TCPSocket
     include Loggable
 
+    class AlreadyInWritingByOthers < StandardError
+    end
+
     def initialize(socket, data_directory)
       super(socket)
       @data_directory = data_directory
@@ -47,6 +50,7 @@ module Droonga
       until @_write_buffer.empty?
         chunk = @_write_buffer.shift
         begin
+          chunk.writing
           logger.trace("Sending...", :data => chunk.data)
           written_size = @_io.write_nonblock(chunk.data)
           if written_size == chunk.data.bytesize
@@ -60,14 +64,18 @@ module Droonga
             @_write_buffer.unshift(chunk)
             break
           end
+        rescue AlreadyInWritingByOthers
+          logger.trace("Chunk is already in sending by another process.")
         rescue Errno::EINTR
           @_write_buffer.unshift(chunk)
+          chunk.failed
           logger.trace("Failed to send chunk. Retry later.",
                        :chunk => chunk,
                        :errpr => "Errno::EINTR")
           return
         rescue SystemCallError, IOError, SocketError => exception
           @_write_buffer.unshift(chunk)
+          chunk.failed
           logger.trace("Failed to send chunk. Retry later.",
                        :chunk => chunk,
                        :exception => exception)
@@ -121,6 +129,7 @@ module Droonga
 
     class Chunk
       SUFFIX = ".chunk"
+      WRITING_SUFFIX = ".writing"
 
       class << self
         def load(path)
@@ -152,6 +161,20 @@ module Droonga
         end
       end
 
+      def writing
+        raise AlreadyInWritingByOthers.new if writing?
+        FileUtils.mv(path.to_s, writing_path.to_s)
+      end
+
+      def writing?
+        not path.exist?
+      end
+
+      def failed
+        return unless writing?
+        FileUtils.mv(writing_path.to_s, path.to_s)
+      end
+
       def written
         FileUtils.rm_f(path.to_s)
       end
@@ -166,6 +189,10 @@ module Droonga
       private
       def path
         @path ||= create_chunk_file_path
+      end
+
+      def writing_path
+        @writing_path ||= Pathname("#{path.to_s}#{WRITING_SUFFIX}")
       end
 
       def create_chunk_file_path
