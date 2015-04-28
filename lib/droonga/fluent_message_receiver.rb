@@ -27,14 +27,14 @@ module Droonga
     class InvalidObject < StandardError
       def initialize(object)
         message = "no valid tag information"
-        super(message, :object => obejct)
+        super(message, :object => object)
       end
     end
 
     class UnknownTypeEntries < StandardError
       def initialize(object)
         message = "unknown type message: couldn't detect entries"
-        super(message, :object => obejct)
+        super(message, :object => object)
       end
     end
 
