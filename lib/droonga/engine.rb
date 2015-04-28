@@ -144,7 +144,8 @@ module Droonga
     end
 
     def save_last_message_timestamp
-      logger.trace("save_last_message_timestamp: start")
+      logger.trace("save_last_message_timestamp: start",
+                   :current => @last_message_timestamp)
       Timestamp.last_message_timestamp = @last_message_timestamp
       logger.trace("save_last_message_timestamp: done")
     end
@@ -158,6 +159,8 @@ module Droonga
           if @last_message_timestamp.nil? or
                timestamp > @last_message_timestamp
             @last_message_timestamp = timestamp
+          else
+            Timestamp.last_message_timestamp = @last_message_timestamp
           end
         end
       end
