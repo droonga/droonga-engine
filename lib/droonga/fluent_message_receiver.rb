@@ -241,7 +241,7 @@ module Droonga
           logger.trace("Client: feed_each: start", :object => object)
           begin
             handle_feeded_object(object)
-          rescue InvalidObject, UnknownTypeEntries => error
+          rescue InvalidObject, UnknownTypeEntries, MessagePack::MalformedFormatError => error
             logger.exception("failed to process feeded object", error)
           end
           logger.trace("Client: feed_each: done")
