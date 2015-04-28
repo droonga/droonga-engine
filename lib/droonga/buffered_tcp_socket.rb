@@ -34,7 +34,8 @@ module Droonga
     end
 
     def write(data)
-      chunk = Chunk.new(@data_directory, data, Time.now, 0)
+      chunk = Chunk.new(:directory => @data_directory,
+                        :data      => data)
       chunk.buffering
       @_write_buffer << chunk
       schedule_write
@@ -118,20 +119,26 @@ module Droonga
       class << self
         def load(path)
           data_directory = path.dirname
-          time_stamp1, time_stamp2, revision, = path.basename.to_s.split(".", 4)
+          time_stamp1, time_stamp2, uniqueness, revision, = path.basename.to_s.split(".", 5)
           data = path.open("rb") {|file| file.read}
           time_stamp = Time.iso8601("#{time_stamp1}.#{time_stamp2}")
           revision = Integer(revision)
-          new(data_directory, data, time_stamp, revision)
+          new(:directory  => data_directory,
+              :data       => data,
+              :time_stamp => time_stamp,
+              :uniqueness => uniqueness,
+              :revision   => revision)
         end
       end
 
       attr_reader :data, :time_stamp
-      def initialize(data_directory, data, time_stamp, revision)
-        @data_directory = data_directory
-        @data = data
-        @time_stamp = time_stamp.utc
-        @revision = revision
+      def initialize(params)
+        @data_directory = params[:directory]
+        @data = params[:data]
+        @time_stamp = params[:time_stamp] || Time.now
+        @time_stamp = @time_stamp.utc
+        @uniqueness = params[:uniqueness]
+        @revision = params[:revision] || 0
       end
 
       def buffering
@@ -152,8 +159,19 @@ module Droonga
       end
 
       private
+      MICRO_SECONDS_DECIMAL_PLACE = 6
+
       def path
-        @data_directory + "#{@time_stamp.iso8601(6)}.#{@revision}.#{SUFFIX}"
+        @path ||= create_chunk_file_path
+      end
+
+      def create_chunk_file_path
+        basename = @time_stamp.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
+        if @uniqueness
+          @data_directory + "#{basename}.#{@uniqueness}.#{@revision}#{SUFFIX}"
+        else
+          Path.unique_file_path(@data_directory, basename, "#{@revision}#{SUFFIX}")
+        end
       end
     end
   end
