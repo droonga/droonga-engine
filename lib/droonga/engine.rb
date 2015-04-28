@@ -62,7 +62,6 @@ module Droonga
       logger.trace("start: start")
       @state.on_ready = lambda do
         on_ready
-        serf = Serf.new(@name.to_s)
         serf.set_tag(Serf::Tag.internal_node_name, @internal_name)
       end
       @state.on_failure = lambda do
@@ -146,12 +145,10 @@ module Droonga
 
     def export_last_message_timestamp_to_cluster
       logger.trace("export_last_message_timestamp_to_cluster: start")
-      @last_message_timestamp ||= read_last_message_timestamp
+      @last_message_timestamp ||= read_last_message_timestamp_file
       if @last_message_timestamp
         timestamp = @last_message_timestamp
-        serf = Serf.new(@name)
-        old_timestamp = serf.last_message_timestamp
-        old_timestamp = Time.parse(old_timestamp) if old_timestamp
+        old_timestamp = read_last_message_timestamp_tag
         logger.trace("export_last_message_timestamp_to_cluster: check",
                      :old     => old_timestamp,
                      :current => @last_message_timestamp)
@@ -167,7 +164,7 @@ module Droonga
 
     def export_last_message_timestamp_to_file
       logger.trace("export_last_message_timestamp_to_file: start")
-      old_timestamp = read_last_message_timestamp
+      old_timestamp = read_last_message_timestamp_file
       logger.trace("export_last_message_timestamp_to_file: check",
                    :loaded  => old_timestamp,
                    :current => @last_message_timestamp)
@@ -189,7 +186,7 @@ module Droonga
       path = Path.last_message_timestamp
       observer = FileObserver.new(@loop, path)
       observer.on_change = lambda do
-        timestamp = read_last_message_timestamp
+        timestamp = read_last_message_timestamp_file
         logger.trace("last message stamp file is modified",
                      :loaded  => timestamp,
                      :current => @last_message_timestamp)
@@ -205,12 +202,22 @@ module Droonga
       observer
     end
 
-    def read_last_message_timestamp
+    def read_last_message_timestamp_file
       file = Path.last_message_timestamp
       return nil unless file.exist?
       timestamp = file.read
       return nil if timestamp.nil? or timestamp.empty?
       Time.parse(timestamp)
+    end
+
+    def read_last_message_timestamp_tag
+      old_timestamp = serf.last_message_timestamp
+      old_timestamp = Time.parse(old_timestamp) if old_timestamp
+      old_timestamp
+    end
+
+    def serf
+      @serf ||= Serf.new(@name.to_s)
     end
 
     def log_tag
