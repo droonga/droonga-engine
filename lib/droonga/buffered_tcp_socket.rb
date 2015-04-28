@@ -55,9 +55,15 @@ module Droonga
           end
         rescue Errno::EINTR
           @_write_buffer.unshift(chunk)
+          logger.trace("Failed to send chunk. Retry later.",
+                       :chunk => chunk,
+                       :errpr => "Errno::EINTR")
           return
-        rescue SystemCallError, IOError, SocketError
+        rescue SystemCallError, IOError, SocketError => exception
           @_write_buffer.unshift(chunk)
+          logger.trace("Failed to send chunk. Retry later.",
+                       :chunk => chunk,
+                       :exception => exception)
           return close
         end
       end
