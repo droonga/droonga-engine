@@ -24,6 +24,8 @@ module Droonga
     ABSORB_SOURCE      = "absorb-source"
     ABSORB_DESTINATION = "absorb-destination"
 
+    ANY = "any"
+
     ROLES = [
       SERVICE_PROVIDER,
       ABSORB_SOURCE,

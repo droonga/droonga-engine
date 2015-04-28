@@ -34,6 +34,12 @@ module Droonga
     class UnknownTarget < StandardError
     end
 
+    class NoAcceptableReceiver < StandardError
+      def initialize(message)
+        super(message.inspect)
+      end
+    end
+
     class << self
       def load_state_file
         path = Path.cluster_state
@@ -161,6 +167,30 @@ module Droonga
         end
       end
       raise UnknownTarget.new(receiver)
+    end
+
+    def bounce(message)
+      role = message["targetRole"]
+      logger.info("bounce: trying to bounce message to another " +
+                    "node with the role: #{role}")
+      raise NotStartedYet.new unless @engine_nodes
+
+      acceptable_nodes = engine_nodes.select do |node|
+        node.role == role and
+          node.live?
+      end
+      receiver = acceptable_nodes.sample
+      if receiver
+        destination = {
+          "to"   => receiver.name,
+          "type" => message["type"],
+        }
+        receiver.forward(message, destination)
+      else
+        logger.error("bounce: no available node with the role #{role}",
+                     :message => message)
+        # raise NoAcceptableReceiver.new(message)
+      end
     end
 
     def engine_node_names

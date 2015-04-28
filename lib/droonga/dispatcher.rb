@@ -350,7 +350,17 @@ module Droonga
       @engine_state.public_farm_path(route)
     end
 
+    def acceptable_role?(message)
+      message["targetRole"].nil? or
+        message["targetRole"] == NodeRole::ANY or
+        message["targetRole"] == NodeRole.mine
+    end
+
     def process_input_message(message)
+      unless acceptable_role?(message)
+        @cluster.bounce(message)
+        return
+      end
       dataset = message["dataset"]
       adapter_runner = @adapter_runners[dataset]
       adapted_message = adapter_runner.adapt_input(message)

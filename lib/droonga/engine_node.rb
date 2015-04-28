@@ -102,6 +102,10 @@ module Droonga
       end
     end
 
+    def live?
+      @state.nil? or @state["live"]
+    end
+
     def forwardable?
       return false unless live?
       role == NodeRole.mine
@@ -178,10 +182,6 @@ module Droonga
       else
         NodeRole::SERVICE_PROVIDER
       end
-    end
-
-    def live?
-      @state.nil? or @state["live"]
     end
 
     def have_unprocessed_messages?
