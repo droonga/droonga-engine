@@ -177,6 +177,7 @@ module Droonga
 
       def written
         FileUtils.rm_f(path.to_s)
+        FileUtils.rm_f(writing_path.to_s)
       end
 
       def written_partial(size)
