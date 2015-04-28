@@ -253,13 +253,13 @@ module Droonga
         raise InvalidObject.new(object) unless tag.is_a?(String)
 
         case object[1]
-        when String # PackedForward message
+        when String # PackedForward message [tag, "packed entries"]
           raise InvalidObject.new(object) unless object.size == 2
           entries = MessagePack.unpack(object[1])
-        when Array # Forward message
+        when Array # Forward message [tag, [entry, entry...]]
           raise InvalidObject.new(object) unless object.size == 2
           entries = object[1]
-        when Integer, Float # Message message
+        when Integer, Float # Message message [tag, time, record]
           raise InvalidObject.new(object) unless object.size == 3
           entries = [[object[1], object[2]]]
         else
