@@ -151,6 +151,9 @@ module Droonga
         serf = Serf.new(@name)
         old_timestamp = serf.last_message_timestamp
         old_timestamp = Time.parse(old_timestamp) if old_timestamp
+        logger.trace("export_last_message_timestamp_to_cluster: check",
+                     :old     => old_timestamp,
+                     :current => @last_message_timestamp)
         if old_timestamp.nil? or timestamp > old_timestamp
           timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
           serf.last_message_timestamp = timestamp
@@ -162,9 +165,14 @@ module Droonga
     end
 
     def export_last_message_timestamp_to_file
+      logger.trace("export_last_message_timestamp_to_file: start")
       old_timestamp = read_last_message_timestamp
+      logger.trace("export_last_message_timestamp_to_file: check",
+                   :loaded  => old_timestamp,
+                   :current => @last_message_timestamp)
       if old_timestamp and
            old_timestamp > @last_message_timestamp
+        logger.trace("export_last_message_timestamp_to_file: skipped")
         return
       end
       path = Path.last_message_timestamp
@@ -173,6 +181,7 @@ module Droonga
         timestamp = timestamp.utc.iso8601(MICRO_SECONDS_DECIMAL_PLACE)
         output.puts(timestamp)
       end
+      logger.trace("export_last_message_timestamp_to_file: done")
     end
 
     def run_last_message_timestamp_observer
@@ -180,6 +189,9 @@ module Droonga
       observer = FileObserver.new(@loop, path)
       observer.on_change = lambda do
         timestamp = read_last_message_timestamp
+        logger.trace("last message stamp file is modified",
+                     :loaded  => timestamp,
+                     :current => @last_message_timestamp)
         if timestamp
           if @last_message_timestamp.nil? or
                timestamp > @last_message_timestamp
