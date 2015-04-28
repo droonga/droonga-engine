@@ -202,6 +202,9 @@ module Droonga
     def latest_last_message_timestamp
       send_query("export_last_message_timestamp",
                  "node" => @name.to_s)
+      # Wait until the query is completely processed by the node
+      # and and the timestamp is correctly exported to its tag.
+      sleep(10)
       last_message_timestamp
     end
 
