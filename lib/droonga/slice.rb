@@ -26,7 +26,8 @@ module Droonga
     include Loggable
     include Deferrable
 
-    def initialize(dataset, loop, options={})
+    def initialize(label, dataset, loop, options={})
+      @label = label
       @dataset = dataset
       @loop = loop
       @options = options
@@ -118,6 +119,7 @@ module Droonga
 
       config = Supervisor::WorkerConfiguration.new
       config.name = @options[:name]
+      config.label = @label
       config.dataset = @dataset
       config.database_path = @database_path
       config.plugins = @options[:plugins]

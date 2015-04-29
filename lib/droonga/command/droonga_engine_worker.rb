@@ -40,6 +40,7 @@ module Droonga
         @contrtol_read_fd = nil
         @contrtol_write_fd = nil
         @pid_file_path = nil
+        @label = nil
         @dataset = nil
         @database_path = nil
         @plugins = []
@@ -90,6 +91,10 @@ module Droonga
         parser.on("--pid-file=PATH",
                   "Put PID to PATH") do |path|
           @pid_file_path = Pathname.new(path)
+        end
+        parser.on("--label=LABEL",
+                  "Use given value as the label") do |label|
+          @label = label
         end
         parser.on("--dataset=DATASET",
                   "Process DATASET") do |dataset|
@@ -181,6 +186,7 @@ module Droonga
 
       def start_handler_runner
         options = {
+          :label     => @label,
           :forwarder => @forwarder,
           :dataset   => @dataset,
           :database  => @database_path.to_s,

@@ -35,9 +35,10 @@ module Droonga
       end
     end
 
-    attr_reader :messenger, :loop
-    def initialize(name, context, messenger, loop)
+    attr_reader :label, :messenger, :loop
+    def initialize(name, label, context, messenger, loop)
       @name = name
+      @label = label
       @context = context
       @messenger = messenger
       @loop = loop

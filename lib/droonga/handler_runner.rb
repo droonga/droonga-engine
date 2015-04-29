@@ -28,6 +28,7 @@ module Droonga
       @loop = loop
       @options = options
       @name = options[:name]
+      @label = options[:label]
       @dataset_name = options[:dataset]
       @database_name = options[:database]
       prepare
@@ -112,7 +113,7 @@ module Droonga
       handler_message.validate
 
       messenger = HandlerMessenger.new(@forwarder, handler_message, @options)
-      handler = handler_class.new(@name, @context, messenger, @loop)
+      handler = handler_class.new(@name, @label, @context, messenger, @loop)
       begin
         result = handler.handle(handler_message)
         unless result.nil?

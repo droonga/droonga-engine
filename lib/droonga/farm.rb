@@ -40,7 +40,7 @@ module Droonga
       slices = @catalog.slices(name)
       slices.each do |slice_name, slice_options|
         dataset = @catalog.datasets[slice_options[:dataset]]
-        slice = Droonga::Slice.new(dataset,
+        slice = Droonga::Slice.new(slice_name, dataset,
                                    @loop,
                                    @options.merge(slice_options))
         @slices[slice_name] = slice

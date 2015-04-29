@@ -78,6 +78,7 @@ module Droonga
 
     class WorkerConfiguration
       attr_accessor :name
+      attr_accessor :label
       attr_accessor :dataset
       attr_accessor :database_path
       attr_accessor :plugins
@@ -85,6 +86,7 @@ module Droonga
       attr_accessor :internal_connection_lifetime
       def initialize
         @name = nil
+        @label = nil
         @dataset = nil
         @database_path = nil
         @plugins = []
@@ -116,6 +118,7 @@ module Droonga
           "--control-write-fd", control_read_out.fileno.to_s,
           "--job-queue-socket-path", @config.job_pusher.socket_path.to_s,
           "--pid-file", pid_path.to_s,
+          "--label", @config.label,
           "--dataset", @config.dataset.name,
           "--database-path", @config.database_path.to_s,
           "--plugins", @config.plugins.join(","),

@@ -55,16 +55,8 @@ module Droonga
       class StatisticsObjectCountPerVolumeHandler < StatisticsObjectCountHandler
         def handle(message)
           {
-            replica_name => counts(message.request["output"]),
+            label => counts(message.request["output"]),
           }
-        end
-
-        def replica_name
-          my_node_name
-        end
-
-        def my_node_name
-          ENV["DROONGA_ENGINE_NAME"]
         end
       end
 
