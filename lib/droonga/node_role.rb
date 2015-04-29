@@ -64,7 +64,7 @@ module Droonga
     end
 
     def normalize(role)
-      role = role.downcase
+      role = role.to_s.downcase
       role = SERVICE_PROVIDER unless valid?(role)
       role
     end
