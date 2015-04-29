@@ -5,16 +5,30 @@
       },
       "replicas": [
         {
-          "label": "replica000",
-          "volume": {
-            "address": "127.0.0.1:23003/droonga.000"
-          }
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice000",
+              "weight": 100,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.000"
+              }
+            }
+          ]
         },
         {
-          "label": "replica010",
-          "volume": {
-            "address": "127.0.0.1:23003/droonga.000"
-          }
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice010",
+              "weight": 100,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.010"
+              }
+            }
+          ]
         }
       ]
     }

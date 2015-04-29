@@ -3,13 +3,13 @@
   "statusCode": 200,
   "type": "system.statistics.object.count.per-volume.result",
   "body": {
-    "127.0.0.1:42300/droonga.000": {
+    "127.0.0.1:23003/droonga.000": {
       "tables":  1,
       "columns": 0,
       "records": 1,
       "total":   2
     },
-    "127.0.0.1:42300/droonga.010": {
+    "127.0.0.1:23003/droonga.010": {
       "tables":  1,
       "columns": 0,
       "records": 1,
