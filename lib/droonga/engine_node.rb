@@ -102,6 +102,14 @@ module Droonga
       end
     end
 
+    def role
+      if @state
+        @state["role"]
+      else
+        NodeRole::SERVICE_PROVIDER
+      end
+    end
+
     def live?
       @state.nil? or @state["live"]
     end
@@ -174,14 +182,6 @@ module Droonga
         :port => $2,
         :tag  => $3,
       }
-    end
-
-    def role
-      if @state
-        @state["role"]
-      else
-        NodeRole::SERVICE_PROVIDER
-      end
     end
 
     def have_unprocessed_messages?
