@@ -20,11 +20,11 @@ require "droonga/serf/tag"
 
 module Droonga
   class NodeRole
-    SERVICE_PROVIDER   = "service-provider"
-    ABSORB_SOURCE      = "absorb-source"
-    ABSORB_DESTINATION = "absorb-destination"
+    SERVICE_PROVIDER   = "service-provider".downcase
+    ABSORB_SOURCE      = "absorb-source".downcase
+    ABSORB_DESTINATION = "absorb-destination".downcase
 
-    ANY = "any"
+    ANY = "any".downcase
 
     ROLES = [
       SERVICE_PROVIDER,
@@ -41,7 +41,8 @@ module Droonga
         if Path.serf_tags_file.exist?
           tags = Path.serf_tags_file.read
           tags = JSON.parse(tags)
-          return tags[Serf::Tag.node_role] if tags[Serf::Tag.node_role]
+          role_from_tag = tags[Serf::Tag.node_role]
+          return role_from_tag.downcase if role_from_tag
         end
         SERVICE_PROVIDER
       rescue Errno::ENOENT, JSON::ParserError
@@ -63,6 +64,7 @@ module Droonga
     end
 
     def normalize(role)
+      role = role.downcase
       role = SERVICE_PROVIDER unless valid?(role)
       role
     end

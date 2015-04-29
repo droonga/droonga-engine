@@ -351,9 +351,9 @@ module Droonga
     end
 
     def acceptable_role?(message)
-      message["targetRole"].nil? or
-        message["targetRole"] == NodeRole::ANY or
-        message["targetRole"] == NodeRole.mine
+      return true unless message["targetRole"]
+      role = message["targetRole"].downcase
+      role == NodeRole::ANY or role == NodeRole.mine
     end
 
     def process_input_message(message)

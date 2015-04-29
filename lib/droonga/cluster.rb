@@ -170,7 +170,7 @@ module Droonga
     end
 
     def bounce(message)
-      role = message["targetRole"]
+      role = message["targetRole"].downcase
       logger.info("bounce: trying to bounce message to another " +
                     "node with the role: #{role}")
       raise NotStartedYet.new unless @engine_nodes
