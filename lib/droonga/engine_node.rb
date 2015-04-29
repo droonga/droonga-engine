@@ -102,6 +102,14 @@ module Droonga
       end
     end
 
+    def bounce(message)
+      destination = {
+        "to"   => name,
+        "type" => message["type"],
+      }
+      output(message, destination)
+    end
+
     def role
       if @state
         @state["role"]

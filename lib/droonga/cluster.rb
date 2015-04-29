@@ -181,11 +181,7 @@ module Droonga
       end
       receiver = acceptable_nodes.sample
       if receiver
-        destination = {
-          "to"   => receiver.name,
-          "type" => message["type"],
-        }
-        receiver.forward(message, destination)
+        receiver.bounce(message)
       else
         logger.error("bounce: no available node with the role #{role}",
                      :message => message)
