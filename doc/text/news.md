@@ -17,6 +17,12 @@
    * `system.status` command: now the reporter node and its internal name is reported as a part of response body.
    * `system.statistics.object.count` command is now available. It is used by command line utilities internally.
    * `system.absorb-data` command is now available. It is used by command line utilities internally.
+ * Message format:
+   * `targetRole` field is introduced to the envelope.
+     Now you can specify the role of the engine node which can process the messsage.
+     If mismatched role node receives the message, it will be bounced to suitable node automatically if possible.
+   * `timeout` field is introduced to the envelope.
+     Now you can specify time to expire the request, in seconds.
  * Command line utilities:
    * `droonga-engine-join` and `droonga-engine-absorb-data` commands work more surely.
    * A new option `--verbose` is introduced to monitor internal Serf operations, for `droonga-engine-join` and `droonga-engine-absorb-data`.
