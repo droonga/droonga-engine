@@ -1,0 +1,12 @@
+{
+  "datasets": {
+    "Default": {
+      "schema": {
+        "Users": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText"
+        }
+      }
+    }
+  }
+}

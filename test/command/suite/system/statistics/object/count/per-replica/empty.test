@@ -1,0 +1,12 @@
+{
+  "type": "system.statistics.object.count.per-replica",
+  "dataset": "Default",
+  "body": {
+    "output": [
+      "tables",
+      "columns",
+      "records",
+      "total"
+    ]
+  }
+}

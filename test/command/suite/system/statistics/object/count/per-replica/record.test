@@ -1,0 +1,23 @@
+#@require-catalog-version 2
+#@disable-logging
+{
+  "type": "add",
+  "dataset": "Default",
+  "body": {
+    "table": "Users",
+    "key": "Adam"
+  }
+}
+#@enable-logging
+{
+  "type": "system.statistics.object.count.per-replica",
+  "dataset": "Default",
+  "body": {
+    "output": [
+      "tables",
+      "columns",
+      "records",
+      "total"
+    ]
+  }
+}
