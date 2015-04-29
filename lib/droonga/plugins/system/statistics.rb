@@ -52,7 +52,7 @@ module Droonga
         step.collector = Collectors::RecursiveSum
       end
 
-      class StatisticsObjectCountPerReplicaHandler < StatisticsObjectCountHandler
+      class StatisticsObjectCountPerVolumeHandler < StatisticsObjectCountHandler
         def handle(message)
           {
             replica_name => counts(message.request["output"]),
@@ -69,9 +69,9 @@ module Droonga
       end
 
       define_single_step do |step|
-        step.name = "system.statistics.object.count.per-replica"
+        step.name = "system.statistics.object.count.per-volume"
         step.use_all_replicas = true
-        step.handler = StatisticsObjectCountPerReplicaHandler
+        step.handler = StatisticsObjectCountPerVolumeHandler
         step.collector = Collectors::Sum
       end
     end

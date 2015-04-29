@@ -1,5 +1,5 @@
 {
-  "type": "system.statistics.object.count.per-replica",
+  "type": "system.statistics.object.count.per-volume",
   "dataset": "Default",
   "body": {
     "output": [

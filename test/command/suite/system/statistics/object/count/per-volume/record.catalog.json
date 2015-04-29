@@ -1,0 +1,26 @@
+{
+  "datasets": {
+    "Default": {
+      "schema": {
+        "Users": {
+          "type": "PatriciaTrie",
+          "keyType": "ShortText"
+        }
+      },
+      "replicas": [
+        {
+          "label": "replica000",
+          "volume": {
+            "address": "127.0.0.1:23003/droonga.000"
+          }
+        },
+        {
+          "label": "replica010",
+          "volume": {
+            "address": "127.0.0.1:23003/droonga.000"
+          }
+        }
+      ]
+    }
+  }
+}
