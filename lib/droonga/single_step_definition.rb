@@ -19,6 +19,7 @@ module Droonga
     attr_accessor :handler
     attr_accessor :collector
     attr_writer :write, :single_operation
+    attr_writer :use_all_replicas
     attr_writer :timeout_calculator
     attr_accessor :inputs
     attr_accessor :output
@@ -29,6 +30,7 @@ module Droonga
       @collector = nil
       @write = false
       @single_operation = false
+      @use_all_replicas = false
       @timeout_calculator = lambda do |step|
         if step["timeout"]
           return step["timeout"]
@@ -50,6 +52,11 @@ module Droonga
     def single_operation?
       return false if @write
       @single_operation
+    end
+
+    def use_all_replicas?
+      return true if @write
+      @use_all_replicas
     end
 
     def timeout_for_step(step)

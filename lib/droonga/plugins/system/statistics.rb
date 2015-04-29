@@ -23,8 +23,11 @@ module Droonga
         include DatabaseScanner
 
         def handle(message)
+          counts(message.request["output"])
+        end
+
+        def counts(output)
           counts = {}
-          output = message.request["output"]
           if output and output.is_a?(Array)
             if output.include?("tables")
               counts["tables"] = n_tables
@@ -47,6 +50,29 @@ module Droonga
         step.name = "system.statistics.object.count"
         step.handler = StatisticsObjectCountHandler
         step.collector = Collectors::RecursiveSum
+      end
+
+      class StatisticsObjectCountPerReplicaHandler < StatisticsObjectCountHandler
+        def handle(message)
+          {
+            replica_name => counts(message.request["output"]),
+          }
+        end
+
+        def replica_name
+          my_node_name
+        end
+
+        def my_node_name
+          ENV["DROONGA_ENGINE_NAME"]
+        end
+      end
+
+      define_single_step do |step|
+        step.name = "system.statistics.object.count.per-replica"
+        step.use_all_replicas = true
+        step.handler = StatisticsObjectCountPerReplicaHandler
+        step.collector = Collectors::Sum
       end
     end
   end

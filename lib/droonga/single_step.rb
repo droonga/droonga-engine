@@ -34,6 +34,7 @@ module Droonga
       planner = Planner.new(@dataset)
       planner.write = @definition.write?
       planner.single_operation = @definition.single_operation?
+      planner.use_all_replicas = @definition.use_all_replicas?
       planner.collector_class = @definition.collector_class
 
       body = message["body"]

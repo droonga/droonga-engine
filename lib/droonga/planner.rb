@@ -22,12 +22,13 @@ module Droonga
     include Loggable
     include ErrorMessages
 
-    attr_writer :write, :single_operation, :collector_class
+    attr_writer :write, :single_operation, :use_all_replicas, :collector_class
 
     def initialize(dataset)
       @dataset = dataset
       @write = false
       @single_operation = false
+      @use_all_replicas = false
       @collector_class = nil
     end
 
@@ -75,6 +76,10 @@ module Droonga
       @single_operation
     end
 
+    def use_all_replicas?
+      write? or @use_all_replicas
+    end
+
     def scatter(message, options={})
       planner = DistributedCommandPlanner.new(@dataset, message)
       scatter_options = {
@@ -95,7 +100,7 @@ module Droonga
       broadcast_options = {
         :write => write?,
       }
-      if write?
+      if use_all_replicas?
         broadcast_options[:replica] = "all"
       elsif single_operation?
         broadcast_options[:slice]   = "random"
