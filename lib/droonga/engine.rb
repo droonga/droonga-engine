@@ -159,7 +159,7 @@ module Droonga
           if @last_message_timestamp.nil? or
                timestamp > @last_message_timestamp
             @last_message_timestamp = timestamp
-          else
+          elsif timestamp < @last_message_timestamp
             Timestamp.last_message_timestamp = @last_message_timestamp
           end
         end
