@@ -15,10 +15,10 @@
 
 class DeleteTest < GroongaHandlerTest
   def create_handler
-    Droonga::Plugins::Groonga::Delete::Handler.new("droonga",
-                                                   @handler.context,
-                                                   @messenger,
-                                                   @loop)
+    Droonga::Plugins::Groonga::Delete::Handler.new(:name      => "droonga",
+                                                   :context   => @handler.context,
+                                                   :messenger => @messenger,
+                                                   :loop      => @loop)
   end
 
   def test_success

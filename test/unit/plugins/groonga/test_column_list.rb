@@ -26,10 +26,10 @@ class ColumnListTest < GroongaHandlerTest
   ]
 
   def create_handler
-    Droonga::Plugins::Groonga::ColumnList::Handler.new("droonga",
-                                                       @handler.context,
-                                                       @messenger,
-                                                       @loop)
+    Droonga::Plugins::Groonga::ColumnList::Handler.new(:name      => "droonga",
+                                                       :context   => @handler.context,
+                                                       :messenger => @messenger,
+                                                       :loop      => @loop)
   end
 
   def virtual_key_column(id, table_name)

@@ -47,18 +47,21 @@ class CatalogVersion2Test < Test::Unit::TestCase
                      "localhost:23003/test.000" => {
                        :database  => "#{base_path}/databases/000/db",
                        :dataset   => "Test",
+                       :label     => "localhost:23003/test.000",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,
                      },
                      "localhost:23003/test.001" => {
                        :database  => "#{base_path}/databases/001/db",
                        :dataset   => "Test",
+                       :label     => "localhost:23003/test.001",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,
                      },
                      "localhost:23003/test.002" => {
                        :database  => "#{base_path}/databases/002/db",
                        :dataset   => "Test",
+                       :label     => "localhost:23003/test.002",
                        :plugins   => ["plugin1", "plugin2", "plugin3"],
                        :n_workers => 4,
                      },

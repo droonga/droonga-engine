@@ -15,10 +15,10 @@
 
 class TableRemoveTest < GroongaHandlerTest
   def create_handler
-    Droonga::Plugins::Groonga::TableRemove::Handler.new("droonga",
-                                                        @handler.context,
-                                                        @messenger,
-                                                        @loop)
+    Droonga::Plugins::Groonga::TableRemove::Handler.new(:name      => "droonga",
+                                                        :context   => @handler.context,
+                                                        :messenger => @messenger,
+                                                        :loop      => @loop)
   end
 
   def setup

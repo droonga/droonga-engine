@@ -52,10 +52,10 @@ class WatchHandlerTest < Test::Unit::TestCase
   public
   class SubscribeTest < self
     def create_plugin
-      Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
-                                                    @handler.context,
-                                                    @messenger,
-                                                    @loop)
+      Droonga::Plugins::Watch::SubscribeHandler.new(:name      => "droonga",
+                                                    :context   => @handler.context,
+                                                    :messenger => @messenger,
+                                                    :loop      => @loop)
     end
 
     def test_subscribe
@@ -119,10 +119,10 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
 
     def create_plugin
-      Droonga::Plugins::Watch::UnsubscribeHandler.new("droonga",
-                                                      @handler.context,
-                                                      @messenger,
-                                                      @loop)
+      Droonga::Plugins::Watch::UnsubscribeHandler.new(:name      => "droonga",
+                                                      :context   => @handler.context,
+                                                      :messenger => @messenger,
+                                                      :loop      => @loop)
     end
 
     def test_unsubscribe
@@ -154,10 +154,10 @@ class WatchHandlerTest < Test::Unit::TestCase
     end
 
     def create_plugin
-      Droonga::Plugins::Watch::FeedHandler.new("droonga",
-                                               @handler.context,
-                                               @messenger,
-                                               @loop)
+      Droonga::Plugins::Watch::FeedHandler.new(:name      => "droonga",
+                                               :context   => @handler.context,
+                                               :messenger => @messenger,
+                                               :loop      => @loop)
     end
 
     def test_feed_match
@@ -200,10 +200,10 @@ class WatchHandlerTest < Test::Unit::TestCase
       }
       message = Droonga::Test::StubHandlerMessage.new(request, {})
       subscribe_handler =
-        Droonga::Plugins::Watch::SubscribeHandler.new("droonga",
-                                                      @handler.context,
-                                                      @messenger,
-                                                      @loop)
+        Droonga::Plugins::Watch::SubscribeHandler.new(:name      => "droonga",
+                                                      :context   => @handler.context,
+                                                      :messenger => @messenger,
+                                                      :loop      => @loop)
       response = subscribe_handler.handle(message)
       assert_equal(SUCCESS_RESULT, response)
     end

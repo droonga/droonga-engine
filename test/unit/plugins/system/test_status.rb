@@ -31,10 +31,10 @@ class SystemStatusHandlerTest < Test::Unit::TestCase
     @messenger.cluster = StubCluster.new
     @messenger.engine_state = StubEngineState.new
     @loop = nil
-    @handler = Droonga::Plugins::System::StatusHandler.new("name",
-                                                           @worker.context,
-                                                           @messenger,
-                                                           @loop)
+    @handler = Droonga::Plugins::System::StatusHandler.new(:name      => "name",
+                                                           :context   => @worker.context,
+                                                           :messenger => @messenger,
+                                                           :loop      => @loop)
   end
 
   def teardown_handler

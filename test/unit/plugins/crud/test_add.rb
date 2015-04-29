@@ -37,10 +37,10 @@ class CRUDAddHandlerTest < Test::Unit::TestCase
     @worker = StubWorker.new
     @messenger = Droonga::Test::StubHandlerMessenger.new
     @loop = nil
-    @handler = Droonga::Plugins::CRUD::Handler.new("name",
-                                                   @worker.context,
-                                                   @messenger,
-                                                   @loop)
+    @handler = Droonga::Plugins::CRUD::Handler.new(:name      => "name",
+                                                   :context   => @worker.context,
+                                                   :messenger => @messenger,
+                                                   :loop      => @loop)
   end
 
   def teardown_handler
