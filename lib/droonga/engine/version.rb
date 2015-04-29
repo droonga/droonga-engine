@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -15,6 +15,6 @@
 
 module Droonga
   class Engine
-    VERSION = "1.1.0"
+    VERSION = "1.1.1"
   end
 end
