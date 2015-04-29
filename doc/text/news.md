@@ -16,6 +16,7 @@
    * `Collectors::RecursiveSum` is introduced.
    * `system.status` command: now the reporter node and its internal name is reported as a part of response body.
    * `system.statistics.object.count` command is now available. It is used by command line utilities internally.
+   * `system.statistics.object.count.per-volume` command is now available. It is useful to confirm equivalence of replicas.
    * `system.absorb-data` command is now available. It is used by command line utilities internally.
  * Message format:
    * `targetRole` field is introduced to the envelope.
