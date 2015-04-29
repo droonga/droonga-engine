@@ -49,6 +49,7 @@ TEMPDIR=/tmp/install-$NAME
 : ${VERSION:=release}
 : ${HOST:=Auto Detect}
 : ${PORT:=10031}
+: ${INSTALL_FROM_REPOSITORY:=$NAME}
 
 case $(uname) in
   Darwin|*BSD|CYGWIN*) sed="sed -E" ;;
@@ -223,11 +224,32 @@ install_gem_from_repository() {
 install_from_repository() {
   gem install bundler --no-ri --no-rdoc
 
-  install_gem_from_repository rroonga $RROONGA_REPOSITORY_URL
-  install_gem_from_repository groonga-command $GROONGA_COMMAND_REPOSITORY_URL
-  install_gem_from_repository groonga-command-parser $GROONGA_COMMAND_PARSER_REPOSITORY_URL
-  install_gem_from_repository droonga-client-ruby $DROONGA_CLIENT_RUBY_REPOSITORY_URL
-  install_gem_from_repository drndump $DRNDUMP_REPOSITORY_URL
+  if echo "$INSTALL_FROM_REPOSITORY" | grep "rroonga"
+  then
+    install_gem_from_repository rroonga $RROONGA_REPOSITORY_URL
+    install_gem_from_repository groonga-command $GROONGA_COMMAND_REPOSITORY_URL
+    install_gem_from_repository groonga-command-parser $GROONGA_COMMAND_PARSER_REPOSITORY_URL
+  else
+    rm -rf $TEMPDIR/rroonga
+    rm -rf $TEMPDIR/groonga-command
+    rm -rf $TEMPDIR/groonga-command-parser
+  fi
+
+  if echo "$INSTALL_FROM_REPOSITORY" | grep "client"
+  then
+    install_gem_from_repository droonga-client-ruby $DROONGA_CLIENT_RUBY_REPOSITORY_URL
+  else
+    rm -rf $TEMPDIR/droonga-client-ruby
+  fi
+
+
+  if echo "$INSTALL_FROM_REPOSITORY" | grep "drndump"
+  then
+    install_gem_from_repository drndump $DRNDUMP_REPOSITORY_URL
+  else
+    rm -rf $TEMPDIR/drndump
+  fi
+
   install_gem_from_repository $NAME $REPOSITORY_URL
 }
 
