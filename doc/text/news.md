@@ -4,9 +4,12 @@
 
  * General:
    * Graceful stopping/restarting works correctly with continual inpouring messages.
-   * A new parameter `random` is introduced to single step definitions.
+   * A new parameter `single_operation` is introduced to single step definitions.
      If you set it to `true`, messages for the handler will be delivered to just single volume (one of replicas and slices).
      It is useful for commands which has to be executed only once in a cluster, like `system.status`.
+   * A new parameter `use_all_replicas` is introduced to single step definitions.
+     If you set it to `true`, messages for the handler will be delivered to all replica volumes always.
+     It is useful for commands which has to be executed all replicas, like `system.statistics.object.count.per-volume`.
    * `add` command now accepts requests with automatically-convertible mismatched type keys.
      For example, a string key `"1"` is available for a table with the key type `UInt32`.
    * `dump` command: the value of a column referring any record of another table are correctly exported as its key string, instead of object value (it's invalid value for a message of the `add` command).
