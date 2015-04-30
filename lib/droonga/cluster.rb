@@ -68,7 +68,10 @@ module Droonga
 
       @params = params
       @catalog = params[:catalog]
-      @state = nil
+      @state = params[:state] || {}
+
+      @engine_nodes = nil
+      @on_change = nil
 
       reload
     end
@@ -221,12 +224,15 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(:loop  => @loop,
-                       :name  => name,
-                       :state => node_state,
-                       :auto_close_timeout =>
-                         @params[:internal_connection_lifetime])
+        create_engine_node(:name  => name,
+                           :state => node_state)
       end
+    end
+
+    def create_engine_node(params)
+      EngineNode.new(params.merge(:loop => @loop,
+                                  :auto_close_timeout =>
+                                    @params[:internal_connection_lifetime]))
     end
 
     def log_tag
