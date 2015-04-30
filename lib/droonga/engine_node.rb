@@ -112,7 +112,7 @@ module Droonga
 
     def role
       if @state
-        @state["role"]
+        NodeRole.normalize(@state["role"])
       else
         NodeRole::SERVICE_PROVIDER
       end
