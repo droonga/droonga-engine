@@ -17,6 +17,7 @@ require "droonga/loggable"
 require "droonga/changable"
 require "droonga/path"
 require "droonga/file_observer"
+require "droonga/address"
 require "droonga/engine_node"
 require "droonga/differ"
 
@@ -161,7 +162,7 @@ module Droonga
 
     def forward(message, destination)
       receiver = destination["to"]
-      receiver_node_name = receiver.match(/\A[^:]+:\d+\/[^.]+/).to_s
+      receiver_node_name = Address.parse(receiver).node
       raise NotStartedYet.new unless @engine_nodes
       @engine_nodes.each do |node|
         if node.name == receiver_node_name
