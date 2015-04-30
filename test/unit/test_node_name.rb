@@ -39,6 +39,40 @@ class NodeNameTest < Test::Unit::TestCase
     end
   end
 
+  class DefaultParameterTest < self
+    data(:omitted => {
+           :params => {
+           },
+           :host  => Droonga::NodeName::DEFAULT_HOST,
+           :port  => Droonga::NodeName::DEFAULT_PORT,
+           :tag   => Droonga::NodeName::DEFAULT_TAG,
+         },
+         :nil => {
+           :params => {
+             :host => nil,
+             :port => nil,
+             :tag  => nil,
+           },
+           :host  => Droonga::NodeName::DEFAULT_HOST,
+           :port  => Droonga::NodeName::DEFAULT_PORT,
+           :tag   => Droonga::NodeName::DEFAULT_TAG,
+         },
+         :filled => {
+           :params => {
+             :host => "node29",
+             :port => 2929,
+             :tag  => "test",
+           },
+           :host  => "node29",
+           :port  => 2929,
+           :tag   => "test",
+         })
+    def test_default_parameter(data)
+      assert_equal(node_name(data[:host], data[:port], data[:tag]),
+                   Droonga::NodeName.new(data[:params]))
+    end
+  end
+
   class ParseTest < self
     def parse(string)
       Droonga::NodeName.parse(string)
