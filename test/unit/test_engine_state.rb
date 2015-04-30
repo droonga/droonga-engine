@@ -35,6 +35,20 @@ class EngineStateTest < Test::Unit::TestCase
                              :internal_name => INTERNAL_NODE_NAME)
   end
 
+  data(:public => PUBLIC_NODE_NAME,
+       :internal => INTERNAL_NODE_NAME,
+       :public_with_local => "#{PUBLIC_NODE_NAME}.\#1",
+       :internal_with_local => "#{INTERNAL_NODE_NAME}.\#1")
+  def test_local_route(route)
+    assert_true(@state.local_route?(route))
+  end
+
+  data(:foreign => "node30:2929/droonga",
+       :foreign_with_logal => "node30:2929/droonga.\#1")
+  def test_not_local_route(route)
+    assert_false(@state.local_route?(route))
+  end
+
   data(:public => {
          :route    => PUBLIC_NODE_NAME,
          :expected => INTERNAL_NODE_NAME,
