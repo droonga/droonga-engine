@@ -36,12 +36,7 @@ module Droonga
       @state = params[:state]
       logger.trace("initialize: start")
 
-      @buffer = ForwardBuffer.new(name)
-      boundary_timestamp = accept_messages_newer_than_timestamp
-      @buffer.process_messages_newer_than(boundary_timestamp)
-      @buffer.on_forward = lambda do |message, destination|
-        output(message, destination)
-      end
+      @buffer = create_buffer
 
       @node_name = NodeName.parse(@name)
 
@@ -184,6 +179,16 @@ module Droonga
     private
     def sender_role
       NodeRole.mine
+    end
+
+    def create_buffer
+      buffer = ForwardBuffer.new(@name)
+      boundary_timestamp = accept_messages_newer_than_timestamp
+      buffer.process_messages_newer_than(boundary_timestamp)
+      buffer.on_forward = lambda do |message, destination|
+        output(message, destination)
+      end
+      buffer
     end
 
     def have_unprocessed_messages?
