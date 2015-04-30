@@ -112,6 +112,35 @@ class NodeNameTest < Test::Unit::TestCase
     end
   end
 
+  class AttributeTest < self
+    def test_attributes
+      node_name = node_name("192.168.0.1", 2929, "droonga")
+      assert_equal({:host => "192.168.0.1",
+                    :port => 2929,
+                    :tag  => "droonga"},
+                   {:host => node_name.host,
+                    :port => node_name.port,
+                    :tag  => node_name.tag})
+    end
+  end
+
+  class ComparisonTest < self
+    def test_node_name_vs_string
+      string    = "192.168.0.1:2929/droonga"
+      node_name = node_name("192.168.0.1", 2929, "droonga")
+      assert_true(node_name == string)
+    end
+
+    #XXX This is a confusable behavior. It seems should be true
+    #    but actually false, so you have to be careful when you
+    #    compare string with Nodename.
+    def test_string_vs_node_name
+      string    = "192.168.0.1:2929/droonga"
+      node_name = node_name("192.168.0.1", 2929, "droonga")
+      assert_false(string == node_name)
+    end
+  end
+
   class FormatterTest < self
     def test_node
       assert_equal("192.168.0.1:2929/droonga",
@@ -121,6 +150,11 @@ class NodeNameTest < Test::Unit::TestCase
     def test_string
       assert_equal("192.168.0.1:2929/droonga",
                    node_name("192.168.0.1", 2929, "droonga").to_s)
+    end
+
+    def test_array
+      assert_equal(["192.168.0.1", 2929, "droonga"],
+                   node_name("192.168.0.1", 2929, "droonga").to_a)
     end
   end
 end
