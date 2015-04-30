@@ -215,7 +215,6 @@ module Droonga
     end
 
     def all_node_names
-      raise NoCatalogLoaded.new unless @catalog
       @catalog.all_nodes
     end
 
