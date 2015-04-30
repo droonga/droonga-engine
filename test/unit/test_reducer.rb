@@ -58,6 +58,26 @@ class ReducerTest < Test::Unit::TestCase
       :left     => {:a => 0, :c => 2},
       :right    => {:b => 1, :c => 3},
     },
+    :nested_hash => {
+      :expected => {:a => 0, :b => 1, :c => {:d => 2}},
+      :left     => {:a => 0, :c => {:d => 2}},
+      :right    => {:b => 1, :c => {:e => 3}},
+    },
+    :nil_left => {
+      :expected => 0,
+      :left     => nil,
+      :right    => 0,
+    },
+    :nil_right => {
+      :expected => 0,
+      :left     => 0,
+      :right    => nil,
+    },
+    :nil_both => {
+      :expected => nil,
+      :left     => nil,
+      :right    => nil,
+    },
   )
   def test_sum(data)
     reduced = reduce_value({ "type" => "sum" },
