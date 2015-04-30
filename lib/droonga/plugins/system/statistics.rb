@@ -26,6 +26,7 @@ module Droonga
           counts(message.request["output"])
         end
 
+        private
         def counts(output)
           counts = {}
           if output and output.is_a?(Array)
