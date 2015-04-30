@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Droonga Project
+# Copyright (C) 2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -13,17 +13,16 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "droonga/test"
+class StubSerf
+  def initialize
+    @have_unprocessed_messages_for = {}
+  end
 
-require_relative "helper/sandbox"
-require_relative "helper/fixture"
-require_relative "helper/stub_worker"
-require_relative "helper/plugin_helper"
-require_relative "helper/watch_helper"
-require_relative "helper/distributed_search_planner_helper"
-require_relative "helper/stub_serf"
+  def set_have_unprocessed_messages_for(target)
+    @have_unprocessed_messages_for[target] = true
+  end
 
-class Test::Unit::TestCase
-  include ::Sandbox
-  include ::Fixture
+  def reset_have_unprocessed_messages_for(target)
+    @have_unprocessed_messages_for.delete(target)
+  end
 end
