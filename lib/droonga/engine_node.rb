@@ -119,7 +119,8 @@ module Droonga
     end
 
     def live?
-      @state.nil? or @state["live"]
+      @state.nil? or
+        @state["live"] == true
     end
 
     def forwardable?

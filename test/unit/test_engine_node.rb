@@ -59,4 +59,34 @@ class EngineNodeTest < Test::Unit::TestCase
     assert_false(node(:name => "node29:2929/droonga",
                       :state => state).live?)
   end
+
+  class FromServiceProvider < self
+    class EngineNode < Droonga::EngineNode
+      private
+      def sender_role
+        Droonga::NodeRole::SERVICE_PROVIDER
+      end
+    end
+
+    class ToServiceProvider < self
+      def node(params)
+        EngineNode.new(params)
+      end
+
+      data(:same_role => {
+             "live" => true,
+             "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+           })
+      def test_forwardable(state)
+        assert_true(node(:name => "node29:2929/droonga",
+                         :state => state).forwardable?)
+      end
+
+      data(:dead => { "live" => false })
+      def test_not_forwardable(state)
+        assert_false(node(:name => "node29:2929/droonga",
+                          :state => state).forwardable?)
+      end
+    end
+  end
 end
