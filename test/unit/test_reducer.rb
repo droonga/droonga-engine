@@ -88,6 +88,60 @@ class ReducerTest < Test::Unit::TestCase
 
   data(
     :int => {
+      :expected => 3,
+      :left     => 1,
+      :right    => 2,
+    },
+    :float => {
+      :expected => 3.0,
+      :left     => 1.0,
+      :right    => 2.0,
+    },
+    :string => {
+      :expected => "ab",
+      :left     => "a",
+      :right    => "b",
+    },
+    :array => {
+      :expected => [3],
+      :left     => [1],
+      :right    => [2],
+    },
+    :hash => {
+      :expected => {:a => 0, :b => 1, :c => 5},
+      :left     => {:a => 0, :c => 2},
+      :right    => {:b => 1, :c => 3},
+    },
+    :nested_hash => {
+      :expected => {:a => 0, :b => 1, :c => {:d => 2, :e => 3}},
+      :left     => {:a => 0, :c => {:d => 2}},
+      :right    => {:b => 1, :c => {:e => 3}},
+    },
+    :nil_left => {
+      :expected => 0,
+      :left     => nil,
+      :right    => 0,
+    },
+    :nil_right => {
+      :expected => 0,
+      :left     => 0,
+      :right    => nil,
+    },
+    :nil_both => {
+      :expected => nil,
+      :left     => nil,
+      :right    => nil,
+    },
+  )
+  def test_recursive_sum(data)
+    reduced = reduce_value({ "type" => "recursive-sum" },
+                           data[:left],
+                           data[:right])
+    assert_equal(data[:expected], reduced)
+  end
+
+  data(
+    :int => {
       :expected => 1.5,
       :left     => 1,
       :right    => 2,
