@@ -80,26 +80,36 @@ class EngineNodeTest < Test::Unit::TestCase
     assert_equal(data[:expected], json)
   end
 
+  class Buffered < Droonga::EngineNode
+    private
+    def create_buffer
+      [0]
+    end
+  end
+
+  class NotBuffered < Droonga::EngineNode
+    private
+    def create_buffer
+      []
+    end
+  end
+
   class FromServiceProvider < self
-    class EngineNode < Droonga::EngineNode
+    class BufferedEngineNode < Buffered
       private
       def sender_role
         Droonga::NodeRole::SERVICE_PROVIDER
       end
     end
 
-    class BufferedEngineNode < EngineNode
+    class NotBufferedEngineNode < NotBuffered
       private
-      def create_buffer
-        [0]
+      def sender_role
+        Droonga::NodeRole::SERVICE_PROVIDER
       end
     end
 
-    class NotBufferedEngineNode < EngineNode
-      private
-      def create_buffer
-        []
-      end
+    class EngineNode < NotBufferedEngineNode
     end
 
     data(:same_role => {
@@ -235,25 +245,21 @@ class EngineNodeTest < Test::Unit::TestCase
   end
 
   class FromAbsorbSource < self
-    class EngineNode < Droonga::EngineNode
+    class BufferedEngineNode < Buffered
       private
       def sender_role
         Droonga::NodeRole::ABSORB_SOURCE
       end
     end
 
-    class BufferedEngineNode < EngineNode
+    class NotBufferedEngineNode < NotBuffered
       private
-      def create_buffer
-        [0]
+      def sender_role
+        Droonga::NodeRole::ABSORB_SOURCE
       end
     end
 
-    class NotBufferedEngineNode < EngineNode
-      private
-      def create_buffer
-        []
-      end
+    class EngineNode < NotBufferedEngineNode
     end
 
     data(:same_role => {
