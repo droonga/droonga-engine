@@ -44,7 +44,7 @@ class EngineNodeTest < Test::Unit::TestCase
   end
 
   data(:no_state => nil,
-       :valid => {
+       :live_info => {
          "live" => true,
        })
   def test_live(state)
@@ -52,7 +52,9 @@ class EngineNodeTest < Test::Unit::TestCase
                      :state => state).live?)
   end
 
-  data(:valid => {
+  data(:no_live_info => {
+       },
+       :live_info => {
          "live" => false,
        })
   def test_not_live(state)
