@@ -63,8 +63,8 @@ module Droonga
 
     attr_accessor :catalog
 
-    def initialize(loop, params)
-      @loop = loop
+    def initialize(params)
+      @loop = params[:loop]
 
       @params = params
       @catalog = params[:catalog]

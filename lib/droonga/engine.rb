@@ -46,7 +46,7 @@ module Droonga
                                :catalog  => @catalog,
                                :internal_connection_lifetime =>
                                  options[:internal_connection_lifetime])
-      @cluster = Cluster.new(loop,
+      @cluster = Cluster.new(:loop     => loop,
                              :catalog  => @catalog,
                              :internal_connection_lifetime =>
                                options[:internal_connection_lifetime])
