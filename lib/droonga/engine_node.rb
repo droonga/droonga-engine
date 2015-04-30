@@ -191,7 +191,7 @@ module Droonga
       buffer
     end
 
-    def have_unprocessed_messages?
+    def have_unprocessed_messages_in_other_node?
       @state and @state["have_unprocessed_messages"]
     end
 
@@ -221,7 +221,8 @@ module Droonga
     end
 
     def complete_service_provider?
-      service_provider? and not have_unprocessed_messages?
+      service_provider? and
+        not have_unprocessed_messages_in_other_node?
     end
 
     def really_writable?
