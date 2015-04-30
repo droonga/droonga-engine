@@ -133,7 +133,7 @@ class NodeNameTest < Test::Unit::TestCase
 
     #XXX This is a confusable behavior. It seems should be true
     #    but actually false, so you have to be careful when you
-    #    compare string with Nodename.
+    #    compare string with NodeName.
     def test_string_vs_node_name
       string    = "192.168.0.1:2929/droonga"
       node_name = node_name("192.168.0.1", 2929, "droonga")
