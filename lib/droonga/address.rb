@@ -68,6 +68,9 @@ module Droonga
     end
 
     def ==(other)
+      if other.is_a?(String)
+        return to_s == other
+      end
       other.is_a?(self.class) and to_a == other.to_a
     end
   end
