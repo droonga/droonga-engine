@@ -32,116 +32,116 @@ class ReducerTest < Test::Unit::TestCase
     end
   end
 
-    data(
-      :int => {
-        :expected => 3,
-        :left     => 1,
-        :right    => 2,
-      },
-      :float => {
-        :expected => 3.0,
-        :left     => 1.0,
-        :right    => 2.0,
-      },
-      :string => {
-        :expected => "ab",
-        :left     => "a",
-        :right    => "b",
-      },
-      :array => {
-        :expected => [0, 1],
-        :left     => [0],
-        :right    => [1],
-      },
-      :hash => {
-        :expected => [0, 1],
-        :left     => [0],
-        :right    => [1],
-      },
-    )
-    def test_sum(data)
-      reduced = reduce_value({ "type" => "sum" },
-                             data[:left],
-                             data[:right])
-      assert_equal(data[:expected], reduced)
-    end
+  data(
+    :int => {
+      :expected => 3,
+      :left     => 1,
+      :right    => 2,
+    },
+    :float => {
+      :expected => 3.0,
+      :left     => 1.0,
+      :right    => 2.0,
+    },
+    :string => {
+      :expected => "ab",
+      :left     => "a",
+      :right    => "b",
+    },
+    :array => {
+      :expected => [0, 1],
+      :left     => [0],
+      :right    => [1],
+    },
+    :hash => {
+      :expected => [0, 1],
+      :left     => [0],
+      :right    => [1],
+    },
+  )
+  def test_sum(data)
+    reduced = reduce_value({ "type" => "sum" },
+                           data[:left],
+                           data[:right])
+    assert_equal(data[:expected], reduced)
+  end
 
-    data(
-      :int => {
-        :expected => 1.5,
-        :left     => 1,
-        :right    => 2,
-      },
-      :float => {
-        :expected => 1.5,
-        :left     => 1.0,
-        :right    => 2.0,
-      },
-    )
-    def test_average(data)
-      reduced = reduce_value({ "type" => "average" },
-                             data[:left],
-                             data[:right])
-      assert_equal(data[:expected], reduced)
-    end
+  data(
+    :int => {
+      :expected => 1.5,
+      :left     => 1,
+      :right    => 2,
+    },
+    :float => {
+      :expected => 1.5,
+      :left     => 1.0,
+      :right    => 2.0,
+    },
+  )
+  def test_average(data)
+    reduced = reduce_value({ "type" => "average" },
+                           data[:left],
+                           data[:right])
+    assert_equal(data[:expected], reduced)
+  end
 
-    data(
-      :true_and_false => {
-        :expected => false,
-        :left     => true,
-        :right    => false,
-      },
-      :false_and_true => {
-        :expected => false,
-        :left     => false,
-        :right    => true,
-      },
-      :both_true => {
-        :expected => true,
-        :left     => true,
-        :right    => true,
-      },
-      :both_false => {
-        :expected => false,
-        :left     => false,
-        :right    => false,
-      },
-    )
-    def test_and(data)
-      reduced = reduce_value({ "type" => "and" },
-                             data[:left],
-                             data[:right])
-      assert_equal(data[:expected], reduced)
-    end
+  data(
+    :true_and_false => {
+      :expected => false,
+      :left     => true,
+      :right    => false,
+    },
+    :false_and_true => {
+      :expected => false,
+      :left     => false,
+      :right    => true,
+    },
+    :both_true => {
+      :expected => true,
+      :left     => true,
+      :right    => true,
+    },
+    :both_false => {
+      :expected => false,
+      :left     => false,
+      :right    => false,
+    },
+  )
+  def test_and(data)
+    reduced = reduce_value({ "type" => "and" },
+                           data[:left],
+                           data[:right])
+    assert_equal(data[:expected], reduced)
+  end
 
-    data(
-      :true_and_false => {
-        :expected => true,
-        :left     => true,
-        :right    => false,
-      },
-      :false_and_true => {
-        :expected => true,
-        :left     => false,
-        :right    => true,
-      },
-      :both_true => {
-        :expected => true,
-        :left     => true,
-        :right    => true,
-      },
-      :both_false => {
-        :expected => false,
-        :left     => false,
-        :right    => false,
-      },
-    )
-    def test_or(data)
-      reduced = reduce_value({ "type" => "or" },
-                             data[:left],
-                             data[:right])
-      assert_equal(data[:expected], reduced)
-    end
+  data(
+    :true_and_false => {
+      :expected => true,
+      :left     => true,
+      :right    => false,
+    },
+    :false_and_true => {
+      :expected => true,
+      :left     => false,
+      :right    => true,
+    },
+    :both_true => {
+      :expected => true,
+      :left     => true,
+      :right    => true,
+    },
+    :both_false => {
+      :expected => false,
+      :left     => false,
+      :right    => false,
+    },
+  )
+  def test_or(data)
+    reduced = reduce_value({ "type" => "or" },
+                           data[:left],
+                           data[:right])
+    assert_equal(data[:expected], reduced)
+  end
 
   class ReduceRecords < self
     data(
