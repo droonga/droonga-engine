@@ -41,7 +41,7 @@ module Droonga
       @unpacker = MessagePack::Unpacker.new
 
       @target = node_name
-      @serf = Serf.new(ENV["DROONGA_ENGINE_NAME"])
+      @serf = Serf.new(ENV["DROONGA_ENGINE_NAME"] || node_name)
 
       dirname = node_name.gsub("/", ":")
       @data_directory = Path.intentional_buffer + dirname
