@@ -21,17 +21,16 @@ class ReducerTest < Test::Unit::TestCase
     columns
   end
 
+  def reduce_value(deal, left_value, right_value)
+    reducer = Droonga::Reducer.new(deal)
+    reducer.reduce(left_value, right_value)
+  end
+
   class << self
     def create_record(*columns)
       columns
     end
   end
-
-  class ReduceRecordsTest < self
-    def reduce_value(deal, left_value, right_value)
-      reducer = Droonga::Reducer.new(deal)
-      reducer.reduce(left_value, right_value)
-    end
 
     data(
       :int => {
@@ -110,6 +109,7 @@ class ReducerTest < Test::Unit::TestCase
       assert_equal(data[:expected], reduced)
     end
 
+  class ReduceRecords < self
     data(
       :numeric_values => {
         :expected => 3,
@@ -295,12 +295,7 @@ class ReducerTest < Test::Unit::TestCase
     end
   end
 
-  class MergeRecordsTest < self
-    def reduce_value(deal, left_value, right_value)
-      reducer = Droonga::Reducer.new(deal)
-      reducer.reduce(left_value, right_value)
-    end
-
+  class MergeRecords < self
     def test_grouped
       expected = [
         [
