@@ -62,6 +62,24 @@ class EngineNodeTest < Test::Unit::TestCase
                       :state => state).live?)
   end
 
+  data(:valid => {
+         :state => {
+           "live" => true,
+           "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+         },
+         :expected => {
+           "name"   => "node29:2929/droonga",
+           "live"   => true,
+           "role"   => Droonga::NodeRole::SERVICE_PROVIDER,
+           "status" => "active",
+         },
+       })
+  def test_to_json(data)
+    json = node(:name => "node29:2929/droonga",
+                :state => data[:state]).to_json
+    assert_equal(data[:expected], json)
+  end
+
   class FromServiceProvider < self
     class EngineNode < Droonga::EngineNode
       private
