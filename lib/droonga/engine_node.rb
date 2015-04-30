@@ -181,17 +181,6 @@ module Droonga
     end
 
     private
-    def parse_node_name(name)
-      unless name =~ /\A(.*):(\d+)\/([^.]+)\z/
-        raise "name format: hostname:port/tag"
-      end
-      {
-        :host => $1,
-        :port => $2,
-        :tag  => $3,
-      }
-    end
-
     def have_unprocessed_messages?
       @state and @state["have_unprocessed_messages"]
     end
@@ -249,14 +238,14 @@ module Droonga
       command = destination["type"]
       receiver = destination["to"]
       arguments = destination["arguments"]
-      parsed_receiver = parse_node_name(receiver)
+      parsed_receiver = NodeName.parse(receiver)
 
       override_message = {
         "type" => command,
       }
       override_message["arguments"] = arguments if arguments
       message = message.merge(override_message)
-      output_tag = "#{parsed_receiver[:tag]}.message"
+      output_tag = "#{parsed_receiver.tag}.message"
       log_info = "<#{receiver}>:<#{output_tag}>"
       logger.trace("forward: start: #{log_info}")
       sender.send(output_tag, message)
