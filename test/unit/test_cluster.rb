@@ -25,8 +25,25 @@ class ClusterTest < Test::Unit::TestCase
     end
   end
 
-  class SilentEngineNode < Droonga::EngineNode
+  class StubEngineNode < Droonga::EngineNode
+    attr_reader :forwarded_messages, :bounced_messages
+
+    def initialize(params)
+      @forwarded_messages = []
+      @bounced_messages = []
+      super
+    end
+
     def resume
+    end
+
+    def forward(message, destination)
+      @forwarded_messages << {:message     => message,
+                              :destination => destination}
+    end
+
+    def bounce(message)
+      @bounced_messages << message
     end
 
     private
@@ -43,9 +60,13 @@ class ClusterTest < Test::Unit::TestCase
     def reload
     end
 
+    def start
+      engine_nodes # instantiate it
+    end
+
     private
     def create_engine_node(params)
-      SilentEngineNode.new(params)
+      StubEngineNode.new(params)
     end
   end
 
@@ -61,9 +82,9 @@ class ClusterTest < Test::Unit::TestCase
                                "node30:2929/droonga",
                              ])
     assert_equal([
-                   {:class => SilentEngineNode,
+                   {:class => StubEngineNode,
                     :name  => "node29:2929/droonga"},
-                   {:class => SilentEngineNode,
+                   {:class => StubEngineNode,
                     :name  => "node30:2929/droonga"},
                  ],
                  cluster.engine_nodes.collect do |node|
@@ -144,8 +165,68 @@ class ClusterTest < Test::Unit::TestCase
   end
 
   def test_forward
+    cluster = create_cluster(:state => {
+                               "node29:2929/droonga" => {
+                                 "live" => true,
+                                 "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+                               },
+                               "node30:2929/droonga" => {
+                                 "live" => true,
+                                 "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+                               },
+                             },
+                             :all_nodes => [
+                               "node29:2929/droonga",
+                               "node30:2929/droonga",
+                             ])
+    cluster.start
+    cluster.forward({"id" => 1},
+                    {"to" => "node29:2929/droonga"})
+    assert_equal([
+                   {:name      => "node29:2929/droonga",
+                    :forwarded => [
+                      {:message     => {"id" => 1},
+                       :destination => {"to" => "node29:2929/droonga"}}
+                    ]},
+                   {:name      => "node30:2929/droonga",
+                    :forwarded => []}
+                 ],
+                 cluster.engine_nodes.collect do |node|
+                   {:name      => node.name,
+                    :forwarded => node.forwarded_messages}
+                 end)
   end
 
   def test_bounce
+    cluster = create_cluster(:state => {
+                               "node29:2929/droonga" => {
+                                 "live" => true,
+                                 "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+                               },
+                               "node30:2929/droonga" => {
+                                 "live" => true,
+                                 "role" => Droonga::NodeRole::ABSORB_SOURCE,
+                               },
+                             },
+                             :all_nodes => [
+                               "node29:2929/droonga",
+                               "node30:2929/droonga",
+                             ])
+    cluster.start
+    cluster.bounce({"id" => 1,
+                    "targetRole" => Droonga::NodeRole::ABSORB_SOURCE})
+    assert_equal([
+                   {:name    => "node29:2929/droonga",
+                    :bounced => []},
+                   {:name    => "node30:2929/droonga",
+                    :bounced => [
+                      {"id" => 1,
+                       "targetRole" => Droonga::NodeRole::ABSORB_SOURCE},
+                    ]}
+                 ],
+                 cluster.engine_nodes.collect do |node|
+                   {:name    => node.name,
+                    :bounced => node.bounced_messages}
+                 end)
   end
 end
