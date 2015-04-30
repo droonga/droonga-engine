@@ -44,10 +44,8 @@ module Droonga
       @internal_connection_lifetime = params[:internal_connection_lifetime]
       @sessions = {}
       @current_id = 0
-      @forwarder = Forwarder.new(@loop,
-                                 :auto_close_timeout =>
-                                   @internal_connection_lifetime)
-      @replier = Replier.new(@forwarder)
+      @forwarder = create_forwarder
+      @replier = create_replier
       @on_finish = nil
       @catalog = params[:catalog]
     end
@@ -154,6 +152,16 @@ module Droonga
     end
 
     private
+    def create_forwarder
+      Forwarder.new(@loop,
+                    :auto_close_timeout =>
+                      @internal_connection_lifetime)
+    end
+
+    def create_replier
+      Replier.new(@forwarder)
+    end
+
     def log_tag
       "engine_state"
     end
