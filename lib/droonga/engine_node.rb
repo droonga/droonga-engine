@@ -30,7 +30,7 @@ module Droonga
 
     attr_reader :name
 
-    def initialize(params={})
+    def initialize(params)
       @loop  = params[:loop]
       @name  = params[:name]
       @state = params[:state]
