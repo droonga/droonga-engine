@@ -41,6 +41,7 @@ module Droonga
       @unpacker = MessagePack::Unpacker.new
 
       @target = node_name
+      @process_messages_newer_than_timestamp = nil
     end
 
     def add(message, destination)
