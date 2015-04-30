@@ -54,9 +54,9 @@ class ReducerTest < Test::Unit::TestCase
       :right    => [1],
     },
     :hash => {
-      :expected => [0, 1],
-      :left     => [0],
-      :right    => [1],
+      :expected => {:a => 0, :b => 1, :c => 2},
+      :left     => {:a => 0, :c => 2},
+      :right    => {:b => 1, :c => 3},
     },
   )
   def test_sum(data)
