@@ -41,13 +41,14 @@ module Droonga
       @internal_name = internal_name
       @loop = loop
       @catalog = load_catalog
-      @state = EngineState.new(loop, name,
-                               internal_name,
-                               :catalog  => @catalog,
+      @state = EngineState.new(:loop          => loop,
+                               :name          => name,
+                               :internal_name => internal_name,
+                               :catalog       => @catalog,
                                :internal_connection_lifetime =>
                                  options[:internal_connection_lifetime])
-      @cluster = Cluster.new(:loop     => loop,
-                             :catalog  => @catalog,
+      @cluster = Cluster.new(:loop    => loop,
+                             :catalog => @catalog,
                              :internal_connection_lifetime =>
                                options[:internal_connection_lifetime])
 

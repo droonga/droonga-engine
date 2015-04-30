@@ -37,10 +37,10 @@ module Droonga
     attr_accessor :catalog
     attr_accessor :on_finish
 
-    def initialize(loop, name, internal_name, params)
-      @loop = loop
-      @name = name
-      @internal_name = internal_name
+    def initialize(params)
+      @loop = params[:loop]
+      @name = params[:name]
+      @internal_name = params[:internal_name]
       @internal_connection_lifetime = params[:internal_connection_lifetime]
       @sessions = {}
       @current_id = 0
