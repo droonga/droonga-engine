@@ -30,10 +30,10 @@ module Droonga
 
     attr_reader :name
 
-    def initialize(loop, name, state, options={})
-      @loop = loop
-      @name  = name
-      @state = state
+    def initialize(params={})
+      @loop  = params[:loop]
+      @name  = params[:name]
+      @state = params[:state]
       logger.trace("initialize: start")
 
       @buffer = ForwardBuffer.new(name)
@@ -47,7 +47,7 @@ module Droonga
 
       @sender = nil
       @auto_close_timer = nil
-      @auto_close_timeout = options[:auto_close_timeout] ||
+      @auto_close_timeout = params[:auto_close_timeout] ||
                               DEFAULT_AUTO_CLOSE_TIMEOUT_SECONDS
 
       logger.trace("initialize: done")

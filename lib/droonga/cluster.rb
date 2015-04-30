@@ -222,9 +222,9 @@ module Droonga
     def create_engine_nodes
       all_node_names.collect do |name|
         node_state = @state[name] || {}
-        EngineNode.new(@loop,
-                       name,
-                       node_state,
+        EngineNode.new(:loop  => @loop,
+                       :name  => name,
+                       :state => node_state,
                        :auto_close_timeout =>
                          @params[:internal_connection_lifetime])
       end
