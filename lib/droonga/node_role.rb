@@ -26,6 +26,8 @@ module Droonga
 
     ANY = "any".downcase
 
+    #XXX ANY is not a valid role for a node. It is used
+    #    just for checking acceptability of messages.
     ROLES = [
       SERVICE_PROVIDER,
       ABSORB_SOURCE,
