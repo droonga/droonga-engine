@@ -125,7 +125,7 @@ module Droonga
 
     def forwardable?
       return false unless live?
-      role == NodeRole.mine
+      role == sender_role
     end
 
     def readable?
@@ -134,7 +134,7 @@ module Droonga
     end
 
     def writable?
-      case NodeRole.mine
+      case sender_role
       when NodeRole::SERVICE_PROVIDER
         true
       when NodeRole::ABSORB_SOURCE
@@ -182,6 +182,10 @@ module Droonga
     end
 
     private
+    def sender_role
+      NodeRole.mine
+    end
+
     def have_unprocessed_messages?
       @state and @state["have_unprocessed_messages"]
     end
@@ -217,7 +221,7 @@ module Droonga
 
     def really_writable?
       return false unless writable?
-      case NodeRole.mine
+      case sender_role
       when NodeRole::SERVICE_PROVIDER
         service_provider?
       when NodeRole::ABSORB_SOURCE
