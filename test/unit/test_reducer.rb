@@ -27,7 +27,7 @@ class ReducerTest < Test::Unit::TestCase
     end
   end
 
-  class ReducerTest < self
+  class ReduceRecordsTest < self
     def reduce_value(deal, left_value, right_value)
       reducer = Droonga::Reducer.new(deal)
       reducer.reduce(left_value, right_value)
@@ -295,7 +295,7 @@ class ReducerTest < Test::Unit::TestCase
     end
   end
 
-  class MergeTest < self
+  class MergeRecordsTest < self
     def reduce_value(deal, left_value, right_value)
       reducer = Droonga::Reducer.new(deal)
       reducer.reduce(left_value, right_value)
