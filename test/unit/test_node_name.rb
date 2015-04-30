@@ -22,6 +22,23 @@ class NodeNameTest < Test::Unit::TestCase
                           :tag  => tag)
   end
 
+  class ValidationTest < self
+    data(:ip_address => "192.168.0.1:2929/droonga",
+         :host_name  => "node29:2929/droonga")
+    def test_valid(input)
+      assert_true(Droonga::NodeName.valid?(input))
+    end
+
+    data(:no_host => ":2929/droonga",
+         :no_port => "192.168.0.1/droonga",
+         :no_tag  => "192.168.0.1:2929",
+         :blank   => "",
+         :nil     => nil)
+    def test_invalid(input)
+      assert_false(Droonga::NodeName.valid?(input))
+    end
+  end
+
   class ParseTest < self
     def parse(string)
       Droonga::NodeName.parse(string)
