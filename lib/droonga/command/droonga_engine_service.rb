@@ -157,8 +157,11 @@ module Droonga
       end
 
       def run_engine
-        @engine = Engine.new(@loop, @engine_name, @internal_engine_name,
-                             :internal_connection_lifetime => @internal_connection_lifetime)
+        @engine = Engine.new(:loop          => @loop,
+                             :name          => @engine_name,
+                             :internal_name => @internal_engine_name,
+                             :internal_connection_lifetime =>
+                               @internal_connection_lifetime)
         @engine.on_ready = lambda do
           @worker_process_agent.ready
         end
