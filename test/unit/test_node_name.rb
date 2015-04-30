@@ -44,9 +44,21 @@ class NodeNameTest < Test::Unit::TestCase
       Droonga::NodeName.parse(string)
     end
 
-    def test_valid_string
-      assert_equal(node_name("192.168.0.1", 2929, "droonga"),
-                   parse("192.168.0.1:2929/droonga"))
+    data(:ip_address => {
+           :input => "192.168.0.1:2929/droonga",
+           :host  => "192.168.0.1",
+           :port  => 2929,
+           :tag   => "droonga",
+         },
+         :host_name => {
+           :input => "node29:2929/droonga",
+           :host  => "node29",
+           :port  => 2929,
+           :tag   => "droonga",
+         })
+    def test_valid_string(data)
+      assert_equal(node_name(data[:host], data[:port], data[:tag]),
+                   parse(data[:input]))
     end
 
     def test_instance
