@@ -17,6 +17,7 @@ require "English"
 
 require "droonga/loggable"
 require "droonga/deferrable"
+require "droonga/address"
 require "droonga/event_loop"
 require "droonga/forwarder"
 require "droonga/replier"
@@ -66,52 +67,48 @@ module Droonga
       route.start_with?(@name) or route.start_with?(@internal_name)
     end
 
-    FARM_PATH_MATCHER = /\A[^:]+:\d+\/[^.]+/
-
     def internal_route(route)
-      if FARM_PATH_MATCHER =~ route
-        name = $MATCH
-        if name == @name or name == @internal_name
-          return route.sub(name, @internal_name)
-        end
+      name = Address.parse(route).node
+      if name == @name
+        route.sub(name, @internal_name)
+      else
+        route
       end
+    rescue ArgumentError
       route
     end
 
     def public_route(route)
-      if FARM_PATH_MATCHER =~ route
-        name = $MATCH
-        if name == @internal_name
-          return route.sub(name, @name)
-        end
+      name = Address.parse(route).node
+      if name == @internal_name
+        route.sub(name, @name)
+      else
+        route
       end
+    rescue ArgumentError
       route
     end
 
     def internal_farm_path(route)
-      if FARM_PATH_MATCHER =~ route
-        name = $MATCH
-        if name == @name or name == @internal_name
-          @internal_name
-        else
-          name
-        end
+      name = Address.parse(route).node
+      if name == @name
+        @internal_name
       else
-        route
+        name
       end
+    rescue ArgumentError
+      route
     end
 
     def public_farm_path(route)
-      if FARM_PATH_MATCHER =~ route
-        name = $MATCH
-        if name == @internal_name
-          @name
-        else
-          name
-        end
+      name = Address.parse(route).node
+      if name == @internal_name
+        @name
       else
-        route
+        name
       end
+    rescue ArgumentError
+      route
     end
 
     def generate_id
