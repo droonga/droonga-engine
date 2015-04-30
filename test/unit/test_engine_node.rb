@@ -398,4 +398,159 @@ class EngineNodeTest < Test::Unit::TestCase
                                   :state => data[:state]).status)
     end
   end
+
+  class FromAbsorbDestination < self
+    class BufferedEngineNode < Buffered
+      private
+      def sender_role
+        Droonga::NodeRole::ABSORB_DESTINATION
+      end
+    end
+
+    class NotBufferedEngineNode < NotBuffered
+      private
+      def sender_role
+        Droonga::NodeRole::ABSORB_DESTINATION
+      end
+    end
+
+    class EngineNode < NotBufferedEngineNode
+    end
+
+    data(:same_role => {
+           "live" => true,
+           "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+         })
+    def test_forwardable(state)
+      assert_true(EngineNode.new(:name => "node29:2929/droonga",
+                                 :state => state).forwardable?)
+    end
+
+    data(:dead => {
+           "live" => false,
+           "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+         },
+         :to_service_provider => {
+           "live" => true,
+           "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+         },
+         :to_absorb_source => {
+           "live" => true,
+           "role" => Droonga::NodeRole::ABSORB_SOURCE,
+         })
+    def test_not_forwardable(state)
+      assert_false(EngineNode.new(:name => "node29:2929/droonga",
+                                  :state => state).forwardable?)
+    end
+
+    data(:same_role_with_no_unprocessed_message => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+           },
+           :class => NotBufferedEngineNode,
+         },
+         :have_unprocessed_message_in_other_node => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+             "have_unprocessed_messages" => true,
+           },
+           :class => NotBufferedEngineNode,
+         })
+    def test_readable(data)
+      assert_true(data[:class].new(:name => "node29:2929/droonga",
+                                   :state => data[:state]).readable?)
+    end
+
+    data(:dead => {
+           :state => {
+             "live" => false,
+             "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+           },
+           :class => NotBufferedEngineNode,
+         },
+         :have_unprocessed_message => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+           },
+           :class => BufferedEngineNode,
+         },
+         :to_service_provider => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+           },
+           :class => NotBufferedEngineNode,
+         },
+         :to_absorb_source => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::ABSORB_SOURCE,
+           },
+           :class => NotBufferedEngineNode,
+         })
+    def test_not_readable(data)
+      assert_false(data[:class].new(:name => "node29:2929/droonga",
+                                    :state => data[:state]).readable?)
+    end
+
+    data(:same_role => {
+           "live" => true,
+           "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+         },
+         :to_dead => {
+           "live" => false,
+           "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+         },
+         :to_node_have_unprocessed_message => {
+           "live" => true,
+           "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+           "have_unprocessed_messages" => true,
+         })
+    def test_writable(state)
+      assert_true(EngineNode.new(:name => "node29:2929/droonga",
+                                 :state => state).writable?)
+    end
+
+    data(:to_service_provider => {
+           "live" => true,
+           "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+         },
+         :to_absorb_source => {
+           "live" => true,
+           "role" => Droonga::NodeRole::ABSORB_SOURCE,
+         })
+    def test_not_writable(state)
+      assert_false(EngineNode.new(:name => "node29:2929/droonga",
+                                  :state => state).writable?)
+    end
+
+    data(:dead => {
+           :state => {
+             "live" => false,
+           },
+           :expected => "dead",
+         },
+         :readable => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::ABSORB_DESTINATION,
+           },
+           :expected => "active",
+         },
+         :not_readable_but_writable => {
+           :state => {
+             "live" => true,
+             "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+           },
+           :expected => "inactive",
+         })
+    def test_status(data)
+      assert_equal(data[:expected],
+                   EngineNode.new(:name => "node29:2929/droonga",
+                                  :state => data[:state]).status)
+    end
+  end
 end
