@@ -104,4 +104,37 @@ class ClusterTest < Test::Unit::TestCase
                  },
                  cluster.engine_nodes_status)
   end
+
+  def test_readable_nodes
+    cluster = create_cluster(:state => {
+                               "node29:2929/droonga" => {
+                                 "live" => true,
+                                 "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+                               },
+                               "node30:2929/droonga" => {
+                                 "live" => false,
+                                 "role" => Droonga::NodeRole::SERVICE_PROVIDER,
+                               },
+                             },
+                             :all_nodes => [
+                               "node29:2929/droonga",
+                               "node30:2929/droonga",
+                             ])
+    assert_equal([
+                   "node29:2929/droonga",
+                 ],
+                 cluster.readable_nodes)
+  end
+
+  def test_writable_nodes
+    cluster = create_cluster(:all_nodes => [
+                               "node29:2929/droonga",
+                               "node30:2929/droonga",
+                             ])
+    assert_equal([
+                   "node29:2929/droonga",
+                   "node30:2929/droonga",
+                 ],
+                 cluster.writable_nodes)
+  end
 end
