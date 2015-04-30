@@ -61,10 +61,15 @@ class ClusterTest < Test::Unit::TestCase
                                "node30:2929/droonga",
                              ])
     assert_equal([
-                   SilentEngineNode,
-                   SilentEngineNode,
+                   {:class => SilentEngineNode,
+                    :name  => "node29:2929/droonga"},
+                   {:class => SilentEngineNode,
+                    :name  => "node30:2929/droonga"},
                  ],
-                 cluster.engine_nodes.collect(&:class))
+                 cluster.engine_nodes.collect do |node|
+                   {:class => node.class,
+                    :name  => node.name}
+                 end)
   end
 
   def test_engine_node_names
@@ -136,5 +141,11 @@ class ClusterTest < Test::Unit::TestCase
                    "node30:2929/droonga",
                  ],
                  cluster.writable_nodes)
+  end
+
+  def test_forward
+  end
+
+  def test_bounce
   end
 end
