@@ -23,7 +23,7 @@ module Droonga
       def run
         parse_options do |option|
           option.on(:role=,
-                    "New role for the target node.",
+                    "New role for the engine node.",
                     :required => true)
         end
 
