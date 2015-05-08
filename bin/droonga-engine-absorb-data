@@ -83,46 +83,46 @@ module Droonga
       parser.version = Engine::VERSION
 
       parser.separator("")
-      parser.separator("Destination node:")
+      parser.separator("Destination:")
       parser.on("--host=HOST",
-                "Host name of the destination node.") do |host|
+                "Host name of the destination engine node to copy data.") do |host|
         options.host = host
       end
       parser.on("--port=PORT", Integer,
-                "Port number of the destination node.",
+                "Port number to communicate with the destination engine node.",
                 "(#{options.port})") do |port|
         options.port = port
       end
       parser.on("--tag=TAG", Integer,
-                "Tag name of the destination node.",
+                "Tag name to communicate with the destination engine node.",
                 "(#{options.tag})") do |tag|
         options.tag = tag
       end
       parser.on("--dataset=DATASET",
-                "Name of the destination dataset.",
+                "Name of the destination dataset for copying data.",
                 "(#{options.dataset})") do |dataset|
         options.dataset = dataset
       end
 
       parser.separator("")
-      parser.separator("Source node:")
+      parser.separator("Source:")
       parser.on("--source-host=HOST",
-                "Host name of the source node.",
+                "Host name of the soruce engine node to copy data.",
                 "(#{options.source_host})") do |host|
         options.source_host = host
       end
       parser.on("--source-port=PORT", Integer,
-                "Port number of the source node.",
+                "Port number to communicate with the soruce engine node.",
                 "(#{options.source_port})") do |host|
         options.source_host = host
       end
       parser.on("--source-tag=TAG",
-                "Tag name of the source node.",
+                "Tag name to communicate with the soruce engine node.",
                 "(#{options.source_tag})") do |tag|
         options.source_tag = tag
       end
       parser.on("--source-dataset=DATASET",
-                "Name of the source dataset.",
+                "Name of the soruce dataset for copying data.",
                 "(#{options.source_dataset})") do |dataset|
         options.source_dataset = dataset
       end
@@ -130,7 +130,7 @@ module Droonga
       parser.separator("")
       parser.separator("Connection:")
       parser.on("--receiver-host=HOST",
-                "Host name of this computer.",
+                "Host name of the computer you are running this command.",
                 "(#{options.receiver_host})") do |host|
         options.receiver_host = host
       end
@@ -138,18 +138,18 @@ module Droonga
       parser.separator("")
       parser.separator("Miscellaneous:")
       parser.on("--records-per-second=N", Integer,
-                "Maximum number of records per second to be absorbed.",
+                "Maximum number of records to be copied per one second.",
                 "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
                 "(#{options.messages_per_second})") do |n|
         options.messages_per_second = n
       end
       parser.on("--progress-interval-seconds=N", Integer,
-                "Interval seconds to report progress.",
+                "Interval seconds to report progress of data copying.",
                 "(#{options.progress_interval_seconds})") do |n|
         options.progress_interval_seconds = n
       end
       parser.on("--[no-]verbose",
-                "Output details for internal operations.",
+                "Output details for internal operations or not.",
                 "(#{options.verbose})") do |verbose|
         options.verbose = verbose
       end

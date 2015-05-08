@@ -92,7 +92,7 @@ module Droonga
     private
     def parse_options
       options = Slop.parse(:help => true) do |option|
-        option.on("no-copy", "Don't copy data from the source cluster.",
+        option.on("no-copy", "Don't copy data from the source node.",
                   :default => false)
 
         option.separator("Target:")
@@ -100,33 +100,33 @@ module Droonga
                   "Host name of the new node to be joined.",
                   :required => true)
         option.on("replica-source-host=",
-                  "Host name of the soruce node in the cluster to be connected.",
+                  "Host name of the soruce node in the cluster to join.",
                   :required => true)
 
         option.on(:port=,
-                  "Port number of the source cluster to be connected.",
+                  "Port number to communicate with engine nodes.",
                   :as => Integer,
                   :default => NodeName::DEFAULT_PORT)
         option.on(:tag=,
-                  "Tag name of the soruce cluster to be connected.",
+                  "Tag name to communicate with engine nodes.",
                   :default => NodeName::DEFAULT_TAG)
         option.on(:dataset=,
-                  "Dataset name of for the node to be joined.",
+                  "Dataset name the node is going to join as a replica in.",
                   :default => Catalog::Dataset::DEFAULT_NAME)
 
         option.separator("Connections:")
         option.on("receiver-host=",
-                  "Host name of this host.",
+                  "Host name of the computer you are running this command.",
                   :default => Socket.gethostname)
 
         option.separator("Miscellaneous:")
         option.on("records-per-second=",
-                  "Maximum number of records per second to be copied. " +
+                  "Maximum number of records to be copied per one second. " +
                     "'#{Client::RateLimiter::NO_LIMIT}' means no limit.",
                   :as => Integer,
                   :default => DataAbsorberClient::DEFAULT_MESSAGES_PER_SECOND)
         option.on("progress-interval-seconds=",
-                  "Interval seconds to report progress.",
+                  "Interval seconds to report progress of data copying.",
                   :as => Integer,
                   :default => DataAbsorberClient::DEFAULT_PROGRESS_INTERVAL_SECONDS)
         option.on(:verbose, "Output details for internal operations.",

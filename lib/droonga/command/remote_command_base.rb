@@ -31,14 +31,14 @@ module Droonga
 
           option.separator("Connections:")
           option.on(:host=,
-                    "Host name of the target node.",
+                    "Host name of the node to be operated.",
                     :required => true)
           option.on(:port=,
-                    "Port number of the source cluster to be connected.",
+                    "Port number to communicate with the engine node.",
                     :as => Integer,
                     :default => NodeName::DEFAULT_PORT)
           option.on(:tag=,
-                    "Tag name of the soruce cluster to be connected.",
+                    "Tag name to communicate with the engine node.",
                     :default => NodeName::DEFAULT_TAG)
 
           option.separator("Miscellaneous:")

@@ -31,10 +31,10 @@ module Droonga
       def run
         parse_options do |option|
           option.on("receiver-host=",
-                    "Host name of this host.",
+                    "Host name of the computer you are running this command.",
                     :default => Socket.gethostname)
           option.on(:dataset=,
-                    "Dataset name of for the node to be unjoined.",
+                    "Dataset name the node is going to be removed from.",
                     :default => Catalog::Dataset::DEFAULT_NAME)
         end
 
