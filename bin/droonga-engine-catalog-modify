@@ -46,14 +46,15 @@ end
 parser = OptionParser.new
 parser.version = Droonga::Engine::VERSION
 parser.on("--source=PATH",
-          "Path to an existing catalog.json.",
+          "The path to the catalog.json to be modified.",
           "\"-\" means the standard input.",
           "(#{options.source_path})") do |path|
   options.source_path = path
 end
 parser.on("--output=PATH",
-          "Output catalog.json to PATH.",
+          "The output path of modified catalog.json to be saved as.",
           "\"-\" means the standard output.",
+          "Any existing file at the specified path will be overwritten without confirmation.",
           "(#{options.output_path})") do |path|
   options.output_path = path
 end
@@ -63,21 +64,26 @@ parser.on("--[no-]update",
   options.update = update
 end
 parser.on("--dataset=NAME",
-          "Add a dataset its name is NAME.",
-          "And set the NAME to the current dataset.",
+          "The name of an existing dataset to be modified.",
+          "This can be specified multiple times to modify multiple datasets.",
           "(#{Droonga::Catalog::Generator::DEFAULT_DATASET})") do |name|
   current_dataset = datasets[name] = {}
 end
 parser.on("--replica-hosts=NAME1,NAME2,...", Array,
-          "Use given hosts as replicas for the current dataset.") do |hosts|
+          "Host names of engine nodes to be used as replicas in the dataset ",
+          "specified by the preceding --dataset option.",
+          "If you specify this option, all existing replica nodes ",
+          "defined in the dataset are replaced.") do |hosts|
   current_dataset[:replica_hosts] = hosts
 end
 parser.on("--add-replica-hosts=NAME1,NAME2,...", Array,
-          "Use given hosts to be added as replicas to the current dataset.") do |hosts|
+          "Host names of engine nodes to be added to the cluster as replicas, ",
+          "in the dataset specified by the preceding --dataset option.") do |hosts|
   current_dataset[:add_replica_hosts] = hosts
 end
 parser.on("--remove-replica-hosts=NAME1,NAME2,...", Array,
-          "Use given hosts to be removed as replicas from the current dataset.") do |hosts|
+          "Host names of engine nodes to be removed from the cluster, ",
+          "in the dataset specified by the preceding --dataset option.") do |hosts|
   current_dataset[:remove_replica_hosts] = hosts
 end
 parser.parse!(ARGV)

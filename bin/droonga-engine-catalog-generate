@@ -45,6 +45,7 @@ parser.version = Droonga::Engine::VERSION
 parser.on("--output=PATH",
           "The output path of generated catalog.json to be saved as.",
           "\"-\" means the standard output.",
+          "Any existing file at the specified path will be overwritten without confirmation.",
           "(#{options.output_path})") do |path|
   options.output_path = path
 end
