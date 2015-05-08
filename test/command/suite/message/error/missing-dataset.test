@@ -1,6 +1,9 @@
 #@include fixture/user-table.jsons
+#@disable_completion
 #@disable_validation
 {
+  "id": "1234567890",
+  "date": "2015-05-09T00:00:00.000000Z",
   "type": "add",
   "body": {}
 }
