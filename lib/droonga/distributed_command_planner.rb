@@ -15,8 +15,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "droonga/loggable"
+
 module Droonga
   class DistributedCommandPlanner
+    include Loggable
+
     attr_accessor :key
 
     REDUCE_SUM = "sum"
@@ -38,7 +42,9 @@ module Droonga
     end
 
     def plan
-      unified_reducers + unified_gatherers + [fixed_processor]
+      steps = unified_reducers + unified_gatherers + [fixed_processor]
+      logger.debug("distribution plan", :steps => steps)
+      steps
     end
 
     def reduce(params=nil)
@@ -172,6 +178,10 @@ module Droonga
     #    This must be rewritten. 
     def plan_errors_handling
       reduce("errors"=> REDUCE_SUM)
+    end
+
+    def log_tag
+      "distributed_command_planner"
     end
   end
 end

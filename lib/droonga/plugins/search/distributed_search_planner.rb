@@ -39,9 +39,11 @@ module Droonga
 
           ensure_unifiable!
 
+          logger.debug("from", :queries => @request)
           @queries.each do |input_name, query|
             transform_query(input_name, query)
           end
+          logger.debug("to", :queries => @request)
 
           broadcast(:body => @request)
 
@@ -97,6 +99,10 @@ module Droonga
           output_elements.any? do |element|
             need_reduce_elements.include?(element)
           end
+        end
+
+        def log_tag
+          "distributed_search_planner"
         end
 
         class QueryTransformer
