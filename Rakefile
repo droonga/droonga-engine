@@ -50,6 +50,11 @@ namespace :test do
       run_command_test
     end
 
+    desc "Run command test: single slice"
+    task :single_slice do
+      run_command_test("--config", "single_slice")
+    end
+
     desc "Run command test: version1"
     task :version1 do
       run_command_test("--config", "version1")
@@ -61,6 +66,7 @@ desc "Run test"
 task :test => [
   "test:unit",
   "test:command:default",
+  "test:command:single_slice",
   "test:command:version1",
 ]
 

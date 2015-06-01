@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "effectiveDate": "2014-02-28T00:00:00Z",
+  "datasets": {
+    "Default": {
+      "nWorkers": 2,
+      "plugins": ["groonga", "crud", "search", "dump", "system", "catalog"],
+      "replicas": [
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice000",
+              "weight": 100,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.000"
+              }
+            }
+          ]
+        },
+        {
+          "dimension": "_key",
+          "slicer": "hash",
+          "slices": [
+            {
+              "label": "slice010",
+              "weight": 100,
+              "volume": {
+                "address": "127.0.0.1:23003/droonga.010"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
