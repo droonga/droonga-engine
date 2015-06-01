@@ -256,6 +256,9 @@ module Droonga
             converter = RequestConverter.new
             select_request = input_message.body
             search_request = converter.convert(select_request)
+            logger.debug("Conversion of select:",
+                         :select => select_request,
+                         :search => search_request)
             input_message.type = "search"
             input_message.body = search_request
           end
