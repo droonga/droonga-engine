@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Droonga Project
+# Copyright (C) 2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,6 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "droonga/catalog/generator"
+require "droonga/node_name"
 
 class CatalogGeneratorTest < Test::Unit::TestCase
   def setup
@@ -68,7 +69,7 @@ class CatalogGeneratorTest < Test::Unit::TestCase
             "slices" => [
               {
                 "volume" => {
-                  "address" => "127.0.0.1:10031/droonga.000",
+                  "address" => "#{Droonga::NodeName::DEFAULT_HOST}:10031/droonga.000",
                 },
                 "weight" => 100,
               },
