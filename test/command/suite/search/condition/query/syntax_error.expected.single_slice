@@ -1,0 +1,26 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 400,
+  "type": "search.result",
+  "body": {
+    "name": "SyntaxError",
+    "message": "Syntax error: syntax:<query> input:<(>",
+    "detail": {
+      "syntax": "query",
+      "input": "("
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 400,
+      "body": {
+        "name": "SyntaxError",
+        "message": "Syntax error: syntax:<query> input:<(>",
+        "detail": {
+          "syntax": "query",
+          "input": "("
+        }
+      }
+    }
+  }
+}

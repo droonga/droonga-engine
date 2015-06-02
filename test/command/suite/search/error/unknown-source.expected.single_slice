@@ -1,0 +1,28 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 404,
+  "type": "search.result",
+  "body": {
+    "name": "UnknownSource",
+    "message": "Source not found: <unknown> It must be a name of an existing table or another query.",
+    "detail": {
+      "unknown-source": {
+        "source": "unknown"
+      }
+    }
+  },
+  "errors": {
+    "sources0": {
+      "statusCode": 404,
+      "body": {
+        "name": "UnknownSource",
+        "message": "Source not found: <unknown> It must be a name of an existing table or another query.",
+        "detail": {
+          "unknown-source": {
+            "source": "unknown"
+          }
+        }
+      }
+    }
+  }
+}
