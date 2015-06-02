@@ -444,7 +444,12 @@ module Droonga
         else
           raise '"sortBy" parameter must be a Hash or an Array'
         end
+        if offset >= @records.size
+          # to avoid Groonga::TooLargeOffset error, we have to create a blank result manually.
+          @records = @records.sort(keys, :offset => 0, :limit => 0)
+        else
         @records = @records.sort(keys, :offset => offset, :limit => limit)
+        end
         logger.trace("search_query: sort: done",
                      :by => sort_by)
       end
