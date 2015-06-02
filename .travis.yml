@@ -5,7 +5,7 @@ env:
   - DEFAULT_TEST_TASK=test:unit
   - DEFAULT_TEST_TASK=test:command:default
   - DEFAULT_TEST_TASK=test:command:single_slice
-  - DEFAULT_TEST_TASK=test:command:version1
+#  - DEFAULT_TEST_TASK=test:command:version1
 rvm:
   - 1.9.3
   - 2.0.0
