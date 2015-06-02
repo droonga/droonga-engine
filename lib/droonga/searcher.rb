@@ -439,8 +439,8 @@ module Droonga
           limit = -1
         when Hash
           keys = parse_order_keys(sort_by["keys"])
-          offset = sort_by["offset"]
-          limit = sort_by["limit"]
+          offset = sort_by["offset"] || 0
+          limit = sort_by["limit"] || -1
         else
           raise '"sortBy" parameter must be a Hash or an Array'
         end
@@ -544,9 +544,13 @@ module Droonga
 
     module RecordsFormattable
       def format(output_target_attributes, records, output_limit, output_offset)
+        if output_offset >= records.size
+          # to avoid Groonga::TooLargeOffset error, we have to create a blank result manually.
+          output_offset = output_limit = 0
+        end
         cursor_options = {
           :offset => output_offset,
-          :limit => output_limit
+          :limit  => output_limit,
         }
         formatted_records = nil
         records.open_cursor(cursor_options) do |cursor|
