@@ -160,6 +160,8 @@ module Droonga
             @records_offset = final_offset
             @records_limit = final_limit
 
+            return unless @dataset.sliced?
+
             updated_sort_limit = nil
             updated_output_limit = nil
             if final_limit == UNLIMITED
@@ -180,6 +182,7 @@ module Droonga
           end
 
           def calculate_sort_offset!
+            return unless @dataset.sliced?
             # Offset for workers must be zero, because we have to apply "limit" and
             # "offset" on the last gathering phase instead of each reducing phase.
             if rich_sort?
@@ -212,17 +215,18 @@ module Droonga
           end
 
           def calculate_output_offset!
+            return unless @dataset.sliced?
             @output["offset"] = 0 if have_records? and @output["offset"]
           end
 
           def final_offset
-            return @original_output_offset unless @dataset.sliced?
+            return 0 unless @dataset.sliced?
 
             @original_sort_offset + @original_output_offset
           end
 
           def final_limit
-            return @original_output_limit unless @dataset.sliced?
+            return UNLIMITED unless @dataset.sliced?
 
             if @original_sort_limit == UNLIMITED and
                 @original_output_limit == UNLIMITED
