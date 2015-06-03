@@ -72,7 +72,11 @@ module Droonga
             if count_mapper["no_output"]
               value.delete("count")
             else
+              if count_mapper.is_a?(String)
+                value["count"] = value[mapper]
+              else
               value["count"] = value[count_mapper["target"]].size
+              end
             end
           end
 

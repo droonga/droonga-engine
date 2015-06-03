@@ -266,10 +266,12 @@ module Droonga
                   @query["sortBy"]["limit"] = UNLIMITED
                 end
                 @output["limit"] = UNLIMITED
-              end
               mapper = {
                 "target" => "records",
               }
+              else
+                mapper = "count"
+              end
               unless @output["elements"].include?("records")
                 @records_limit = UNLIMITED if @dataset.sliced?
                 @output["elements"] << "records"
