@@ -1,5 +1,12 @@
 # News
 
+## 1.2.0: 2015-06-29 (planned)
+
+ * General:
+   * `search` command: The `offset` of `sortBy` parameter works correctly even if there is only one slice.
+ * Groonga compatibility:
+   * `select` command: The `offset` parameter works correctly with the `sortby` parameter, even if there is only one slice.
+
 ## 1.1.0: 2015-04-29
 
  * General:
