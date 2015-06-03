@@ -69,14 +69,12 @@ module Droonga
           # I have to apply it at first, before "limit" and "offset" are applied.
           count_mapper = elements["count"]
           if count_mapper
-            if count_mapper["no_output"]
+            if count_mapper.is_a?(String)
+              value["count"] = value[mapper]
+            elsif count_mapper["no_output"]
               value.delete("count")
             else
-              if count_mapper.is_a?(String)
-                value["count"] = value[mapper]
-              else
               value["count"] = value[count_mapper["target"]].size
-              end
             end
           end
 
