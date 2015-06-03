@@ -1,0 +1,117 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "dump.result",
+  "body": {
+    "started": true
+  }
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "nMessages": 7
+  },
+  "type": "dump.forecast"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Tags",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "Hash",
+    "name": "Users",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Memos",
+    "name": "tags",
+    "type": "Vector",
+    "valueType": "Tags",
+    "vectorOptions": {
+      "weight": false
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Memos",
+    "key": "Groonga newbie",
+    "values": {
+      "tags": [
+        "Groonga",
+        "column store"
+      ]
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "Groonga",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Tags",
+    "key": "column store",
+    "values": {
+    }
+  },
+  "type": "dump.record"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.end"
+}

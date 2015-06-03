@@ -1,0 +1,86 @@
+{
+  "inReplyTo": "request-id",
+  "statusCode": 200,
+  "type": "dump.result",
+  "body": {
+    "started": true
+  }
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.start"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "nMessages": 4
+  },
+  "type": "dump.forecast"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "Hash",
+    "name": "Memos",
+    "keyType": "ShortText"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "type": "PatriciaTrie",
+    "name": "Terms",
+    "keyType": "ShortText",
+    "tokenizer": "TokenBigram",
+    "normalizer": "NormalizerAuto"
+  },
+  "type": "dump.table"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Memos",
+    "name": "content",
+    "type": "Scalar",
+    "valueType": "ShortText"
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "body": {
+    "table": "Terms",
+    "name": "Memos__key_content",
+    "type": "Index",
+    "valueType": "Memos",
+    "indexOptions": {
+      "section": true,
+      "weight": true,
+      "position": true,
+      "sources": [
+        "_key",
+        "content"
+      ]
+    }
+  },
+  "type": "dump.column"
+}
+{
+  "inReplyTo": "request-id",
+  "dataset": "Default",
+  "date": "0000-00-00T00:00:00.000000Z",
+  "type": "dump.end"
+}
