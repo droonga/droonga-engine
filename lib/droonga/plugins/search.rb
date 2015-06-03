@@ -70,7 +70,7 @@ module Droonga
           count_mapper = elements["count"]
           if count_mapper
             if count_mapper.is_a?(String)
-              value["count"] = value[mapper]
+              value["count"] = value[count_mapper]
             elsif count_mapper["no_output"]
               value.delete("count")
             else
