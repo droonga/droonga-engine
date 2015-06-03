@@ -266,9 +266,9 @@ module Droonga
                   @query["sortBy"]["limit"] = UNLIMITED
                 end
                 @output["limit"] = UNLIMITED
-              mapper = {
-                "target" => "records",
-              }
+                mapper = {
+                  "target" => "records",
+                }
               else
                 mapper = "count"
               end
