@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Copyright (C) 2013 Droonga Project
+# Copyright (C) 2013-2015 Droonga Project
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -48,4 +48,5 @@ drntest_options.concat(["--droonga-engine-options",
                          "--internal-connection-lifetime=5"].join(" ")])
 drntest_options.concat(ARGV)
 
-run("bundle", "exec", "drntest", *drntest_options)
+run(RbConfig.ruby, "-S", "bundle", "exec",
+    RbConfig.ruby, "-S", "drntest", *drntest_options)
