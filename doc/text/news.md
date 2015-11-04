@@ -1,6 +1,6 @@
 # News
 
-## 1.2.0: 2015-06-29 (planned)
+## 1.1.1: 2015-11-04
 
  * General:
    * `search` command: The `offset` of `sortBy` parameter works correctly even if there is only one slice.
