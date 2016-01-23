@@ -76,17 +76,9 @@ module Droonga
     def installed_as_service?
       return false unless user_exist?
 
-      #TODO: we should support systemd also...
-      succeeded = system("service", "droonga-engine", "status",
-                         :out => "/dev/null",
-                         :err => "/dev/null")
-      return true if succeeded
-
-      #TODO: we should support systemd also...
-      result = `service droonga-engine status`
-      result.include?("running") or \
-        result.include?("droonga-engine is stopped") or \
-        result.include?("droonga-engine dead")
+      system("systemctl", "is-enabled", "droonga-engine.srvice",
+             :out => "/dev/null",
+             :err => "/dev/null")
     end
 
     def ensure_correct_file_permission(file)
@@ -98,24 +90,21 @@ module Droonga
 
     def running?(pid_file_path=nil)
       raise NotInstalledAsService.new unless installed_as_service?
-      #TODO: we should support systemd also...
-      system("service", "droonga-engine", "status",
+      system("systemctl", "is-active", "droonga-engine",
              :out => "/dev/null",
              :err => "/dev/null")
     end
 
     def start
       raise NotInstalledAsService.new unless installed_as_service?
-      #TODO: we should support systemd also...
-      system("service", "droonga-engine", "start",
+      system("systemctl", "start", "droonga-engine",
              :out => "/dev/null",
              :err => "/dev/null")
     end
 
     def stop
       raise NotInstalledAsService.new unless installed_as_service?
-      #TODO: we should support systemd also...
-      system("service", "droonga-engine", "stop",
+      system("systemctl", "stop", "droonga-engine",
              :out => "/dev/null",
              :err => "/dev/null")
     end
