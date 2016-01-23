@@ -76,7 +76,7 @@ module Droonga
     def installed_as_service?
       return false unless user_exist?
 
-      system("systemctl", "is-enabled", "droonga-engine.srvice",
+      system("systemctl", "is-enabled", "droonga-engine.service",
              :out => "/dev/null",
              :err => "/dev/null")
     end
