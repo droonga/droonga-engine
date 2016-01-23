@@ -339,6 +339,7 @@ install() {
 
   echo "Preparing the environment..."
   prepare_environment_in_$PLATFORM
+  gem update --system
 
   echo ""
   if [ "$VERSION" != "release" ]; then
