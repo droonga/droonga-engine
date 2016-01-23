@@ -90,21 +90,21 @@ module Droonga
 
     def running?(pid_file_path=nil)
       raise NotInstalledAsService.new unless installed_as_service?
-      system("systemctl", "is-active", "droonga-engine",
+      system("systemctl", "is-active", "droonga-engine.service",
              :out => "/dev/null",
              :err => "/dev/null")
     end
 
     def start
       raise NotInstalledAsService.new unless installed_as_service?
-      system("systemctl", "start", "droonga-engine",
+      system("systemctl", "start", "droonga-engine.service",
              :out => "/dev/null",
              :err => "/dev/null")
     end
 
     def stop
       raise NotInstalledAsService.new unless installed_as_service?
-      system("systemctl", "stop", "droonga-engine",
+      system("systemctl", "stop", "droonga-engine.service",
              :out => "/dev/null",
              :err => "/dev/null")
     end
