@@ -253,7 +253,17 @@ install_from_repository() {
   install_gem_from_repository $NAME $REPOSITORY_URL
 }
 
+register_service() {
+  local unit=$NAME.service
 
+  curl -s -o /etc/systemd/system/$unit $(download_url "install/$unit")
+  if [ $? -ne 0 ];then
+    echo "ERROR: Failed to download systemd unit file!"
+    exit 1
+  fi
+
+  systemctl enable $unit
+}
 
 # ====================== for Debian/Ubuntu ==========================
 prepare_environment_in_debian() {
