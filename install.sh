@@ -354,11 +354,6 @@ install() {
     exit 1
   fi
 
-  curl -s -o $TEMPDIR/functions.sh $(download_url "install/$PLATFORM/functions.sh")
-  if ! source $TEMPDIR/functions.sh; then
-    echo "ERROR: Failed to download post-installation script!"
-    exit 1
-  fi
   if ! exist_command register_service; then
     echo "ERROR: Downloaded post-installation script is broken!"
     exit 1
