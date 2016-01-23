@@ -354,11 +354,6 @@ install() {
     exit 1
   fi
 
-  if ! exist_command register_service; then
-    echo "ERROR: Downloaded post-installation script is broken!"
-    exit 1
-  fi
-
   prepare_user
 
   setup_configuration_directory
