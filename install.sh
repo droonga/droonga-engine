@@ -340,6 +340,7 @@ install() {
   echo "Preparing the environment..."
   prepare_environment_in_$PLATFORM
   gem update --system
+  gem update --no-document
 
   echo ""
   if [ "$VERSION" != "release" ]; then
@@ -347,7 +348,7 @@ install() {
     install_from_repository
   else
     echo "Installing $NAME from RubyGems..."
-    gem install droonga-engine --no-rdoc --no-ri
+    gem install droonga-engine --no-document
   fi
 
   if ! exist_command droonga-engine; then
