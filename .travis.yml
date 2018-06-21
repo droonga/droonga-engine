@@ -1,17 +1,18 @@
 notifications:
   recipients:
-    - groonga-commit@lists.sourceforge.jp
+    - droonga@ml.commit-email.info
 env:
   - DEFAULT_TEST_TASK=test:unit
   - DEFAULT_TEST_TASK=test:command:default
   - DEFAULT_TEST_TASK=test:command:single_slice
 #  - DEFAULT_TEST_TASK=test:command:version1
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1
   - 2.2
+  - 2.3
+  - 2.4.4
+  - 2.5.1
 #  - ruby-head
+sudo: true
 before_install:
 #  - GROONGA_MASTER=yes curl --silent --location https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
   - curl --silent --location https://raw.github.com/groonga/groonga/master/data/travis/setup.sh | sh
